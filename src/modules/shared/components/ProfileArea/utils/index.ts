@@ -92,3 +92,27 @@ export const useAdherenceEvents = (data: any, programStage: string) => {
 
 	return { filteredEvents };
 };
+
+export const useActualCurrentDate = () => {
+	const [date, setDate] = useState<Date | null>(null);
+	const [error, setError] = useState<any>(null);
+
+	const fetchActualDate = async () => {
+		try {
+			const response = await fetch("http://worldtimeapi.org/api/ip");
+			if (!response.ok) throw new Error("Failed to fetch date");
+			const data = await response.json();
+			setDate(new Date(data.datetime));
+		} catch (error) {
+			console.error("Error fetching actual date:", error);
+			setDate(new Date());
+			setError(error);
+		}
+	};
+
+	useEffect(() => {
+		fetchActualDate();
+	}, []);
+
+	return { date, error };
+};
