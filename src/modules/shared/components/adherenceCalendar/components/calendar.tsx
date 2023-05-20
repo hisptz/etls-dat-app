@@ -18,6 +18,7 @@ export interface DateEvent {
 interface CalendarProps {
 	events: DateEvent[];
 	frequency: "Daily" | "Weekly" | "Monthly" | string;
+	actualDate: Date;
 	onClick: ({
 		date,
 		event,
@@ -25,18 +26,18 @@ interface CalendarProps {
 	}: {
 		date: string;
 		event: string;
-		batteryLevel: string;
+		batteryLevel?: string;
 	}) => void;
 }
 
-function Calendar({ events, frequency, onClick }: CalendarProps) {
+function Calendar({ events, frequency, onClick, actualDate }: CalendarProps) {
 	const cellColors = {
 		enrolled: "blue",
 		takenDose: "green",
 		notTakenDose: "red",
 	};
-	const month = new Date().getMonth();
-	const year = new Date().getFullYear();
+	const month = actualDate.getMonth();
+	const year = actualDate.getFullYear();
 
 	useEffect(() => {
 		let targetDate: string | null = null;
@@ -44,9 +45,9 @@ function Calendar({ events, frequency, onClick }: CalendarProps) {
 
 		switch (frequency) {
 			case "Daily":
-				targetDate = DateTime.fromJSDate(new Date()).toISO();
+				targetDate = DateTime.fromJSDate(actualDate).toISO();
 				targetColor = getCellColor(
-					DateTime.fromJSDate(new Date()).toISODate(),
+					DateTime.fromJSDate(actualDate).toISODate(),
 				)[0];
 				break;
 			case "Weekly":
@@ -62,9 +63,8 @@ function Calendar({ events, frequency, onClick }: CalendarProps) {
 					) {
 						targetColor = cellColors[event.event];
 						if (targetDate === null) {
-							targetDate = DateTime.fromJSDate(
-								new Date(),
-							).toISO();
+							targetDate =
+								DateTime.fromJSDate(actualDate).toISO();
 						}
 					}
 				});
@@ -81,9 +81,8 @@ function Calendar({ events, frequency, onClick }: CalendarProps) {
 							DateTime.fromJSDate(endDateM)
 					) {
 						if (targetDate === null) {
-							targetDate = DateTime.fromJSDate(
-								new Date(),
-							).toISO();
+							targetDate =
+								DateTime.fromJSDate(actualDate).toISO();
 							targetColor = cellColors[event.event];
 						}
 					}
@@ -126,7 +125,11 @@ function Calendar({ events, frequency, onClick }: CalendarProps) {
 		));
 	};
 
-	const showDetails = (date: string, event: string, batteryLevel: string) => {
+	const showDetails = (
+		date: string,
+		event: string,
+		batteryLevel?: string,
+	) => {
 		onClick({ date, event, batteryLevel });
 	};
 
@@ -168,7 +171,7 @@ function Calendar({ events, frequency, onClick }: CalendarProps) {
 					event.event === "takenDose" || event.event === "enrolled",
 			);
 
-			const currentDate = DateTime.now().toJSDate();
+			const currentDate = actualDate;
 
 			if (takenDosePresent) {
 				return filteredEvents.filter(
