@@ -1,6 +1,6 @@
 import {isStubMode} from "@dhis2/cypress-commands";
 
-Cypress.Commands.add("validateUserIsLoggedIn", ({baseUrl, username}: { baseUrl: string; username: string }) => {
+Cypress.Commands.add("validateUserIsLoggedIn", ({baseUrl}: { baseUrl: string; username: string }) => {
 	cy.request(`${baseUrl}/api/me`).then((response) => {
 		expect(response.status).to.eq(200);
 	});
