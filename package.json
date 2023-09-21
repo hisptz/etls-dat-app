@@ -16,7 +16,8 @@
     "_cy:capture": "yarn cypress run --env networkMode=capture",
     "test:capture": "yarn cy:prepare 'yarn _cy:capture'",
     "_cy:stub": "dotenv -- cross-var yarn cypress run --env networkMode=stub",
-    "test": "yarn cy:prepare 'yarn _cy:live'"
+    "test": "yarn cy:prepare 'yarn _cy:live'",
+    "prepare": "husky install"
   },
   "devDependencies": {
     "@badeball/cypress-cucumber-preprocessor": "16.0.3",
@@ -32,6 +33,8 @@
     "dotenv-cli": "^7.3.0",
     "eslint": "^8.49.0",
     "eslint-plugin-react": "^7.33.2",
+    "husky": ">=6",
+    "lint-staged": ">=10",
     "prettier": "3.0.3",
     "start-server-and-test": "^2.0.0",
     "ts-loader": "^9.4.4",
@@ -40,5 +43,9 @@
   "dependencies": {
     "@dhis2/app-runtime": "^3.9.4",
     "@dhis2/ui": "^8.14.4"
+  },
+  "lint-staged": {
+    "*.js": "eslint --cache --fix",
+    "*.{js,css,md}": "prettier --write"
   }
 }

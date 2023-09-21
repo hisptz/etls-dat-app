@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "target": "es5",
+    "lib": [
+      "es2022",
+      "dom"
+    ],
+    "types": [
+      "cypress",
+      "node",
+      "../../../../types",
+      "../node_modules/@types"
+    ]
+  },
+  "include": [
+    "**/*.ts",
+    "../src/types"
+  ]
+}
