@@ -1,0 +1,32 @@
+name: Tests
+
+env:
+  DHIS2_PROXY: '${{vars.DHIS2_PROXY}}'
+on:
+  pull_request:
+    types:
+      - synchronize
+      - opened
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16.20.1
+          cache: yarn
+      - name: Install JS dependencies
+        run: yarn install --frozen-lockfile
+      - name: Run tests
+        run: yarn test
+        env:
+          BROWSER: none
+          DHIS2_PROXY: ${{ vars.DHIS2_PROXY }}
+          CYPRESS_dhis2Username: ${{ secrets.DHIS2_USERNAME }}
+          CYPRESS_dhis2Password: ${{ secrets.DHIS2_PASSWORD }}
+          CYPRESS_dhis2BaseUrl: 'http://localhost:8080'
+
+
