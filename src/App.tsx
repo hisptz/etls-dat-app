@@ -3,7 +3,7 @@ import classes from './App.module.css'
 
 const MyApp = () => (
 		<div className={classes.container}>
-				<h1>DAT Custom app</h1>
+				<h1>DAT Custom App</h1>
 		</div>
 )
 

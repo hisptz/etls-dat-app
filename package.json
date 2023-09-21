@@ -6,18 +6,34 @@
   "private": true,
   "scripts": {
     "build": "d2-app-scripts build",
-    "start": "d2-app-scripts start",
-    "test": "d2-app-scripts test",
-    "deploy": "d2-app-scripts deploy"
+    "start": "dotenv -- cross-var d2-app-scripts start --proxy %DHIS2_PROXY_TO%",
+    "deploy": "d2-app-scripts deploy",
+    "cy:start": "REACT_APP_NODE_ENV=test BROWSER=none yarn start",
+    "cy:prepare": "start-server-and-test 'yarn cy:start' http://localhost:3000",
+    "test:open": "yarn cy:prepare 'yarn cypress open --env networkMode=live'",
+    "_cy:live": "dotenv -- cross-var yarn cypress run --env networkMode=live --key %CYPRESS_RECORD_KEY%",
+    "test:live": "yarn cy:prepare 'yarn _cy:live'",
+    "_cy:capture": "yarn cypress run --env networkMode=capture",
+    "test:capture": "yarn cy:prepare 'yarn _cy:capture'",
+    "_cy:stub": "dotenv -- cross-var yarn cypress run --env networkMode=stub",
+    "test": "yarn cy:prepare 'yarn _cy:live'"
   },
   "devDependencies": {
+    "@badeball/cypress-cucumber-preprocessor": "16.0.3",
+    "@cypress/webpack-preprocessor": "^6.0.0",
     "@dhis2/cli-app-scripts": "^10.3.10",
+    "@dhis2/cypress-commands": "^10.0.3",
+    "@dhis2/cypress-plugins": "^10.0.3",
     "cross-var": "^1.1.0",
+    "cypress": "^13.2.0",
     "dotenv": "^16.3.1",
     "dotenv-cli": "^7.3.0",
+    "start-server-and-test": "^2.0.0",
+    "ts-loader": "^9.4.4",
     "typescript": "^5.2.2"
   },
   "dependencies": {
-    "@dhis2/app-runtime": "^3.9.4"
+    "@dhis2/app-runtime": "^3.9.4",
+    "@dhis2/ui": "^8.14.4"
   }
 }

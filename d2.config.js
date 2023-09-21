@@ -1,8 +1,8 @@
 const config = {
     type: 'app',
-
+    title: "DAT Custom App",
     entryPoints: {
-        app: './src/App.js',
+        app: './src/App.tsx',
     },
 }
 
