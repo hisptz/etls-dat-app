@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2023-09-25T10:26:17.153Z\n"
-"PO-Revision-Date: 2023-09-25T10:26:17.153Z\n"
+"POT-Creation-Date: 2023-09-25T16:39:40.579Z\n"
+"PO-Revision-Date: 2023-09-25T16:39:40.579Z\n"
 
 msgid "Something went wrong"
 msgstr "Something went wrong"
@@ -25,6 +25,27 @@ msgstr "Reports"
 
 msgid "Configuration"
 msgstr "Configuration"
+
+msgid "Reset"
+msgstr "Reset"
+
+msgid "Searching..."
+msgstr "Searching..."
+
+msgid "Search"
+msgstr "Search"
+
+msgid "Search Criteria"
+msgstr "Search Criteria"
+
+msgid "TB District Number"
+msgstr "TB District Number"
+
+msgid "Device EMI Number"
+msgstr "Device EMI Number"
+
+msgid "Organisation Unit"
+msgstr "Organisation Unit"
 
 msgid "Reload"
 msgstr "Reload"
