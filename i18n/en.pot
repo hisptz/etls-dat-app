@@ -1,0 +1,30 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: i18next-conv\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"POT-Creation-Date: 2023-09-25T10:26:17.153Z\n"
+"PO-Revision-Date: 2023-09-25T10:26:17.153Z\n"
+
+msgid "Something went wrong"
+msgstr "Something went wrong"
+
+msgid "The page you are looking for does not exist."
+msgstr "The page you are looking for does not exist."
+
+msgid "Go to home page"
+msgstr "Go to home page"
+
+msgid "TB Adherence"
+msgstr "TB Adherence"
+
+msgid "Reports"
+msgstr "Reports"
+
+msgid "Configuration"
+msgstr "Configuration"
+
+msgid "Reload"
+msgstr "Reload"

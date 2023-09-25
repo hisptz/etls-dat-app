@@ -1,9 +1,9 @@
 const config = {
-    type: 'app',
-    title: "DAT Custom App",
-    entryPoints: {
-        app: './src/App.tsx',
-    },
-}
+	type: "app",
+	title: "Tanzania ETLs",
+	entryPoints: {
+		app: "./src/App.tsx",
+	},
+};
 
-module.exports = config
+module.exports = config;

@@ -1,9 +1,13 @@
-import React from "react";
-import classes from "./App.module.css";
+import "./styles/common.css";
+import React, { Suspense } from "react";
+import { Routes } from "./modules/Routes";
+import { FullPageLoader } from "./modules/shared/components/Loaders";
 
 const MyApp = () => (
-	<div className={classes.container}>
-		<h1>DAT Custom App</h1>
+	<div>
+		<Suspense fallback={<FullPageLoader />}>
+			<Routes />
+		</Suspense>
 	</div>
 );
 
