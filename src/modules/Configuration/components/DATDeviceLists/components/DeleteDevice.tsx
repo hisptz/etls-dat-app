@@ -38,16 +38,19 @@ function DeleteDevice({ emei }: deviceConfig) {
 					<div
 						style={{
 							display: "flex",
-							flexDirection: "row",
-							justifyContent: "center",
+							flexDirection: "column",
+							alignItems: "center",
 							padding: "32px",
 						}}
 					>
 						<label style={{ fontSize: "16px" }}>
 							{i18n.t(
-								`Are you sure you want to delete the device with EMEI ${emei}`,
+								"Are you sure you want to delete the device with EMEI ",
 							)}
 						</label>
+						<span style={{ fontWeight: "bold" }}>
+							{i18n.t(`${emei}`)}
+						</span>
 					</div>
 				</ModalContent>
 				<ModalActions>

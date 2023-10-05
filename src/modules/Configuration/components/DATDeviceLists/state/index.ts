@@ -12,5 +12,5 @@ export const edit = atom<boolean>({
 
 export const add = atom<boolean>({
 	key: "add-state",
-	default: true,
+	default: false,
 });

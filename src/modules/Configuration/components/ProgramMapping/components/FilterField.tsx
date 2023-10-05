@@ -14,6 +14,7 @@ export interface FilterFieldProps {
 	name: string;
 	label: string;
 	required?: boolean;
+	initialValue?: string;
 	options?: [{ name: string; code: string }];
 	update?: (val: number) => void;
 	type: "date" | "text" | "select";
@@ -25,12 +26,13 @@ export function FilterField({
 	label,
 	required,
 	options,
+	initialValue,
 	type,
 	multiSelect,
 	update,
 }: FilterFieldProps) {
 	const [params, setParams] = useSearchParams();
-	const value = params.get(name);
+	const value = params.get(name) ?? initialValue;
 	const onChange = ({ value }: { value: string }) => {
 		setParams((params) => {
 			const updatedParams = new URLSearchParams(params);
@@ -38,13 +40,6 @@ export function FilterField({
 
 			return updatedParams;
 		});
-		if (name == "reportType" && update != undefined) {
-			options?.forEach((option, index) => {
-				if (value == option.code) {
-					update(index);
-				}
-			});
-		}
 	};
 
 	if (type === "select") {
@@ -104,7 +99,7 @@ export function FilterField({
 		<InputField
 			type={type}
 			required={required}
-			onChange={onChange}
+			onChange={initialValue ? null : onChange}
 			value={value}
 			name={name}
 			label={label}

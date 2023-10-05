@@ -54,7 +54,14 @@ export function ActionButton({
 	]);
 
 	return (
-		<div style={{ display: "flex", flexDirection: "row", width: "30px" }}>
+		<div
+			style={{
+				display: "flex",
+				flexDirection: "row",
+				height: "20px",
+				width: "20px",
+			}}
+		>
 			{menu.map(({ label, onClick, icon }) => (
 				<MenuItem
 					dataTest={`${dataTest}-${label}`}

@@ -23,7 +23,7 @@ import { isEmpty } from "lodash";
 import { FullPageLoader } from "../../../../shared/components/Loaders";
 import { ActionButton } from "../../../../shared/components/ActionButton";
 import { deviceConfig } from "../models/device";
-import { edit, remove } from "../state";
+import { add, edit, remove } from "../state";
 import { useRecoilState } from "recoil";
 import DeleteDevice from "./DeleteDevice";
 import EditDevice from "./EditDevice";
@@ -39,6 +39,7 @@ export default function DeviceListTable({
 }: DevicesTableProps) {
 	const [, setDelete] = useRecoilState<boolean>(remove);
 	const [, setEdit] = useRecoilState<boolean>(edit);
+
 	const devicesColumns = [
 		{
 			key: "sn",
@@ -58,7 +59,7 @@ export default function DeviceListTable({
 	];
 	function getActions(device: deviceConfig) {
 		return (
-			<div>
+			<>
 				<ActionButton
 					onDelete={() => {
 						setDelete(false);
@@ -66,11 +67,10 @@ export default function DeviceListTable({
 					onEdit={() => {
 						setEdit(false);
 					}}
-				/>
+				></ActionButton>
 				<EditDevice emei={device.emei} inUse={device.inUse} />
-				<DeleteDevice emei={device.emei} inUse={device.inUse} />;
-				<ActionButton />
-			</div>
+				<DeleteDevice emei={device.emei} inUse={device.inUse} />
+			</>
 		);
 	}
 
@@ -81,7 +81,7 @@ export default function DeviceListTable({
 					<FullPageLoader />
 				) : (
 					<CustomDataTable
-						emptyLabel={i18n.t("There is no devices")}
+						emptyLabel={i18n.t("There are no devices")}
 						loading={loading}
 						columns={devicesColumns as CustomDataTableColumn[]}
 						rows={devices.map((device, index) => {

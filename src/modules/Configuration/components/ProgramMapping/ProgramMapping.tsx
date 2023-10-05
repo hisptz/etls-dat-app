@@ -64,10 +64,9 @@ export function ProgramMapping() {
 								className={styles["label-title"]}
 								htmlFor="name"
 							>
-								<a
-									href="https://evrimed.wisepill.com/api/v1"
-									target="_blank"
-									rel="noopener noreferrer"
+								<label
+									className={styles["label-value"]}
+									htmlFor="value"
 									style={{
 										fontStyle: "italic",
 										color: "#147cd7",
@@ -76,7 +75,7 @@ export function ProgramMapping() {
 									{i18n.t(
 										"https://evrimed.wisepill.com/api/v1",
 									)}
-								</a>
+								</label>
 							</label>
 						</div>
 					</div>

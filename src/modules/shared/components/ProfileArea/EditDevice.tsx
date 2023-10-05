@@ -51,7 +51,7 @@ function EditDevice({ name, options, value }: editDeviceProps) {
 					>
 						<FilterField
 							label={i18n.t("Device IMEI number")}
-							name={name}
+							name={"deviceEMInumber"}
 							type="select"
 							options={options}
 						/>

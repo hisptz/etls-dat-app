@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
 	Button,
 	Modal,
@@ -13,11 +13,13 @@ import {
 import i18n from "@dhis2/d2-i18n";
 import { useRecoilState } from "recoil";
 import { FilterField } from "../../ProgramMapping/components/FilterField";
-import { edit } from "../state";
+import { add, edit } from "../state";
 import { deviceConfig } from "../models/device";
 
-function EditDevice({ emei, addNew }: deviceConfig) {
+function EditDevice({ emei }: deviceConfig) {
 	const [hide, setHide] = useRecoilState<boolean>(edit);
+	const [addNew, setAdd] = useRecoilState<boolean>(add);
+	const [bulkUpload, setBulkUpload] = useState<boolean>(false);
 
 	return (
 		<div>
@@ -26,6 +28,8 @@ function EditDevice({ emei, addNew }: deviceConfig) {
 				hide={hide}
 				onClose={() => {
 					setHide(true);
+					setAdd(false);
+					setBulkUpload(false);
 				}}
 			>
 				<ModalTitle>
@@ -48,40 +52,47 @@ function EditDevice({ emei, addNew }: deviceConfig) {
 									label={i18n.t("Bulk Upload")}
 									name="bulkUpload"
 									onChange={() => {
-										null;
+										setBulkUpload(!bulkUpload);
 									}}
-									value={true}
+									checked={bulkUpload}
 								/>
 								<br />
-
-								<FileInputField
-									helpText={i18n.t(
-										"Add an excel file with a list of devices only",
-									)}
-									label={i18n.t("Device File")}
-									name="uploadName"
-									onChange={{}}
-								>
-									<FileListItem
-										label="IMEI.xlsx"
-										onRemove={{}}
-										removeText="remove"
-									/>
-								</FileInputField>
-								<br />
+								{bulkUpload ? (
+									<div>
+										<FileInputField
+											helpText={i18n.t(
+												"Add an excel file with a list of devices only",
+											)}
+											label={i18n.t("Device File")}
+											name="uploadName"
+											onChange={{}}
+										>
+											<FileListItem
+												label="IMEI.xlsx"
+												onRemove={{}}
+												removeText="remove"
+											/>
+										</FileInputField>
+										<br />
+									</div>
+								) : null}
 							</div>
 						) : null}
-						<FilterField
-							label={i18n.t("Device IMEI number")}
-							name={emei!}
-							type="text"
-						/>
-
-						<label style={{ fontSize: "12px" }}>
-							{i18n.t(
-								"Add the EMEI number as seen on the device",
-							)}
-						</label>
+						{!bulkUpload ? (
+							<div>
+								<FilterField
+									label={i18n.t("Device IMEI number")}
+									name="deviceEMInumber"
+									type="text"
+									initialValue={emei}
+								/>
+								<label style={{ fontSize: "12px" }}>
+									{i18n.t(
+										"Add the EMEI number as seen on the device",
+									)}
+								</label>
+							</div>
+						) : null}
 					</div>
 				</ModalContent>
 				<ModalActions>
@@ -89,6 +100,8 @@ function EditDevice({ emei, addNew }: deviceConfig) {
 						<Button
 							onClick={() => {
 								setHide(true);
+								setAdd(false);
+								setBulkUpload(false);
 							}}
 							secondary
 						>

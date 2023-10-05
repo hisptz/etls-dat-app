@@ -4,10 +4,11 @@ import i18n from "@dhis2/d2-i18n";
 import { DATA_TEST_PREFIX } from "../../../shared/constants";
 import { useRecoilState } from "recoil";
 import DeviceListTable from "./components/DeviceListTable";
-import { edit } from "./state";
+import { add, edit } from "./state";
 import EditDevice from "./components/EditDevice";
 
 export function DATDevicelists() {
+	const [, setAdd] = useRecoilState<boolean>(add);
 	const [, setHide] = useRecoilState<boolean>(edit);
 	return (
 		<div data-test={`${DATA_TEST_PREFIX}-program-mapping-container`}>
@@ -23,6 +24,7 @@ export function DATDevicelists() {
 					>
 						<Button
 							onClick={() => {
+								setAdd(true);
 								setHide(false);
 							}}
 							secondary
@@ -30,8 +32,14 @@ export function DATDevicelists() {
 							{i18n.t("Add Device")}
 						</Button>
 					</div>
-					<EditDevice addNew={true} />
-					<DeviceListTable devices={[]} loading={false} />
+					<EditDevice />
+					<DeviceListTable
+						devices={[
+							{ emei: "123456789098654321", inUse: false },
+							{ emei: "999998777765555433", inUse: false },
+						]}
+						loading={false}
+					/>
 				</div>
 			</Card>
 		</div>
