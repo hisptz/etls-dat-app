@@ -12,6 +12,7 @@ import {
 import i18n from "@dhis2/d2-i18n";
 import { useRecoilState } from "recoil";
 import { AddDevice } from "../../state";
+import { FilterField } from "../../../Configuration/components/ProgramMapping/components/FilterField";
 
 interface editDeviceProps {
 	name: string;
@@ -48,29 +49,16 @@ function EditDevice({ name, options, value }: editDeviceProps) {
 							height: "300px",
 						}}
 					>
-						<SingleSelectField
-							id={name}
-							clearable
-							selected={value}
-							filterable={(options?.length ?? 0) > 5}
-							onChange={({ selected }: { selected: string }) =>
-								onChange({ value: selected })
-							}
-							value={value}
-							name={name}
+						<FilterField
 							label={i18n.t("Device IMEI number")}
-						>
-							{options?.map(({ name, code }) => (
-								<SingleSelectOption
-									key={`${code}-option`}
-									label={name}
-									value={code}
-								/>
-							))}
-						</SingleSelectField>
+							name={name}
+							type="select"
+							options={options}
+						/>
+
 						<label style={{ fontSize: "12px" }}>
 							{i18n.t(
-								"Assign the device number, or click clear to clear previous device"
+								"Assign the device number, or click clear to clear previous device",
 							)}
 						</label>
 					</div>

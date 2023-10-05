@@ -1,6 +1,6 @@
 import { useDataQuery } from "@dhis2/app-runtime";
 import { useEffect, useState } from "react";
-import { OptionSet, Pagination } from "@hisptz/dhis2-utils";
+import { Pagination } from "@hisptz/dhis2-utils";
 import { useSearchParams } from "react-router-dom";
 import { compact, isEmpty } from "lodash";
 import { useDownloadData } from "../../../utils/download";
@@ -61,7 +61,7 @@ const filtersConfig: any = {
 		operator: "eq",
 	},
 	deviceEMInumber: {
-		attribute: SHARED_ATTRIBUTES.TB_DISTRICT_NUMBER,
+		attribute: SHARED_ATTRIBUTES.DEVICE_NUMBER,
 		operator: "eq",
 	},
 };
@@ -77,7 +77,7 @@ export function useFilters() {
 					return `${filterConfig.attribute}:${filterConfig.operator}:${value}`;
 				}
 			}
-		})
+		}),
 	);
 
 	return {
@@ -101,8 +101,6 @@ export function useTBAdherenceTableData() {
 			pageSize: 10,
 			program: DAT_PROGRAM,
 			filters,
-			startDate,
-			endDate,
 			orgUnit,
 		},
 		lazy: true,
@@ -112,8 +110,7 @@ export function useTBAdherenceTableData() {
 		refetch({
 			page,
 			filters,
-			startDate,
-			endDate,
+
 			orgUnit,
 		});
 	};
@@ -122,8 +119,7 @@ export function useTBAdherenceTableData() {
 			page: 1,
 			pageSize,
 			filters,
-			startDate,
-			endDate,
+
 			orgUnit,
 		});
 	};
@@ -133,14 +129,14 @@ export function useTBAdherenceTableData() {
 			setPatients(
 				data?.patients.instances.map((tei) => {
 					return new PatientProfile(tei);
-				}) ?? []
+				}) ?? [],
 			);
 			setPagination({
 				page: data?.patients.page,
 				pageSize: data?.patients.pageSize,
 				total: data?.patients.total,
 				pageCount: Math.ceil(
-					data?.patients.total / data?.patients.pageSize
+					data?.patients.total / data?.patients.pageSize,
 				),
 			});
 		}
@@ -159,8 +155,7 @@ export function useTBAdherenceTableData() {
 		if (!isEmpty(orgUnit) && !isEmpty(startDate) && !isEmpty(endDate)) {
 			download(type, {
 				orgUnit,
-				startDate,
-				endDate,
+
 				filters,
 				program: DAT_PROGRAM,
 			});

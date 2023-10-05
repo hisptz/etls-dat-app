@@ -13,8 +13,12 @@ import { Navigate } from "react-router-dom";
 
 import { getDefaultTBAdherenceFilters } from "../../TBAdherence/constants/filters";
 
-import { Configuration } from "../../Configuration";
 import { TBAdherenceDetails } from "../../TBAdherence/TBAdherenceDetails/TBAdherenceDetails";
+
+import { Configuration } from "../../Configuration";
+import { Dashboards } from "../../Dashboards";
+import { ProgramMapping } from "../../Configuration/components/ProgramMapping";
+import { DATDevicelists } from "../../Configuration/components/DATDeviceLists";
 
 export interface NavItem {
 	label?: string | ((data: any) => any);
@@ -54,17 +58,47 @@ export const ROUTES: NavItem[] = [
 		],
 	},
 	{
+		id: "dashboards",
+		path: "dashboards",
+		element: Dashboards,
+		icon: IconDashboardWindow24,
+		label: i18n.t("Dashboards"),
+	},
+	{
 		id: "reports",
 		path: "reports",
 		element: Reports,
 		icon: IconDashboardWindow24,
 		label: i18n.t("Reports"),
 	},
+
 	{
 		id: "configuration",
 		path: "configuration",
-		element: Configuration,
-		icon: IconSettings24,
 		label: i18n.t("Configuration"),
+		icon: IconSettings24,
+		element: Configuration,
+		subItems: [
+			{
+				path: "",
+				id: "settings-main",
+				element: () => {
+					return <Navigate to="program-mapping" />;
+				},
+			},
+			{
+				path: "program-mapping",
+				id: "program-mapping",
+				label: i18n.t("Program Mapping"),
+				element: ProgramMapping,
+			},
+
+			{
+				path: "dat-device-lists",
+				id: "dat-device-lists",
+				label: i18n.t("DAT Device lists"),
+				element: DATDevicelists,
+			},
+		],
 	},
 ];
