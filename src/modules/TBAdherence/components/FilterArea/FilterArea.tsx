@@ -5,19 +5,30 @@ import { PropertiesFilter } from "./components/PropertiesFilter";
 import i18n from "@dhis2/d2-i18n";
 import { getDefaultFilters } from "./constants/filters";
 import { useSearchParams } from "react-router-dom";
+import { useDataQuery } from "@dhis2/app-runtime";
+import { useFilters } from "../Table/hooks/data";
+import { OrganizationUnitState } from "../../state/filters";
+import { useRecoilState } from "recoil";
 
 export interface FilterAreaProps {
 	loading: boolean;
+	onFetch: ReturnType<typeof useDataQuery>["refetch"];
 }
 
-export function FilterArea({ loading }: FilterAreaProps) {
-	const [, setParams] = useSearchParams();
+export function FilterArea({ loading, onFetch }: FilterAreaProps) {
+	const [params, setParams] = useSearchParams();
+	const { filters, endDate, startDate } = useFilters();
 
-	// const onFilterClick = () => {
-	// 	onFetch({
-	// 		filters,
-	// 	});
-	// };
+	const orgUnit = params.get("ou") ?? null;
+	const onFilterClick = () => {
+		onFetch({
+			page: 1,
+			filters,
+			endDate,
+			startDate,
+			orgUnit,
+		});
+	};
 	const onResetClick = () => {
 		const defaultValue = getDefaultFilters();
 		setParams(defaultValue);
@@ -35,7 +46,7 @@ export function FilterArea({ loading }: FilterAreaProps) {
 						</Button>
 						<Button
 							loading={loading}
-							onClick={() => {}}
+							onClick={onFilterClick}
 							primary
 							icon={<IconSearch24 />}
 						>

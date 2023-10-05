@@ -1,6 +1,8 @@
 import React from "react";
 import { InputField } from "@dhis2/ui";
 import { useSearchParams } from "react-router-dom";
+import OrganisationUnitSelector from "./OrganisationUnitSelector";
+import i18n from "@dhis2/d2-i18n";
 
 export interface FilterFieldProps {
 	name: string;
@@ -22,7 +24,14 @@ export function FilterField({ name, label, type }: FilterFieldProps) {
 	};
 
 	if (type === "orgUnit") {
-		return null;
+		return (
+			<div>
+				<span style={{ fontSize: "14px", color: "#222a35" }}>
+					{i18n.t("Organisation Unit")}
+				</span>
+				<OrganisationUnitSelector />
+			</div>
+		);
 	}
 
 	return (

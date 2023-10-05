@@ -5,8 +5,11 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2023-09-25T16:39:40.579Z\n"
-"PO-Revision-Date: 2023-09-25T16:39:40.579Z\n"
+"POT-Creation-Date: 2023-10-05T05:33:01.440Z\n"
+"PO-Revision-Date: 2023-10-05T05:33:01.440Z\n"
+
+msgid "39"
+msgstr "39"
 
 msgid "Something went wrong"
 msgstr "Something went wrong"
@@ -26,6 +29,33 @@ msgstr "Reports"
 msgid "Configuration"
 msgstr "Configuration"
 
+msgid "Back"
+msgstr "Back"
+
+msgid "Summary"
+msgstr "Summary"
+
+msgid "Enrollment time"
+msgstr "Enrollment time"
+
+msgid "Device Health"
+msgstr "Device Health"
+
+msgid "Very good"
+msgstr "Very good"
+
+msgid "Battery Health"
+msgstr "Battery Health"
+
+msgid "100%"
+msgstr "100%"
+
+msgid "A traveler UHC code is required"
+msgstr "A traveler UHC code is required"
+
+msgid "Patient with TB Device {{id}} could not be found"
+msgstr "Patient with TB Device {{id}} could not be found"
+
 msgid "Reset"
 msgstr "Reset"
 
@@ -34,6 +64,12 @@ msgstr "Searching..."
 
 msgid "Search"
 msgstr "Search"
+
+msgid "Organisation Unit"
+msgstr "Organisation Unit"
+
+msgid "Select Organisation unit"
+msgstr "Select Organisation unit"
 
 msgid "Search Criteria"
 msgstr "Search Criteria"
@@ -44,8 +80,65 @@ msgstr "TB District Number"
 msgid "Device EMI Number"
 msgstr "Device EMI Number"
 
-msgid "Organisation Unit"
-msgstr "Organisation Unit"
+msgid "There is no data for the selected filters"
+msgstr "There is no data for the selected filters"
+
+msgid "Downloading..."
+msgstr "Downloading..."
 
 msgid "Reload"
 msgstr "Reload"
+
+msgid "Device IMEI number"
+msgstr "Device IMEI number"
+
+msgid "Assign the device number, or click clear to clear previous device"
+msgstr "Assign the device number, or click clear to clear previous device"
+
+msgid "Hide"
+msgstr "Hide"
+
+msgid "Save"
+msgstr "Save"
+
+msgid "TB Client"
+msgstr "TB Client"
+
+msgid "Name"
+msgstr "Name"
+
+msgid "Age"
+msgstr "Age"
+
+msgid "Sex"
+msgstr "Sex"
+
+msgid "Adherence Frequency"
+msgstr "Adherence Frequency"
+
+msgid "Phone"
+msgstr "Phone"
+
+msgid "DAT device information"
+msgstr "DAT device information"
+
+msgid "Edit Device"
+msgstr "Edit Device"
+
+msgid "Total Openings"
+msgstr "Total Openings"
+
+msgid "Battery Level"
+msgstr "Battery Level"
+
+msgid "97%"
+msgstr "97%"
+
+msgid "Next dose Alarm"
+msgstr "Next dose Alarm"
+
+msgid "Next refill Alarm"
+msgstr "Next refill Alarm"
+
+msgid "Last updated"
+msgstr "Last updated"
