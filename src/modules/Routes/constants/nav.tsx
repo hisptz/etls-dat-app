@@ -14,6 +14,7 @@ import { Navigate } from "react-router-dom";
 import { getDefaultTBAdherenceFilters } from "../../TBAdherence/constants/filters";
 
 import { Configuration } from "../../Configuration";
+import { TBAdherenceDetails } from "../../TBAdherence/TBAdherenceDetails/TBAdherenceDetails";
 
 export interface NavItem {
 	label?: string | ((data: any) => any);
@@ -44,6 +45,11 @@ export const ROUTES: NavItem[] = [
 				path: "list",
 				id: "tbadherence-list",
 				element: TBAdherencePage,
+			},
+			{
+				path: ":id",
+				id: "tbadherence-details",
+				element: TBAdherenceDetails,
 			},
 		],
 	},

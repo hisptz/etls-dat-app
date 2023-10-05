@@ -1,6 +1,6 @@
 import { DateTime } from "luxon";
 
-export function getDefaultTBAdherenceFilters() {
+export function getDefaultFilters() {
 	const endDate = DateTime.now();
 	const startDate = endDate.minus({ year: 1 });
 	return new URLSearchParams({
