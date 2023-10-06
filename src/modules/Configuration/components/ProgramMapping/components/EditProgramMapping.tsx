@@ -13,6 +13,8 @@ import { useRecoilState } from "recoil";
 import { edit } from "../state";
 import { FilterField } from "./FilterField";
 import { Option } from "../hooks/data";
+import { useProgramMapping } from "../hooks/save";
+import { useSetting } from "@dhis2/app-service-datastore";
 
 interface EditProps {
 	programOptions: Option[];
@@ -22,6 +24,15 @@ interface EditProps {
 
 function Edit({ programOptions, attributeOptions, error }: EditProps) {
 	const [hideEdit, setHide] = useRecoilState<boolean>(edit);
+	const { programMapping } = useProgramMapping();
+	const [pM, { set: setPM }] = useSetting("programMapping", { global: true });
+
+	const onSave = () => {
+		if (programMapping) {
+			setPM(programMapping);
+			setHide(true);
+		}
+	};
 
 	if (error) {
 		throw error;
@@ -77,7 +88,7 @@ function Edit({ programOptions, attributeOptions, error }: EditProps) {
 							<FilterField
 								options={attributeOptions}
 								required={true}
-								name="tb-identification number"
+								name="tb-identification-number"
 								label={i18n.t("TB Identification Number")}
 								type="select"
 							/>
@@ -120,6 +131,7 @@ function Edit({ programOptions, attributeOptions, error }: EditProps) {
 						</div>
 						<div style={{ padding: "5px" }}>
 							<FilterField
+								options={attributeOptions}
 								required={true}
 								name="deviceIMEInumber"
 								label={i18n.t("Device IMEI Number")}
@@ -156,7 +168,8 @@ function Edit({ programOptions, attributeOptions, error }: EditProps) {
 						</Button>
 						<Button
 							onClick={() => {
-								null;
+								onSave();
+								console.log(pM);
 							}}
 							primary
 						>
