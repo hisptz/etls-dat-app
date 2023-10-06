@@ -99,7 +99,7 @@ export function FilterField({
 		<InputField
 			type={type}
 			required={required}
-			onChange={initialValue ? null : onChange}
+			onChange={onChange}
 			value={value}
 			name={name}
 			label={label}

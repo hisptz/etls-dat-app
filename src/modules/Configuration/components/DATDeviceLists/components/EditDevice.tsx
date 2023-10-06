@@ -15,11 +15,20 @@ import { useRecoilState } from "recoil";
 import { FilterField } from "../../ProgramMapping/components/FilterField";
 import { add, edit } from "../state";
 import { deviceConfig } from "../models/device";
+import { useSearchParams } from "react-router-dom";
+import { getDefaultFilters } from "../constants/filters";
 
 function EditDevice({ emei }: deviceConfig) {
 	const [hide, setHide] = useRecoilState<boolean>(edit);
 	const [addNew, setAdd] = useRecoilState<boolean>(add);
 	const [bulkUpload, setBulkUpload] = useState<boolean>(false);
+	const [params, setParams] = useSearchParams();
+	const [file, setFile] = useState<File>();
+
+	const onResetClick = () => {
+		const defaultValue = getDefaultFilters();
+		setParams(defaultValue);
+	};
 
 	return (
 		<div>
@@ -30,6 +39,7 @@ function EditDevice({ emei }: deviceConfig) {
 					setHide(true);
 					setAdd(false);
 					setBulkUpload(false);
+					onResetClick();
 				}}
 			>
 				<ModalTitle>
@@ -64,12 +74,20 @@ function EditDevice({ emei }: deviceConfig) {
 												"Add an excel file with a list of devices only",
 											)}
 											label={i18n.t("Device File")}
-											name="uploadName"
-											onChange={{}}
+											accept=".xlsx"
+											name={"IMEI"}
+											onChange={(val: {
+												name: string;
+												files: [];
+											}) => {
+												console.log(val.files);
+											}}
 										>
 											<FileListItem
 												label="IMEI.xlsx"
-												onRemove={{}}
+												onRemove={(val: any) => {
+													null;
+												}}
 												removeText="remove"
 											/>
 										</FileInputField>
@@ -84,7 +102,7 @@ function EditDevice({ emei }: deviceConfig) {
 									label={i18n.t("Device IMEI number")}
 									name="deviceEMInumber"
 									type="text"
-									initialValue={emei}
+									initialValue={addNew ? undefined : emei}
 								/>
 								<label style={{ fontSize: "12px" }}>
 									{i18n.t(
@@ -102,6 +120,7 @@ function EditDevice({ emei }: deviceConfig) {
 								setHide(true);
 								setAdd(false);
 								setBulkUpload(false);
+								onResetClick();
 							}}
 							secondary
 						>

@@ -4,17 +4,7 @@ import {
 	CustomDataTableColumn,
 	CustomDataTableRow,
 } from "@hisptz/dhis2-ui";
-import {
-	Card,
-	Button,
-	Modal,
-	ModalTitle,
-	ModalContent,
-	ModalActions,
-	ButtonStrip,
-	SingleSelectField,
-	SingleSelectOption,
-} from "@dhis2/ui";
+import { Card } from "@dhis2/ui";
 import i18n from "@dhis2/d2-i18n";
 import { Pagination } from "@hisptz/dhis2-utils";
 import { useSetting } from "@dhis2/app-service-datastore";
@@ -23,7 +13,7 @@ import { isEmpty } from "lodash";
 import { FullPageLoader } from "../../../../shared/components/Loaders";
 import { ActionButton } from "../../../../shared/components/ActionButton";
 import { deviceConfig } from "../models/device";
-import { add, edit, remove } from "../state";
+import { edit, remove } from "../state";
 import { useRecoilState } from "recoil";
 import DeleteDevice from "./DeleteDevice";
 import EditDevice from "./EditDevice";
@@ -39,6 +29,7 @@ export default function DeviceListTable({
 }: DevicesTableProps) {
 	const [, setDelete] = useRecoilState<boolean>(remove);
 	const [, setEdit] = useRecoilState<boolean>(edit);
+	const [selectedDevice, setSelectedDevice] = useState<deviceConfig | null>();
 
 	const devicesColumns = [
 		{
@@ -63,13 +54,13 @@ export default function DeviceListTable({
 				<ActionButton
 					onDelete={() => {
 						setDelete(false);
+						setSelectedDevice(device);
 					}}
 					onEdit={() => {
 						setEdit(false);
+						setSelectedDevice(device);
 					}}
 				></ActionButton>
-				<EditDevice emei={device.emei} inUse={device.inUse} />
-				<DeleteDevice emei={device.emei} inUse={device.inUse} />
 			</>
 		);
 	}
@@ -80,18 +71,22 @@ export default function DeviceListTable({
 				{loading && isEmpty(devices) ? (
 					<FullPageLoader />
 				) : (
-					<CustomDataTable
-						emptyLabel={i18n.t("There are no devices")}
-						loading={loading}
-						columns={devicesColumns as CustomDataTableColumn[]}
-						rows={devices.map((device, index) => {
-							return {
-								...(device as CustomDataTableRow),
-								sn: index + 1,
-								action: getActions(device),
-							};
-						})}
-					/>
+					<>
+						<CustomDataTable
+							emptyLabel={i18n.t("There are no devices")}
+							loading={loading}
+							columns={devicesColumns as CustomDataTableColumn[]}
+							rows={devices.map((device, index) => {
+								return {
+									...(device as CustomDataTableRow),
+									sn: index + 1,
+									action: getActions(device),
+								};
+							})}
+						/>
+						<EditDevice emei={selectedDevice?.emei} />
+						<DeleteDevice emei={selectedDevice?.emei} />
+					</>
 				)}
 			</div>
 		</div>

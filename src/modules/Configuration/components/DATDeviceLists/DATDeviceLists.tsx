@@ -35,8 +35,13 @@ export function DATDevicelists() {
 					<EditDevice />
 					<DeviceListTable
 						devices={[
-							{ emei: "123456789098654321", inUse: false },
-							{ emei: "999998777765555433", inUse: false },
+							{ emei: "11", inUse: false },
+							{ emei: "22", inUse: false },
+							{ emei: "33", inUse: false },
+							{ emei: "44", inUse: false },
+							{ emei: "55", inUse: false },
+							{ emei: "66", inUse: false },
+							{ emei: "77", inUse: false },
 						]}
 						loading={false}
 					/>
