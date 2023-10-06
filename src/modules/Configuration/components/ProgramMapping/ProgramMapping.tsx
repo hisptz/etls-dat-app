@@ -7,10 +7,20 @@ import { DATA_TEST_PREFIX } from "../../../shared/constants";
 import { edit } from "./state";
 import { useRecoilState } from "recoil";
 import Edit from "./components/EditProgramMapping";
+import { usePrograms } from "./hooks/data";
 
 export function ProgramMapping() {
 	const [, setHide] = useRecoilState<boolean>(edit);
-	return (
+	const { attributeOptions, programOptions, error, loading } = usePrograms();
+
+	return loading ? (
+		<div
+			style={{ minHeight: 600 }}
+			className="h-100 w-100 row align-center center p-16"
+		>
+			<CircularLoader small />
+		</div>
+	) : (
 		<div data-test={`${DATA_TEST_PREFIX}-program-mapping-container`}>
 			<Card>
 				<div className="w-100 h-100 column p-16">
@@ -81,7 +91,11 @@ export function ProgramMapping() {
 					</div>
 				</div>
 			</Card>
-			<Edit />
+			<Edit
+				attributeOptions={attributeOptions}
+				programOptions={programOptions}
+				error={error}
+			/>
 		</div>
 	);
 }

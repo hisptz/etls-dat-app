@@ -6,14 +6,26 @@ import {
 	ModalContent,
 	ModalActions,
 	ButtonStrip,
+	CircularLoader,
 } from "@dhis2/ui";
 import i18n from "@dhis2/d2-i18n";
 import { useRecoilState } from "recoil";
 import { edit } from "../state";
 import { FilterField } from "./FilterField";
+import { Option } from "../hooks/data";
 
-function Edit() {
+interface EditProps {
+	programOptions: Option[];
+	attributeOptions: Option[];
+	error: any;
+}
+
+function Edit({ programOptions, attributeOptions, error }: EditProps) {
 	const [hideEdit, setHide] = useRecoilState<boolean>(edit);
+
+	if (error) {
+		throw error;
+	}
 
 	return (
 		<div>
@@ -37,6 +49,7 @@ function Edit() {
 						<div style={{ padding: "5px" }}>
 							<FilterField
 								required={true}
+								options={programOptions}
 								name="mapped-tb-program"
 								label={i18n.t("Mapped TB Program")}
 								type="select"
@@ -44,6 +57,7 @@ function Edit() {
 						</div>
 						<div style={{ padding: "5px" }}>
 							<FilterField
+								options={attributeOptions}
 								required={true}
 								name="firstName"
 								label={i18n.t("First Name")}
@@ -52,6 +66,7 @@ function Edit() {
 						</div>
 						<div style={{ padding: "5px" }}>
 							<FilterField
+								options={attributeOptions}
 								required={true}
 								name="surname"
 								label={i18n.t("Surname")}
@@ -60,6 +75,7 @@ function Edit() {
 						</div>
 						<div style={{ padding: "5px" }}>
 							<FilterField
+								options={attributeOptions}
 								required={true}
 								name="tb-identification number"
 								label={i18n.t("TB Identification Number")}
@@ -68,6 +84,7 @@ function Edit() {
 						</div>
 						<div style={{ padding: "5px" }}>
 							<FilterField
+								options={attributeOptions}
 								required={true}
 								name="dateOfBirth"
 								label={i18n.t("Date of Birth")}
@@ -76,6 +93,7 @@ function Edit() {
 						</div>
 						<div style={{ padding: "5px" }}>
 							<FilterField
+								options={attributeOptions}
 								required={true}
 								name="sex"
 								label={i18n.t("Sex")}
@@ -84,6 +102,7 @@ function Edit() {
 						</div>
 						<div style={{ padding: "5px" }}>
 							<FilterField
+								options={attributeOptions}
 								required={true}
 								name="adherenceFrequency"
 								label={i18n.t("Adherence Frequency")}
@@ -92,6 +111,7 @@ function Edit() {
 						</div>
 						<div style={{ padding: "5px" }}>
 							<FilterField
+								options={attributeOptions}
 								required={true}
 								name="phoneNumber"
 								label={i18n.t("Phone Number")}
