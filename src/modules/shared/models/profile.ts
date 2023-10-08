@@ -1,18 +1,19 @@
 import { TrackedEntityModel } from "./trackedEntityModel";
 import { DateTime } from "luxon";
 import {
-	DATA_ELEMENTS,
-	EXPIRE_DAYS,
 	SHARED_ATTRIBUTES,
 	TRACKED_ENTITY_ATTRIBUTES,
+	programMapping,
 } from "../constants";
 
-import { Option, TrackedEntity } from "../types";
-import { filter, find, forIn, head, isEmpty } from "lodash";
+import { TrackedEntity } from "../types";
 
 export class PatientProfile extends TrackedEntityModel {
-	constructor(trackedEntity: TrackedEntity) {
+	programMapping?: programMapping;
+
+	constructor(trackedEntity: TrackedEntity, programMapping: programMapping) {
 		super(trackedEntity);
+		this.programMapping = programMapping;
 	}
 
 	get id(): string {
@@ -21,13 +22,19 @@ export class PatientProfile extends TrackedEntityModel {
 
 	get name() {
 		return `${
-			this.getAttributeValue(TRACKED_ENTITY_ATTRIBUTES.FIRST_NAME) ?? ""
-		} ${this.getAttributeValue(TRACKED_ENTITY_ATTRIBUTES.SURNAME) ?? ""}`;
+			this.getAttributeValue(
+				this.programMapping?.attributes?.firstName ?? "",
+			) ?? ""
+		} ${
+			this.getAttributeValue(
+				this.programMapping?.attributes?.surname ?? "",
+			) ?? ""
+		}`;
 	}
 
 	get tbDistrictNumber(): string {
 		return this.getAttributeValue(
-			SHARED_ATTRIBUTES.TB_DISTRICT_NUMBER
+			this.programMapping?.attributes?.tbIdentificationNumber ?? "",
 		) as string;
 	}
 
@@ -36,7 +43,10 @@ export class PatientProfile extends TrackedEntityModel {
 	}
 
 	get sex() {
-		return this.getAttributeValue(TRACKED_ENTITY_ATTRIBUTES.SEX);
+		const sex = this.getAttributeValue(
+			this.programMapping?.attributes?.sex ?? "",
+		);
+		return sex == "M" ? "Male" : sex == "F" ? "Female" : null;
 	}
 
 	get age() {
@@ -45,13 +55,24 @@ export class PatientProfile extends TrackedEntityModel {
 
 	get phoneNumber(): string {
 		return this.getAttributeValue(
-			TRACKED_ENTITY_ATTRIBUTES.PHONE_NUMBER
+			this.programMapping?.attributes?.phoneNumber ?? "",
+		) as string;
+	}
+
+	get deviceIMEINumber() {
+		return this.getAttributeValue(
+			this.programMapping?.attributes?.deviceIMEInumber ?? "",
+		) as string;
+	}
+	get adherenceFrequency() {
+		return this.getAttributeValue(
+			this.programMapping?.attributes?.adherenceFrequency ?? "",
 		) as string;
 	}
 
 	get tbIdentificationNumber(): string {
 		return this.getAttributeValue(
-			TRACKED_ENTITY_ATTRIBUTES.TB_NO
+			this.programMapping?.attributes?.tbIdentificationNumber ?? "",
 		) as string;
 	}
 
@@ -62,6 +83,8 @@ export class PatientProfile extends TrackedEntityModel {
 		const age = this.age;
 		const sex = this.sex;
 		const phoneNumber = this.phoneNumber;
+		const deviceIMEINumber = this.deviceIMEINumber;
+		const adherenceFrequency = this.adherenceFrequency;
 
 		return {
 			id: this.id as string,
@@ -71,6 +94,8 @@ export class PatientProfile extends TrackedEntityModel {
 			age,
 			sex,
 			phoneNumber,
+			deviceIMEINumber,
+			adherenceFrequency,
 		};
 	}
 }

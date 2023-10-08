@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import {
 	Button,
 	Modal,
@@ -8,12 +8,31 @@ import {
 	ButtonStrip,
 } from "@dhis2/ui";
 import i18n from "@dhis2/d2-i18n";
-import { deviceConfig } from "../models/device";
 import { remove } from "../state";
 import { useRecoilState } from "recoil";
+import { useSetting } from "@dhis2/app-service-datastore";
+import { deviceEmeiList } from "../../../../shared/constants";
 
-function DeleteDevice({ emei }: deviceConfig) {
+interface DeleteDevice {
+	emei?: string;
+}
+
+function DeleteDevice({ emei }: DeleteDevice) {
 	const [hideModal, setHide] = useRecoilState<boolean>(remove);
+	const [devices, { set: deleteDevice }] = useSetting("deviceEmeiList", {
+		global: true,
+	});
+
+	const onDelete = () => {
+		if (emei) {
+			const updatedDevices = devices.filter(
+				(item: deviceEmeiList) => item["emei"] !== emei,
+			);
+			deleteDevice(updatedDevices);
+			setHide(true);
+		}
+	};
+
 	return (
 		<div>
 			<Modal
@@ -65,7 +84,7 @@ function DeleteDevice({ emei }: deviceConfig) {
 						</Button>
 						<Button
 							onClick={() => {
-								null;
+								onDelete();
 							}}
 							destructive
 						>

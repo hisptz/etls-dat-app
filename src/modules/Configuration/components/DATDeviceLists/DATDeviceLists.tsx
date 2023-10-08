@@ -1,15 +1,18 @@
 import React from "react";
-import { Card, CircularLoader, Button } from "@dhis2/ui";
+import { Card, Button } from "@dhis2/ui";
 import i18n from "@dhis2/d2-i18n";
 import { DATA_TEST_PREFIX } from "../../../shared/constants";
 import { useRecoilState } from "recoil";
 import DeviceListTable from "./components/DeviceListTable";
 import { add, edit } from "./state";
 import EditDevice from "./components/EditDevice";
+import { useSetting } from "@dhis2/app-service-datastore";
 
 export function DATDevicelists() {
 	const [, setAdd] = useRecoilState<boolean>(add);
 	const [, setHide] = useRecoilState<boolean>(edit);
+	const [deviceEmeiList] = useSetting("deviceEmeiList", { global: true });
+
 	return (
 		<div data-test={`${DATA_TEST_PREFIX}-program-mapping-container`}>
 			<Card>
@@ -33,18 +36,7 @@ export function DATDevicelists() {
 						</Button>
 					</div>
 					<EditDevice />
-					<DeviceListTable
-						devices={[
-							{ emei: "11", inUse: false },
-							{ emei: "22", inUse: false },
-							{ emei: "33", inUse: false },
-							{ emei: "44", inUse: false },
-							{ emei: "55", inUse: false },
-							{ emei: "66", inUse: false },
-							{ emei: "77", inUse: false },
-						]}
-						loading={false}
-					/>
+					<DeviceListTable devices={deviceEmeiList} loading={false} />
 				</div>
 			</Card>
 		</div>

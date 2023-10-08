@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
 	Button,
 	Modal,
@@ -14,20 +14,57 @@ import i18n from "@dhis2/d2-i18n";
 import { useRecoilState } from "recoil";
 import { FilterField } from "../../ProgramMapping/components/FilterField";
 import { add, edit } from "../state";
-import { deviceConfig } from "../models/device";
 import { useSearchParams } from "react-router-dom";
-import { getDefaultFilters } from "../constants/filters";
+import { getDefaultFilters } from "../../constants/filters";
+import { useSetting } from "@dhis2/app-service-datastore";
+import { deviceEmeiList } from "../../../../shared/constants";
 
-function EditDevice({ emei }: deviceConfig) {
+interface EditDevice {
+	emei?: string;
+}
+
+function EditDevice({ emei }: EditDevice) {
 	const [hide, setHide] = useRecoilState<boolean>(edit);
 	const [addNew, setAdd] = useRecoilState<boolean>(add);
 	const [bulkUpload, setBulkUpload] = useState<boolean>(false);
+	const [disabled, setDisabled] = useState<boolean>(true);
 	const [params, setParams] = useSearchParams();
-	const [file, setFile] = useState<File>();
+	const [devices, { set: addDevice }] = useSetting("deviceEmeiList", {
+		global: true,
+	});
+	const deviceEMInumber = params.get("deviceEMInumber");
+
+	useEffect(() => {
+		setDisabled(!deviceEMInumber);
+	}, [deviceEMInumber]);
 
 	const onResetClick = () => {
 		const defaultValue = getDefaultFilters();
 		setParams(defaultValue);
+	};
+	const onSave = () => {
+		if (deviceEMInumber) {
+			devices.push({
+				name: deviceEMInumber,
+				code: deviceEMInumber,
+				emei: deviceEMInumber,
+				inUse: false,
+			});
+			addDevice(devices);
+			setHide(true);
+		}
+	};
+	const onEdit = () => {
+		if (emei) {
+			const updatedDevices = devices.map((device: deviceEmeiList) => {
+				if (device.emei === emei && deviceEMInumber) {
+					device.emei = device.code = device.name = deviceEMInumber;
+					setHide(true);
+				}
+				return device;
+			});
+			addDevice(updatedDevices);
+		}
 	};
 
 	return (
@@ -127,8 +164,10 @@ function EditDevice({ emei }: deviceConfig) {
 							{i18n.t("Hide")}
 						</Button>
 						<Button
+							disabled={disabled}
 							onClick={() => {
-								null;
+								addNew ? onSave() : onEdit();
+								onResetClick();
 							}}
 							primary
 						>

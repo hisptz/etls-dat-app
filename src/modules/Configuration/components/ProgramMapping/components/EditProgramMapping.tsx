@@ -6,7 +6,6 @@ import {
 	ModalContent,
 	ModalActions,
 	ButtonStrip,
-	CircularLoader,
 } from "@dhis2/ui";
 import i18n from "@dhis2/d2-i18n";
 import { useRecoilState } from "recoil";
@@ -15,22 +14,37 @@ import { FilterField } from "./FilterField";
 import { Option } from "../hooks/data";
 import { useProgramMapping } from "../hooks/save";
 import { useSetting } from "@dhis2/app-service-datastore";
+import { useSearchParams } from "react-router-dom";
+import { useDataQuery } from "@dhis2/app-runtime";
 
 interface EditProps {
 	programOptions: Option[];
 	attributeOptions: Option[];
 	error: any;
+	onUpdate: ReturnType<typeof useDataQuery>["refetch"];
 }
 
-function Edit({ programOptions, attributeOptions, error }: EditProps) {
+function Edit({
+	programOptions,
+	attributeOptions,
+	error,
+	onUpdate,
+}: EditProps) {
+	const [params] = useSearchParams();
 	const [hideEdit, setHide] = useRecoilState<boolean>(edit);
+	const program = params.get("mappedTbProgram");
 	const { programMapping } = useProgramMapping();
-	const [pM, { set: setPM }] = useSetting("programMapping", { global: true });
+	const [, { set: setProgramMapping }] = useSetting("programMapping", {
+		global: true,
+	});
 
 	const onSave = () => {
 		if (programMapping) {
-			setPM(programMapping);
+			setProgramMapping(programMapping);
 			setHide(true);
+			onUpdate({
+				programID: program,
+			});
 		}
 	};
 
@@ -61,7 +75,7 @@ function Edit({ programOptions, attributeOptions, error }: EditProps) {
 							<FilterField
 								required={true}
 								options={programOptions}
-								name="mapped-tb-program"
+								name="mappedTbProgram"
 								label={i18n.t("Mapped TB Program")}
 								type="select"
 							/>
@@ -88,7 +102,7 @@ function Edit({ programOptions, attributeOptions, error }: EditProps) {
 							<FilterField
 								options={attributeOptions}
 								required={true}
-								name="tb-identification-number"
+								name="tbIdentificationNumber"
 								label={i18n.t("TB Identification Number")}
 								type="select"
 							/>
@@ -141,7 +155,7 @@ function Edit({ programOptions, attributeOptions, error }: EditProps) {
 						<div style={{ padding: "5px" }}>
 							<FilterField
 								required={true}
-								name="mediatorurl"
+								name="mediatorUrl"
 								label={i18n.t("Mediator Url")}
 								type="text"
 							/>
@@ -169,7 +183,6 @@ function Edit({ programOptions, attributeOptions, error }: EditProps) {
 						<Button
 							onClick={() => {
 								onSave();
-								console.log(pM);
 							}}
 							primary
 						>

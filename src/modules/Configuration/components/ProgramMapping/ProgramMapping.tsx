@@ -1,17 +1,32 @@
-import React from "react";
+import React, { useEffect } from "react";
 import i18n from "@dhis2/d2-i18n";
 import { Card, CircularLoader, Button } from "@dhis2/ui";
 import styles from "./programMapping.module.css";
-
 import { DATA_TEST_PREFIX } from "../../../shared/constants";
 import { edit } from "./state";
 import { useRecoilState } from "recoil";
 import Edit from "./components/EditProgramMapping";
 import { usePrograms } from "./hooks/data";
+import { useSetting } from "@dhis2/app-service-datastore";
+import { useSearchParams } from "react-router-dom";
+import { getDefaultFilters } from "./hooks/save";
 
 export function ProgramMapping() {
+	const [, setParams] = useSearchParams();
 	const [, setHide] = useRecoilState<boolean>(edit);
-	const { attributeOptions, programOptions, error, loading } = usePrograms();
+	const {
+		program,
+		attributeOptions,
+		programOptions,
+		error,
+		loading,
+		refetch,
+	} = usePrograms();
+	const [programMapping] = useSetting("programMapping", { global: true });
+	const defaultValue = getDefaultFilters();
+	useEffect(() => {
+		setParams(defaultValue);
+	}, []);
 
 	return loading ? (
 		<div
@@ -44,7 +59,6 @@ export function ProgramMapping() {
 							}}
 							secondary
 						>
-							{" "}
 							{i18n.t("Edit")}
 						</Button>
 					</div>
@@ -60,7 +74,7 @@ export function ProgramMapping() {
 								className={styles["label-value"]}
 								htmlFor="value"
 							>
-								{i18n.t("TB Program")}
+								{i18n.t(program?.displayName ?? " - ")}
 							</label>
 						</div>
 						<div className={styles["grid-item"]}>
@@ -83,7 +97,7 @@ export function ProgramMapping() {
 									}}
 								>
 									{i18n.t(
-										"https://evrimed.wisepill.com/api/v1",
+										programMapping.mediatorUrl ?? " - ",
 									)}
 								</label>
 							</label>
@@ -95,6 +109,7 @@ export function ProgramMapping() {
 				attributeOptions={attributeOptions}
 				programOptions={programOptions}
 				error={error}
+				onUpdate={refetch}
 			/>
 		</div>
 	);

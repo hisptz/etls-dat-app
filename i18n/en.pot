@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2023-10-05T17:05:59.232Z\n"
-"PO-Revision-Date: 2023-10-05T17:05:59.232Z\n"
+"POT-Creation-Date: 2023-10-08T13:54:18.637Z\n"
+"PO-Revision-Date: 2023-10-08T13:54:18.637Z\n"
 
 msgid "39"
 msgstr "39"
@@ -58,9 +58,6 @@ msgstr "Program Mapping"
 
 msgid "Edit"
 msgstr "Edit"
-
-msgid "TB Program"
-msgstr "TB Program"
 
 msgid "Mapped TB Program"
 msgstr "Mapped TB Program"
@@ -140,11 +137,11 @@ msgstr "Battery Health"
 msgid "100%"
 msgstr "100%"
 
-msgid "A traveler UHC code is required"
-msgstr "A traveler UHC code is required"
+msgid "Instance ID is required"
+msgstr "Instance ID is required"
 
-msgid "Patient with TB Device {{id}} could not be found"
-msgstr "Patient with TB Device {{id}} could not be found"
+msgid "Patient with Instance ID {{id}} could not be found"
+msgstr "Patient with Instance ID {{id}} could not be found"
 
 msgid "Reset"
 msgstr "Reset"

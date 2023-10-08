@@ -8,14 +8,15 @@ import {
 } from "@dhis2/ui";
 import { useSearchParams } from "react-router-dom";
 import { isEmpty } from "lodash";
-import { DATA_TEST_PREFIX } from "../../../../shared/constants";
+import { DATA_TEST_PREFIX, deviceEmeiList } from "../../../../shared/constants";
+import { Option } from "../hooks/data";
 
 export interface FilterFieldProps {
 	name: string;
 	label: string;
 	required?: boolean;
 	initialValue?: string;
-	options?: [{ name: string; code: string }];
+	options?: [{ name: string; code: string }] | Option[] | deviceEmeiList[];
 	update?: (val: number) => void;
 	type: "date" | "text" | "select";
 	multiSelect?: boolean;
@@ -29,7 +30,6 @@ export function FilterField({
 	initialValue,
 	type,
 	multiSelect,
-	update,
 }: FilterFieldProps) {
 	const [params, setParams] = useSearchParams();
 	const value = params.get(name) ?? initialValue;

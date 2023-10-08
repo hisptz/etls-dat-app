@@ -1,14 +1,12 @@
 import React from "react";
 import { Box, Button, ButtonStrip, Card, IconSearch24 } from "@dhis2/ui";
-
 import { PropertiesFilter } from "./components/PropertiesFilter";
 import i18n from "@dhis2/d2-i18n";
 import { getDefaultFilters } from "./constants/filters";
 import { useSearchParams } from "react-router-dom";
 import { useDataQuery } from "@dhis2/app-runtime";
 import { useFilters } from "../Table/hooks/data";
-import { OrganizationUnitState } from "../../state/filters";
-import { useRecoilState } from "recoil";
+import { useSetting } from "@dhis2/app-service-datastore";
 
 export interface FilterAreaProps {
 	loading: boolean;
@@ -18,6 +16,7 @@ export interface FilterAreaProps {
 export function FilterArea({ loading, onFetch }: FilterAreaProps) {
 	const [params, setParams] = useSearchParams();
 	const { filters, endDate, startDate } = useFilters();
+	const [programMapping] = useSetting("programMapping", { global: true });
 
 	const orgUnit = params.get("ou") ?? null;
 	const onFilterClick = () => {
@@ -45,6 +44,7 @@ export function FilterArea({ loading, onFetch }: FilterAreaProps) {
 							{i18n.t("Reset")}
 						</Button>
 						<Button
+							disabled={!programMapping}
 							loading={loading}
 							onClick={onFilterClick}
 							primary

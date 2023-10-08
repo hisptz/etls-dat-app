@@ -1,14 +1,18 @@
 import { useSetting } from "@dhis2/app-service-datastore";
 import { useDataQuery } from "@dhis2/app-runtime";
-import { useMemo } from "react";
-import { DAT_PROGRAM, DEFAULT_SETTINGS } from "../../../../shared/constants";
-import { useSearchParams } from "react-router-dom";
 
 const query = {
 	programs: {
 		resource: "programs",
 		params: {
 			fields: ["id", "displayName"],
+		},
+	},
+	programID: {
+		resource: "programs",
+		id: ({ programID }: any) => programID,
+		params: {
+			fields: ["displayName"],
 		},
 	},
 	programAttributes: {
@@ -31,15 +35,17 @@ interface QueryType {
 	programs: {
 		programs: Option[];
 	};
+	programID: {
+		displayName: string;
+	};
 	programAttributes: { trackedEntityAttributes: Option[] };
 }
 
 export function usePrograms() {
-	const [params, setParams] = useSearchParams();
-	const programId = params.get("mapped-tb-program");
+	const [programMapping] = useSetting("programMapping", { global: true });
 	const { data, loading, refetch, error } = useDataQuery<QueryType>(query, {
 		variables: {
-			program: programId,
+			programID: programMapping.program ?? "",
 		},
 	});
 
@@ -53,6 +59,7 @@ export function usePrograms() {
 		};
 		programOpts.push(newProgram);
 	});
+
 	data?.programAttributes.trackedEntityAttributes.map((attribute) => {
 		const newAttribute = {
 			...attribute,
@@ -65,6 +72,7 @@ export function usePrograms() {
 		loading,
 		error,
 		refetch,
+		program: data?.programID,
 		programOptions: programOpts,
 		attributeOptions: attributeOpts,
 	};

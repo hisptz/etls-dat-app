@@ -12,15 +12,15 @@ import { useSetting } from "@dhis2/app-service-datastore";
 import { isEmpty } from "lodash";
 import { FullPageLoader } from "../../../../shared/components/Loaders";
 import { ActionButton } from "../../../../shared/components/ActionButton";
-import { deviceConfig } from "../models/device";
 import { edit, remove } from "../state";
 import { useRecoilState } from "recoil";
 import DeleteDevice from "./DeleteDevice";
 import EditDevice from "./EditDevice";
+import { deviceEmeiList } from "../../../../shared/constants";
 
 export interface DevicesTableProps {
 	loading: boolean;
-	devices: deviceConfig[];
+	devices: deviceEmeiList[];
 }
 
 export default function DeviceListTable({
@@ -29,7 +29,8 @@ export default function DeviceListTable({
 }: DevicesTableProps) {
 	const [, setDelete] = useRecoilState<boolean>(remove);
 	const [, setEdit] = useRecoilState<boolean>(edit);
-	const [selectedDevice, setSelectedDevice] = useState<deviceConfig | null>();
+	const [selectedDevice, setSelectedDevice] =
+		useState<deviceEmeiList | null>();
 
 	const devicesColumns = [
 		{
@@ -48,7 +49,7 @@ export default function DeviceListTable({
 			path: "action",
 		},
 	];
-	function getActions(device: deviceConfig) {
+	function getActions(device: deviceEmeiList) {
 		return (
 			<>
 				<ActionButton
