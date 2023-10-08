@@ -1,16 +1,17 @@
 import { useDataQuery } from "@dhis2/app-runtime";
 import { useEffect, useState } from "react";
-import { OptionSet, Pagination } from "@hisptz/dhis2-utils";
+import { Pagination } from "@hisptz/dhis2-utils";
 import { useSearchParams } from "react-router-dom";
 import { compact, isEmpty } from "lodash";
 import { useDownloadData } from "../../../utils/download";
 import { PatientProfile } from "../../../../shared/models";
 import {
 	DAT_PROGRAM,
-	SHARED_ATTRIBUTES,
 	TEI_FIELDS,
+	programMapping,
 } from "../../../../shared/constants";
 import { TrackedEntity } from "../../../../shared/types";
+import { useSetting } from "@dhis2/app-service-datastore";
 
 const query: any = {
 	patients: {
@@ -55,29 +56,38 @@ type Data = {
 		total: number;
 	};
 };
-const filtersConfig: any = {
-	tbDistrictNumber: {
-		attribute: SHARED_ATTRIBUTES.TB_DISTRICT_NUMBER,
-		operator: "eq",
-	},
-	deviceEMInumber: {
-		attribute: SHARED_ATTRIBUTES.TB_DISTRICT_NUMBER,
-		operator: "eq",
-	},
-};
+export function filterObject(programMapping: programMapping) {
+	const filtersConfig: any = {
+		tbDistrictNumber: {
+			attribute: programMapping.attributes?.tbIdentificationNumber,
+			operator: "eq",
+		},
+		deviceEMInumber: {
+			attribute: programMapping.attributes?.deviceIMEInumber,
+			operator: "eq",
+		},
+	};
+
+	return { filtersConfig: filtersConfig };
+}
 
 export function useFilters() {
 	const [params] = useSearchParams();
+	const [programMapping] = useSetting("programMapping", {
+		global: true,
+	});
+
 	const filters = compact(
 		Array.from(params.keys()).map((filter) => {
-			const filterConfig = filtersConfig[filter];
+			const filterConfig =
+				filterObject(programMapping).filtersConfig[filter];
 			if (filterConfig) {
 				const value = params.get(filter);
 				if (value) {
 					return `${filterConfig.attribute}:${filterConfig.operator}:${value}`;
 				}
 			}
-		})
+		}),
 	);
 
 	return {
@@ -90,7 +100,9 @@ export function useFilters() {
 export function useTBAdherenceTableData() {
 	const { filters, startDate, endDate } = useFilters();
 	const [patients, setPatients] = useState<PatientProfile[]>([]);
-
+	const [programMapping] = useSetting("programMapping", {
+		global: true,
+	});
 	const [pagination, setPagination] = useState<Pagination>();
 	const [params] = useSearchParams();
 	const orgUnit = params.get("ou");
@@ -99,10 +111,8 @@ export function useTBAdherenceTableData() {
 		variables: {
 			page: 1,
 			pageSize: 10,
-			program: DAT_PROGRAM,
+			program: DAT_PROGRAM(),
 			filters,
-			startDate,
-			endDate,
 			orgUnit,
 		},
 		lazy: true,
@@ -112,8 +122,7 @@ export function useTBAdherenceTableData() {
 		refetch({
 			page,
 			filters,
-			startDate,
-			endDate,
+
 			orgUnit,
 		});
 	};
@@ -122,8 +131,7 @@ export function useTBAdherenceTableData() {
 			page: 1,
 			pageSize,
 			filters,
-			startDate,
-			endDate,
+
 			orgUnit,
 		});
 	};
@@ -132,15 +140,15 @@ export function useTBAdherenceTableData() {
 		if (data) {
 			setPatients(
 				data?.patients.instances.map((tei) => {
-					return new PatientProfile(tei);
-				}) ?? []
+					return new PatientProfile(tei, programMapping);
+				}) ?? [],
 			);
 			setPagination({
 				page: data?.patients.page,
 				pageSize: data?.patients.pageSize,
 				total: data?.patients.total,
 				pageCount: Math.ceil(
-					data?.patients.total / data?.patients.pageSize
+					data?.patients.total / data?.patients.pageSize,
 				),
 			});
 		}
@@ -151,7 +159,7 @@ export function useTBAdherenceTableData() {
 		query: query,
 		queryKey: "report",
 		mapping: (data: TrackedEntity) => {
-			return new PatientProfile(data).tableData;
+			return new PatientProfile(data, programMapping).tableData;
 		},
 	});
 
@@ -159,10 +167,8 @@ export function useTBAdherenceTableData() {
 		if (!isEmpty(orgUnit) && !isEmpty(startDate) && !isEmpty(endDate)) {
 			download(type, {
 				orgUnit,
-				startDate,
-				endDate,
 				filters,
-				program: DAT_PROGRAM,
+				program: DAT_PROGRAM(),
 			});
 		}
 	};

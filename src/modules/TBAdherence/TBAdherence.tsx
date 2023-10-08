@@ -1,25 +1,28 @@
 import React, { useEffect } from "react";
-import { Outlet, useSearchParams } from "react-router-dom";
+import { Outlet, useNavigate, useSearchParams } from "react-router-dom";
 import { DATA_TEST_PREFIX } from "../shared/constants";
 import { FilterArea } from "./components/FilterArea";
 import i18n from "@dhis2/d2-i18n";
 import TBAdherenceTable from "./components/Table";
+import { Center, Card } from "@dhis2/ui";
 import {
 	useFilters,
 	useTBAdherenceTableData,
 } from "./components/Table/hooks/data";
+import { useSetting } from "@dhis2/app-service-datastore";
 
 export function TBAdherenceOutlet() {
 	return <Outlet />;
 }
 
 export function TBAdherencePage() {
-	const [params, setParams] = useSearchParams();
+	const [programMapping] = useSetting("programMapping", { global: true });
+	const [params] = useSearchParams();
 	const { filters, endDate, startDate } = useFilters();
 	const orgUnit = params.get("ou");
 	const { patients, pagination, refetch, loading } =
 		useTBAdherenceTableData();
-
+	const navigate = useNavigate();
 	useEffect(() => {
 		refetch({
 			page: 1,
@@ -40,11 +43,52 @@ export function TBAdherencePage() {
 			</h1>
 			<FilterArea loading={loading} onFetch={refetch} />
 			<div className="flex-1">
-				<TBAdherenceTable
-					patients={patients}
-					pagination={pagination}
-					loading={loading}
-				/>
+				{!programMapping ? (
+					<div style={{ marginTop: "16px" }}>
+						<Card>
+							<Center>
+								<div
+									style={{
+										padding: "32px",
+										height: "61vh",
+										fontSize: "22px",
+										color: "#6e7a8b",
+										fontWeight: "500",
+										display: "flex",
+										flexDirection: "column",
+										alignItems: "center",
+									}}
+								>
+									<span>
+										{i18n.t(
+											"Program Mapping is not configured. Please click the link below to go to the configurations",
+										)}
+									</span>
+									<br />
+									<span
+										style={{
+											color: "#1362bc",
+											cursor: "pointer",
+										}}
+										onClick={() =>
+											navigate("/configuration")
+										}
+									>
+										{i18n.t("Configuration")}
+									</span>
+								</div>
+							</Center>
+						</Card>
+					</div>
+				) : (
+					<div style={{ marginTop: "16px" }}>
+						<TBAdherenceTable
+							patients={patients}
+							pagination={pagination}
+							loading={loading}
+						/>
+					</div>
+				)}
 			</div>
 		</div>
 	);

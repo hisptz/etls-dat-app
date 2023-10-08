@@ -1,15 +1,9 @@
 import { selectorFamily } from "recoil";
 import { head } from "lodash";
 import i18n from "@dhis2/d2-i18n";
-import {
-	DAT_PROGRAM,
-	SHARED_ATTRIBUTES,
-	TEI_FIELDS,
-	TRACKED_ENTITY_ATTRIBUTES,
-} from "../../../shared/constants";
+import { DAT_PROGRAM, TEI_FIELDS } from "../../../shared/constants";
 import { TrackedEntity } from "../../../shared/types";
 import { DataEngineState } from "../../../shared/state";
-import { PatientProfile } from "../../../shared/models";
 
 const query: any = {
 	traveler: {
@@ -17,7 +11,7 @@ const query: any = {
 		params: ({ id }: { id: string }) => ({
 			trackedEntity: id,
 			ouMode: "ACCESSIBLE",
-			program: DAT_PROGRAM,
+			program: "tj4u1ip0tTF",
 			fields: TEI_FIELDS,
 		}),
 	},
@@ -29,7 +23,7 @@ export const PatientState = selectorFamily<TrackedEntity, string | undefined>({
 		(id?: string) =>
 		async ({ get }) => {
 			if (!id) {
-				throw Error(i18n.t("A traveler UHC code is required"));
+				throw Error(i18n.t("Instance ID is required"));
 			}
 
 			const engine = get(DataEngineState);
@@ -42,9 +36,12 @@ export const PatientState = selectorFamily<TrackedEntity, string | undefined>({
 
 			if (!trackedEntity) {
 				throw Error(
-					i18n.t("Patient with TB Device {{id}} could not be found", {
-						id,
-					})
+					i18n.t(
+						"Patient with Instance ID {{id}} could not be found",
+						{
+							id,
+						},
+					),
 				);
 			}
 

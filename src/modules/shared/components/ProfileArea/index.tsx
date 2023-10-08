@@ -3,7 +3,6 @@ import styles from "./ProfileArea.module.css";
 import { Button, IconEdit24, Card } from "@dhis2/ui";
 import React from "react";
 import EditDevice from "./EditDevice";
-import { SHARED_ATTRIBUTES } from "../../constants";
 import { PatientProfile } from "../../models";
 import { useRecoilState } from "recoil";
 import { AddDevice } from "../../state";
@@ -14,8 +13,6 @@ export interface ProfileAreaProps {
 
 export function ProfileArea({ profile }: ProfileAreaProps) {
 	const [, setHide] = useRecoilState<boolean>(AddDevice);
-	const sex =
-		profile.sex == "M" ? "Male" : profile.sex == "F" ? "Female" : null;
 
 	return (
 		<div>
@@ -100,7 +97,7 @@ export function ProfileArea({ profile }: ProfileAreaProps) {
 									className={styles["label-value"]}
 									htmlFor="value"
 								>
-									{sex}
+									{profile.sex}
 								</label>
 							</div>
 
@@ -114,7 +111,9 @@ export function ProfileArea({ profile }: ProfileAreaProps) {
 								<label
 									className={styles["label-value"]}
 									htmlFor="value"
-								></label>
+								>
+									{profile.adherenceFrequency}
+								</label>
 							</div>
 
 							<div className={styles["grid-item"]}>
@@ -241,22 +240,7 @@ export function ProfileArea({ profile }: ProfileAreaProps) {
 					</div>
 				</Card>
 			</div>
-			<EditDevice
-				options={[
-					{
-						name: profile.getAttributeValue(
-							SHARED_ATTRIBUTES.DEVICE_NUMBER
-						),
-						code: profile.getAttributeValue(
-							SHARED_ATTRIBUTES.DEVICE_NUMBER
-						),
-					},
-				]}
-				value={profile.getAttributeValue(
-					SHARED_ATTRIBUTES.DEVICE_NUMBER
-				)}
-				name={profile.name}
-			/>
+			<EditDevice value={profile.deviceIMEINumber} name={profile.name} />
 		</div>
 	);
 }

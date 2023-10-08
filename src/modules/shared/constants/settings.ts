@@ -3,6 +3,27 @@ export interface TBAdherenceConfig {
 	label: string;
 	path: string | Array<string | number>;
 }
+export interface deviceEmeiList {
+	emei: string;
+	inUse: boolean;
+	name: string;
+	code: string;
+}
+export interface programMapping {
+	program?: string;
+	mediatorUrl?: string;
+	apiKey?: string;
+	attributes?: {
+		firstName?: string;
+		surname?: string;
+		tbIdentificationNumber?: string;
+		dateOfBirth?: string;
+		sex?: string;
+		adherenceFrequency?: string;
+		phoneNumber?: string;
+		deviceIMEInumber?: string;
+	};
+}
 
 export const TBAdherence: TBAdherenceConfig[] = [
 	{
@@ -32,9 +53,15 @@ export const TBAdherence: TBAdherenceConfig[] = [
 	},
 ];
 
+export const deviceEmeiList: deviceEmeiList[] = [];
+
+export const programMapping: programMapping = {};
+
 export const DEFAULT_SETTINGS = {
 	settings: {},
 	TBAdherence,
+	programMapping,
+	deviceEmeiList,
 } as const;
 
 export const IN_APP_SETTINGS = {};

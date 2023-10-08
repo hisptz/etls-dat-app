@@ -5,11 +5,92 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2023-10-05T05:33:01.440Z\n"
-"PO-Revision-Date: 2023-10-05T05:33:01.440Z\n"
+"POT-Creation-Date: 2023-10-08T13:54:18.637Z\n"
+"PO-Revision-Date: 2023-10-08T13:54:18.637Z\n"
 
 msgid "39"
 msgstr "39"
+
+msgid "Configurations"
+msgstr "Configurations"
+
+msgid "Add Device"
+msgstr "Add Device"
+
+msgid "Delete DAT Device"
+msgstr "Delete DAT Device"
+
+msgid "Are you sure you want to delete the device with EMEI "
+msgstr "Are you sure you want to delete the device with EMEI "
+
+msgid "Hide"
+msgstr "Hide"
+
+msgid "Delete"
+msgstr "Delete"
+
+msgid "There are no devices"
+msgstr "There are no devices"
+
+msgid "DAT Device Form"
+msgstr "DAT Device Form"
+
+msgid "Bulk Upload"
+msgstr "Bulk Upload"
+
+msgid "Add an excel file with a list of devices only"
+msgstr "Add an excel file with a list of devices only"
+
+msgid "Device File"
+msgstr "Device File"
+
+msgid "Device IMEI number"
+msgstr "Device IMEI number"
+
+msgid "Add the EMEI number as seen on the device"
+msgstr "Add the EMEI number as seen on the device"
+
+msgid "Save"
+msgstr "Save"
+
+msgid "Program Mapping"
+msgstr "Program Mapping"
+
+msgid "Edit"
+msgstr "Edit"
+
+msgid "Mapped TB Program"
+msgstr "Mapped TB Program"
+
+msgid "First Name"
+msgstr "First Name"
+
+msgid "Surname"
+msgstr "Surname"
+
+msgid "TB Identification Number"
+msgstr "TB Identification Number"
+
+msgid "Date of Birth"
+msgstr "Date of Birth"
+
+msgid "Sex"
+msgstr "Sex"
+
+msgid "Adherence Frequency"
+msgstr "Adherence Frequency"
+
+msgid "Phone Number"
+msgstr "Phone Number"
+
+msgid "Device IMEI Number"
+msgstr "Device IMEI Number"
+
+msgid "Mediator Url"
+msgstr "Mediator Url"
+
+msgid "API Key"
+msgstr "API Key"
 
 msgid "Something went wrong"
 msgstr "Something went wrong"
@@ -23,11 +104,17 @@ msgstr "Go to home page"
 msgid "TB Adherence"
 msgstr "TB Adherence"
 
+msgid "Dashboards"
+msgstr "Dashboards"
+
 msgid "Reports"
 msgstr "Reports"
 
 msgid "Configuration"
 msgstr "Configuration"
+
+msgid "DAT Device lists"
+msgstr "DAT Device lists"
 
 msgid "Back"
 msgstr "Back"
@@ -50,11 +137,11 @@ msgstr "Battery Health"
 msgid "100%"
 msgstr "100%"
 
-msgid "A traveler UHC code is required"
-msgstr "A traveler UHC code is required"
+msgid "Instance ID is required"
+msgstr "Instance ID is required"
 
-msgid "Patient with TB Device {{id}} could not be found"
-msgstr "Patient with TB Device {{id}} could not be found"
+msgid "Patient with Instance ID {{id}} could not be found"
+msgstr "Patient with Instance ID {{id}} could not be found"
 
 msgid "Reset"
 msgstr "Reset"
@@ -86,20 +173,14 @@ msgstr "There is no data for the selected filters"
 msgid "Downloading..."
 msgstr "Downloading..."
 
+msgid "View"
+msgstr "View"
+
 msgid "Reload"
 msgstr "Reload"
 
-msgid "Device IMEI number"
-msgstr "Device IMEI number"
-
 msgid "Assign the device number, or click clear to clear previous device"
 msgstr "Assign the device number, or click clear to clear previous device"
-
-msgid "Hide"
-msgstr "Hide"
-
-msgid "Save"
-msgstr "Save"
 
 msgid "TB Client"
 msgstr "TB Client"
@@ -109,12 +190,6 @@ msgstr "Name"
 
 msgid "Age"
 msgstr "Age"
-
-msgid "Sex"
-msgstr "Sex"
-
-msgid "Adherence Frequency"
-msgstr "Adherence Frequency"
 
 msgid "Phone"
 msgstr "Phone"
