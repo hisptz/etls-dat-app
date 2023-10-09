@@ -11,6 +11,7 @@ export interface deviceEmeiList {
 }
 export interface programMapping {
 	program?: string;
+	programStage?: string;
 	mediatorUrl?: string;
 	apiKey?: string;
 	attributes?: {

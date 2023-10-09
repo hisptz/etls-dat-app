@@ -193,9 +193,7 @@ const EditDevice = ({ emei }: { emei?: string }) => {
 							setShowSuccess(!showSuccess);
 						}}
 					>
-						{!addNew
-							? i18n.t("Device registered successfully")
-							: i18n.t("Device updated successfully")}
+						{i18n.t("Device updated successfully")}
 					</AlertBar>
 				</div>
 			)}
