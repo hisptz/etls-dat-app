@@ -10,6 +10,7 @@ import {
 	useTBAdherenceTableData,
 } from "./components/Table/hooks/data";
 import { useSetting } from "@dhis2/app-service-datastore";
+import { isEmpty } from "lodash";
 
 export function TBAdherenceOutlet() {
 	return <Outlet />;
@@ -18,19 +19,20 @@ export function TBAdherenceOutlet() {
 export function TBAdherencePage() {
 	const [programMapping] = useSetting("programMapping", { global: true });
 	const [params] = useSearchParams();
-	const { filters, endDate, startDate } = useFilters();
+	const { filters, startDate } = useFilters();
 	const orgUnit = params.get("ou");
 	const { patients, pagination, refetch, loading } =
 		useTBAdherenceTableData();
 	const navigate = useNavigate();
 	useEffect(() => {
-		refetch({
-			page: 1,
-			filters,
-			endDate,
-			startDate,
-			orgUnit,
-		});
+		if (!isEmpty(programMapping.program)) {
+			refetch({
+				page: 1,
+				filters,
+				startDate,
+				orgUnit,
+			});
+		}
 	}, []);
 
 	return (
@@ -43,7 +45,7 @@ export function TBAdherencePage() {
 			</h1>
 			<FilterArea loading={loading} onFetch={refetch} />
 			<div className="flex-1">
-				{!programMapping ? (
+				{isEmpty(programMapping.program) ? (
 					<div style={{ marginTop: "16px" }}>
 						<Card>
 							<Center>
@@ -51,9 +53,8 @@ export function TBAdherencePage() {
 									style={{
 										padding: "32px",
 										height: "61vh",
-										fontSize: "22px",
+										fontSize: "18px",
 										color: "#6e7a8b",
-										fontWeight: "500",
 										display: "flex",
 										flexDirection: "column",
 										alignItems: "center",
@@ -61,7 +62,7 @@ export function TBAdherencePage() {
 								>
 									<span>
 										{i18n.t(
-											"Program Mapping is not configured. Please click the link below to go to the configurations",
+											"Program Mapping is not configured. Please click the link below to go to the configurations.",
 										)}
 									</span>
 									<br />

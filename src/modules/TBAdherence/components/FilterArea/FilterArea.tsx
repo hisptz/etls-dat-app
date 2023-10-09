@@ -7,6 +7,7 @@ import { useSearchParams } from "react-router-dom";
 import { useDataQuery } from "@dhis2/app-runtime";
 import { useFilters } from "../Table/hooks/data";
 import { useSetting } from "@dhis2/app-service-datastore";
+import { isEmpty } from "lodash";
 
 export interface FilterAreaProps {
 	loading: boolean;
@@ -15,7 +16,7 @@ export interface FilterAreaProps {
 
 export function FilterArea({ loading, onFetch }: FilterAreaProps) {
 	const [params, setParams] = useSearchParams();
-	const { filters, endDate, startDate } = useFilters();
+	const { filters, startDate } = useFilters();
 	const [programMapping] = useSetting("programMapping", { global: true });
 
 	const orgUnit = params.get("ou") ?? null;
@@ -23,7 +24,6 @@ export function FilterArea({ loading, onFetch }: FilterAreaProps) {
 		onFetch({
 			page: 1,
 			filters,
-			endDate,
 			startDate,
 			orgUnit,
 		});
@@ -44,7 +44,7 @@ export function FilterArea({ loading, onFetch }: FilterAreaProps) {
 							{i18n.t("Reset")}
 						</Button>
 						<Button
-							disabled={!programMapping}
+							disabled={isEmpty(programMapping.program)}
 							loading={loading}
 							onClick={onFilterClick}
 							primary

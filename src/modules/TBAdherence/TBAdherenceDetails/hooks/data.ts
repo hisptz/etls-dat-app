@@ -20,17 +20,22 @@ const ActualPatientState = atomFamily<TrackedEntity | null, string | undefined>(
 
 export function usePatient() {
 	const { id } = useParams();
-	const patientState = useRecoilValueLoadable(PatientState(id));
 	const [programMapping] = useSetting("programMapping", {
 		global: true,
 	});
+
+	const program = programMapping.program;
+	const patientState = useRecoilValueLoadable(
+		PatientState({ id: id, program: program }),
+	);
+
 	const [patientTei, setPatient] = useRecoilState<TrackedEntity | null>(
 		ActualPatientState(id),
 	);
 	const refresh = useRecoilCallback(
 		({ refresh }) =>
 			() =>
-				refresh(PatientState(id)),
+				refresh(PatientState({ id: id, program: program })),
 	);
 	const loading = patientState.state === "loading";
 	const error =

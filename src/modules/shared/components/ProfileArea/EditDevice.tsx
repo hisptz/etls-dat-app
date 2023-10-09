@@ -33,20 +33,26 @@ function EditDevice({ name, value }: editDeviceProps) {
 
 	useEffect(() => {
 		setAvailableDevices(
-			devices.filter((device: deviceEmeiList) => !device.inUse),
+			devices.filter(
+				(device: deviceEmeiList) =>
+					!device.inUse || device.emei === value,
+			),
 		);
 		setDisabled(!deviceEMInumber);
 	}, [deviceEMInumber]);
 
 	const onSave = () => {
 		if (deviceEMInumber) {
-			const updatedDevices = devices.map((device: deviceEmeiList) => {
-				if (device.emei == deviceEMInumber) {
-					device.inUse = true;
-					setHide(true);
-				}
-				return device;
-			});
+			const updatedDevices = devices.map((device: deviceEmeiList) => ({
+				...device,
+				inUse:
+					device.emei === deviceEMInumber
+						? true
+						: device.emei === value && value !== deviceEMInumber
+						? false
+						: device.inUse,
+			}));
+			setHide(true);
 			updateDevice(updatedDevices);
 		}
 	};
@@ -76,7 +82,7 @@ function EditDevice({ name, value }: editDeviceProps) {
 						<FilterField
 							label={i18n.t("Device IMEI number")}
 							name={"deviceEMInumber"}
-							initialValue={value ?? null}
+							initialValue={value}
 							type="select"
 							options={availableDevices}
 						/>

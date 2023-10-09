@@ -9,6 +9,7 @@ import {
 	SwitchField,
 	FileInputField,
 	FileListItem,
+	AlertBar,
 } from "@dhis2/ui";
 import i18n from "@dhis2/d2-i18n";
 import { useRecoilState } from "recoil";
@@ -19,11 +20,7 @@ import { getDefaultFilters } from "../../constants/filters";
 import { useSetting } from "@dhis2/app-service-datastore";
 import { deviceEmeiList } from "../../../../shared/constants";
 
-interface EditDevice {
-	emei?: string;
-}
-
-function EditDevice({ emei }: EditDevice) {
+const EditDevice = ({ emei }: { emei?: string }) => {
 	const [hide, setHide] = useRecoilState<boolean>(edit);
 	const [addNew, setAdd] = useRecoilState<boolean>(add);
 	const [bulkUpload, setBulkUpload] = useState<boolean>(false);
@@ -33,6 +30,7 @@ function EditDevice({ emei }: EditDevice) {
 		global: true,
 	});
 	const deviceEMInumber = params.get("deviceEMInumber");
+	const [showSuccess, setShowSuccess] = useState<boolean>(false);
 
 	useEffect(() => {
 		setDisabled(!deviceEMInumber);
@@ -42,28 +40,40 @@ function EditDevice({ emei }: EditDevice) {
 		const defaultValue = getDefaultFilters();
 		setParams(defaultValue);
 	};
+
 	const onSave = () => {
 		if (deviceEMInumber) {
-			devices.push({
+			const newDevice = {
 				name: deviceEMInumber,
 				code: deviceEMInumber,
 				emei: deviceEMInumber,
 				inUse: false,
-			});
-			addDevice(devices);
+			};
+
+			const updatedDevices = [...devices, newDevice];
 			setHide(true);
+			setAdd(false);
+			addDevice(updatedDevices);
+			setShowSuccess(true);
 		}
 	};
+
 	const onEdit = () => {
-		if (emei) {
-			const updatedDevices = devices.map((device: deviceEmeiList) => {
-				if (device.emei === emei && deviceEMInumber) {
-					device.emei = device.code = device.name = deviceEMInumber;
-					setHide(true);
-				}
-				return device;
-			});
+		if (emei && deviceEMInumber) {
+			const updatedDevices = devices.map((device: deviceEmeiList) =>
+				device.emei === emei
+					? {
+							...device,
+							emei: deviceEMInumber,
+							code: deviceEMInumber,
+							name: deviceEMInumber,
+					  }
+					: device,
+			);
+			setHide(true);
 			addDevice(updatedDevices);
+			setAdd(false);
+			setShowSuccess(true);
 		}
 	};
 
@@ -88,23 +98,17 @@ function EditDevice({ emei }: EditDevice) {
 					</h3>
 				</ModalTitle>
 				<ModalContent>
-					<div
-						style={{
-							height: "300px",
-						}}
-					>
-						{addNew == true ? (
+					<div style={{ height: "300px" }}>
+						{addNew && (
 							<div>
 								<SwitchField
 									label={i18n.t("Bulk Upload")}
 									name="bulkUpload"
-									onChange={() => {
-										setBulkUpload(!bulkUpload);
-									}}
+									onChange={() => setBulkUpload(!bulkUpload)}
 									checked={bulkUpload}
 								/>
 								<br />
-								{bulkUpload ? (
+								{bulkUpload && (
 									<div>
 										<FileInputField
 											helpText={i18n.t(
@@ -122,18 +126,16 @@ function EditDevice({ emei }: EditDevice) {
 										>
 											<FileListItem
 												label="IMEI.xlsx"
-												onRemove={(val: any) => {
-													null;
-												}}
+												onRemove={() => null}
 												removeText="remove"
 											/>
 										</FileInputField>
 										<br />
 									</div>
-								) : null}
+								)}
 							</div>
-						) : null}
-						{!bulkUpload ? (
+						)}
+						{!bulkUpload && (
 							<div>
 								<FilterField
 									label={i18n.t("Device IMEI number")}
@@ -147,7 +149,7 @@ function EditDevice({ emei }: EditDevice) {
 									)}
 								</label>
 							</div>
-						) : null}
+						)}
 					</div>
 				</ModalContent>
 				<ModalActions>
@@ -176,8 +178,29 @@ function EditDevice({ emei }: EditDevice) {
 					</ButtonStrip>
 				</ModalActions>
 			</Modal>
+			{showSuccess && (
+				<div
+					style={{
+						position: "fixed",
+						bottom: "0",
+						left: "50%",
+						transform: "translateX(-50%)",
+					}}
+				>
+					<AlertBar
+						duration={2000}
+						onHidden={() => {
+							setShowSuccess(!showSuccess);
+						}}
+					>
+						{!addNew
+							? i18n.t("Device registered successfully")
+							: i18n.t("Device updated successfully")}
+					</AlertBar>
+				</div>
+			)}
 		</div>
 	);
-}
+};
 
 export default EditDevice;

@@ -1,10 +1,6 @@
 import { TrackedEntityModel } from "./trackedEntityModel";
 import { DateTime } from "luxon";
-import {
-	SHARED_ATTRIBUTES,
-	TRACKED_ENTITY_ATTRIBUTES,
-	programMapping,
-} from "../constants";
+import { TRACKED_ENTITY_ATTRIBUTES, programMapping } from "../constants";
 
 import { TrackedEntity } from "../types";
 

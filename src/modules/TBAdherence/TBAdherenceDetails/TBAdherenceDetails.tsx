@@ -1,9 +1,7 @@
 import React from "react";
-
 import { usePatient } from "./hooks/data";
 import { Button, Card, IconArrowLeft24 } from "@dhis2/ui";
 import i18n from "@dhis2/d2-i18n";
-
 import { useNavigate } from "react-router-dom";
 import { FullPageLoader } from "../../shared/components/Loaders";
 import ErrorPage from "../../shared/components/ErrorPage";

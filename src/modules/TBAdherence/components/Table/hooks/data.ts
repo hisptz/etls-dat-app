@@ -98,7 +98,7 @@ export function useFilters() {
 }
 
 export function useTBAdherenceTableData() {
-	const { filters, startDate, endDate } = useFilters();
+	const { filters, startDate } = useFilters();
 	const [patients, setPatients] = useState<PatientProfile[]>([]);
 	const [programMapping] = useSetting("programMapping", {
 		global: true,
@@ -112,6 +112,7 @@ export function useTBAdherenceTableData() {
 			page: 1,
 			pageSize: 10,
 			program: DAT_PROGRAM(),
+			startDate,
 			filters,
 			orgUnit,
 		},
@@ -122,7 +123,6 @@ export function useTBAdherenceTableData() {
 		refetch({
 			page,
 			filters,
-
 			orgUnit,
 		});
 	};
@@ -131,7 +131,6 @@ export function useTBAdherenceTableData() {
 			page: 1,
 			pageSize,
 			filters,
-
 			orgUnit,
 		});
 	};
@@ -164,7 +163,7 @@ export function useTBAdherenceTableData() {
 	});
 
 	const onDownload = (type: "xlsx" | "csv" | "json") => {
-		if (!isEmpty(orgUnit) && !isEmpty(startDate) && !isEmpty(endDate)) {
+		if (!isEmpty(orgUnit) && !isEmpty(startDate)) {
 			download(type, {
 				orgUnit,
 				filters,

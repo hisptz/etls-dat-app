@@ -1,38 +1,42 @@
 import { selectorFamily } from "recoil";
 import { head } from "lodash";
 import i18n from "@dhis2/d2-i18n";
-import { DAT_PROGRAM, TEI_FIELDS } from "../../../shared/constants";
+import { TEI_FIELDS } from "../../../shared/constants";
 import { TrackedEntity } from "../../../shared/types";
 import { DataEngineState } from "../../../shared/state";
 
 const query: any = {
-	traveler: {
+	patient: {
 		resource: "tracker/trackedEntities",
-		params: ({ id }: { id: string }) => ({
+		params: ({ id, program }: { id: string; program: string }) => ({
 			trackedEntity: id,
 			ouMode: "ACCESSIBLE",
-			program: "tj4u1ip0tTF",
+			program: program,
 			fields: TEI_FIELDS,
 		}),
 	},
 };
 
-export const PatientState = selectorFamily<TrackedEntity, string | undefined>({
+export const PatientState = selectorFamily<
+	TrackedEntity,
+	{ id?: string; program: string }
+>({
 	key: "patient-state",
 	get:
-		(id?: string) =>
+		({ id, program }) =>
 		async ({ get }) => {
 			if (!id) {
 				throw Error(i18n.t("Instance ID is required"));
 			}
-
 			const engine = get(DataEngineState);
 			const response = await engine.query(query, {
 				variables: {
 					id,
+					program,
 				},
 			});
-			const trackedEntity = head((response?.traveler as any)?.instances);
+
+			const trackedEntity = head((response?.patient as any)?.instances);
 
 			if (!trackedEntity) {
 				throw Error(
