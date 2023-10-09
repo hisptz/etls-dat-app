@@ -14,7 +14,7 @@ import { isEmpty } from "lodash";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { PatientProfile } from "../../../shared/models/profile";
 
-export interface ReportTableProps {
+export interface AdherenceTableProps {
 	loading: boolean;
 	patients: PatientProfile[];
 	pagination: Pagination;
@@ -24,7 +24,7 @@ export default function TBAdherenceTable({
 	loading,
 	patients,
 	pagination,
-}: ReportTableProps) {
+}: AdherenceTableProps) {
 	const [TBAdherence] = useSetting("TBAdherence", { global: true });
 	const navigate = useNavigate();
 
@@ -45,7 +45,7 @@ export default function TBAdherenceTable({
 					) : (
 						<CustomDataTable
 							emptyLabel={i18n.t(
-								"There is no data for the selected filters"
+								"There is no data for the selected filters",
 							)}
 							loading={loading}
 							columns={TBAdherence as CustomDataTableColumn[]}

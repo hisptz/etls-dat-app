@@ -42,7 +42,7 @@ export class TrackedEntityModel {
 	}
 
 	getAttributeValue(
-		attributeId: (typeof SHARED_ATTRIBUTES)[keyof typeof SHARED_ATTRIBUTES]
+		attributeId: (typeof SHARED_ATTRIBUTES)[keyof typeof SHARED_ATTRIBUTES],
 	): string {
 		return (
 			find(this.attributes, { attribute: attributeId })?.value ??

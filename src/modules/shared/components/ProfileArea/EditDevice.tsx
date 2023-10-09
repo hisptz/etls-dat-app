@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
 	Button,
 	Modal,
@@ -6,24 +6,55 @@ import {
 	ModalContent,
 	ModalActions,
 	ButtonStrip,
-	SingleSelectField,
-	SingleSelectOption,
 } from "@dhis2/ui";
 import i18n from "@dhis2/d2-i18n";
 import { useRecoilState } from "recoil";
 import { AddDevice } from "../../state";
+import { FilterField } from "../../../Configuration/components/ProgramMapping/components/FilterField";
+import { useSetting } from "@dhis2/app-service-datastore";
+import { deviceEmeiList } from "../../constants";
+import { useSearchParams } from "react-router-dom";
 
 interface editDeviceProps {
 	name: string;
 	value: string;
-	options: [{ name: string; code: string }];
 }
 
-function EditDevice({ name, options, value }: editDeviceProps) {
+function EditDevice({ name, value }: editDeviceProps) {
 	const [hide, setHide] = useRecoilState<boolean>(AddDevice);
+	const [disabled, setDisabled] = useState<boolean>(true);
+	const [devices, { set: updateDevice }] = useSetting("deviceEmeiList", {
+		global: true,
+	});
+	const [params] = useSearchParams();
+	const deviceEMInumber = params.get("deviceEMInumber");
+	const [availableDevices, setAvailableDevices] =
+		useState<deviceEmeiList[]>();
 
-	const onChange = ({ value }: { value: string }) => {
-		null;
+	useEffect(() => {
+		setAvailableDevices(
+			devices.filter(
+				(device: deviceEmeiList) =>
+					!device.inUse || device.emei === value,
+			),
+		);
+		setDisabled(!deviceEMInumber);
+	}, [deviceEMInumber]);
+
+	const onSave = () => {
+		if (deviceEMInumber) {
+			const updatedDevices = devices.map((device: deviceEmeiList) => ({
+				...device,
+				inUse:
+					device.emei === deviceEMInumber
+						? true
+						: device.emei === value && value !== deviceEMInumber
+						? false
+						: device.inUse,
+			}));
+			setHide(true);
+			updateDevice(updatedDevices);
+		}
 	};
 	return (
 		<div>
@@ -48,29 +79,17 @@ function EditDevice({ name, options, value }: editDeviceProps) {
 							height: "300px",
 						}}
 					>
-						<SingleSelectField
-							id={name}
-							clearable
-							selected={value}
-							filterable={(options?.length ?? 0) > 5}
-							onChange={({ selected }: { selected: string }) =>
-								onChange({ value: selected })
-							}
-							value={value}
-							name={name}
+						<FilterField
 							label={i18n.t("Device IMEI number")}
-						>
-							{options?.map(({ name, code }) => (
-								<SingleSelectOption
-									key={`${code}-option`}
-									label={name}
-									value={code}
-								/>
-							))}
-						</SingleSelectField>
+							name={"deviceEMInumber"}
+							initialValue={value}
+							type="select"
+							options={availableDevices}
+						/>
+
 						<label style={{ fontSize: "12px" }}>
 							{i18n.t(
-								"Assign the device number, or click clear to clear previous device"
+								"Assign the device number, or click clear to clear previous device",
 							)}
 						</label>
 					</div>
@@ -86,8 +105,9 @@ function EditDevice({ name, options, value }: editDeviceProps) {
 							{i18n.t("Hide")}
 						</Button>
 						<Button
+							disabled={disabled}
 							onClick={() => {
-								null;
+								onSave();
 							}}
 							primary
 						>
