@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2023-10-09T05:23:08.279Z\n"
-"PO-Revision-Date: 2023-10-09T05:23:08.279Z\n"
+"POT-Creation-Date: 2023-10-09T17:21:21.160Z\n"
+"PO-Revision-Date: 2023-10-09T17:21:21.160Z\n"
 
 msgid "39"
 msgstr "39"
@@ -28,6 +28,15 @@ msgstr "Hide"
 
 msgid "Delete"
 msgstr "Delete"
+
+msgid "Device deleted successfully"
+msgstr "Device deleted successfully"
+
+msgid "Device with emei "
+msgstr "Device with emei "
+
+msgid " can not be deleted since it has dependencies with a client"
+msgstr " can not be deleted since it has dependencies with a client"
 
 msgid "There are no devices"
 msgstr "There are no devices"
@@ -52,6 +61,9 @@ msgstr "Add the EMEI number as seen on the device"
 
 msgid "Save"
 msgstr "Save"
+
+msgid "Device updated successfully"
+msgstr "Device updated successfully"
 
 msgid "Program Mapping"
 msgstr "Program Mapping"
@@ -118,10 +130,10 @@ msgstr "DAT Device lists"
 
 msgid ""
 "Program Mapping is not configured. Please click the link below to go to the "
-"configurations"
+"configurations."
 msgstr ""
 "Program Mapping is not configured. Please click the link below to go to the "
-"configurations"
+"configurations."
 
 msgid "Back"
 msgstr "Back"
