@@ -137,9 +137,15 @@ function DeleteDevice({ emei, inUse }: DeleteDevice) {
 							setShowError(!showError);
 						}}
 					>
-						{i18n.t(
-							`Device with emei ${emei} can not be deleted since it has dependencies with a client`,
-						)}
+						<span>
+							{i18n.t("Device with emei ")}
+							<strong style={{ fontWeight: "bold" }}>
+								{emei}
+							</strong>
+							{i18n.t(
+								" can not be deleted since it has dependencies with a client",
+							)}
+						</span>
 					</AlertBar>
 				</div>
 			)}

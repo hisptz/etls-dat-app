@@ -12,7 +12,7 @@ import { useRecoilState } from "recoil";
 import { edit } from "../state";
 import { FilterField } from "./FilterField";
 import { Option } from "../hooks/data";
-import { useProgramMapping } from "../hooks/save";
+import { useProgramMapping, useProgramStage } from "../hooks/save";
 import { useSetting } from "@dhis2/app-service-datastore";
 import { useSearchParams } from "react-router-dom";
 import { useDataQuery } from "@dhis2/app-runtime";
@@ -34,6 +34,7 @@ function Edit({
 	const [hideEdit, setHide] = useRecoilState<boolean>(edit);
 	const program = params.get("mappedTbProgram");
 	const { programMapping } = useProgramMapping();
+	const { createProgramStage } = useProgramStage();
 	const [, { set: setProgramMapping }] = useSetting("programMapping", {
 		global: true,
 	});
@@ -45,6 +46,7 @@ function Edit({
 			onUpdate({
 				programID: program,
 			});
+			createProgramStage();
 		}
 	};
 
