@@ -6,6 +6,13 @@ import { programMapping } from "../../../../shared/constants";
 export function useProgramMapping() {
 	const [params] = useSearchParams();
 	const programId = params.get("mappedTbProgram");
+	const [programMap] = useSetting("programMapping", { global: true });
+
+	const programStageID =
+		programId == programMap.program
+			? programMap.programStage
+			: generateUid();
+
 	const mediatorUrl = params.get("mediatorUrl");
 	const apiKey = params.get("apiKey");
 	const firstName = params.get("firstName");
@@ -19,6 +26,7 @@ export function useProgramMapping() {
 
 	const programMapping: programMapping = {
 		program: programId ?? "",
+		programStage: programStageID,
 		mediatorUrl: mediatorUrl ?? "",
 		apiKey: apiKey ?? "",
 		attributes: {
@@ -54,18 +62,34 @@ export function getDefaultFilters() {
 	});
 }
 
+export function generateUid() {
+	const letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+	const allowedChars = "0123456789$" + letters;
+	const numberOfCodePoints = allowedChars.length;
+	const codeSize = 11;
+	let uid = "";
+	const charIndex = Math.floor(((Math.random() * 10) / 10) * letters.length);
+	uid = letters.substring(charIndex, charIndex + 1);
+	for (let i = 1; i < codeSize; ++i) {
+		const charIndex = Math.floor(
+			((Math.random() * 10) / 10) * numberOfCodePoints,
+		);
+		uid += allowedChars.substring(charIndex, charIndex + 1);
+	}
+	return uid;
+}
+
 export function useProgramStage() {
 	const [params] = useSearchParams();
 	const programId = params.get("mappedTbProgram");
 	const [programMapping] = useSetting("programMapping", { global: true });
-	const [programStageID] = useSetting("programStage", { global: true });
 
 	const programStage = {
 		programStages: [
 			{
-				id: programStageID ?? "",
+				id: programMapping.programStage,
 				name: "Test Program stage",
-				program: { id: programId ?? programMapping.program },
+				program: { id: programId ?? programMapping.program ?? null },
 				programStageDataElements: [
 					{
 						dataElement: { id: "Vc6c6OjvvHO" },
@@ -127,18 +151,18 @@ export function useProgramStage() {
 
 	const [mutate, { loading, error }] = useDataMutation(createProgramStage);
 
-	const handleCreateMetadata = () => {
+	const handleImportProgramStage = () => {
 		mutate()
 			.then((response) => {
-				console.log("Metadata created:", response);
+				null;
 			})
 			.catch((error) => {
-				console.error("Error creating metadata:", error);
+				null;
 			});
 	};
 
 	return {
-		createProgramStage: handleCreateMetadata,
+		importProgramStage: handleImportProgramStage,
 		loading,
 		error,
 	};

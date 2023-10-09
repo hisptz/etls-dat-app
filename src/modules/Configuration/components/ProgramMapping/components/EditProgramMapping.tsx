@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
 	Button,
 	Modal,
@@ -16,6 +16,7 @@ import { useProgramMapping, useProgramStage } from "../hooks/save";
 import { useSetting } from "@dhis2/app-service-datastore";
 import { useSearchParams } from "react-router-dom";
 import { useDataQuery } from "@dhis2/app-runtime";
+import { isEmpty } from "lodash";
 
 interface EditProps {
 	programOptions: Option[];
@@ -32,23 +33,35 @@ function Edit({
 }: EditProps) {
 	const [params] = useSearchParams();
 	const [hideEdit, setHide] = useRecoilState<boolean>(edit);
+	const [importMeta, setImport] = useState<boolean>(false);
+	const [disabled, setDisabled] = useState<boolean>(true);
 	const program = params.get("mappedTbProgram");
 	const { programMapping } = useProgramMapping();
-	const { createProgramStage } = useProgramStage();
-	const [, { set: setProgramMapping }] = useSetting("programMapping", {
+	const { importProgramStage } = useProgramStage();
+	const [pM, { set: setProgramMapping }] = useSetting("programMapping", {
 		global: true,
 	});
 
 	const onSave = () => {
-		if (programMapping) {
+		if (!isEmpty(programMapping.program)) {
 			setProgramMapping(programMapping);
 			setHide(true);
 			onUpdate({
 				programID: program,
 			});
-			createProgramStage();
+			setImport(!importMeta);
 		}
 	};
+
+	useEffect(() => {
+		if (!isEmpty(pM.program)) {
+			importProgramStage();
+		}
+	}, [importMeta]);
+
+	useEffect(() => {
+		setDisabled(!program);
+	}, [program]);
 
 	if (error) {
 		throw error;
@@ -183,6 +196,7 @@ function Edit({
 							{i18n.t("Hide")}
 						</Button>
 						<Button
+							disabled={disabled}
 							onClick={() => {
 								onSave();
 							}}
