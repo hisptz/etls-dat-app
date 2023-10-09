@@ -86,7 +86,10 @@ export default function DeviceListTable({
 							})}
 						/>
 						<EditDevice emei={selectedDevice?.emei} />
-						<DeleteDevice emei={selectedDevice?.emei} />
+						<DeleteDevice
+							emei={selectedDevice?.emei}
+							inUse={selectedDevice?.inUse}
+						/>
 					</>
 				)}
 			</div>

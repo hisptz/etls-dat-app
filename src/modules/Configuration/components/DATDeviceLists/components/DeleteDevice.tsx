@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
 	Button,
 	Modal,
@@ -6,6 +6,7 @@ import {
 	ModalContent,
 	ModalActions,
 	ButtonStrip,
+	AlertBar,
 } from "@dhis2/ui";
 import i18n from "@dhis2/d2-i18n";
 import { remove } from "../state";
@@ -15,21 +16,30 @@ import { deviceEmeiList } from "../../../../shared/constants";
 
 interface DeleteDevice {
 	emei?: string;
+	inUse?: boolean;
 }
 
-function DeleteDevice({ emei }: DeleteDevice) {
+function DeleteDevice({ emei, inUse }: DeleteDevice) {
 	const [hideModal, setHide] = useRecoilState<boolean>(remove);
 	const [devices, { set: deleteDevice }] = useSetting("deviceEmeiList", {
 		global: true,
 	});
+	const [showError, setShowError] = useState<boolean>(false);
+	const [showSuccess, setShowSuccess] = useState<boolean>(false);
 
 	const onDelete = () => {
 		if (emei) {
-			const updatedDevices = devices.filter(
-				(item: deviceEmeiList) => item["emei"] !== emei,
-			);
-			deleteDevice(updatedDevices);
-			setHide(true);
+			if (!inUse) {
+				const updatedDevices = devices.filter(
+					(item: deviceEmeiList) => item["emei"] !== emei,
+				);
+				deleteDevice(updatedDevices);
+				setShowSuccess(true);
+				setHide(true);
+			} else {
+				setHide(true);
+				setShowError(true);
+			}
 		}
 	};
 
@@ -93,6 +103,46 @@ function DeleteDevice({ emei }: DeleteDevice) {
 					</ButtonStrip>
 				</ModalActions>
 			</Modal>
+			{showSuccess && (
+				<div
+					style={{
+						position: "fixed",
+						bottom: "0",
+						left: "50%",
+						transform: "translateX(-50%)",
+					}}
+				>
+					<AlertBar
+						duration={2000}
+						onHidden={() => {
+							setShowSuccess(!showSuccess);
+						}}
+					>
+						{i18n.t("Device deleted successfully")}
+					</AlertBar>
+				</div>
+			)}
+			{showError && (
+				<div
+					style={{
+						position: "fixed",
+						bottom: "0",
+						left: "50%",
+						transform: "translateX(-50%)",
+					}}
+				>
+					<AlertBar
+						critical
+						onHidden={() => {
+							setShowError(!showError);
+						}}
+					>
+						{i18n.t(
+							`Device with emei ${emei} can not be deleted since it has dependencies with a client`,
+						)}
+					</AlertBar>
+				</div>
+			)}
 		</div>
 	);
 }
