@@ -132,7 +132,7 @@ function DeleteDevice({ emei, inUse }: DeleteDevice) {
 					}}
 				>
 					<AlertBar
-						critical
+						duration={5000}
 						onHidden={() => {
 							setShowError(!showError);
 						}}

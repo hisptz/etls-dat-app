@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2023-10-09T17:21:21.160Z\n"
-"PO-Revision-Date: 2023-10-09T17:21:21.160Z\n"
+"POT-Creation-Date: 2023-10-10T17:43:37.976Z\n"
+"PO-Revision-Date: 2023-10-10T17:43:37.976Z\n"
 
 msgid "39"
 msgstr "39"
@@ -80,11 +80,11 @@ msgstr "First Name"
 msgid "Surname"
 msgstr "Surname"
 
-msgid "TB Identification Number"
-msgstr "TB Identification Number"
+msgid "TB District Number"
+msgstr "TB District Number"
 
-msgid "Date of Birth"
-msgstr "Date of Birth"
+msgid "Age"
+msgstr "Age"
 
 msgid "Sex"
 msgstr "Sex"
@@ -147,14 +147,8 @@ msgstr "Enrollment time"
 msgid "Device Health"
 msgstr "Device Health"
 
-msgid "Very good"
-msgstr "Very good"
-
 msgid "Battery Health"
 msgstr "Battery Health"
-
-msgid "100%"
-msgstr "100%"
 
 msgid "Instance ID is required"
 msgstr "Instance ID is required"
@@ -180,9 +174,6 @@ msgstr "Select Organisation unit"
 msgid "Search Criteria"
 msgstr "Search Criteria"
 
-msgid "TB District Number"
-msgstr "TB District Number"
-
 msgid "Device EMI Number"
 msgstr "Device EMI Number"
 
@@ -207,9 +198,6 @@ msgstr "TB Client"
 msgid "Name"
 msgstr "Name"
 
-msgid "Age"
-msgstr "Age"
-
 msgid "Phone"
 msgstr "Phone"
 
@@ -224,9 +212,6 @@ msgstr "Total Openings"
 
 msgid "Battery Level"
 msgstr "Battery Level"
-
-msgid "97%"
-msgstr "97%"
 
 msgid "Next dose Alarm"
 msgstr "Next dose Alarm"
