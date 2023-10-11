@@ -2,12 +2,31 @@ import React from "react";
 import i18n from "@dhis2/d2-i18n";
 import styles from "./adherenceCalendar.module.css";
 import { PatientProfile } from "../../../../shared/models";
+import Calendar, { DateEvent } from "./components/calendar";
 
 export interface ProfileAreaProps {
 	profile: PatientProfile;
 }
 
 function AdherenceCalendar({ profile }: ProfileAreaProps) {
+	const events: DateEvent[] = [
+		{
+			date: "2023-10-15",
+			event: "enrolled",
+		},
+		{
+			date: "2023-10-18",
+			event: "takenDose",
+		},
+		{
+			date: "2023-10-22",
+			event: "notTakenDose",
+		},
+		{
+			date: "2023-10-30",
+			event: "enrolled",
+		},
+	];
 	return (
 		<div
 			style={{
@@ -21,13 +40,15 @@ function AdherenceCalendar({ profile }: ProfileAreaProps) {
 			<div
 				style={{
 					height: "auto",
-					flex: "3",
+					flex: "4",
 					marginRight: "12px",
 				}}
-			></div>
+			>
+				<Calendar events={events} month={10} year={2023} />
+			</div>
 			<div
 				style={{
-					flex: "1",
+					flex: "2",
 					height: "auto",
 					padding: "32px",
 				}}
@@ -45,7 +66,7 @@ function AdherenceCalendar({ profile }: ProfileAreaProps) {
 							htmlFor="value"
 						>
 							{i18n.t(
-								`${profile.name} was enrolled into the system`
+								`${profile.name} was enrolled into the system`,
 							)}
 						</label>
 					</div>
@@ -68,7 +89,7 @@ function AdherenceCalendar({ profile }: ProfileAreaProps) {
 							className={styles["label-value"]}
 							htmlFor="value"
 						>
-							{i18n.t("Very good")}
+							{profile.deviceHealth}
 						</label>
 					</div>
 					<div className={styles["grid-item"]}>
@@ -79,7 +100,7 @@ function AdherenceCalendar({ profile }: ProfileAreaProps) {
 							className={styles["label-value"]}
 							htmlFor="value"
 						>
-							{i18n.t("100%")}
+							{profile.batteryHealth}
 						</label>
 					</div>
 				</div>

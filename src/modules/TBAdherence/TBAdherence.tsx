@@ -70,6 +70,7 @@ export function TBAdherencePage() {
 										style={{
 											color: "#1362bc",
 											cursor: "pointer",
+											fontWeight: "600",
 										}}
 										onClick={() =>
 											navigate("/configuration")

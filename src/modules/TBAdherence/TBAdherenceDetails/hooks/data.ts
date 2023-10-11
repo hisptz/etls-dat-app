@@ -55,6 +55,7 @@ export function usePatient() {
 
 	return {
 		patient,
+		patientTei,
 		error,
 		loading,
 		refresh,

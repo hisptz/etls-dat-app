@@ -17,8 +17,8 @@ export interface programMapping {
 	attributes?: {
 		firstName?: string;
 		surname?: string;
-		tbIdentificationNumber?: string;
-		dateOfBirth?: string;
+		tbDistrictNumber?: string;
+		age?: string;
 		sex?: string;
 		adherenceFrequency?: string;
 		phoneNumber?: string;
