@@ -1,20 +1,25 @@
 import { TrackedEntityModel } from "./trackedEntityModel";
-import { programMapping } from "../constants";
+import { programMapping, regimenSetting } from "../constants";
 import { DatDeviceInfoEventModel } from "./datDeviceInfo";
-
 import { TrackedEntity } from "../types";
 import { filter, head } from "lodash";
 
 export class PatientProfile extends TrackedEntityModel {
 	programMapping?: programMapping;
+	regimenSettings?: regimenSetting[];
 	datDeviceInfoEvent?: DatDeviceInfoEventModel;
 	programStageID?: string;
 
-	constructor(trackedEntity: TrackedEntity, programMapping: programMapping) {
+	constructor(
+		trackedEntity: TrackedEntity,
+		programMapping: programMapping,
+		regimenSettings: regimenSetting[],
+	) {
 		super(trackedEntity);
 		this.programMapping = programMapping;
 		this.datDeviceInfoEvent = this.getDatDeviceInfoEvent();
 		this.programStageID = programMapping.programStage;
+		this.regimenSettings = regimenSettings;
 	}
 
 	get id(): string {
@@ -68,9 +73,17 @@ export class PatientProfile extends TrackedEntityModel {
 		) as string;
 	}
 	get adherenceFrequency() {
-		return this.getAttributeValue(
-			this.programMapping?.attributes?.adherenceFrequency ?? "",
-		) as string;
+		const regimen = this.getAttributeValue(
+			this.programMapping?.attributes?.regimen ?? "",
+		);
+		let adherenceFrequency;
+		this.regimenSettings?.map((setting) => {
+			if (setting.regimen === regimen) {
+				adherenceFrequency = setting.administration as string;
+			}
+		});
+
+		return adherenceFrequency ?? "Daily";
 	}
 
 	get deviceHealth() {

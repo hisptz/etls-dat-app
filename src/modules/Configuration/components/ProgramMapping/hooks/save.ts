@@ -20,7 +20,7 @@ export function useProgramMapping() {
 	const tbDistrictNumber = params.get("tbDistrictNumber");
 	const age = params.get("age");
 	const sex = params.get("sex");
-	const adherenceFrequency = params.get("adherenceFrequency");
+	const regimen = params.get("regimen");
 	const phoneNumber = params.get("phoneNumber");
 	const deviceIMEInumber = params.get("deviceIMEInumber");
 
@@ -35,7 +35,7 @@ export function useProgramMapping() {
 			tbDistrictNumber: tbDistrictNumber ?? "",
 			age: age ?? "",
 			sex: sex ?? "",
-			adherenceFrequency: adherenceFrequency ?? "",
+			regimen: regimen ?? "",
 			phoneNumber: phoneNumber ?? "",
 			deviceIMEInumber: deviceIMEInumber ?? "",
 		},
@@ -55,7 +55,7 @@ export function getDefaultFilters() {
 		tbDistrictNumber: programMapping.attributes?.tbDistrictNumber ?? "",
 		age: programMapping.attributes?.age ?? "",
 		sex: programMapping.attributes?.sex ?? "",
-		adherenceFrequency: programMapping.attributes?.adherenceFrequency ?? "",
+		regimen: programMapping.attributes?.regimen ?? "",
 		phoneNumber: programMapping.attributes?.phoneNumber ?? "",
 		deviceIMEInumber: programMapping.attributes?.deviceIMEInumber ?? "",
 	});

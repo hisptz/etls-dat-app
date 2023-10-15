@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2023-10-10T17:43:37.976Z\n"
-"PO-Revision-Date: 2023-10-10T17:43:37.976Z\n"
+"POT-Creation-Date: 2023-10-14T09:27:11.951Z\n"
+"PO-Revision-Date: 2023-10-14T09:27:11.951Z\n"
 
 msgid "39"
 msgstr "39"
@@ -47,11 +47,11 @@ msgstr "DAT Device Form"
 msgid "Bulk Upload"
 msgstr "Bulk Upload"
 
-msgid "Add an excel file with a list of devices only"
-msgstr "Add an excel file with a list of devices only"
+msgid "Device file"
+msgstr "Device file"
 
-msgid "Device File"
-msgstr "Device File"
+msgid "Add an excel file with the list of devices only"
+msgstr "Add an excel file with the list of devices only"
 
 msgid "Device IMEI number"
 msgstr "Device IMEI number"
@@ -89,8 +89,8 @@ msgstr "Age"
 msgid "Sex"
 msgstr "Sex"
 
-msgid "Adherence Frequency"
-msgstr "Adherence Frequency"
+msgid "Regimen"
+msgstr "Regimen"
 
 msgid "Phone Number"
 msgstr "Phone Number"
@@ -103,6 +103,39 @@ msgstr "Mediator Url"
 
 msgid "API Key"
 msgstr "API Key"
+
+msgid "Add Setting"
+msgstr "Add Setting"
+
+msgid "Are you sure you want to delete the device with regimen "
+msgstr "Are you sure you want to delete the device with regimen "
+
+msgid "Regimen deleted successfully"
+msgstr "Regimen deleted successfully"
+
+msgid "Regimen Setting Form"
+msgstr "Regimen Setting Form"
+
+msgid "Administration"
+msgstr "Administration"
+
+msgid "Ideal Doses"
+msgstr "Ideal Doses"
+
+msgid "Ideal Duration (Months)"
+msgstr "Ideal Duration (Months)"
+
+msgid "Completion Minimum Doses"
+msgstr "Completion Minimum Doses"
+
+msgid "Completion Maximum Duration (Months)"
+msgstr "Completion Maximum Duration (Months)"
+
+msgid "Setting updated successfully"
+msgstr "Setting updated successfully"
+
+msgid "Regimens Settings not found"
+msgstr "Regimens Settings not found"
 
 msgid "Something went wrong"
 msgstr "Something went wrong"
@@ -127,6 +160,9 @@ msgstr "Configuration"
 
 msgid "DAT Device lists"
 msgstr "DAT Device lists"
+
+msgid "Regimen Settings"
+msgstr "Regimen Settings"
 
 msgid ""
 "Program Mapping is not configured. Please click the link below to go to the "
@@ -197,6 +233,9 @@ msgstr "TB Client"
 
 msgid "Name"
 msgstr "Name"
+
+msgid "Adherence Frequency"
+msgstr "Adherence Frequency"
 
 msgid "Phone"
 msgstr "Phone"

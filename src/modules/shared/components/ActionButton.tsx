@@ -59,7 +59,7 @@ export function ActionButton({
 				display: "flex",
 				flexDirection: "row",
 				height: "20px",
-				width: "20px",
+				width: "70px",
 			}}
 		>
 			{menu.map(({ label, onClick, icon }) => (

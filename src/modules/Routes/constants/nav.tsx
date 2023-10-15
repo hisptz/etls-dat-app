@@ -19,6 +19,7 @@ import { Configuration } from "../../Configuration";
 import { Dashboards } from "../../Dashboards";
 import { ProgramMapping } from "../../Configuration/components/ProgramMapping";
 import { DATDevicelists } from "../../Configuration/components/DATDeviceLists";
+import { RegimenSetUp } from "../../Configuration/components/RegimeSetUp";
 
 export interface NavItem {
 	label?: string | ((data: any) => any);
@@ -98,6 +99,12 @@ export const ROUTES: NavItem[] = [
 				id: "dat-device-lists",
 				label: i18n.t("DAT Device lists"),
 				element: DATDevicelists,
+			},
+			{
+				path: "regimen-setup",
+				id: "regimen-setup",
+				label: i18n.t("Regimen Settings"),
+				element: RegimenSetUp,
 			},
 		],
 	},

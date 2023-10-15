@@ -1,5 +1,7 @@
 export enum TRACKED_ENTITY_ATTRIBUTES {}
 
+export enum SHARED_ATTRIBUTES {}
+
 export enum DATA_ELEMENTS {
 	DEVICE_HEALTH = "QH0OjHcBBpO",
 	BATTERY_HEALTH = "Vc6c6OjvvHO",
