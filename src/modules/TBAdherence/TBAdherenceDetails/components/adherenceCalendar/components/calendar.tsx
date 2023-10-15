@@ -25,9 +25,9 @@ function Calendar({ events, month, year }: CalendarProps) {
 		return event ? cellColors[event.event] : "";
 	};
 
-	const [currentMonth, setCurrentMonth] = useState(month);
+	const [currentMonth, setCurrentMonth] = useState(month - 1);
 	const [currentYear, setCurrentYear] = useState(year);
-
+	const lastDayOfMonthBefore = new Date(currentYear, currentMonth - 1, 0);
 	const firstDayOfMonth = new Date(currentYear, currentMonth, 1);
 	const lastDayOfMonth = new Date(currentYear, currentMonth + 1, 0);
 	const numDays = lastDayOfMonth.getDate();
@@ -49,13 +49,14 @@ function Calendar({ events, month, year }: CalendarProps) {
 		const calendarCells = [];
 
 		for (let i = 0; i < startDay; i++) {
-			const day = lastDayOfMonth.getDate() - startDay + i + 1;
+			const daysBefore = lastDayOfMonthBefore.getDate() - startDay + i;
+			const day = lastDayOfMonth.getDate() - startDay + i; //removed + 1 check to see results
 			calendarCells.push(
 				<div
 					key={i}
 					className={`${styles["calendar-cell"]} ${styles["greyed-out"]}`}
 				>
-					{day}
+					{daysBefore}
 				</div>,
 			);
 		}

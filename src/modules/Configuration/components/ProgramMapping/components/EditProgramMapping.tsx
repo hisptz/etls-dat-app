@@ -144,8 +144,8 @@ function Edit({
 							<FilterField
 								options={attributeOptions}
 								required={true}
-								name="adherenceFrequency"
-								label={i18n.t("Adherence Frequency")}
+								name="regimen"
+								label={i18n.t("Regimen")}
 								type="select"
 							/>
 						</div>

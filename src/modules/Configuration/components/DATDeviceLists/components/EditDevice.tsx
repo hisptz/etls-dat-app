@@ -7,10 +7,9 @@ import {
 	ModalActions,
 	ButtonStrip,
 	SwitchField,
-	FileInputField,
-	FileListItem,
 	AlertBar,
 } from "@dhis2/ui";
+import { RHFDHIS2FormField } from "@hisptz/dhis2-ui";
 import i18n from "@dhis2/d2-i18n";
 import { useRecoilState } from "recoil";
 import { FilterField } from "../../ProgramMapping/components/FilterField";
@@ -19,12 +18,16 @@ import { useSearchParams } from "react-router-dom";
 import { getDefaultFilters } from "../../constants/filters";
 import { useSetting } from "@dhis2/app-service-datastore";
 import { deviceEmeiList } from "../../../../shared/constants";
+import { FormProvider, useForm } from "react-hook-form";
+import { readXLSXFile } from "../hooks/data";
 
 const EditDevice = ({ emei }: { emei?: string }) => {
 	const [hide, setHide] = useRecoilState<boolean>(edit);
 	const [addNew, setAdd] = useRecoilState<boolean>(add);
 	const [bulkUpload, setBulkUpload] = useState<boolean>(false);
 	const [disabled, setDisabled] = useState<boolean>(true);
+	const [deviceFile, setDeviceFile] = useState<File>();
+	const [excelFile, setExcelFile] = useState<{ imeiNumbers: [object] }>();
 	const [params, setParams] = useSearchParams();
 	const [devices, { set: addDevice }] = useSetting("deviceEmeiList", {
 		global: true,
@@ -40,21 +43,36 @@ const EditDevice = ({ emei }: { emei?: string }) => {
 		const defaultValue = getDefaultFilters();
 		setParams(defaultValue);
 	};
+	const methods = useForm();
+
+	const createDeviceFromEMINumber = (deviceEMInumber: string) => ({
+		name: deviceEMInumber,
+		code: deviceEMInumber,
+		emei: deviceEMInumber,
+		inUse: false,
+	});
+
+	const updateDeviceListAndShowSuccess = (updatedDevices: any) => {
+		addDevice(updatedDevices);
+		setHide(true);
+		setAdd(false);
+		setShowSuccess(true);
+	};
 
 	const onSave = () => {
-		if (deviceEMInumber) {
-			const newDevice = {
-				name: deviceEMInumber,
-				code: deviceEMInumber,
-				emei: deviceEMInumber,
-				inUse: false,
-			};
-
+		if (deviceEMInumber && !bulkUpload) {
+			const newDevice = createDeviceFromEMINumber(deviceEMInumber);
 			const updatedDevices = [...devices, newDevice];
-			setHide(true);
-			setAdd(false);
-			addDevice(updatedDevices);
-			setShowSuccess(true);
+			updateDeviceListAndShowSuccess(updatedDevices);
+		} else if (excelFile) {
+			const devicesFromExcel = excelFile.imeiNumbers.map(
+				(deviceEMInumber: any) =>
+					createDeviceFromEMINumber(
+						deviceEMInumber["9.34022E+11"].toString(),
+					),
+			);
+			const updatedDevices = [...devices, ...devicesFromExcel];
+			updateDeviceListAndShowSuccess(updatedDevices);
 		}
 	};
 
@@ -70,10 +88,7 @@ const EditDevice = ({ emei }: { emei?: string }) => {
 					  }
 					: device,
 			);
-			setHide(true);
-			addDevice(updatedDevices);
-			setAdd(false);
-			setShowSuccess(true);
+			updateDeviceListAndShowSuccess(updatedDevices);
 		}
 	};
 
@@ -110,26 +125,31 @@ const EditDevice = ({ emei }: { emei?: string }) => {
 								<br />
 								{bulkUpload && (
 									<div>
-										<FileInputField
-											helpText={i18n.t(
-												"Add an excel file with a list of devices only",
-											)}
-											label={i18n.t("Device File")}
-											accept=".xlsx"
-											name={"IMEI"}
-											onChange={(val: {
-												name: string;
-												files: [];
-											}) => {
-												console.log(val.files);
-											}}
-										>
-											<FileListItem
-												label="IMEI.xlsx"
-												onRemove={() => null}
-												removeText="remove"
+										<FormProvider {...methods}>
+											<RHFDHIS2FormField
+												name="file"
+												valueType="FILE_RESOURCE"
+												label={
+													deviceFile?.name ??
+													i18n.t("Device file")
+												}
+												onChange={(val: File) => {
+													setDeviceFile(val);
+													setDisabled(false);
+													readXLSXFile(val).then(
+														(result) => {
+															setExcelFile(
+																result,
+															);
+														},
+													);
+												}}
+												helpText={i18n.t(
+													"Add an excel file with the list of devices only",
+												)}
+												accept=".xlsx"
 											/>
-										</FileInputField>
+										</FormProvider>
 										<br />
 									</div>
 								)}
