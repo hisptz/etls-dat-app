@@ -120,7 +120,13 @@ function Calendar({ events, month, year }: CalendarProps) {
 					{monthName} {currentYear}
 				</div>
 				<span>
-					<div style={{ marginRight: "20px" }}>
+					<div
+						style={{
+							marginRight: "20px",
+							display: "flex",
+							cursor: "pointer",
+						}}
+					>
 						<div onClick={handlePrevMonth}>
 							<IconChevronLeft24 />
 						</div>

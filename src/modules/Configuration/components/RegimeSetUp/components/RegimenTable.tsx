@@ -108,7 +108,10 @@ export default function RegimenTable({
 								return {
 									...(regimen as CustomDataTableRow),
 									sn: index + 1,
-									action: getActions(regimen, index),
+									action: getActions(
+										regimen,
+										index ?? undefined,
+									),
 								};
 							})}
 						/>

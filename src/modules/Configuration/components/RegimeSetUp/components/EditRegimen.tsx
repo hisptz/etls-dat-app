@@ -46,6 +46,14 @@ const AddSetting = ({
 	const [availableRegimen, setAvailableRegimen] = useState<Option[]>();
 
 	const defaultValue = getEditFilters(index);
+	const regimenOptionsArray = regimenOptions?.map((option) => option.code);
+
+	const filteredRegimenOptions = regimenOptionsArray?.filter((regimen) => {
+		return !settings.some(
+			(item: regimenSetting) => item.regimen === regimen,
+		);
+	});
+
 	useEffect(() => {
 		if (!hide && !addNew) {
 			setParams(defaultValue);
@@ -53,22 +61,13 @@ const AddSetting = ({
 			onResetClick();
 		}
 
-		const regimenOptionsArray = regimenOptions?.map(
-			(option) => option.code,
-		);
-
-		const filtered = settings.filter((item: regimenSetting) => {
-			return !regimenOptionsArray?.includes(item.regimen);
-		});
-		console.log(filtered);
-
-		const transformedSettings: Option[] = filtered.map(
-			(item: regimenSetting) => {
+		const transformedSettings = filteredRegimenOptions?.map(
+			(item: string) => {
 				return {
-					id: item.regimen,
-					name: item.regimen,
-					displayName: item.regimen,
-					code: item.regimen,
+					id: item,
+					name: item,
+					displayName: item,
+					code: item,
 				};
 			},
 		);
@@ -100,6 +99,15 @@ const AddSetting = ({
 		const defaultValue = getDefaultFilters();
 		setParams(defaultValue);
 	};
+
+	const currentRegimen: Option[] = [
+		{
+			name: regimens ?? "",
+			code: regimens ?? "",
+			displayName: regimens ?? "",
+			id: regimens ?? "",
+		},
+	];
 
 	const createRegimenSetting = (regimens: regimenSetting) => ({
 		regimen: regimens.regimen,
@@ -194,7 +202,9 @@ const AddSetting = ({
 					<div>
 						<div style={{ padding: "5px" }}>
 							<FilterField
-								options={regimenOptions}
+								options={
+									addNew ? availableRegimen : currentRegimen
+								}
 								label={i18n.t("Regimen")}
 								name="regimen"
 								type="select"
