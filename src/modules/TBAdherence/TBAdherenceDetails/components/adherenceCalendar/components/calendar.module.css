@@ -1,6 +1,6 @@
 .calendar {
 	display: grid;
-	grid-template-columns: repeat(7, 125px);
+	grid-template-columns: repeat(7, 135px);
 	max-width: 1200px;
 	margin: 0 auto;
 	font-family: Arial, sans-serif;
@@ -34,7 +34,7 @@
 }
 
 .calendar-cell {
-	width: 125px;
+	width: 135px;
 	height: 65px;
 	background-color: #f2f3f7;
 	display: flex;
@@ -42,7 +42,6 @@
 	justify-content: center;
 	font-weight: "500";
 	border: 0.1rem solid #ccc;
-	cursor: pointer;
 }
 
 .calendar-week-cell {
@@ -81,16 +80,19 @@
 .blue {
 	background-color: #42a5f5;
 	color: white;
+	cursor: pointer;
 }
 
 .green {
 	background-color: #4caf50;
 	color: white;
+	cursor: pointer;
 }
 
 .red {
 	background-color: #f44336;
 	color: white;
+	cursor: pointer;
 }
 
 .greyed-out {

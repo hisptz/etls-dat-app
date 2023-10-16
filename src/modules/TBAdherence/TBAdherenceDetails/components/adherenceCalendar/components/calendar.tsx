@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import styles from "./calendar.module.css";
+import i18n from "@dhis2/d2-i18n";
 import { IconChevronRight24, IconChevronLeft24 } from "@dhis2/ui";
 
 export interface DateEvent {
@@ -9,23 +10,24 @@ export interface DateEvent {
 
 interface CalendarProps {
 	events: DateEvent[];
-	month: number; // Month as a number (0-11)
-	year: number;
+	frequency: "Daily" | "Weekly" | "Monthly" | string;
 }
 
-function Calendar({ events, month, year }: CalendarProps) {
+function Calendar({ events, frequency }: CalendarProps) {
 	const cellColors = {
 		enrolled: "blue",
 		takenDose: "green",
 		notTakenDose: "red",
 	};
+	const month = new Date().getMonth();
+	const year = new Date().getFullYear();
 
 	const getCellColor = (date: any) => {
 		const event = events.find((event) => event.date === date);
 		return event ? cellColors[event.event] : "";
 	};
 
-	const [currentMonth, setCurrentMonth] = useState(month - 1);
+	const [currentMonth, setCurrentMonth] = useState(month);
 	const [currentYear, setCurrentYear] = useState(year);
 
 	const firstDayOfMonth = new Date(currentYear, currentMonth, 1);
@@ -106,7 +108,7 @@ function Calendar({ events, month, year }: CalendarProps) {
 		return calendarCells;
 	};
 
-	function renderWeeklyCalendar() {
+	const renderWeeklyCalendar = () => {
 		const calendarCells = [];
 		const weeksInMonth = 4;
 		for (let week = 1; week <= weeksInMonth; week++) {
@@ -140,12 +142,11 @@ function Calendar({ events, month, year }: CalendarProps) {
 		}
 
 		return calendarCells;
-	}
+	};
 
-	function renderMonthlyCalendar() {
+	const renderMonthlyCalendar = () => {
 		const calendarCells = [];
-		const currentYear = new Date().getFullYear(); // Get the current year
-		const monthsInYear = 12; // Number of months in a year
+		const monthsInYear = 12;
 
 		for (let month = 0; month < monthsInYear; month++) {
 			let monthColor = "";
@@ -176,7 +177,7 @@ function Calendar({ events, month, year }: CalendarProps) {
 		}
 
 		return calendarCells;
-	}
+	};
 
 	const handlePrevMonth = () => {
 		if (currentMonth === 0) {
@@ -196,6 +197,13 @@ function Calendar({ events, month, year }: CalendarProps) {
 		}
 	};
 
+	const handlePrevYear = () => {
+		setCurrentYear(currentYear - 1);
+	};
+	const handleNextYear = () => {
+		setCurrentYear(currentYear + 1);
+	};
+
 	const monthName = new Intl.DateTimeFormat("en-US", {
 		month: "long",
 	}).format(firstDayOfMonth);
@@ -204,34 +212,72 @@ function Calendar({ events, month, year }: CalendarProps) {
 		<>
 			<div className={styles["calendar-header"]}>
 				<div>
-					{monthName} {currentYear}
+					{frequency != "Monthly" ? i18n.t(monthName) : null}{" "}
+					{currentYear}
 				</div>
 				<span>
-					<div
-						style={{
-							marginRight: "80px",
-							display: "flex",
-							cursor: "pointer",
-						}}
-					>
-						<div onClick={handlePrevMonth}>
-							<IconChevronLeft24 />
+					{frequency != "Monthly" ? (
+						<div
+							style={{
+								marginRight: "20px",
+								display: "flex",
+
+								width: "100px",
+								justifyContent: "space-between",
+							}}
+						>
+							<div
+								onClick={handlePrevMonth}
+								style={{ cursor: "pointer" }}
+							>
+								<IconChevronLeft24 />
+							</div>
+							<div
+								onClick={handleNextMonth}
+								style={{ cursor: "pointer" }}
+							>
+								<IconChevronRight24 />
+							</div>
 						</div>
-						<div onClick={handleNextMonth}>
-							<IconChevronRight24 />
+					) : (
+						<div
+							style={{
+								marginRight: "20px",
+								display: "flex",
+
+								width: "100px",
+								justifyContent: "space-between",
+							}}
+						>
+							<div
+								onClick={handlePrevYear}
+								style={{ cursor: "pointer" }}
+							>
+								<IconChevronLeft24 />
+							</div>
+							<div
+								onClick={handleNextYear}
+								style={{ cursor: "pointer" }}
+							>
+								<IconChevronRight24 />
+							</div>
 						</div>
-					</div>
+					)}
 				</span>
 			</div>
-			<div className={styles["calendar"]}>
-				{renderDayNames()} {renderDailyCalendar()}
-			</div>
-			<div className={styles["calendar-week"]}>
-				{renderWeeklyCalendar()}
-			</div>
-			<div className={styles["calendar-monthly"]}>
-				{renderMonthlyCalendar()}
-			</div>
+			{frequency == "Daily" ? (
+				<div className={styles["calendar"]}>
+					{renderDayNames()} {renderDailyCalendar()}
+				</div>
+			) : frequency == "Weekly" ? (
+				<div className={styles["calendar-week"]}>
+					{renderWeeklyCalendar()}
+				</div>
+			) : (
+				<div className={styles["calendar-monthly"]}>
+					{renderMonthlyCalendar()}
+				</div>
+			)}
 		</>
 	);
 }

@@ -48,7 +48,10 @@ function AdherenceCalendar({ profile }: ProfileAreaProps) {
 					marginRight: "12px",
 				}}
 			>
-				<Calendar events={events} month={10} year={2023} />
+				<Calendar
+					events={events}
+					frequency={profile.adherenceFrequency}
+				/>
 			</div>
 			<div
 				style={{
