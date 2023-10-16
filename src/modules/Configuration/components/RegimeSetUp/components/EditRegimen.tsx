@@ -100,6 +100,15 @@ const AddSetting = ({
 		setParams(defaultValue);
 	};
 
+	const currentRegimen: Option[] = [
+		{
+			name: regimens ?? "",
+			code: regimens ?? "",
+			displayName: regimens ?? "",
+			id: regimens ?? "",
+		},
+	];
+
 	const createRegimenSetting = (regimens: regimenSetting) => ({
 		regimen: regimens.regimen,
 		administration: regimens.administration,
@@ -194,7 +203,7 @@ const AddSetting = ({
 						<div style={{ padding: "5px" }}>
 							<FilterField
 								options={
-									addNew ? availableRegimen : regimenOptions
+									addNew ? availableRegimen : currentRegimen
 								}
 								label={i18n.t("Regimen")}
 								name="regimen"
