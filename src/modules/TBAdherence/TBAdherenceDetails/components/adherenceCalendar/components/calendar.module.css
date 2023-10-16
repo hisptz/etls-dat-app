@@ -5,6 +5,25 @@
 	margin: 0 auto;
 	font-family: Arial, sans-serif;
 }
+
+.calendar-week {
+	display: grid;
+	grid-template-columns: repeat(4, 220px);
+	max-width: 1200px;
+	margin: 0 auto;
+	font-family: Arial, sans-serif;
+	padding-top: 20px;
+}
+
+.calendar-monthly {
+	display: grid;
+	grid-template-columns: repeat(4, 230px);
+	max-width: 1200px;
+	margin: 0 auto;
+	font-family: Arial, sans-serif;
+	padding-top: 20px;
+}
+
 .calendar-header {
 	font-size: 27px;
 	font-weight: bold;
@@ -17,6 +36,30 @@
 .calendar-cell {
 	width: 125px;
 	height: 65px;
+	background-color: #f2f3f7;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-weight: "500";
+	border: 0.1rem solid #ccc;
+	cursor: pointer;
+}
+
+.calendar-week-cell {
+	width: 230px;
+	height: 70px;
+	background-color: #f2f3f7;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-weight: "500";
+	border: 0.1rem solid #ccc;
+	cursor: pointer;
+}
+
+.calendar-cell-monthly {
+	width: 250px;
+	height: 70px;
 	background-color: #f2f3f7;
 	display: flex;
 	align-items: center;

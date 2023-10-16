@@ -27,6 +27,7 @@ function Calendar({ events, month, year }: CalendarProps) {
 
 	const [currentMonth, setCurrentMonth] = useState(month - 1);
 	const [currentYear, setCurrentYear] = useState(year);
+
 	const firstDayOfMonth = new Date(currentYear, currentMonth, 1);
 	const lastDayOfMonth = new Date(currentYear, currentMonth + 1, 0);
 
@@ -42,7 +43,7 @@ function Calendar({ events, month, year }: CalendarProps) {
 		));
 	};
 
-	const renderCalendarCells = () => {
+	const renderDailyCalendar = () => {
 		const numDays = lastDayOfMonth.getDate();
 		const startDay = firstDayOfMonth.getDay();
 
@@ -65,6 +66,7 @@ function Calendar({ events, month, year }: CalendarProps) {
 				<div
 					key={`before-${i}`}
 					className={`${styles["calendar-cell"]} ${styles["greyed-out"]}`}
+					style={{ fontSize: "18px" }}
 				>
 					{prevMonthDay}
 				</div>,
@@ -80,6 +82,7 @@ function Calendar({ events, month, year }: CalendarProps) {
 				<div
 					key={i}
 					className={`${styles["calendar-cell"]} ${styles[cellColor]}`}
+					style={{ fontSize: "18px" }}
 				>
 					<span style={{ fontSize: "18px" }}>{i}</span>
 				</div>,
@@ -93,6 +96,7 @@ function Calendar({ events, month, year }: CalendarProps) {
 				<div
 					key={`empty-${i}`}
 					className={`${styles["calendar-cell"]} ${styles["greyed-out"]}`}
+					style={{ fontSize: "18px" }}
 				>
 					{i}
 				</div>,
@@ -101,6 +105,78 @@ function Calendar({ events, month, year }: CalendarProps) {
 
 		return calendarCells;
 	};
+
+	function renderWeeklyCalendar() {
+		const calendarCells = [];
+		const weeksInMonth = 4;
+		for (let week = 1; week <= weeksInMonth; week++) {
+			let weekColor = "";
+
+			// Determine the start and end dates of this week
+			const startDate = new Date(
+				currentYear,
+				currentMonth,
+				(week - 1) * 7 + 1,
+			);
+			const endDate = new Date(currentYear, currentMonth, week * 8);
+
+			for (const event of events) {
+				const eventDate = new Date(event.date);
+				if (eventDate >= startDate && eventDate <= endDate) {
+					weekColor = cellColors[event.event];
+					break; // Exit the loop once an event is found for this week
+				}
+			}
+
+			calendarCells.push(
+				<div
+					key={`before-${week}`}
+					className={`${styles["calendar-week-cell"]} ${styles[weekColor]}`}
+					style={{ fontSize: "18px" }}
+				>
+					Week {week}
+				</div>,
+			);
+		}
+
+		return calendarCells;
+	}
+
+	function renderMonthlyCalendar() {
+		const calendarCells = [];
+		const currentYear = new Date().getFullYear(); // Get the current year
+		const monthsInYear = 12; // Number of months in a year
+
+		for (let month = 0; month < monthsInYear; month++) {
+			let monthColor = "";
+
+			// Determine the start and end dates of the current month
+			const startDate = new Date(currentYear, month, 1);
+			const endDate = new Date(currentYear, month + 1, 0);
+
+			for (const event of events) {
+				const eventDate = new Date(event.date);
+				if (eventDate >= startDate && eventDate <= endDate) {
+					monthColor = cellColors[event.event];
+					break; // Exit the loop once an event is found for this month
+				}
+			}
+
+			calendarCells.push(
+				<div
+					key={`month-${month}`}
+					className={`${styles["calendar-cell-monthly"]} ${styles[monthColor]}`}
+					style={{ fontSize: "18px" }}
+				>
+					{new Date(currentYear, month, 1).toLocaleString("default", {
+						month: "long",
+					})}
+				</div>,
+			);
+		}
+
+		return calendarCells;
+	}
 
 	const handlePrevMonth = () => {
 		if (currentMonth === 0) {
@@ -148,8 +224,13 @@ function Calendar({ events, month, year }: CalendarProps) {
 				</span>
 			</div>
 			<div className={styles["calendar"]}>
-				{renderDayNames()}
-				{renderCalendarCells()}
+				{renderDayNames()} {renderDailyCalendar()}
+			</div>
+			<div className={styles["calendar-week"]}>
+				{renderWeeklyCalendar()}
+			</div>
+			<div className={styles["calendar-monthly"]}>
+				{renderMonthlyCalendar()}
 			</div>
 		</>
 	);
