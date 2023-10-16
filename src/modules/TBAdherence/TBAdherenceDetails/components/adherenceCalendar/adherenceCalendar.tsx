@@ -11,7 +11,11 @@ export interface ProfileAreaProps {
 function AdherenceCalendar({ profile }: ProfileAreaProps) {
 	const events: DateEvent[] = [
 		{
-			date: "2023-10-15",
+			date: "2023-09-30",
+			event: "takenDose",
+		},
+		{
+			date: "2023-10-01",
 			event: "enrolled",
 		},
 		{
@@ -19,7 +23,7 @@ function AdherenceCalendar({ profile }: ProfileAreaProps) {
 			event: "takenDose",
 		},
 		{
-			date: "2023-10-22",
+			date: "2023-10-31",
 			event: "notTakenDose",
 		},
 		{
@@ -44,7 +48,10 @@ function AdherenceCalendar({ profile }: ProfileAreaProps) {
 					marginRight: "12px",
 				}}
 			>
-				<Calendar events={events} month={10} year={2023} />
+				<Calendar
+					events={events}
+					frequency={profile.adherenceFrequency}
+				/>
 			</div>
 			<div
 				style={{
