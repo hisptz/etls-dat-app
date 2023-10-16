@@ -62,7 +62,7 @@ function DeleteSetting({ regimen }: DeleteSetting) {
 							fontWeight: "500",
 						}}
 					>
-						{i18n.t("Delete DAT Device")}
+						{i18n.t("Delete Regimen Setting")}
 					</h3>
 				</ModalTitle>
 				<ModalContent>
