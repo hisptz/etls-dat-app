@@ -27,11 +27,8 @@ function Calendar({ events, month, year }: CalendarProps) {
 
 	const [currentMonth, setCurrentMonth] = useState(month - 1);
 	const [currentYear, setCurrentYear] = useState(year);
-	const lastDayOfMonthBefore = new Date(currentYear, currentMonth - 1, 0);
 	const firstDayOfMonth = new Date(currentYear, currentMonth, 1);
 	const lastDayOfMonth = new Date(currentYear, currentMonth + 1, 0);
-	const numDays = lastDayOfMonth.getDate();
-	const startDay = firstDayOfMonth.getDay();
 
 	const dayNames = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
 
@@ -46,23 +43,36 @@ function Calendar({ events, month, year }: CalendarProps) {
 	};
 
 	const renderCalendarCells = () => {
+		const numDays = lastDayOfMonth.getDate();
+		const startDay = firstDayOfMonth.getDay();
+
 		const calendarCells = [];
 
+		// Calculate the previous month and year
+		const prevMonthYear =
+			currentMonth === 0 ? currentYear - 1 : currentYear;
+		const prevMonth = currentMonth === 0 ? 11 : currentMonth - 1;
+		const prevMonthLastDay = new Date(
+			prevMonthYear,
+			prevMonth + 1,
+			0,
+		).getDate();
+
+		// Generate cells for the days before the 1st of the current month
 		for (let i = 0; i < startDay; i++) {
-			const daysBefore = lastDayOfMonthBefore.getDate() - startDay + i;
-			const day = lastDayOfMonth.getDate() - startDay + i; //removed + 1 check to see results
+			const prevMonthDay = prevMonthLastDay - (startDay - i) + 1;
 			calendarCells.push(
 				<div
-					key={i}
+					key={`before-${i}`}
 					className={`${styles["calendar-cell"]} ${styles["greyed-out"]}`}
 				>
-					{daysBefore}
+					{prevMonthDay}
 				</div>,
 			);
 		}
 
 		for (let i = 1; i <= numDays; i++) {
-			const currentDate = new Date(currentYear, currentMonth, i);
+			const currentDate = new Date(currentYear, currentMonth, i + 1);
 			const cellColor = getCellColor(
 				currentDate.toISOString().split("T")[0],
 			);
@@ -81,13 +91,14 @@ function Calendar({ events, month, year }: CalendarProps) {
 		for (let i = 1; i <= numEmptyCells; i++) {
 			calendarCells.push(
 				<div
-					key={i}
+					key={`empty-${i}`}
 					className={`${styles["calendar-cell"]} ${styles["greyed-out"]}`}
 				>
 					{i}
 				</div>,
 			);
 		}
+
 		return calendarCells;
 	};
 
@@ -122,7 +133,7 @@ function Calendar({ events, month, year }: CalendarProps) {
 				<span>
 					<div
 						style={{
-							marginRight: "20px",
+							marginRight: "80px",
 							display: "flex",
 							cursor: "pointer",
 						}}

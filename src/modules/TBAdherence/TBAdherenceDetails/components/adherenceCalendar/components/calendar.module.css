@@ -1,6 +1,6 @@
 .calendar {
 	display: grid;
-	grid-template-columns: repeat(7, 135px);
+	grid-template-columns: repeat(7, 125px);
 	max-width: 1200px;
 	margin: 0 auto;
 	font-family: Arial, sans-serif;
@@ -15,8 +15,8 @@
 }
 
 .calendar-cell {
-	width: 135px;
-	height: 75px;
+	width: 125px;
+	height: 65px;
 	background-color: #f2f3f7;
 	display: flex;
 	align-items: center;

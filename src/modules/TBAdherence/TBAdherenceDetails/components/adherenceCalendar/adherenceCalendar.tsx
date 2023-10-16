@@ -19,7 +19,7 @@ function AdherenceCalendar({ profile }: ProfileAreaProps) {
 			event: "takenDose",
 		},
 		{
-			date: "2023-10-22",
+			date: "2023-10-31",
 			event: "notTakenDose",
 		},
 		{
