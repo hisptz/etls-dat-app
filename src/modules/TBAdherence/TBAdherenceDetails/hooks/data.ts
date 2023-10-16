@@ -23,6 +23,9 @@ export function usePatient() {
 	const [programMapping] = useSetting("programMapping", {
 		global: true,
 	});
+	const [regimenSetting] = useSetting("regimenSetting", {
+		global: true,
+	});
 
 	const program = programMapping.program;
 	const patientState = useRecoilValueLoadable(
@@ -49,12 +52,17 @@ export function usePatient() {
 
 	const patient = useMemo(() => {
 		if (patientTei) {
-			return new PatientProfile(patientTei, programMapping);
+			return new PatientProfile(
+				patientTei,
+				programMapping,
+				regimenSetting,
+			);
 		}
 	}, [patientTei]);
 
 	return {
 		patient,
+		patientTei,
 		error,
 		loading,
 		refresh,

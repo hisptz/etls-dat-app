@@ -11,7 +11,7 @@ import { useSetting } from "@dhis2/app-service-datastore";
 import { FullPageLoader } from "../../../shared/components/Loaders";
 
 import { isEmpty } from "lodash";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { PatientProfile } from "../../../shared/models/profile";
 
 export interface AdherenceTableProps {

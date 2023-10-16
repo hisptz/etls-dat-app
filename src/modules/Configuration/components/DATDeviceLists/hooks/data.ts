@@ -1,73 +1,27 @@
-import { useSetting } from "@dhis2/app-service-datastore";
-import { useDataQuery } from "@dhis2/app-runtime";
-import { useMemo } from "react";
-import { DEFAULT_SETTINGS } from "../../../../shared/constants";
+import { read, write, utils } from "xlsx";
 
-const query = {
-	yellowFever: {
-		resource: "optionGroups",
-		id: ({ yellowFeverCountriesOptionGroupId }: any) =>
-			yellowFeverCountriesOptionGroupId,
-		params: {
-			fields: [
-				"id",
-				"name",
-				"shortName",
-				"optionSet[id]",
-				"options[id,code,name]",
-				"publicAccess",
-			],
-		},
-	},
-	countries: {
-		resource: "optionSets",
-		id: ({ countriesOptionSetId }: any) => countriesOptionSetId,
-		params: {
-			fields: ["options[id,code,name]"],
-		},
-	},
-};
+export function readXLSXFile(file: File) {
+	return new Promise((resolve, reject) => {
+		try {
+			const reader = new FileReader();
+			reader.onload = (e) => {
+				const data = e.target?.result;
+				const workbook = read(data, { type: "array" });
+				const sheetName = workbook.SheetNames[0];
+				const worksheet = workbook.Sheets[sheetName];
+				const jsonData = utils.sheet_to_json(worksheet);
+				const imeiNumbers = jsonData.map((row: any) => row);
 
-export interface Option {
-	id: string;
-	name: string;
-	code: string;
-}
+				resolve({ imeiNumbers });
+			};
 
-interface QueryType {
-	yellowFever: {
-		options: Array<Option>;
-	};
-	countries: {
-		options: Array<Option>;
-	};
-}
+			reader.onerror = (e) => {
+				reject({ error: "Error reading XLSX file" });
+			};
 
-export function useYellowFeverCountries() {
-	const [settings] = useSetting("settings", { global: true });
-	const { yellowFeverCountriesOptionGroupId, countriesOptionSetId } =
-		settings ?? DEFAULT_SETTINGS.settings;
-	const { data, loading, refetch, error } = useDataQuery<QueryType>(query, {
-		variables: {
-			yellowFeverCountriesOptionGroupId,
-			countriesOptionSetId,
-		},
+			reader.readAsArrayBuffer(file);
+		} catch (error) {
+			reject({ error: "Error reading XLSX file" });
+		}
 	});
-
-	const yellowFeverCountries = useMemo(() => {
-		return data?.yellowFever?.options?.map(({ code }) => code) ?? [];
-	}, [data]);
-
-	const countries = useMemo(() => {
-		return data?.countries?.options ?? [];
-	}, [data]);
-
-	return {
-		yellowFeverCountries,
-		countries,
-		loading,
-		error,
-		refetch,
-		optionGroup: data?.yellowFever,
-	};
 }

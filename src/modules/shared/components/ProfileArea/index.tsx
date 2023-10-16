@@ -181,7 +181,7 @@ export function ProfileArea({ profile }: ProfileAreaProps) {
 									className={styles["label-value"]}
 									htmlFor="value"
 								>
-									{i18n.t("Very good")}
+									{profile.deviceHealth}
 								</label>
 							</div>
 							<div className={styles["grid-item"]}>
@@ -195,7 +195,7 @@ export function ProfileArea({ profile }: ProfileAreaProps) {
 									className={styles["label-value"]}
 									htmlFor="value"
 								>
-									{i18n.t("97%")}
+									{profile.batteryHealth}
 								</label>
 							</div>
 							<div className={styles["grid-item"]}>
@@ -208,7 +208,10 @@ export function ProfileArea({ profile }: ProfileAreaProps) {
 								<label
 									className={styles["label-value"]}
 									htmlFor="value"
-								></label>
+								>
+									{" "}
+									{profile.dosageTime}
+								</label>
 							</div>
 
 							<div className={styles["grid-item"]}>
@@ -221,7 +224,10 @@ export function ProfileArea({ profile }: ProfileAreaProps) {
 								<label
 									className={styles["label-value"]}
 									htmlFor="value"
-								></label>
+								>
+									{" "}
+									{i18n.t("Next refill Alarm")}{" "}
+								</label>
 							</div>
 
 							<div className={styles["grid-item"]}>
@@ -234,7 +240,9 @@ export function ProfileArea({ profile }: ProfileAreaProps) {
 								<label
 									className={styles["label-value"]}
 									htmlFor="value"
-								></label>
+								>
+									{i18n.t("Last updated")}
+								</label>
 							</div>
 						</div>
 					</div>

@@ -9,6 +9,15 @@ export interface deviceEmeiList {
 	name: string;
 	code: string;
 }
+
+export interface regimenSetting {
+	regimen: string;
+	administration: string;
+	idealDoses: string;
+	idealDuration: string;
+	completionMinimumDoses: string;
+	completionMaximumDuration: string;
+}
 export interface programMapping {
 	program?: string;
 	programStage?: string;
@@ -17,10 +26,10 @@ export interface programMapping {
 	attributes?: {
 		firstName?: string;
 		surname?: string;
-		tbIdentificationNumber?: string;
-		dateOfBirth?: string;
+		tbDistrictNumber?: string;
+		age?: string;
 		sex?: string;
-		adherenceFrequency?: string;
+		regimen?: string;
 		phoneNumber?: string;
 		deviceIMEInumber?: string;
 	};
@@ -56,6 +65,8 @@ export const TBAdherence: TBAdherenceConfig[] = [
 
 export const deviceEmeiList: deviceEmeiList[] = [];
 
+export const regimenSetting: regimenSetting[] = [];
+
 export const programMapping: programMapping = {};
 
 export const DEFAULT_SETTINGS = {
@@ -63,6 +74,7 @@ export const DEFAULT_SETTINGS = {
 	TBAdherence,
 	programMapping,
 	deviceEmeiList,
+	regimenSetting,
 } as const;
 
 export const IN_APP_SETTINGS = {};

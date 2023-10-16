@@ -117,8 +117,8 @@ function Edit({
 							<FilterField
 								options={attributeOptions}
 								required={true}
-								name="tbIdentificationNumber"
-								label={i18n.t("TB Identification Number")}
+								name="tbDistrictNumber"
+								label={i18n.t("TB District Number")}
 								type="select"
 							/>
 						</div>
@@ -126,8 +126,8 @@ function Edit({
 							<FilterField
 								options={attributeOptions}
 								required={true}
-								name="dateOfBirth"
-								label={i18n.t("Date of Birth")}
+								name="age"
+								label={i18n.t("Age")}
 								type="select"
 							/>
 						</div>
@@ -144,8 +144,8 @@ function Edit({
 							<FilterField
 								options={attributeOptions}
 								required={true}
-								name="adherenceFrequency"
-								label={i18n.t("Adherence Frequency")}
+								name="regimen"
+								label={i18n.t("Regimen")}
 								type="select"
 							/>
 						</div>

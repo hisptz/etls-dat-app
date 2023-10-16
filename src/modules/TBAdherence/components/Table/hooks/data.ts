@@ -59,7 +59,7 @@ type Data = {
 export function filterObject(programMapping: programMapping) {
 	const filtersConfig: any = {
 		tbDistrictNumber: {
-			attribute: programMapping.attributes?.tbIdentificationNumber,
+			attribute: programMapping.attributes?.tbDistrictNumber,
 			operator: "eq",
 		},
 		deviceEMInumber: {
@@ -103,6 +103,9 @@ export function useTBAdherenceTableData() {
 	const [programMapping] = useSetting("programMapping", {
 		global: true,
 	});
+	const [regimenSetting] = useSetting("regimenSetting", {
+		global: true,
+	});
 	const [pagination, setPagination] = useState<Pagination>();
 	const [params] = useSearchParams();
 	const orgUnit = params.get("ou");
@@ -139,7 +142,11 @@ export function useTBAdherenceTableData() {
 		if (data) {
 			setPatients(
 				data?.patients.instances.map((tei) => {
-					return new PatientProfile(tei, programMapping);
+					return new PatientProfile(
+						tei,
+						programMapping,
+						regimenSetting,
+					);
 				}) ?? [],
 			);
 			setPagination({
@@ -158,7 +165,8 @@ export function useTBAdherenceTableData() {
 		query: query,
 		queryKey: "report",
 		mapping: (data: TrackedEntity) => {
-			return new PatientProfile(data, programMapping).tableData;
+			return new PatientProfile(data, programMapping, regimenSetting)
+				.tableData;
 		},
 	});
 

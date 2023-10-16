@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
 	Button,
 	Modal,
@@ -12,34 +12,36 @@ import i18n from "@dhis2/d2-i18n";
 import { remove } from "../state";
 import { useRecoilState } from "recoil";
 import { useSetting } from "@dhis2/app-service-datastore";
-import { deviceEmeiList } from "../../../../shared/constants";
+import { regimenSetting } from "../../../../shared/constants";
+import { getDefaultFilters } from "../../constants/filters";
+import { useSearchParams } from "react-router-dom";
 
-interface DeleteDevice {
-	emei?: string;
-	inUse?: boolean;
+interface DeleteSetting {
+	regimen?: string;
 }
 
-function DeleteDevice({ emei, inUse }: DeleteDevice) {
+function DeleteSetting({ regimen }: DeleteSetting) {
 	const [hideModal, setHide] = useRecoilState<boolean>(remove);
-	const [devices, { set: deleteDevice }] = useSetting("deviceEmeiList", {
+	const [regimens, { set: deleteSetting }] = useSetting("regimenSetting", {
 		global: true,
 	});
-	const [showError, setShowError] = useState<boolean>(false);
 	const [showSuccess, setShowSuccess] = useState<boolean>(false);
+	const [, setParams] = useSearchParams();
+
+	const defaultValue = getDefaultFilters();
+	useEffect(() => {
+		setParams(defaultValue);
+	}, []);
 
 	const onDelete = () => {
-		if (emei) {
-			if (!inUse) {
-				const updatedDevices = devices.filter(
-					(item: deviceEmeiList) => item["emei"] !== emei,
-				);
-				deleteDevice(updatedDevices);
-				setShowSuccess(true);
-				setHide(true);
-			} else {
-				setHide(true);
-				setShowError(true);
-			}
+		if (regimen) {
+			const updatedRegimens = regimens.filter(
+				(item: regimenSetting) => item["regimen"] !== regimen,
+			);
+			deleteSetting(updatedRegimens);
+			setShowSuccess(true);
+			setHide(true);
+			setParams(defaultValue);
 		}
 	};
 
@@ -60,7 +62,7 @@ function DeleteDevice({ emei, inUse }: DeleteDevice) {
 							fontWeight: "500",
 						}}
 					>
-						{i18n.t("Delete DAT Device")}
+						{i18n.t("Delete Regimen Setting")}
 					</h3>
 				</ModalTitle>
 				<ModalContent>
@@ -74,11 +76,11 @@ function DeleteDevice({ emei, inUse }: DeleteDevice) {
 					>
 						<label style={{ fontSize: "16px" }}>
 							{i18n.t(
-								"Are you sure you want to delete the device with EMEI ",
+								"Are you sure you want to delete this regimen setting ",
 							)}
 						</label>
 						<span style={{ fontWeight: "bold" }}>
-							{i18n.t(`${emei}`)}
+							{i18n.t(`${regimen}`)}
 						</span>
 					</div>
 				</ModalContent>
@@ -118,34 +120,7 @@ function DeleteDevice({ emei, inUse }: DeleteDevice) {
 							setShowSuccess(!showSuccess);
 						}}
 					>
-						{i18n.t("Device deleted successfully")}
-					</AlertBar>
-				</div>
-			)}
-			{showError && (
-				<div
-					style={{
-						position: "fixed",
-						bottom: "0",
-						left: "50%",
-						transform: "translateX(-50%)",
-					}}
-				>
-					<AlertBar
-						duration={5000}
-						onHidden={() => {
-							setShowError(!showError);
-						}}
-					>
-						<span>
-							{i18n.t("Device with emei ")}
-							<strong style={{ fontWeight: "bold" }}>
-								{emei}
-							</strong>
-							{i18n.t(
-								" can not be deleted since it has dependencies with a client",
-							)}
-						</span>
+						{i18n.t("Regimen deleted successfully")}
 					</AlertBar>
 				</div>
 			)}
@@ -153,4 +128,4 @@ function DeleteDevice({ emei, inUse }: DeleteDevice) {
 	);
 }
 
-export default DeleteDevice;
+export default DeleteSetting;

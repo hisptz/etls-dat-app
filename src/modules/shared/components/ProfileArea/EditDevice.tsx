@@ -14,6 +14,7 @@ import { FilterField } from "../../../Configuration/components/ProgramMapping/co
 import { useSetting } from "@dhis2/app-service-datastore";
 import { deviceEmeiList } from "../../constants";
 import { useSearchParams } from "react-router-dom";
+import { useAssignDevice } from "../utils/assignDevice";
 
 interface editDeviceProps {
 	name: string;
@@ -30,6 +31,7 @@ function EditDevice({ name, value }: editDeviceProps) {
 	const deviceEMInumber = params.get("deviceEMInumber");
 	const [availableDevices, setAvailableDevices] =
 		useState<deviceEmeiList[]>();
+	const { assignDevice } = useAssignDevice();
 
 	useEffect(() => {
 		setAvailableDevices(
@@ -52,6 +54,7 @@ function EditDevice({ name, value }: editDeviceProps) {
 						? false
 						: device.inUse,
 			}));
+			assignDevice();
 			setHide(true);
 			updateDevice(updatedDevices);
 		}

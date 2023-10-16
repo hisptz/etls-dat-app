@@ -1,5 +1,11 @@
-export enum TRACKED_ENTITY_ATTRIBUTES {
-	AGE = "ycm08j1RuKr",
+export enum TRACKED_ENTITY_ATTRIBUTES {}
+
+export enum SHARED_ATTRIBUTES {}
+
+export enum DATA_ELEMENTS {
+	DEVICE_HEALTH = "QH0OjHcBBpO",
+	BATTERY_HEALTH = "Vc6c6OjvvHO",
+	DOSAGE_TIME = "FOHv6pUjBjv",
 }
 
-export enum DATA_ELEMENTS {}
+export enum PROGRAM_STAGES {}

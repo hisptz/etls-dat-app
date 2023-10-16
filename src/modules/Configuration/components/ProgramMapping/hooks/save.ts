@@ -17,10 +17,10 @@ export function useProgramMapping() {
 	const apiKey = params.get("apiKey");
 	const firstName = params.get("firstName");
 	const surname = params.get("surname");
-	const tbIdentificationNumber = params.get("tbIdentificationNumber");
-	const dateOfBirth = params.get("dateOfBirth");
+	const tbDistrictNumber = params.get("tbDistrictNumber");
+	const age = params.get("age");
 	const sex = params.get("sex");
-	const adherenceFrequency = params.get("adherenceFrequency");
+	const regimen = params.get("regimen");
 	const phoneNumber = params.get("phoneNumber");
 	const deviceIMEInumber = params.get("deviceIMEInumber");
 
@@ -32,10 +32,10 @@ export function useProgramMapping() {
 		attributes: {
 			firstName: firstName ?? "",
 			surname: surname ?? "",
-			tbIdentificationNumber: tbIdentificationNumber ?? "",
-			dateOfBirth: dateOfBirth ?? "",
+			tbDistrictNumber: tbDistrictNumber ?? "",
+			age: age ?? "",
 			sex: sex ?? "",
-			adherenceFrequency: adherenceFrequency ?? "",
+			regimen: regimen ?? "",
 			phoneNumber: phoneNumber ?? "",
 			deviceIMEInumber: deviceIMEInumber ?? "",
 		},
@@ -52,11 +52,10 @@ export function getDefaultFilters() {
 		apiKey: programMapping.apiKey ?? "",
 		firstName: programMapping.attributes?.firstName ?? "",
 		surname: programMapping.attributes?.surname ?? "",
-		tbIdentificationNumber:
-			programMapping.attributes?.tbIdentificationNumber ?? "",
-		dateOfBirth: programMapping.attributes?.dateOfBirth ?? "",
+		tbDistrictNumber: programMapping.attributes?.tbDistrictNumber ?? "",
+		age: programMapping.attributes?.age ?? "",
 		sex: programMapping.attributes?.sex ?? "",
-		adherenceFrequency: programMapping.attributes?.adherenceFrequency ?? "",
+		regimen: programMapping.attributes?.regimen ?? "",
 		phoneNumber: programMapping.attributes?.phoneNumber ?? "",
 		deviceIMEInumber: programMapping.attributes?.deviceIMEInumber ?? "",
 	});
