@@ -5,6 +5,25 @@
 	margin: 0 auto;
 	font-family: Arial, sans-serif;
 }
+
+.calendar-week {
+	display: grid;
+	grid-template-columns: repeat(4, 220px);
+	max-width: 1200px;
+	margin: 0 auto;
+	font-family: Arial, sans-serif;
+	padding-top: 20px;
+}
+
+.calendar-monthly {
+	display: grid;
+	grid-template-columns: repeat(4, 230px);
+	max-width: 1200px;
+	margin: 0 auto;
+	font-family: Arial, sans-serif;
+	padding-top: 20px;
+}
+
 .calendar-header {
 	font-size: 27px;
 	font-weight: bold;
@@ -16,7 +35,30 @@
 
 .calendar-cell {
 	width: 135px;
-	height: 75px;
+	height: 65px;
+	background-color: #f2f3f7;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-weight: "500";
+	border: 0.1rem solid #ccc;
+}
+
+.calendar-week-cell {
+	width: 230px;
+	height: 70px;
+	background-color: #f2f3f7;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-weight: "500";
+	border: 0.1rem solid #ccc;
+	cursor: pointer;
+}
+
+.calendar-cell-monthly {
+	width: 230px;
+	height: 70px;
 	background-color: #f2f3f7;
 	display: flex;
 	align-items: center;
@@ -38,16 +80,19 @@
 .blue {
 	background-color: #42a5f5;
 	color: white;
+	cursor: pointer;
 }
 
 .green {
 	background-color: #4caf50;
 	color: white;
+	cursor: pointer;
 }
 
 .red {
 	background-color: #f44336;
 	color: white;
+	cursor: pointer;
 }
 
 .greyed-out {
