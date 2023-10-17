@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2023-10-16T05:21:08.381Z\n"
-"PO-Revision-Date: 2023-10-16T05:21:08.381Z\n"
+"POT-Creation-Date: 2023-10-17T09:08:15.621Z\n"
+"PO-Revision-Date: 2023-10-17T09:08:15.621Z\n"
 
 msgid "39"
 msgstr "39"
@@ -182,6 +182,21 @@ msgstr "Summary"
 
 msgid "Enrollment time"
 msgstr "Enrollment time"
+
+msgid "Dose Taken"
+msgstr "Dose Taken"
+
+msgid "Yes"
+msgstr "Yes"
+
+msgid "No"
+msgstr "No"
+
+msgid "N/A"
+msgstr "N/A"
+
+msgid "Dose Taken at"
+msgstr "Dose Taken at"
 
 msgid "Device Health"
 msgstr "Device Health"

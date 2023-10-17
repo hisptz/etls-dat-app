@@ -41,7 +41,7 @@
 	align-items: center;
 	justify-content: center;
 	font-weight: "500";
-	border: 0.1rem solid #ccc;
+	border: 0.1rem solid #cccccc6c;
 }
 
 .calendar-week-cell {
@@ -52,7 +52,7 @@
 	align-items: center;
 	justify-content: center;
 	font-weight: "500";
-	border: 0.1rem solid #ccc;
+	border: 0.1rem solid #cccccc6c;
 	cursor: pointer;
 }
 
@@ -64,7 +64,7 @@
 	align-items: center;
 	justify-content: center;
 	font-weight: "500";
-	border: 0.1rem solid #ccc;
+	border: 0.1rem solid #cccccc6c;
 	cursor: pointer;
 }
 
@@ -97,5 +97,5 @@
 
 .greyed-out {
 	color: #ccc;
-	background-color: #f0f0f0;
+	background-color: #f2f3f7;
 }
