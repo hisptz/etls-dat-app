@@ -1,18 +1,20 @@
 import i18n from "@dhis2/d2-i18n";
 import styles from "./ProfileArea.module.css";
-import { Button, IconEdit24, Card } from "@dhis2/ui";
+import { Button, IconEdit24, Card, ButtonStrip, IconClock24 } from "@dhis2/ui";
 import React from "react";
 import EditDevice from "./EditDevice";
 import { PatientProfile } from "../../models";
 import { useRecoilState } from "recoil";
-import { AddDevice } from "../../state";
+import { AddAlarm, AddDevice } from "../../state";
+import EditAlarm from "./AddAlarm";
 
 export interface ProfileAreaProps {
 	profile: PatientProfile;
 }
 
 export function ProfileArea({ profile }: ProfileAreaProps) {
-	const [, setHide] = useRecoilState<boolean>(AddDevice);
+	const [, setHideDevice] = useRecoilState<boolean>(AddDevice);
+	const [, setHideAlarm] = useRecoilState<boolean>(AddAlarm);
 
 	return (
 		<div>
@@ -146,13 +148,22 @@ export function ProfileArea({ profile }: ProfileAreaProps) {
 								</h2>
 							</div>
 						</div>
-						<Button
-							secondary
-							icon={<IconEdit24 />}
-							onClick={() => setHide(false)}
-						>
-							{i18n.t("Edit Device")}
-						</Button>
+						<ButtonStrip>
+							<Button
+								secondary
+								icon={<IconEdit24 />}
+								onClick={() => setHideDevice(false)}
+							>
+								{i18n.t("Edit Device")}
+							</Button>
+							<Button
+								secondary
+								icon={<IconClock24 />}
+								onClick={() => setHideAlarm(false)}
+							>
+								{i18n.t("Set Alarm")}
+							</Button>
+						</ButtonStrip>
 					</div>
 					<div className={styles["profile"]}>
 						<div className={styles["profile-container"]}>
@@ -249,6 +260,7 @@ export function ProfileArea({ profile }: ProfileAreaProps) {
 				</Card>
 			</div>
 			<EditDevice value={profile.deviceIMEINumber} name={profile.name} />
+			<EditAlarm nextDose="" nextRefill="" />
 		</div>
 	);
 }
