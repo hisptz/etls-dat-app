@@ -69,10 +69,12 @@ export default function TBAdherenceTable({
 			},
 		];
 		return (
-			<AdherenceStreak
-				events={events}
-				frequency={patient.adherenceFrequency}
-			/>
+			<div style={{ width: "120px" }}>
+				<AdherenceStreak
+					events={events}
+					frequency={patient.adherenceFrequency}
+				/>
+			</div>
 		);
 	}
 
