@@ -86,7 +86,7 @@ function EditAlarm({ nextDose, nextRefill }: addAlarmProps) {
 							<div
 								style={{
 									width: "300px",
-									marginBottom: "30px",
+									marginBottom: "20px",
 									marginRight: "10px",
 								}}
 							>
@@ -111,7 +111,7 @@ function EditAlarm({ nextDose, nextRefill }: addAlarmProps) {
 							<div
 								style={{
 									width: "300px",
-									marginBottom: "30px",
+									marginBottom: "20px",
 									marginRight: "10px",
 								}}
 							>

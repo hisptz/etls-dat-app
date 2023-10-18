@@ -13,6 +13,7 @@ import { FullPageLoader } from "../../../shared/components/Loaders";
 import { isEmpty } from "lodash";
 import { useNavigate } from "react-router-dom";
 import { PatientProfile } from "../../../shared/models/profile";
+import AdherenceStreak from "../../../shared/components/AdherenceStreak/AdherenceStreak";
 
 export interface AdherenceTableProps {
 	loading: boolean;
@@ -35,6 +36,45 @@ export default function TBAdherenceTable({
 			navigate(`/tbadherence/${row.id}`);
 		}
 	};
+	function getAdherenceStreak(patient: PatientProfile) {
+		const events: any = [
+			{
+				date: "2023-08-07",
+				event: "takenDose",
+			},
+			{
+				date: "2023-09-20",
+				event: "notTakenDose",
+			},
+			{
+				date: "2023-09-30",
+				event: "takenDose",
+			},
+			{
+				date: "2023-10-01",
+				event: "enrolled",
+			},
+			{
+				date: "2023-10-18",
+				event: "takenDose",
+			},
+			{
+				date: "2023-11-30",
+				event: "notTakenDose",
+			},
+
+			{
+				date: "2023-10-31",
+				event: "notTakenDose",
+			},
+		];
+		return (
+			<AdherenceStreak
+				events={events}
+				frequency={patient.adherenceFrequency}
+			/>
+		);
+	}
 
 	return (
 		<div className="w-100 h-100">
@@ -54,6 +94,8 @@ export default function TBAdherenceTable({
 							rows={patients.map((patient) => {
 								return {
 									...(patient.tableData as CustomDataTableRow),
+									adherenceStreak:
+										getAdherenceStreak(patient),
 								};
 							})}
 						/>

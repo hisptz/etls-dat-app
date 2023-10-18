@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2023-10-17T17:47:32.073Z\n"
-"PO-Revision-Date: 2023-10-17T17:47:32.073Z\n"
+"POT-Creation-Date: 2023-10-18T05:35:25.827Z\n"
+"PO-Revision-Date: 2023-10-18T05:35:25.827Z\n"
 
 msgid "39"
 msgstr "39"
@@ -246,8 +246,14 @@ msgstr "Reload"
 msgid "Set Device Alarm"
 msgstr "Set Device Alarm"
 
-msgid "Next Dose Alarm"
-msgstr "Next Dose Alarm"
+msgid "Next Dose Date"
+msgstr "Next Dose Date"
+
+msgid "Alarm"
+msgstr "Alarm"
+
+msgid "Next Refill Date"
+msgstr "Next Refill Date"
 
 msgid "Assign the device number, or click clear to clear previous device"
 msgstr "Assign the device number, or click clear to clear previous device"
