@@ -60,13 +60,13 @@ function AdherenceStreak({ events, frequency }: CalendarProps) {
 
 			const tooltipId = `daily-tooltip-${i}`;
 			const tooltipContent = i18n.t(
-				`Date: ${formatDate(cellDate)}\nStatus: ${
+				`Date: ${formatDate(cellDate)} \n Status: ${
 					cellColor
 						? cellColor == "green"
-							? "Taken Dose"
+							? "Dose Taken"
 							: cellColor == "blue"
 							? "Enrolled"
-							: "Not Taken Dose"
+							: "Dose Missed"
 						: "N/A"
 				}`,
 			);
@@ -122,10 +122,10 @@ function AdherenceStreak({ events, frequency }: CalendarProps) {
 				`Week: ${week}\nStatus: ${
 					weekColor
 						? weekColor == "green"
-							? "Taken Dose"
+							? "Dose Taken"
 							: weekColor == "blue"
 							? "Enrolled"
-							: "Not Taken Dose"
+							: "Dose Missed"
 						: "N/A"
 				}`,
 			);
