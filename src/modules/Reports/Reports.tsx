@@ -51,7 +51,7 @@ export function Reports() {
 				value={reportType! && periods! && orgUnit!}
 			/>
 			<div>
-				{true ? (
+				{false ? (
 					<div className="flex-1">
 						<ReportTable
 							reports={reports}
@@ -66,6 +66,7 @@ export function Reports() {
 							display: "flex",
 							justifyContent: "center",
 							padding: "64px",
+							fontSize: "18px",
 						}}
 					>
 						{i18n.t(

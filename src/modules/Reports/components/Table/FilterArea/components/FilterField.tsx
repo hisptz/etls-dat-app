@@ -1,11 +1,11 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
 	InputField,
 	MultiSelectField,
 	MultiSelectOption,
 	SingleSelectField,
 	SingleSelectOption,
-	IconLaunch24,
+	IconLaunch16,
 	IconTable24,
 	MenuItem,
 	Modal,
@@ -62,11 +62,22 @@ export function FilterField({
 	const [orgUnits, setOrgUnits] = useState<boolean>(true);
 	const [periods, setPeriods] = useState<boolean>(true);
 	const [reports, setReports] = useState<boolean>(true);
-	const [selectedReport, setSelectedReport] = useState<string>();
 	const [selectedOrgUnits, setSelectedOrgUnits] = useState<[]>();
-	const [selectedPeriods, setSelectedPeriods] = useState<[]>();
+	const [selectedPeriods, setSelectedPeriods] = useState<any>();
 	const [reportConfig] = useSetting("reports", { global: true });
 	const { orgUnit, loading } = useOrgUnit();
+
+	function transformAndJoinArray(inputArray: string[]) {
+		for (let i = 0; i < inputArray.length; i++) {
+			const item = inputArray[i].replace(/_/g, " ").toLowerCase();
+			const words = item.split(" ");
+			for (let j = 0; j < words.length; j++) {
+				words[j] = words[j].charAt(0).toUpperCase() + words[j].slice(1);
+			}
+			inputArray[i] = words.join(" ");
+		}
+		return inputArray.join(", ");
+	}
 
 	const onChange = ({ value }: { value: any }) => {
 		setParams((params) => {
@@ -95,7 +106,6 @@ export function FilterField({
 
 	const showSelection = () => {
 		if (type === "organisation units") {
-			console.log(orgUnit);
 			setOrgUnits(false);
 		}
 		if (type === "periods") {
@@ -111,18 +121,16 @@ export function FilterField({
 			return loading
 				? i18n.t("Loading...")
 				: (selectedOrgUnits ?? orgUnit)?.map((orgUnit: any) => {
-						return value
-							?.split(";")
-							.map((ou: string) => {
-								if (orgUnit.id == ou) {
-									return orgUnit.displayName;
-								}
-							})
-							.join(", ");
+						return value?.split(";").map((ou: string) => {
+							if (orgUnit.id == ou) {
+								return orgUnit.displayName;
+							}
+						});
 				  });
 		}
 		if (type === "periods") {
-			return "Period";
+			const periods = transformAndJoinArray(value?.split(",") ?? []);
+			return periods;
 		}
 		if (type === "report") {
 			return reportConfig?.map((report: ReportConfig) => {
@@ -219,32 +227,34 @@ export function FilterField({
 				<span style={{ marginRight: "5px" }}>
 					{value ? showSelected() : i18n.t(`Choose ${type}`)}
 				</span>
-				<IconLaunch24 color="#888989" />
+				<IconLaunch16 color="#888989" />
 			</div>
-			<OrgUnitSelectorModal
-				value={{
-					orgUnits: compact(orgUnit),
-				}}
-				hide={orgUnits}
-				onClose={() => {
-					setOrgUnits(!orgUnits);
-				}}
-				onUpdate={async (val: any) => {
-					setOrgUnits(!orgUnits);
+			{loading ? null : (
+				<OrgUnitSelectorModal
+					value={{
+						orgUnits: orgUnit,
+					}}
+					hide={orgUnits}
+					onClose={() => {
+						setOrgUnits(!orgUnits);
+					}}
+					onUpdate={async (val: any) => {
+						setOrgUnits(!orgUnits);
 
-					onChange({ value: val.orgUnits });
-					setSelectedOrgUnits(val.orgUnits);
-				}}
-			/>
+						onChange({ value: val.orgUnits });
+						setSelectedOrgUnits(val.orgUnits);
+					}}
+				/>
+			)}
 			<PeriodSelectorModal
 				enablePeriodSelector
 				hide={periods}
+				selectedPeriods={type == "periods" ? value?.split(",") : []}
 				onClose={() => {
 					setPeriods(!periods);
 				}}
 				onUpdate={async (val: any) => {
 					setPeriods(!periods);
-					console.log(val);
 					onChange({ value: val });
 				}}
 			/>
