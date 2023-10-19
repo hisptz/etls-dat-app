@@ -26,6 +26,7 @@ import i18n from "@dhis2/d2-i18n";
 import { OrgUnitSelectorModal } from "@hisptz/dhis2-ui";
 import { PeriodSelectorModal } from "@hisptz/dhis2-ui";
 import { useSetting } from "@dhis2/app-service-datastore";
+import { useOrgUnit } from "../../../../utils/orgUnits";
 
 export interface ReportType {
 	id?: string;
@@ -62,18 +63,22 @@ export function FilterField({
 	const [periods, setPeriods] = useState<boolean>(true);
 	const [reports, setReports] = useState<boolean>(true);
 	const [selectedReport, setSelectedReport] = useState<string>();
-	const [selectedOrgUnits, setSelectedOrgUnits] = useState();
-	const [selectedPeriods, setSelectedPeriods] = useState();
+	const [selectedOrgUnits, setSelectedOrgUnits] = useState<[]>();
+	const [selectedPeriods, setSelectedPeriods] = useState<[]>();
 	const [reportConfig] = useSetting("reports", { global: true });
+	const { orgUnit, loading } = useOrgUnit();
+
 	const onChange = ({ value }: { value: any }) => {
 		setParams((params) => {
 			const updatedParams = new URLSearchParams(params);
 			updatedParams.set(
 				name,
 				type == "organisation units"
-					? value.map((ou: any) => {
-							return ou.id;
-					  })
+					? value
+							.map((ou: any) => {
+								return ou.id;
+							})
+							.join(";")
 					: value,
 			);
 
@@ -90,6 +95,7 @@ export function FilterField({
 
 	const showSelection = () => {
 		if (type === "organisation units") {
+			console.log(orgUnit);
 			setOrgUnits(false);
 		}
 		if (type === "periods") {
@@ -102,7 +108,18 @@ export function FilterField({
 
 	const showSelected = () => {
 		if (type === "organisation units") {
-			return "OU";
+			return loading
+				? i18n.t("Loading...")
+				: (selectedOrgUnits ?? orgUnit)?.map((orgUnit: any) => {
+						return value
+							?.split(";")
+							.map((ou: string) => {
+								if (orgUnit.id == ou) {
+									return orgUnit.displayName;
+								}
+							})
+							.join(", ");
+				  });
 		}
 		if (type === "periods") {
 			return "Period";
@@ -205,15 +222,18 @@ export function FilterField({
 				<IconLaunch24 color="#888989" />
 			</div>
 			<OrgUnitSelectorModal
-				value={{}}
+				value={{
+					orgUnits: compact(orgUnit),
+				}}
 				hide={orgUnits}
 				onClose={() => {
 					setOrgUnits(!orgUnits);
 				}}
 				onUpdate={async (val: any) => {
 					setOrgUnits(!orgUnits);
-					console.log(val.orgUnits);
+
 					onChange({ value: val.orgUnits });
+					setSelectedOrgUnits(val.orgUnits);
 				}}
 			/>
 			<PeriodSelectorModal
