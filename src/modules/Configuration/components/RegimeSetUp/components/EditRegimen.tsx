@@ -18,6 +18,7 @@ import { useSetting } from "@dhis2/app-service-datastore";
 import { regimenSetting } from "../../../../shared/constants";
 import { Option, useRegimens } from "../hooks/data";
 import { getEditFilters } from "../hooks/save";
+import { isEmpty } from "lodash";
 
 const AddSetting = ({
 	regimen,
@@ -35,6 +36,9 @@ const AddSetting = ({
 	const [settings, { set: addRegimen }] = useSetting("regimenSetting", {
 		global: true,
 	});
+	const [programMapping] = useSetting("programMapping", {
+		global: true,
+	});
 	const regimens = params.get("regimen");
 	const administration = params.get("administration");
 	const idealDoses = params.get("idealDoses");
@@ -42,7 +46,8 @@ const AddSetting = ({
 	const completionMinimumDoses = params.get("completionMinimumDoses");
 	const completionMaximumDuration = params.get("completionMaximumDuration");
 	const [showSuccess, setShowSuccess] = useState<boolean>(false);
-	const { regimenOptions, administrationOptions, loading } = useRegimens();
+	const { regimenOptions, administrationOptions, loading, refetch } =
+		useRegimens();
 	const [availableRegimen, setAvailableRegimen] = useState<Option[]>();
 
 	const defaultValue = getEditFilters(index);
@@ -55,22 +60,27 @@ const AddSetting = ({
 	});
 
 	useEffect(() => {
+		if (!isEmpty(programMapping.attributes.regimen)) {
+			refetch();
+		}
+	}, []);
+
+	useEffect(() => {
 		if (!hide && !addNew) {
 			setParams(defaultValue);
 		} else {
 			onResetClick();
 		}
 
-		const transformedSettings = filteredRegimenOptions?.map(
-			(item: string) => {
+		const transformedSettings: Option[] =
+			filteredRegimenOptions?.map((item: string) => {
 				return {
 					id: item,
 					name: item,
 					displayName: item,
 					code: item,
 				};
-			},
-		);
+			}) ?? [];
 
 		setAvailableRegimen(transformedSettings);
 	}, [hide, index]);
