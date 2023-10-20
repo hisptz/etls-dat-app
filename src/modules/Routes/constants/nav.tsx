@@ -20,6 +20,7 @@ import { Dashboards } from "../../Dashboards";
 import { ProgramMapping } from "../../Configuration/components/ProgramMapping";
 import { DATDevicelists } from "../../Configuration/components/DATDeviceLists";
 import { RegimenSetUp } from "../../Configuration/components/RegimeSetUp";
+import { getDefaultReportFilters } from "../../Reports/constants/filters";
 
 export interface NavItem {
 	label?: string | ((data: any) => any);

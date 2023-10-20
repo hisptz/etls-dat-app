@@ -7,11 +7,13 @@ import { useDownloadData } from "../../../utils/download";
 import { PatientProfile } from "../../../../shared/models";
 import {
 	DAT_PROGRAM,
+	ReportConfig,
 	TEI_FIELDS,
 	programMapping,
 } from "../../../../shared/constants";
 import { TrackedEntity } from "../../../../shared/types";
 import { useSetting } from "@dhis2/app-service-datastore";
+import { DateTime } from "luxon";
 
 const query: any = {
 	reports: {
@@ -19,7 +21,7 @@ const query: any = {
 		params: ({
 			page,
 			pageSize,
-			filters,
+			periods,
 			startDate,
 			endDate,
 			program,
@@ -28,6 +30,7 @@ const query: any = {
 			page: number;
 			pageSize: number;
 			filters?: string[];
+			periods: string;
 			startDate?: string;
 			endDate?: string;
 			program: string;
@@ -40,7 +43,7 @@ const query: any = {
 			program,
 			orgUnit,
 			rootJunction: "OR",
-			filter: filters,
+			enrolledAt: periods,
 			totalPages: true,
 			ouMode: "DESCENDANTS",
 			fields: TEI_FIELDS,
@@ -98,7 +101,7 @@ export function useFilters() {
 }
 
 export function useReportTableData() {
-	const { filters, startDate } = useFilters();
+	const { filters } = useFilters();
 	const [reports, setreports] = useState<PatientProfile[]>([]);
 	const [programMapping] = useSetting("programMapping", {
 		global: true,
@@ -109,13 +112,19 @@ export function useReportTableData() {
 	const [pagination, setPagination] = useState<Pagination>();
 	const [params] = useSearchParams();
 	const orgUnit = params.get("ou");
+	const reportType = params.get("reportType");
+	const [reportConfigs] = useSetting("reports", { global: true });
+
+	const endDate = DateTime.now().toFormat("yyyy-MM-dd");
+	const startDate = DateTime.now().minus({ year: 1 }).toFormat("yyyy-MM-dd");
 
 	const { data, loading, error, refetch } = useDataQuery<Data>(query, {
 		variables: {
 			page: 1,
-			pageSize: 10,
+			pageSize: 20,
 			program: DAT_PROGRAM(),
 			startDate,
+			endDate,
 			filters,
 			orgUnit,
 		},
@@ -163,19 +172,40 @@ export function useReportTableData() {
 	const { download, downloading } = useDownloadData({
 		resource: "tracker/trackedEntities",
 		query: query,
-		queryKey: "report",
+		queryKey: "reports",
 		mapping: (data: TrackedEntity) => {
-			return new PatientProfile(data, programMapping, regimenSetting)
-				.tableData;
+			const downloadData = new PatientProfile(
+				data,
+				programMapping,
+				regimenSetting,
+			).tableData;
+
+			let i;
+			reportConfigs.map((report: ReportConfig, index: number) => {
+				if (report.id === reportType) {
+					i = index;
+				}
+			});
+
+			const { columns } = reportConfigs[parseInt(`${i ?? 0}`)];
+
+			return Object.fromEntries(
+				Object.entries(downloadData).filter(([key]) =>
+					columns.map(({ key }: any) => key).includes(key),
+				),
+			);
 		},
 	});
+
+	const programId = DAT_PROGRAM();
 
 	const onDownload = (type: "xlsx" | "csv" | "json") => {
 		if (!isEmpty(orgUnit) && !isEmpty(startDate)) {
 			download(type, {
 				orgUnit,
 				filters,
-				program: DAT_PROGRAM(),
+				startDate,
+				program: programId,
 			});
 		}
 	};

@@ -1,13 +1,12 @@
 import { DATA_TEST_PREFIX } from "../shared/constants";
 import React, { useEffect, useState } from "react";
 import i18n from "@dhis2/d2-i18n";
-
 import { Outlet, useSearchParams } from "react-router-dom";
-
 import { isEmpty } from "lodash";
 import { useReportTableData } from "./components/Table/hooks/data";
 import ReportTable from "./components/Table";
 import FilterArea from "./components/Table/FilterArea";
+import { getDefaultReportFilters } from "./constants/filters";
 
 export function ReportsOutlet() {
 	return <Outlet />;
@@ -22,17 +21,17 @@ export function Reports() {
 	const [enabled, setenabled] = useState<boolean>(false);
 
 	useEffect(() => {
-		if (!isEmpty(reportType)) {
+		if (!isEmpty(reportType && periods && orgUnit)) {
 			setenabled(true);
 			refetch({
 				page: 1,
-				periods,
 				orgUnit,
+				periods,
 			});
 		} else {
 			setenabled(false);
 		}
-	}, []);
+	}, [reportType, orgUnit, periods]);
 
 	return (
 		<div
@@ -42,16 +41,9 @@ export function Reports() {
 			<h1 className="m-0" style={{ marginBottom: "16px" }}>
 				{i18n.t("Reports")}
 			</h1>
-			<FilterArea
-				loading={loading}
-				onFetch={refetch}
-				show={() => {
-					setenabled(true);
-				}}
-				value={reportType! && periods! && orgUnit!}
-			/>
+			<FilterArea />
 			<div>
-				{false ? (
+				{enabled ? (
 					<div className="flex-1">
 						<ReportTable
 							reports={reports}

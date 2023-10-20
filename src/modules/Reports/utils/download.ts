@@ -10,14 +10,14 @@ import { saveAs } from "file-saver";
 export async function downloadFile(
 	type: "xlsx" | "json" | "csv",
 	data: any[],
-	options?: { filename?: string }
+	options?: { filename?: string },
 ) {
 	if (type === "json") {
 		saveAs(
 			new File([JSON.stringify(data)] as any, "data.json", {
 				type: "json",
 			}),
-			`${options?.filename ?? "data"}.json`
+			`${options?.filename ?? "data"}.json`,
 		);
 	} else if (type === "xlsx") {
 		const excel = await import("xlsx");
@@ -33,7 +33,7 @@ export async function downloadFile(
 			new File([csvData], "data.csv", {
 				type: "csv",
 			}),
-			`${options?.filename ?? "data"}.csv`
+			`${options?.filename ?? "data"}.csv`,
 		);
 	}
 }
@@ -43,7 +43,7 @@ async function getPagination(
 	{
 		queryVariables,
 		queryKey,
-	}: { queryVariables: Record<string, any>; queryKey: string }
+	}: { queryVariables: Record<string, any>; queryKey: string },
 ): Promise<Pagination> {
 	const data = await refetch({
 		...queryVariables,
@@ -71,7 +71,7 @@ async function getData(
 		resource: string;
 		mapping: any;
 		page: number;
-	}
+	},
 ): Promise<Array<Record<string, any>>> {
 	const data = await refetch({ ...options, page });
 	const rawData = get(data, [queryKey, "instances"]);
@@ -94,7 +94,7 @@ export function useDownloadData({
 }) {
 	const { show, hide } = useAlert(
 		({ message }) => message,
-		({ type }) => ({ ...type, duration: 10000 })
+		({ type }) => ({ ...type, duration: 10000 }),
 	);
 
 	const [downloading, setDownloading] = useState(false);
@@ -119,7 +119,7 @@ export function useDownloadData({
 	const download = useCallback(
 		async (
 			type: "xlsx" | "csv" | "json",
-			queryVariables: Record<string, any>
+			queryVariables: Record<string, any>,
 		) => {
 			try {
 				setDownloading(true);
@@ -130,7 +130,7 @@ export function useDownloadData({
 
 				if (pagination) {
 					const pageCount = Math.ceil(
-						pagination.total! / pagination.pageSize!
+						pagination.total! / pagination.pageSize!,
 					);
 					setPageCount(pageCount);
 					const dataFetch = async (page: number) => {
@@ -147,7 +147,7 @@ export function useDownloadData({
 									info: true,
 								},
 								message: `${i18n.t(
-									"Downloading..."
+									"Downloading...",
 								)} ${progress}/${pageCount}`,
 							});
 							return data;
@@ -157,8 +157,8 @@ export function useDownloadData({
 						const data = flattenDeep(
 							await mapSeries(
 								range(1, pageCount + 1),
-								asyncify(dataFetch)
-							)
+								asyncify(dataFetch),
+							),
 						);
 						await downloadFile(type, data);
 					}
@@ -173,7 +173,7 @@ export function useDownloadData({
 				hide();
 			}
 		},
-		[hide, mapping, queryKey, refetch, resource, show]
+		[hide, mapping, queryKey, refetch, resource, show],
 	);
 
 	return {
@@ -196,7 +196,7 @@ export function downloadJSON(rows: any, reportName = "report"): void {
 export function downloadLineListingReport(
 	format: string,
 	rows: any[],
-	reportName = "report"
+	reportName = "report",
 ): void {
 	const workSheet = XLSX.utils.json_to_sheet(rows);
 	const workbook = XLSX.utils.book_new();

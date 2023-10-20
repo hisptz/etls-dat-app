@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
 	CustomDataTable,
 	CustomDataTableColumn,
@@ -11,13 +11,15 @@ import { useSetting } from "@dhis2/app-service-datastore";
 import { FullPageLoader } from "../../../shared/components/Loaders";
 
 import { isEmpty } from "lodash";
-import { useNavigate } from "react-router-dom";
-import { reportProfile } from "../../../shared/models/profile";
+
+import { PatientProfile } from "../../../shared/models/profile";
 import Download from "../../Download";
+import { useSearchParams } from "react-router-dom";
+import { ReportConfig } from "../../../shared/constants";
 
 export interface AdherenceTableProps {
 	loading: boolean;
-	reports: reportProfile[];
+	reports: PatientProfile[];
 	pagination: Pagination;
 }
 
@@ -26,16 +28,20 @@ export default function ReportTable({
 	reports,
 	pagination,
 }: AdherenceTableProps) {
-	const [TBAdherence] = useSetting("TBAdherence", { global: true });
-	const navigate = useNavigate();
+	const [Reports] = useSetting("reports", { global: true });
+	const [params] = useSearchParams();
+	const reportType = params.get("reportType");
+	const [selectedReport, setSelectedReport] = useState<[] | any>();
 
-	const onRowClick = (id: string) => {
-		const row = reports.find((report) => report.id === id);
-
-		if (row) {
-			navigate(`/tbadherence/${row.id}`);
+	useEffect(() => {
+		if (!isEmpty(Reports && reportType)) {
+			Reports.map((report: ReportConfig) => {
+				if (report.id === reportType) {
+					setSelectedReport(report.columns);
+				}
+			});
 		}
-	};
+	}, [reportType]);
 
 	return (
 		<div className="w-100 h-100">
@@ -52,8 +58,7 @@ export default function ReportTable({
 								"There is no report data for the selected filters",
 							)}
 							loading={loading}
-							columns={TBAdherence as CustomDataTableColumn[]}
-							onRowClick={onRowClick}
+							columns={selectedReport as CustomDataTableColumn[]}
 							pagination={pagination}
 							rows={reports.map((report) => {
 								return {

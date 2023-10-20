@@ -28,17 +28,10 @@ import { PeriodSelectorModal } from "@hisptz/dhis2-ui";
 import { useSetting } from "@dhis2/app-service-datastore";
 import { useOrgUnit } from "../../../../utils/orgUnits";
 
-export interface ReportType {
-	id?: string;
-	name?: string;
-	code?: string;
-}
-
 export interface FilterFieldProps {
 	name: string;
 	label: string;
-	options?: Option[] | ReportType[];
-	update?: (val: number) => void;
+	options?: Option[];
 	type:
 		| "date"
 		| "text"
@@ -55,7 +48,6 @@ export function FilterField({
 	options,
 	type,
 	multiSelect,
-	update,
 }: FilterFieldProps) {
 	const [params, setParams] = useSearchParams();
 	const value = params.get(name);
@@ -63,11 +55,10 @@ export function FilterField({
 	const [periods, setPeriods] = useState<boolean>(true);
 	const [reports, setReports] = useState<boolean>(true);
 	const [selectedOrgUnits, setSelectedOrgUnits] = useState<[]>();
-	const [selectedPeriods, setSelectedPeriods] = useState<any>();
 	const [reportConfig] = useSetting("reports", { global: true });
 	const { orgUnit, loading } = useOrgUnit();
 
-	function transformAndJoinArray(inputArray: string[]) {
+	const transformAndJoinArray = (inputArray: string[]) => {
 		for (let i = 0; i < inputArray.length; i++) {
 			const item = inputArray[i].replace(/_/g, " ").toLowerCase();
 			const words = item.split(" ");
@@ -77,7 +68,7 @@ export function FilterField({
 			inputArray[i] = words.join(" ");
 		}
 		return inputArray.join(", ");
-	}
+	};
 
 	const onChange = ({ value }: { value: any }) => {
 		setParams((params) => {
@@ -95,13 +86,6 @@ export function FilterField({
 
 			return updatedParams;
 		});
-		if (name == "reportType" && update != undefined) {
-			options?.forEach((option, index) => {
-				if (value == option.code) {
-					update(index);
-				}
-			});
-		}
 	};
 
 	const showSelection = () => {
@@ -277,7 +261,7 @@ export function FilterField({
 								<MenuItem
 									key={i}
 									icon={<IconTable24 />}
-									onClick={() => {
+									onClick={async () => {
 										onChange({ value: report.id });
 										setReports(!reports);
 									}}
