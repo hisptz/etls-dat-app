@@ -34,23 +34,11 @@ function EditAlarm({ nextDose, nextRefill }: addAlarmProps) {
 	const nextRefillAlarm = params.get("nextRefillAlarm");
 
 	useEffect(() => {
-		setDisabled(
-			!(
-				nextDoseAlarm &&
-				nextDoseDate &&
-				nextRefillDate &&
-				nextRefillAlarm
-			),
-		);
-	}, [nextDoseAlarm, nextDoseDate, nextRefillDate, nextRefillAlarm]);
+		setDisabled(!(nextRefillDate && nextRefillAlarm));
+	}, [nextRefillDate, nextRefillAlarm]);
 
 	const onSave = () => {
-		if (
-			nextDoseAlarm &&
-			nextDoseDate &&
-			nextRefillDate &&
-			nextRefillAlarm
-		) {
+		if (nextRefillDate && nextRefillAlarm) {
 			setHide(true);
 		}
 	};
@@ -77,7 +65,7 @@ function EditAlarm({ nextDose, nextRefill }: addAlarmProps) {
 							height: "300px",
 						}}
 					>
-						<div
+						{/* <div
 							style={{
 								display: "flex",
 								flexDirection: "row",
@@ -101,7 +89,7 @@ function EditAlarm({ nextDose, nextRefill }: addAlarmProps) {
 								name={"nextDoseAlarm"}
 								type="time"
 							/>
-						</div>
+						</div> */}
 						<div
 							style={{
 								display: "flex",

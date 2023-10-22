@@ -41,11 +41,8 @@ function AdherenceStreak({ events, frequency }: CalendarProps) {
 		today.setHours(0, 0, 0, 0);
 
 		for (let i = 0; i < 7; i++) {
-			const cellDate = new Date(
-				currentYear,
-				currentMonth,
-				today.getDate() - (today.getDay() - i),
-			);
+			const cellDate = new Date(today);
+			cellDate.setDate(today.getDate() + i - 6);
 			let cellColor = "";
 
 			for (const event of events) {
@@ -91,6 +88,72 @@ function AdherenceStreak({ events, frequency }: CalendarProps) {
 		}
 
 		return calendarCells;
+	};
+
+	const renderMonthlyCalendar = () => {
+		const calendarMonths = [];
+
+		const today = new Date();
+		today.setHours(0, 0, 0, 0);
+
+		for (let i = -6; i <= 0; i++) {
+			const targetMonth = new Date(
+				today.getFullYear(),
+				today.getMonth() + i,
+				1,
+			);
+
+			const monthEvents = events.filter((event) => {
+				const eventDate = new Date(event.date);
+				eventDate.setHours(0, 0, 0, 0);
+				return (
+					eventDate.getFullYear() === targetMonth.getFullYear() &&
+					eventDate.getMonth() === targetMonth.getMonth()
+				);
+			});
+
+			const monthStreakColor =
+				monthEvents.length > 0
+					? cellColors[monthEvents[0].event]
+					: "N/A";
+
+			const tooltipId = `monthly-tooltip-${i}`;
+			const tooltipContent = i18n.t(
+				`Month: ${targetMonth.toLocaleString("default", {
+					month: "long",
+				})} \n Status: ${
+					monthStreakColor
+						? monthStreakColor == "green"
+							? "Dose Taken"
+							: monthStreakColor == "blue"
+							? "Enrolled"
+							: monthStreakColor == "red"
+							? "Dose Missed"
+							: "N/A"
+						: "N/A"
+				}`,
+			);
+
+			calendarMonths.push(
+				<>
+					<div
+						key={i}
+						className={`${styles["calendar-cell"]} ${styles[monthStreakColor]}`}
+						style={{ fontSize: "18px" }}
+						data-tooltip-id={tooltipId}
+					></div>
+					<Tooltip
+						id={tooltipId}
+						content={tooltipContent}
+						delayShow={500}
+						closeOnResize
+						place="bottom"
+					/>
+				</>,
+			);
+		}
+
+		return calendarMonths;
 	};
 
 	const renderWeeklyCalendar = () => {
@@ -163,7 +226,7 @@ function AdherenceStreak({ events, frequency }: CalendarProps) {
 				</div>
 			) : (
 				<div className={styles["calendar-monthly"]}>
-					{renderDailyCalendar()}
+					{renderMonthlyCalendar()}
 				</div>
 			)}
 		</>
