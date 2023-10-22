@@ -20,7 +20,7 @@ export function useAssignDevice() {
 		(attribute) => attribute.attribute === TEA_ID,
 	);
 
-	const { enrollments, ...updatedTeiWithoutEnrollments } = patientTei;
+	const { trackedEntity, trackedEntityType, orgUnit } = patientTei;
 
 	const updatedAttributes =
 		attributeIndex === -1
@@ -38,26 +38,23 @@ export function useAssignDevice() {
 			  );
 
 	const updatedTei = {
-		...enrollments[0],
 		attributes: updatedAttributes,
+		trackedEntity,
+		trackedEntityType,
+		orgUnit,
 	};
 
-	delete updatedTei.events;
-	delete updatedTei.relationships;
-	delete updatedTei.followUp;
-
 	console.log({
-		enrollments: [updatedTei],
+		trackedEntities: [updatedTei],
 	});
 
 	const newDevice: any = {
 		type: "create",
 		resource: "tracker",
 		data: {
-			enrollments: [updatedTei],
+			trackedEntities: [updatedTei],
 		},
-		importStrategy: "CREATE_AND_UPDATE",
-		async: true,
+		async: false,
 	};
 
 	const [mutate, { error }] = useDataMutation(newDevice);
