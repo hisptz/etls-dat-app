@@ -87,7 +87,7 @@ export function useProgramStage() {
 		programStages: [
 			{
 				id: programMapping.programStage,
-				name: "Test Program stage",
+				name: "Device Program stage",
 				program: { id: programId ?? programMapping.program ?? null },
 				programStageDataElements: [
 					{
