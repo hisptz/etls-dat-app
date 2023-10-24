@@ -34,6 +34,7 @@ const EditDevice = ({ emei }: { emei?: string }) => {
 	});
 	const deviceEMInumber = params.get("deviceEMInumber");
 	const [showSuccess, setShowSuccess] = useState<boolean>(false);
+	const [showError, setShowError] = useState<boolean>(false);
 
 	useEffect(() => {
 		setDisabled(!deviceEMInumber);
@@ -63,15 +64,25 @@ const EditDevice = ({ emei }: { emei?: string }) => {
 		if (deviceEMInumber && !bulkUpload) {
 			const newDevice = createDeviceFromEMINumber(deviceEMInumber);
 			const updatedDevices = [...devices, newDevice];
-			updateDeviceListAndShowSuccess(updatedDevices);
+			const isDeviceAlreadyPresent = devices.some(
+				(device: any) => device.emei === newDevice.emei,
+			);
+			isDeviceAlreadyPresent
+				? setShowError(true)
+				: updateDeviceListAndShowSuccess(updatedDevices);
 		} else if (excelFile) {
 			const devicesFromExcel = excelFile.imeiNumbers.map(
 				(deviceEMInumber: any) =>
 					createDeviceFromEMINumber(
-						deviceEMInumber["9.34022E+11"].toString(),
+						deviceEMInumber["devices"].toString(),
 					),
 			);
-			const updatedDevices = [...devices, ...devicesFromExcel];
+			const uniqueDevicesMap = new Map();
+
+			devices.concat(devicesFromExcel).forEach((device: any) => {
+				uniqueDevicesMap.set(device.emei, device);
+			});
+			const updatedDevices = [...uniqueDevicesMap.values()];
 			updateDeviceListAndShowSuccess(updatedDevices);
 		}
 	};
@@ -156,7 +167,11 @@ const EditDevice = ({ emei }: { emei?: string }) => {
 							</div>
 						)}
 						{!bulkUpload && (
-							<div>
+							<div
+								onClick={() => {
+									setShowError(false);
+								}}
+							>
 								<FilterField
 									label={i18n.t("Device IMEI number")}
 									name="deviceEMInumber"
@@ -170,6 +185,16 @@ const EditDevice = ({ emei }: { emei?: string }) => {
 								</label>
 							</div>
 						)}
+						{showError ? (
+							<label
+								style={{
+									fontSize: "14px",
+									color: "red",
+								}}
+							>
+								{i18n.t("Device already exists!")}
+							</label>
+						) : null}
 					</div>
 				</ModalContent>
 				<ModalActions>
@@ -213,7 +238,7 @@ const EditDevice = ({ emei }: { emei?: string }) => {
 							setShowSuccess(!showSuccess);
 						}}
 					>
-						{i18n.t("Device updated successfully")}
+						{i18n.t("Devices updated successfully")}
 					</AlertBar>
 				</div>
 			)}

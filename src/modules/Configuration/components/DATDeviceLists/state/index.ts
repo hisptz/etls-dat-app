@@ -1,16 +1,16 @@
 import { atom } from "recoil";
 
 export const remove = atom<boolean>({
-	key: "delete-state",
+	key: "delete-device-state",
 	default: true,
 });
 
 export const edit = atom<boolean>({
-	key: "edit-state",
+	key: "edit-device-state",
 	default: true,
 });
 
 export const add = atom<boolean>({
-	key: "add-state",
+	key: "add-device-state",
 	default: false,
 });
