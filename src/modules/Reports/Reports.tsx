@@ -7,6 +7,8 @@ import { useReportTableData } from "./components/Table/hooks/data";
 import ReportTable from "./components/Table";
 import FilterArea from "./components/Table/FilterArea";
 import { getDefaultReportFilters } from "./constants/filters";
+import { PeriodUtility } from "@hisptz/dhis2-utils";
+import { DateTime } from "luxon";
 
 export function ReportsOutlet() {
 	return <Outlet />;
@@ -15,23 +17,29 @@ export function ReportsOutlet() {
 export function Reports() {
 	const [params] = useSearchParams();
 	const reportType = params.get("reportType");
-	const periods = params.get("periods");
+	const period = params.get("periods");
 	const orgUnit = params.get("ou");
 	const { reports, pagination, loading, refetch } = useReportTableData();
 	const [enabled, setenabled] = useState<boolean>(false);
+	const periods = PeriodUtility.getPeriodById(period ?? "TODAY");
+	const s = DateTime.fromISO(periods.start);
+	const startDate = s.toFormat("yyyy-MM-dd");
+	const e = DateTime.fromISO(periods.end);
+	const endDate = e.toFormat("yyyy-MM-dd");
 
 	useEffect(() => {
-		if (!isEmpty(reportType && periods && orgUnit)) {
+		if (!isEmpty(reportType && period && orgUnit)) {
 			setenabled(true);
 			refetch({
 				page: 1,
 				orgUnit,
-				periods,
+				startDate,
+				endDate,
 			});
 		} else {
 			setenabled(false);
 		}
-	}, [reportType, orgUnit, periods]);
+	}, [reportType, orgUnit, period]);
 
 	return (
 		<div

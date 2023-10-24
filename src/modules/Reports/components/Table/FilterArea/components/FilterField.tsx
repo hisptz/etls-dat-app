@@ -27,6 +27,7 @@ import { OrgUnitSelectorModal } from "@hisptz/dhis2-ui";
 import { PeriodSelectorModal } from "@hisptz/dhis2-ui";
 import { useSetting } from "@dhis2/app-service-datastore";
 import { useOrgUnit } from "../../../../utils/orgUnits";
+import { PeriodUtility } from "@hisptz/dhis2-utils";
 
 export interface FilterFieldProps {
 	name: string;
@@ -57,18 +58,6 @@ export function FilterField({
 	const [selectedOrgUnits, setSelectedOrgUnits] = useState<[]>();
 	const [reportConfig] = useSetting("reports", { global: true });
 	const { orgUnit, loading } = useOrgUnit();
-
-	const transformAndJoinArray = (inputArray: string[]) => {
-		for (let i = 0; i < inputArray.length; i++) {
-			const item = inputArray[i].replace(/_/g, " ").toLowerCase();
-			const words = item.split(" ");
-			for (let j = 0; j < words.length; j++) {
-				words[j] = words[j].charAt(0).toUpperCase() + words[j].slice(1);
-			}
-			inputArray[i] = words.join(" ");
-		}
-		return inputArray.join(", ");
-	};
 
 	const onChange = ({ value }: { value: any }) => {
 		setParams((params) => {
@@ -113,8 +102,9 @@ export function FilterField({
 				  });
 		}
 		if (type === "periods") {
-			const periods = transformAndJoinArray(value?.split(",") ?? []);
-			return periods;
+			const period = PeriodUtility.getPeriodById(value ?? []);
+
+			return period.name;
 		}
 		if (type === "report") {
 			return reportConfig?.map((report: ReportConfig) => {
@@ -232,6 +222,7 @@ export function FilterField({
 			)}
 			<PeriodSelectorModal
 				enablePeriodSelector
+				singleSelection
 				hide={periods}
 				selectedPeriods={type == "periods" ? value?.split(",") : []}
 				onClose={() => {
