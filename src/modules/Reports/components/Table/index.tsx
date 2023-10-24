@@ -51,7 +51,7 @@ export default function ReportTable({
 				) : (
 					<>
 						<div style={{ display: "flex", justifyContent: "end" }}>
-							<Download enabled={!loading} />
+							<Download enabled={!loading && !isEmpty(reports)} />
 						</div>
 						<CustomDataTable
 							emptyLabel={i18n.t(

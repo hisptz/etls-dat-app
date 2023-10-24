@@ -6,7 +6,6 @@ import { isEmpty } from "lodash";
 import { useReportTableData } from "./components/Table/hooks/data";
 import ReportTable from "./components/Table";
 import FilterArea from "./components/Table/FilterArea";
-import { getDefaultReportFilters } from "./constants/filters";
 import { PeriodUtility } from "@hisptz/dhis2-utils";
 import { DateTime } from "luxon";
 
