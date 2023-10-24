@@ -18,22 +18,9 @@ export function TBAdherenceOutlet() {
 
 export function TBAdherencePage() {
 	const [programMapping] = useSetting("programMapping", { global: true });
-	const [params] = useSearchParams();
-	const { filters, startDate } = useFilters();
-	const orgUnit = params.get("ou");
 	const { patients, pagination, refetch, loading } =
 		useTBAdherenceTableData();
 	const navigate = useNavigate();
-	useEffect(() => {
-		if (!isEmpty(programMapping.program)) {
-			refetch({
-				page: 1,
-				filters,
-				startDate,
-				orgUnit,
-			});
-		}
-	}, []);
 
 	return (
 		<div
