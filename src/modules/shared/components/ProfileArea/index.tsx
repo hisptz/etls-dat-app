@@ -1,6 +1,6 @@
 import i18n from "@dhis2/d2-i18n";
 import styles from "./ProfileArea.module.css";
-import { Button, IconEdit24, Card } from "@dhis2/ui";
+import { Button, Card, IconEdit24 } from "@dhis2/ui";
 import React from "react";
 import EditDevice from "./EditDevice";
 import { PatientProfile } from "../../models";
@@ -21,6 +21,7 @@ export function ProfileArea({ profile }: ProfileAreaProps) {
 					display: "flex",
 					flexDirection: "row",
 					height: "200px",
+					gap: 16,
 				}}
 			>
 				<Card className={styles["profile-area"]}>
@@ -133,7 +134,6 @@ export function ProfileArea({ profile }: ProfileAreaProps) {
 						</div>
 					</div>
 				</Card>
-				<div style={{ margin: "5px" }}></div>
 				<Card className={styles["profile-area"]}>
 					<div
 						className="row space-between gap-32 align-center"
