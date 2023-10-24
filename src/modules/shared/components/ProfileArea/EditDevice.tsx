@@ -19,9 +19,10 @@ import { useAssignDevice } from "../utils/assignDevice";
 interface editDeviceProps {
 	name: string;
 	value: string;
+	refetch?: () => void;
 }
 
-function EditDevice({ name, value }: editDeviceProps) {
+function EditDevice({ name, value, refetch }: editDeviceProps) {
 	const [hide, setHide] = useRecoilState<boolean>(AddDevice);
 	const [disabled, setDisabled] = useState<boolean>(true);
 	const [devices, { set: updateDevice }] = useSetting("deviceEmeiList", {
@@ -31,7 +32,7 @@ function EditDevice({ name, value }: editDeviceProps) {
 	const deviceEMInumber = params.get("deviceEMInumber");
 	const [availableDevices, setAvailableDevices] =
 		useState<deviceEmeiList[]>();
-	const { assignDevice } = useAssignDevice();
+	const { loading, assignDevice } = useAssignDevice();
 
 	useEffect(() => {
 		setAvailableDevices(
@@ -57,6 +58,7 @@ function EditDevice({ name, value }: editDeviceProps) {
 			assignDevice();
 			setHide(true);
 			updateDevice(updatedDevices);
+			!loading && refetch ? refetch() : null;
 		}
 	};
 	return (

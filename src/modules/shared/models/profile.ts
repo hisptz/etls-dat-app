@@ -68,9 +68,11 @@ export class PatientProfile extends TrackedEntityModel {
 	}
 
 	get deviceIMEINumber() {
-		return this.getAttributeValue(
+		const device = this.getAttributeValue(
 			this.programMapping?.attributes?.deviceIMEInumber ?? "",
 		) as string;
+
+		return device == "" ? "N/A" : device;
 	}
 	get adherenceFrequency() {
 		const regimen = this.getAttributeValue(
