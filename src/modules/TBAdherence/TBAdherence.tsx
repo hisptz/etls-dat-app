@@ -1,14 +1,11 @@
-import React, { useEffect } from "react";
-import { Outlet, useNavigate, useSearchParams } from "react-router-dom";
+import React from "react";
+import { Outlet, useNavigate } from "react-router-dom";
 import { DATA_TEST_PREFIX } from "../shared/constants";
 import { FilterArea } from "./components/FilterArea";
 import i18n from "@dhis2/d2-i18n";
 import TBAdherenceTable from "./components/Table";
-import { Center, Card } from "@dhis2/ui";
-import {
-	useFilters,
-	useTBAdherenceTableData,
-} from "./components/Table/hooks/data";
+import { Card, Center } from "@dhis2/ui";
+import { useTBAdherenceTableData } from "./components/Table/hooks/data";
 import { useSetting } from "@dhis2/app-service-datastore";
 import { isEmpty } from "lodash";
 
