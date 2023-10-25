@@ -39,6 +39,10 @@ export default function TBAdherenceTable({
 	function getAdherenceStreak(patient: PatientProfile) {
 		const events: any = [
 			{
+				date: patient.enrollmentDate,
+				event: "enrolled",
+			},
+			{
 				date: "2023-08-07",
 				event: "takenDose",
 			},
@@ -50,10 +54,7 @@ export default function TBAdherenceTable({
 				date: "2023-09-30",
 				event: "takenDose",
 			},
-			{
-				date: "2023-10-01",
-				event: "enrolled",
-			},
+
 			{
 				date: "2023-10-18",
 				event: "takenDose",
