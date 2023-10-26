@@ -4,6 +4,7 @@ import { Menu, MenuItem } from "@dhis2/ui";
 import classes from "./SideNav.module.css";
 import classNames from "classnames";
 import { useMatches, useNavigate } from "react-router-dom";
+import { DATA_TEST_PREFIX } from "../../../shared/constants";
 
 export function SideNav() {
 	const matches = useMatches();
@@ -23,6 +24,7 @@ export function SideNav() {
 					const Icon = icon as React.JSXElementConstructor<any>;
 					return (
 						<MenuItem
+							dataTest={`${DATA_TEST_PREFIX}-${path}-menu-item`}
 							onClick={() => {
 								navigate(`${path}`);
 							}}
