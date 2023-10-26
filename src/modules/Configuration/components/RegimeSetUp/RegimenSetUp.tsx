@@ -3,14 +3,14 @@ import { Card, Button } from "@dhis2/ui";
 import i18n from "@dhis2/d2-i18n";
 import { DATA_TEST_PREFIX } from "../../../shared/constants";
 import { useRecoilState } from "recoil";
-import { add, edit } from "./state";
+import { add, editRegimen } from "./state";
 import { useSetting } from "@dhis2/app-service-datastore";
 import AddSetting from "./components/EditRegimen";
 import RegimenTable from "./components/RegimenTable";
 
 export function RegimenSetUp() {
 	const [, setAdd] = useRecoilState<boolean>(add);
-	const [, setHide] = useRecoilState<boolean>(edit);
+	const [, setHide] = useRecoilState<boolean>(editRegimen);
 	const [settings] = useSetting("regimenSetting", {
 		global: true,
 	});

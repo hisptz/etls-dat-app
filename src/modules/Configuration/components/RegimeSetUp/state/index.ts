@@ -5,7 +5,7 @@ export const remove = atom<boolean>({
 	default: true,
 });
 
-export const edit = atom<boolean>({
+export const editRegimen = atom<boolean>({
 	key: "edit-regimen-state",
 	default: true,
 });

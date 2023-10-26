@@ -10,11 +10,13 @@ import { useSearchParams } from "react-router-dom";
 import { isEmpty } from "lodash";
 import { DATA_TEST_PREFIX, deviceEmeiList } from "../../../../shared/constants";
 import { Option } from "../hooks/data";
+import { useController } from "react-hook-form";
 
 export interface FilterFieldProps {
 	name: string;
 	label: string;
 	required?: boolean;
+	validations?: Record<string, any>;
 	initialValue?: string;
 	options?: [{ name: string; code: string }] | Option[] | deviceEmeiList[];
 	update?: (val: number) => void;
@@ -26,13 +28,13 @@ export function FilterField({
 	name,
 	label,
 	required,
+	validations,
 	options,
 	initialValue,
 	type,
 	multiSelect,
 }: FilterFieldProps) {
 	const [params, setParams] = useSearchParams();
-	const value = params.get(name) ?? initialValue;
 	const onChange = ({ value }: { value: string }) => {
 		setParams((params) => {
 			const updatedParams = new URLSearchParams(params);
@@ -42,6 +44,11 @@ export function FilterField({
 		});
 	};
 
+	const { field, fieldState } = useController({
+		name,
+		rules: validations,
+	});
+
 	if (type === "select") {
 		if (multiSelect) {
 			return (
@@ -49,13 +56,17 @@ export function FilterField({
 					dataTest={`${DATA_TEST_PREFIX}-${name}`}
 					id={name}
 					clearable
+					error={!!fieldState.error}
+					validationText={fieldState.error?.message}
 					required={required}
-					selected={isEmpty(value) ? [] : value?.split(",")}
-					filterable={(options?.length ?? 0) > 5}
-					onChange={({ selected }: { selected: string[] }) =>
-						onChange({ value: selected.join(",") })
+					selected={
+						isEmpty(field.value) ? [] : field.value?.split(",")
 					}
-					value={value}
+					filterable={(options?.length ?? 0) > 5}
+					onChange={({ selected }: { selected: string[] }) => {
+						field.onChange(selected);
+					}}
+					value={field.value}
 					name={name}
 					label={label}
 				>
@@ -74,13 +85,15 @@ export function FilterField({
 				dataTest={`${DATA_TEST_PREFIX}-${name}`}
 				id={name}
 				clearable
-				selected={value}
+				error={!!fieldState.error}
+				validationText={fieldState.error?.message}
+				selected={field.value}
 				required={required}
 				filterable={(options?.length ?? 0) > 5}
-				onChange={({ selected }: { selected: string }) =>
-					onChange({ value: selected })
-				}
-				value={value}
+				onChange={({ selected }: { selected: string }) => {
+					field.onChange(selected);
+				}}
+				value={field.value}
 				name={name}
 				label={label}
 			>
@@ -98,9 +111,13 @@ export function FilterField({
 	return (
 		<InputField
 			type={type}
+			error={!!fieldState.error}
+			validationText={fieldState.error?.message}
 			required={required}
-			onChange={onChange}
-			value={value}
+			onChange={({ value }) => {
+				field.onChange(value);
+			}}
+			value={field.value}
 			name={name}
 			label={label}
 		/>

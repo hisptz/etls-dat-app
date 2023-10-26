@@ -5,7 +5,7 @@ export const remove = atom<boolean>({
 	default: true,
 });
 
-export const edit = atom<boolean>({
+export const editDevice = atom<boolean>({
 	key: "edit-device-state",
 	default: true,
 });

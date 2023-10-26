@@ -13,7 +13,7 @@ import { RHFDHIS2FormField } from "@hisptz/dhis2-ui";
 import i18n from "@dhis2/d2-i18n";
 import { useRecoilState } from "recoil";
 import { FilterField } from "../../ProgramMapping/components/FilterField";
-import { add, edit } from "../state";
+import { add, editDevice } from "../state";
 import { useSearchParams } from "react-router-dom";
 import { getDefaultFilters } from "../../constants/filters";
 import { useSetting } from "@dhis2/app-service-datastore";
@@ -22,7 +22,7 @@ import { FormProvider, useForm } from "react-hook-form";
 import { readXLSXFile } from "../hooks/data";
 
 const EditDevice = ({ emei }: { emei?: string }) => {
-	const [hide, setHide] = useRecoilState<boolean>(edit);
+	const [hide, setHide] = useRecoilState<boolean>(editDevice);
 	const [addNew, setAdd] = useRecoilState<boolean>(add);
 	const [bulkUpload, setBulkUpload] = useState<boolean>(false);
 	const [disabled, setDisabled] = useState<boolean>(true);

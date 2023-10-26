@@ -9,7 +9,7 @@ import { Pagination } from "@hisptz/dhis2-utils";
 import { isEmpty } from "lodash";
 import { FullPageLoader } from "../../../../shared/components/Loaders";
 import { ActionButton } from "../../../../shared/components/ActionButton";
-import { edit, remove } from "../state";
+import { editRegimen, remove } from "../state";
 import { useRecoilState } from "recoil";
 
 import { regimenSetting } from "../../../../shared/constants";
@@ -26,7 +26,7 @@ export default function RegimenTable({
 	regimens,
 }: regimensTableProps) {
 	const [, setDelete] = useRecoilState<boolean>(remove);
-	const [, setEdit] = useRecoilState<boolean>(edit);
+	const [, setEdit] = useRecoilState<boolean>(editRegimen);
 	const [selectedRegimen, setSelectedRegimen] = useState<
 		regimenSetting | undefined
 	>();

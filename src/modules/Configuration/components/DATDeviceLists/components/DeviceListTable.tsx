@@ -12,7 +12,7 @@ import { useSetting } from "@dhis2/app-service-datastore";
 import { isEmpty } from "lodash";
 import { FullPageLoader } from "../../../../shared/components/Loaders";
 import { ActionButton } from "../../../../shared/components/ActionButton";
-import { edit, remove } from "../state";
+import { editDevice, remove } from "../state";
 import { useRecoilState } from "recoil";
 import DeleteDevice from "./DeleteDevice";
 import EditDevice from "./EditDevice";
@@ -28,7 +28,7 @@ export default function DeviceListTable({
 	devices,
 }: DevicesTableProps) {
 	const [, setDelete] = useRecoilState<boolean>(remove);
-	const [, setEdit] = useRecoilState<boolean>(edit);
+	const [, setEdit] = useRecoilState<boolean>(editDevice);
 	const [selectedDevice, setSelectedDevice] =
 		useState<deviceEmeiList | null>();
 

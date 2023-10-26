@@ -11,7 +11,7 @@ import {
 import i18n from "@dhis2/d2-i18n";
 import { useRecoilState } from "recoil";
 import { FilterField } from "../../ProgramMapping/components/FilterField";
-import { add, edit } from "../state";
+import { add, editRegimen } from "../state";
 import { useSearchParams } from "react-router-dom";
 import { getDefaultFilters } from "../../constants/filters";
 import { useSetting } from "@dhis2/app-service-datastore";
@@ -27,7 +27,7 @@ const AddSetting = ({
 	regimen?: regimenSetting;
 	index?: number;
 }) => {
-	const [hide, setHide] = useRecoilState<boolean>(edit);
+	const [hide, setHide] = useRecoilState<boolean>(editRegimen);
 	const [addNew, setAdd] = useRecoilState<boolean>(add);
 
 	const [disabled, setDisabled] = useState<boolean>(true);
