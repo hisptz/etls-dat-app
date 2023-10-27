@@ -13,22 +13,27 @@ import { AddDevice } from "../../state";
 import { FilterField } from "../../../Configuration/components/ProgramMapping/components/FilterField";
 import { useSetting } from "@dhis2/app-service-datastore";
 import { deviceEmeiList } from "../../constants";
-import { useSearchParams } from "react-router-dom";
 import { useAssignDevice } from "../utils/assignDevice";
+import { FormProvider, useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 
 interface editDeviceProps {
 	name: string;
 	value: string;
 }
 
+const schema = z.object({
+	emei: z.string().optional(),
+});
+
+export type DeviceData = z.infer<typeof schema>;
+
 function EditDevice({ name, value }: editDeviceProps) {
 	const [hide, setHide] = useRecoilState<boolean>(AddDevice);
-	const [disabled, setDisabled] = useState<boolean>(true);
 	const [devices, { set: updateDevice }] = useSetting("deviceEmeiList", {
 		global: true,
 	});
-	const [params] = useSearchParams();
-	const deviceEMInumber = params.get("deviceEMInumber");
 	const [availableDevices, setAvailableDevices] =
 		useState<deviceEmeiList[]>();
 	const { assignDevice } = useAssignDevice();
@@ -40,17 +45,16 @@ function EditDevice({ name, value }: editDeviceProps) {
 					!device.inUse || device.emei === value,
 			),
 		);
-		setDisabled(!deviceEMInumber);
-	}, [deviceEMInumber]);
+	}, []);
 
-	const onSave = () => {
-		if (deviceEMInumber) {
+	const onSave = async (data: DeviceData) => {
+		if (data) {
 			const updatedDevices = devices.map((device: deviceEmeiList) => ({
 				...device,
 				inUse:
-					device.emei === deviceEMInumber
+					device.emei === data.emei
 						? true
-						: device.emei === value && value !== deviceEMInumber
+						: device.emei === value && value !== data.emei
 						? false
 						: device.inUse,
 			}));
@@ -59,6 +63,21 @@ function EditDevice({ name, value }: editDeviceProps) {
 			updateDevice(updatedDevices);
 		}
 	};
+
+	const onSubmit = async (data: DeviceData) => {
+		console.log(data);
+		// await onSave(data);
+	};
+
+	useEffect(() => {
+		if (value) {
+			form.reset({ emei: value });
+		}
+	}, [value]);
+
+	const form = useForm<DeviceData>({
+		resolver: zodResolver(schema),
+	});
 	return (
 		<div>
 			<Modal
@@ -77,25 +96,26 @@ function EditDevice({ name, value }: editDeviceProps) {
 					</h3>
 				</ModalTitle>
 				<ModalContent>
-					<div
-						style={{
-							height: "300px",
-						}}
-					>
-						<FilterField
-							label={i18n.t("Device IMEI number")}
-							name={"deviceEMInumber"}
-							initialValue={value}
-							type="select"
-							options={availableDevices}
-						/>
+					<FormProvider {...form}>
+						<div
+							style={{
+								height: "300px",
+							}}
+						>
+							<FilterField
+								label={i18n.t("Device IMEI number")}
+								name="emei"
+								type="select"
+								options={availableDevices}
+							/>
 
-						<label style={{ fontSize: "12px" }}>
-							{i18n.t(
-								"Assign the device number, or click clear to clear previous device",
-							)}
-						</label>
-					</div>
+							<label style={{ fontSize: "12px" }}>
+								{i18n.t(
+									"Assign the device number, or click clear to clear previous device",
+								)}
+							</label>
+						</div>
+					</FormProvider>
 				</ModalContent>
 				<ModalActions>
 					<ButtonStrip end>
@@ -108,10 +128,8 @@ function EditDevice({ name, value }: editDeviceProps) {
 							{i18n.t("Hide")}
 						</Button>
 						<Button
-							disabled={disabled}
-							onClick={() => {
-								onSave();
-							}}
+							loading={form.formState.isSubmitting}
+							onClick={form.handleSubmit(onSubmit)}
 							primary
 						>
 							{i18n.t("Save")}
