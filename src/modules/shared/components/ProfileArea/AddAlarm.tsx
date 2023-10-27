@@ -12,36 +12,49 @@ import { useRecoilState } from "recoil";
 import { AddAlarm, AddDevice } from "../../state";
 import { FilterField } from "../../../Configuration/components/ProgramMapping/components/FilterField";
 import { useSetting } from "@dhis2/app-service-datastore";
-import { deviceEmeiList } from "../../constants";
-import { useSearchParams } from "react-router-dom";
-import { useAssignDevice } from "../utils/assignDevice";
+
+import { FormProvider, useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 
 interface addAlarmProps {
 	nextDose: string;
 	nextRefill: string;
 }
 
+const schema = z.object({
+	nextRefillDate: z.string().nonempty("Next Refill Date is required"),
+	nextRefillAlarm: z.string().nonempty("Next Refill Alarm is required"),
+});
+
+export type AlarmFormData = z.infer<typeof schema>;
+
 function EditAlarm({ nextDose, nextRefill }: addAlarmProps) {
 	const [hide, setHide] = useRecoilState<boolean>(AddAlarm);
-	const [disabled, setDisabled] = useState<boolean>(true);
 	const [devices, { set: updateDevice }] = useSetting("deviceEmeiList", {
 		global: true,
 	});
-	const [params] = useSearchParams();
-	const nextDoseDate = params.get("nextDoseDate");
-	const nextDoseAlarm = params.get("nextDoseAlarm");
-	const nextRefillDate = params.get("nextRefillDate");
-	const nextRefillAlarm = params.get("nextRefillAlarm");
+
+	const onSubmit = async (data: AlarmFormData) => {
+		console.log(data);
+		setHide(true);
+		onClose();
+	};
+
+	const onClose = async () => {
+		form.reset();
+	};
 
 	useEffect(() => {
-		setDisabled(!(nextRefillDate && nextRefillAlarm));
-	}, [nextRefillDate, nextRefillAlarm]);
-
-	const onSave = () => {
-		if (nextRefillDate && nextRefillAlarm) {
-			setHide(true);
+		if (nextDose && nextRefill) {
+			form.reset({ nextRefillDate: nextRefill });
 		}
-	};
+	}, [nextDose, nextRefill]);
+
+	const form = useForm<AlarmFormData>({
+		resolver: zodResolver(schema),
+	});
+
 	return (
 		<div>
 			<Modal
@@ -49,6 +62,7 @@ function EditAlarm({ nextDose, nextRefill }: addAlarmProps) {
 				hide={hide}
 				onClose={() => {
 					setHide(true);
+					onClose();
 				}}
 			>
 				<ModalTitle>
@@ -60,12 +74,13 @@ function EditAlarm({ nextDose, nextRefill }: addAlarmProps) {
 					</h3>
 				</ModalTitle>
 				<ModalContent>
-					<div
-						style={{
-							height: "300px",
-						}}
-					>
-						{/* <div
+					<FormProvider {...form}>
+						<div
+							style={{
+								height: "300px",
+							}}
+						>
+							{/* <div
 							style={{
 								display: "flex",
 								flexDirection: "row",
@@ -90,48 +105,48 @@ function EditAlarm({ nextDose, nextRefill }: addAlarmProps) {
 								type="time"
 							/>
 						</div> */}
-						<div
-							style={{
-								display: "flex",
-								flexDirection: "row",
-							}}
-						>
 							<div
 								style={{
-									width: "300px",
-									marginBottom: "20px",
-									marginRight: "10px",
+									display: "flex",
+									flexDirection: "row",
 								}}
 							>
+								<div
+									style={{
+										width: "300px",
+										marginBottom: "20px",
+										marginRight: "10px",
+									}}
+								>
+									<FilterField
+										label={i18n.t("Next Refill Date")}
+										name="nextRefillDate"
+										type="date"
+									/>
+								</div>
 								<FilterField
-									label={i18n.t("Next Refill Date")}
-									name={"nextRefillDate"}
-									type="date"
+									label={i18n.t("Alarm")}
+									name="nextRefillAlarm"
+									type="time"
 								/>
 							</div>
-							<FilterField
-								label={i18n.t("Alarm")}
-								name={"nextRefillAlarm"}
-								type="time"
-							/>
 						</div>
-					</div>
+					</FormProvider>
 				</ModalContent>
 				<ModalActions>
 					<ButtonStrip end>
 						<Button
 							onClick={() => {
 								setHide(true);
+								onClose();
 							}}
 							secondary
 						>
 							{i18n.t("Hide")}
 						</Button>
 						<Button
-							disabled={disabled}
-							onClick={() => {
-								onSave();
-							}}
+							loading={form.formState.isSubmitting}
+							onClick={form.handleSubmit(onSubmit)}
 							primary
 						>
 							{i18n.t("Save")}

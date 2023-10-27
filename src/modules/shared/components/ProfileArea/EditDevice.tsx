@@ -24,15 +24,13 @@ interface editDeviceProps {
 	refetch?: () => void;
 }
 
-
 const schema = z.object({
-	emei: z.string().optional(),
+	emei: z.string().nonempty("Device IMEI number is required"),
 });
 
 export type DeviceData = z.infer<typeof schema>;
 
 function EditDevice({ name, value, refetch }: editDeviceProps) {
-
 	const [hide, setHide] = useRecoilState<boolean>(AddDevice);
 	const [devices, { set: updateDevice }] = useSetting("deviceEmeiList", {
 		global: true,
@@ -61,7 +59,7 @@ function EditDevice({ name, value, refetch }: editDeviceProps) {
 						? false
 						: device.inUse,
 			}));
-			assignDevice();
+			assignDevice(data.emei);
 			setHide(true);
 			updateDevice(updatedDevices);
 			!loading && refetch ? refetch() : null;
@@ -69,8 +67,7 @@ function EditDevice({ name, value, refetch }: editDeviceProps) {
 	};
 
 	const onSubmit = async (data: DeviceData) => {
-		console.log(data);
-		// await onSave(data);
+		await onSave(data);
 	};
 
 	useEffect(() => {
