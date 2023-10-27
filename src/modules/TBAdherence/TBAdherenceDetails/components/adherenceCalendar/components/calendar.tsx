@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import styles from "./calendar.module.css";
 import i18n from "@dhis2/d2-i18n";
 import { IconChevronRight24, IconChevronLeft24 } from "@dhis2/ui";
@@ -11,9 +11,10 @@ export interface DateEvent {
 interface CalendarProps {
 	events: DateEvent[];
 	frequency: "Daily" | "Weekly" | "Monthly" | string;
+	onClick: ({ date, event }: { date: Date; event: string }) => void;
 }
 
-function Calendar({ events, frequency }: CalendarProps) {
+function Calendar({ events, frequency, onClick }: CalendarProps) {
 	const cellColors = {
 		enrolled: "blue",
 		takenDose: "green",
@@ -21,6 +22,52 @@ function Calendar({ events, frequency }: CalendarProps) {
 	};
 	const month = new Date().getMonth();
 	const year = new Date().getFullYear();
+
+	useEffect(() => {
+		let targetDate: Date | null = null;
+		let targetColor = "";
+
+		switch (frequency) {
+			case "Daily":
+				targetDate = new Date();
+				targetColor = getCellColor(
+					new Date().toISOString().split("T")[0],
+				);
+				break;
+			case "Weekly":
+				const startDateW = new Date(year, month, 1);
+				const endDateW = new Date(year, month, 7);
+				events.forEach((event) => {
+					const eventDate = new Date(event.date);
+					if (eventDate >= startDateW && eventDate <= endDateW) {
+						targetColor = cellColors[event.event];
+						if (targetDate === null) {
+							targetDate = new Date(event.date);
+						}
+					}
+				});
+				break;
+			case "Monthly":
+				const startDateM = new Date(year, month, 1);
+				const endDateM = new Date(year, month + 1, 0);
+				events.forEach((event) => {
+					const eventDate = new Date(event.date);
+					if (eventDate >= startDateM && eventDate <= endDateM) {
+						if (targetDate === null) {
+							targetDate = new Date(event.date);
+							targetColor = cellColors[event.event];
+						}
+					}
+				});
+				break;
+			default:
+				break;
+		}
+
+		if (targetDate != null) {
+			showDetails(targetDate, targetColor);
+		}
+	}, []);
 
 	const getCellColor = (date: any) => {
 		const event = events.find((event) => event.date === date);
@@ -45,13 +92,16 @@ function Calendar({ events, frequency }: CalendarProps) {
 		));
 	};
 
+	const showDetails = (date: Date, event: string) => {
+		onClick({ date, event });
+	};
+
 	const renderDailyCalendar = () => {
 		const numDays = lastDayOfMonth.getDate();
 		const startDay = firstDayOfMonth.getDay();
 
 		const calendarCells = [];
 
-		// Calculate the previous month and year
 		const prevMonthYear =
 			currentMonth === 0 ? currentYear - 1 : currentYear;
 		const prevMonth = currentMonth === 0 ? 11 : currentMonth - 1;
@@ -61,7 +111,6 @@ function Calendar({ events, frequency }: CalendarProps) {
 			0,
 		).getDate();
 
-		// Generate cells for the days before the 1st of the current month
 		for (let i = 0; i < startDay; i++) {
 			const prevMonthDay = prevMonthLastDay - (startDay - i) + 1;
 			calendarCells.push(
@@ -80,11 +129,17 @@ function Calendar({ events, frequency }: CalendarProps) {
 			const cellColor = getCellColor(
 				currentDate.toISOString().split("T")[0],
 			);
+			const date = new Date(currentYear, currentMonth, i);
 			calendarCells.push(
 				<div
 					key={i}
 					className={`${styles["calendar-cell"]} ${styles[cellColor]}`}
 					style={{ fontSize: "18px" }}
+					onClick={() => {
+						if (cellColor) {
+							showDetails(date, cellColor);
+						}
+					}}
 				>
 					<span style={{ fontSize: "18px" }}>{i}</span>
 				</div>,
@@ -114,19 +169,22 @@ function Calendar({ events, frequency }: CalendarProps) {
 		for (let week = 1; week <= weeksInMonth; week++) {
 			let weekColor = "";
 
-			// Determine the start and end dates of this week
 			const startDate = new Date(
 				currentYear,
 				currentMonth,
 				(week - 1) * 7 + 1,
 			);
-			const endDate = new Date(currentYear, currentMonth, week * 8);
+			const endDate = new Date(
+				currentYear,
+				currentMonth,
+				week == 4 ? week * 8 : week * 7,
+			);
 
 			for (const event of events) {
 				const eventDate = new Date(event.date);
 				if (eventDate >= startDate && eventDate <= endDate) {
 					weekColor = cellColors[event.event];
-					break; // Exit the loop once an event is found for this week
+					break;
 				}
 			}
 
@@ -135,6 +193,23 @@ function Calendar({ events, frequency }: CalendarProps) {
 					key={`before-${week}`}
 					className={`${styles["calendar-week-cell"]} ${styles[weekColor]}`}
 					style={{ fontSize: "18px" }}
+					onClick={() => {
+						if (weekColor) {
+							let date: Date | null = null;
+							events.map((event) => {
+								const eventDate = new Date(event.date);
+								if (
+									eventDate >= startDate &&
+									eventDate <= endDate
+								) {
+									if (date == null) {
+										date = new Date(event.date);
+									}
+								}
+							});
+							if (date != null) showDetails(date, weekColor);
+						}
+					}}
 				>
 					Week {week}
 				</div>,
@@ -151,7 +226,6 @@ function Calendar({ events, frequency }: CalendarProps) {
 		for (let month = 0; month < monthsInYear; month++) {
 			let monthColor = "";
 
-			// Determine the start and end dates of the current month
 			const startDate = new Date(currentYear, month, 1);
 			const endDate = new Date(currentYear, month + 1, 0);
 
@@ -159,7 +233,7 @@ function Calendar({ events, frequency }: CalendarProps) {
 				const eventDate = new Date(event.date);
 				if (eventDate >= startDate && eventDate <= endDate) {
 					monthColor = cellColors[event.event];
-					break; // Exit the loop once an event is found for this month
+					break;
 				}
 			}
 
@@ -168,6 +242,23 @@ function Calendar({ events, frequency }: CalendarProps) {
 					key={`month-${month}`}
 					className={`${styles["calendar-cell-monthly"]} ${styles[monthColor]}`}
 					style={{ fontSize: "18px" }}
+					onClick={() => {
+						if (monthColor) {
+							let date: Date | null = null;
+							events.map((event) => {
+								const eventDate = new Date(event.date);
+								if (
+									eventDate >= startDate &&
+									eventDate <= endDate
+								) {
+									if (date == null) {
+										date = new Date(event.date);
+									}
+								}
+							});
+							if (date != null) showDetails(date, monthColor);
+						}
+					}}
 				>
 					{new Date(currentYear, month, 1).toLocaleString("default", {
 						month: "long",
@@ -211,65 +302,45 @@ function Calendar({ events, frequency }: CalendarProps) {
 	return (
 		<>
 			<div className={styles["calendar-header"]}>
-				<div>
-					{frequency != "Monthly" ? i18n.t(monthName) : null}{" "}
-					{currentYear}
-				</div>
+				{frequency !== "Monthly" && i18n.t(monthName)} {currentYear}
 				<span>
-					{frequency != "Monthly" ? (
+					<div
+						style={{
+							marginRight: "20px",
+							display: "flex",
+							width: "100px",
+							justifyContent: "space-between",
+						}}
+					>
 						<div
-							style={{
-								marginRight: "20px",
-								display: "flex",
-
-								width: "100px",
-								justifyContent: "space-between",
-							}}
+							onClick={
+								frequency !== "Monthly"
+									? handlePrevMonth
+									: handlePrevYear
+							}
+							style={{ cursor: "pointer" }}
 						>
-							<div
-								onClick={handlePrevMonth}
-								style={{ cursor: "pointer" }}
-							>
-								<IconChevronLeft24 />
-							</div>
-							<div
-								onClick={handleNextMonth}
-								style={{ cursor: "pointer" }}
-							>
-								<IconChevronRight24 />
-							</div>
+							<IconChevronLeft24 />
 						</div>
-					) : (
 						<div
-							style={{
-								marginRight: "20px",
-								display: "flex",
-
-								width: "100px",
-								justifyContent: "space-between",
-							}}
+							onClick={
+								frequency !== "Monthly"
+									? handleNextMonth
+									: handleNextYear
+							}
+							style={{ cursor: "pointer" }}
 						>
-							<div
-								onClick={handlePrevYear}
-								style={{ cursor: "pointer" }}
-							>
-								<IconChevronLeft24 />
-							</div>
-							<div
-								onClick={handleNextYear}
-								style={{ cursor: "pointer" }}
-							>
-								<IconChevronRight24 />
-							</div>
+							<IconChevronRight24 />
 						</div>
-					)}
+					</div>
 				</span>
 			</div>
-			{frequency == "Daily" ? (
+
+			{frequency === "Daily" ? (
 				<div className={styles["calendar"]}>
 					{renderDayNames()} {renderDailyCalendar()}
 				</div>
-			) : frequency == "Weekly" ? (
+			) : frequency === "Weekly" ? (
 				<div className={styles["calendar-week"]}>
 					{renderWeeklyCalendar()}
 				</div>

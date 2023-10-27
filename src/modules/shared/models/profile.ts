@@ -3,6 +3,7 @@ import { programMapping, regimenSetting } from "../constants";
 import { DatDeviceInfoEventModel } from "./datDeviceInfo";
 import { TrackedEntity } from "../types";
 import { filter, head } from "lodash";
+import { DateTime } from "luxon";
 
 export class PatientProfile extends TrackedEntityModel {
 	programMapping?: programMapping;
@@ -55,6 +56,14 @@ export class PatientProfile extends TrackedEntityModel {
 		return sex == "M" ? "Male" : sex == "F" ? "Female" : null;
 	}
 
+	get enrollmentDate(): string {
+		return (
+			DateTime.fromISO(
+				this.enrollment?.enrolledAt as string,
+			).toISODate() ?? ""
+		);
+	}
+
 	get age() {
 		return this.getAttributeValue(
 			this.programMapping?.attributes?.age ?? "",
@@ -68,9 +77,11 @@ export class PatientProfile extends TrackedEntityModel {
 	}
 
 	get deviceIMEINumber() {
-		return this.getAttributeValue(
+		const device = this.getAttributeValue(
 			this.programMapping?.attributes?.deviceIMEInumber ?? "",
 		) as string;
+
+		return device == "" ? "N/A" : device;
 	}
 	get adherenceFrequency() {
 		const regimen = this.getAttributeValue(
@@ -109,6 +120,7 @@ export class PatientProfile extends TrackedEntityModel {
 		const deviceHealth = this.deviceHealth;
 		const batteryHealth = this.batteryHealth;
 		const dosageTime = this.dosageTime;
+		const enrollmentDate = this.enrollmentDate;
 
 		return {
 			id: this.id as string,
@@ -122,6 +134,7 @@ export class PatientProfile extends TrackedEntityModel {
 			deviceHealth,
 			batteryHealth,
 			dosageTime,
+			enrollmentDate,
 		};
 	}
 

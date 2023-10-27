@@ -1,27 +1,25 @@
 .calendar {
 	display: grid;
-	grid-template-columns: repeat(7, 135px);
-	max-width: 1200px;
+	grid-template-columns: repeat(7, 17px);
+	width: 200px;
 	margin: 0 auto;
 	font-family: Arial, sans-serif;
 }
 
 .calendar-week {
 	display: grid;
-	grid-template-columns: repeat(4, 220px);
-	max-width: 1200px;
+	grid-template-columns: repeat(7, 17px);
+	width: 200px;
 	margin: 0 auto;
 	font-family: Arial, sans-serif;
-	padding-top: 20px;
 }
 
 .calendar-monthly {
 	display: grid;
-	grid-template-columns: repeat(4, 230px);
-	max-width: 1200px;
+	grid-template-columns: repeat(7, 17px);
+	width: 200px;
 	margin: 0 auto;
 	font-family: Arial, sans-serif;
-	padding-top: 20px;
 }
 
 .calendar-header {
@@ -34,8 +32,8 @@
 }
 
 .calendar-cell {
-	width: 135px;
-	height: 65px;
+	width: 15px;
+	height: 15px;
 	background-color: #f2f3f7;
 	display: flex;
 	align-items: center;
@@ -45,8 +43,8 @@
 }
 
 .calendar-week-cell {
-	width: 230px;
-	height: 70px;
+	width: 15px;
+	height: 15px;
 	background-color: #f2f3f7;
 	display: flex;
 	align-items: center;
@@ -56,23 +54,14 @@
 }
 
 .calendar-cell-monthly {
-	width: 230px;
-	height: 70px;
+	width: 15px;
+	height: 15px;
 	background-color: #f2f3f7;
 	display: flex;
 	align-items: center;
 	justify-content: center;
 	font-weight: "500";
 	border: 0.1rem solid #cccccc6c;
-}
-
-.days {
-	width: 120px;
-	height: 50px;
-	background-color: "white";
-	display: flex;
-	align-items: center;
-	justify-content: center;
 }
 
 .blue {

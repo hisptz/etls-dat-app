@@ -21,7 +21,9 @@ import { z } from "zod";
 interface editDeviceProps {
 	name: string;
 	value: string;
+	refetch?: () => void;
 }
+
 
 const schema = z.object({
 	emei: z.string().optional(),
@@ -29,14 +31,15 @@ const schema = z.object({
 
 export type DeviceData = z.infer<typeof schema>;
 
-function EditDevice({ name, value }: editDeviceProps) {
+function EditDevice({ name, value, refetch }: editDeviceProps) {
+
 	const [hide, setHide] = useRecoilState<boolean>(AddDevice);
 	const [devices, { set: updateDevice }] = useSetting("deviceEmeiList", {
 		global: true,
 	});
 	const [availableDevices, setAvailableDevices] =
 		useState<deviceEmeiList[]>();
-	const { assignDevice } = useAssignDevice();
+	const { loading, assignDevice } = useAssignDevice();
 
 	useEffect(() => {
 		setAvailableDevices(
@@ -61,6 +64,7 @@ function EditDevice({ name, value }: editDeviceProps) {
 			assignDevice();
 			setHide(true);
 			updateDevice(updatedDevices);
+			!loading && refetch ? refetch() : null;
 		}
 	};
 
