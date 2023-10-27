@@ -32,6 +32,7 @@ export function useRegimens() {
 		variables: {
 			optionsID: programMapping.attributes.regimen ?? "",
 		},
+		lazy: true,
 	});
 	const administrationOptions: Option[] = [
 		{ name: "Daily", code: "Daily", id: "Daily", displayName: "Daily" },

@@ -5,8 +5,10 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2023-10-25T05:51:40.186Z\n"
-"PO-Revision-Date: 2023-10-25T05:51:40.186Z\n"
+
+"POT-Creation-Date: 2023-10-25T07:30:07.860Z\n"
+"PO-Revision-Date: 2023-10-25T07:30:07.860Z\n"
+
 
 msgid "39"
 msgstr "39"
@@ -59,11 +61,14 @@ msgstr "Device IMEI number"
 msgid "Add the EMEI number as seen on the device"
 msgstr "Add the EMEI number as seen on the device"
 
+msgid "Device already exists!"
+msgstr "Device already exists!"
+
 msgid "Save"
 msgstr "Save"
 
-msgid "Device updated successfully"
-msgstr "Device updated successfully"
+msgid "Devices updated successfully"
+msgstr "Devices updated successfully"
 
 msgid "Program Mapping"
 msgstr "Program Mapping"

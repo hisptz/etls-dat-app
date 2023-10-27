@@ -11,41 +11,54 @@ import {
 import i18n from "@dhis2/d2-i18n";
 import { useRecoilState } from "recoil";
 import { FilterField } from "../../ProgramMapping/components/FilterField";
-import { add, edit } from "../state";
+import { add, editRegimen } from "../state";
 import { useSearchParams } from "react-router-dom";
 import { getDefaultFilters } from "../../constants/filters";
 import { useSetting } from "@dhis2/app-service-datastore";
 import { regimenSetting } from "../../../../shared/constants";
 import { Option, useRegimens } from "../hooks/data";
 import { getEditFilters } from "../hooks/save";
+import { isEmpty } from "lodash";
+import { FormProvider, useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+
+const schema = z.object({
+	regimen: z.string().nonempty("Regmien is required"),
+	administration: z.string().nonempty("Administration is required"),
+	idealDoses: z.string().nonempty("Ideal Doses is required"),
+	idealDuration: z.string().nonempty("Ideal Duration is required"),
+	completionMinimumDoses: z
+		.string()
+		.nonempty("Completion Minimum Doses is required"),
+	completionMaximumDuration: z
+		.string()
+		.nonempty("Completion Maximum Duration is required"),
+});
+
+export type RegimenFormData = z.infer<typeof schema>;
 
 const AddSetting = ({
-	regimen,
+	data,
 	index,
 }: {
-	regimen?: regimenSetting;
+	data?: RegimenFormData;
 	index?: number;
 }) => {
-	const [hide, setHide] = useRecoilState<boolean>(edit);
+	const [hide, setHide] = useRecoilState<boolean>(editRegimen);
 	const [addNew, setAdd] = useRecoilState<boolean>(add);
 
-	const [disabled, setDisabled] = useState<boolean>(true);
-
-	const [params, setParams] = useSearchParams();
 	const [settings, { set: addRegimen }] = useSetting("regimenSetting", {
 		global: true,
 	});
-	const regimens = params.get("regimen");
-	const administration = params.get("administration");
-	const idealDoses = params.get("idealDoses");
-	const idealDuration = params.get("idealDuration");
-	const completionMinimumDoses = params.get("completionMinimumDoses");
-	const completionMaximumDuration = params.get("completionMaximumDuration");
+	const [programMapping] = useSetting("programMapping", {
+		global: true,
+	});
 	const [showSuccess, setShowSuccess] = useState<boolean>(false);
-	const { regimenOptions, administrationOptions, loading } = useRegimens();
+	const { regimenOptions, administrationOptions, loading, refetch } =
+		useRegimens();
 	const [availableRegimen, setAvailableRegimen] = useState<Option[]>();
 
-	const defaultValue = getEditFilters(index);
 	const regimenOptionsArray = regimenOptions?.map((option) => option.code);
 
 	const filteredRegimenOptions = regimenOptionsArray?.filter((regimen) => {
@@ -55,68 +68,43 @@ const AddSetting = ({
 	});
 
 	useEffect(() => {
+		if (!isEmpty(programMapping.attributes.regimen)) {
+			refetch();
+		}
+	}, []);
+
+	useEffect(() => {
 		if (!hide && !addNew) {
-			setParams(defaultValue);
+			null;
 		} else {
 			onResetClick();
 		}
 
-		const transformedSettings = filteredRegimenOptions?.map(
-			(item: string) => {
+		const transformedSettings: Option[] =
+			filteredRegimenOptions?.map((item: string) => {
 				return {
 					id: item,
 					name: item,
 					displayName: item,
 					code: item,
 				};
-			},
-		);
+			}) ?? [];
 
 		setAvailableRegimen(transformedSettings);
 	}, [hide, index]);
 
-	useEffect(() => {
-		setDisabled(
-			!(
-				regimens &&
-				administration &&
-				idealDoses &&
-				idealDuration &&
-				completionMinimumDoses &&
-				completionMaximumDuration
-			),
-		);
-	}, [
-		regimens,
-		administration,
-		idealDoses,
-		idealDuration,
-		completionMaximumDuration,
-		completionMinimumDoses,
-	]);
-
 	const onResetClick = () => {
-		const defaultValue = getDefaultFilters();
-		setParams(defaultValue);
+		form.reset({});
 	};
 
 	const currentRegimen: Option[] = [
 		{
-			name: regimens ?? "",
-			code: regimens ?? "",
-			displayName: regimens ?? "",
-			id: regimens ?? "",
+			name: data?.regimen ?? "",
+			code: data?.regimen ?? "",
+			displayName: data?.regimen ?? "",
+			id: data?.regimen ?? "",
 		},
 	];
-
-	const createRegimenSetting = (regimens: regimenSetting) => ({
-		regimen: regimens.regimen,
-		administration: regimens.administration,
-		idealDoses: regimens.idealDoses,
-		idealDuration: regimens.idealDuration,
-		completionMinimumDoses: regimens.completionMinimumDoses,
-		completionMaximumDuration: regimens.completionMaximumDuration,
-	});
 
 	const updateRegimeSettingsAndShowSuccess = (updatedRegimen: any) => {
 		addRegimen(updatedRegimen);
@@ -125,50 +113,28 @@ const AddSetting = ({
 		setShowSuccess(true);
 	};
 
-	const onSave = () => {
-		if (
-			regimens &&
-			administration &&
-			idealDoses &&
-			idealDuration &&
-			completionMinimumDoses &&
-			completionMaximumDuration
-		) {
-			const setting: regimenSetting = {
-				regimen: regimens,
-				administration: administration,
-				idealDoses: idealDoses,
-				idealDuration: idealDuration,
-				completionMinimumDoses: completionMinimumDoses,
-				completionMaximumDuration: completionMaximumDuration,
-			};
-			const newSetting = createRegimenSetting(setting);
-			const updatedSetting = [...settings, newSetting];
+	const onSave = async (regimenData: RegimenFormData) => {
+		if (regimenData) {
+			const updatedSetting = [...settings, regimenData];
 			updateRegimeSettingsAndShowSuccess(updatedSetting);
 			onResetClick();
 		}
 	};
 
-	const onEdit = () => {
-		if (
-			regimens &&
-			administration &&
-			idealDoses &&
-			idealDuration &&
-			completionMinimumDoses &&
-			completionMaximumDuration
-		) {
+	const onEdit = async (regimenData: RegimenFormData) => {
+		if (regimenData) {
 			const updatedSetting = settings.map((setting: regimenSetting) =>
-				setting.regimen === regimen?.regimen
+				setting.regimen === regimenData.regimen
 					? {
 							...setting,
-							regimen: regimens,
-							administration: administration,
-							idealDoses: idealDoses,
-							idealDuration: idealDuration,
-							completionMinimumDoses: completionMinimumDoses,
+							regimen: regimenData.regimen,
+							administration: regimenData.administration,
+							idealDoses: regimenData.idealDoses,
+							idealDuration: regimenData.idealDuration,
+							completionMinimumDoses:
+								regimenData.completionMinimumDoses,
 							completionMaximumDuration:
-								completionMaximumDuration,
+								regimenData.completionMaximumDuration,
 					  }
 					: setting,
 			);
@@ -176,6 +142,20 @@ const AddSetting = ({
 			onResetClick();
 		}
 	};
+
+	const onSubmit = async (data: RegimenFormData) => {
+		addNew ? await onSave(data) : await onEdit(data);
+	};
+
+	useEffect(() => {
+		if (data) {
+			form.reset(data);
+		}
+	}, [data, index]);
+
+	const form = useForm<RegimenFormData>({
+		resolver: zodResolver(schema),
+	});
 
 	return loading ? (
 		<></>
@@ -200,60 +180,64 @@ const AddSetting = ({
 				</ModalTitle>
 				<ModalContent>
 					<div>
-						<div style={{ padding: "5px" }}>
-							<FilterField
-								options={
-									addNew ? availableRegimen : currentRegimen
-								}
-								label={i18n.t("Regimen")}
-								name="regimen"
-								type="select"
-								required
-							/>
-						</div>
-						<div style={{ padding: "5px" }}>
-							<FilterField
-								options={administrationOptions}
-								label={i18n.t("Administration")}
-								name="administration"
-								type="select"
-								required
-							/>
-						</div>
-						<div style={{ padding: "5px" }}>
-							<FilterField
-								label={i18n.t("Ideal Doses")}
-								name="idealDoses"
-								type="text"
-								required
-							/>
-						</div>
-						<div style={{ padding: "5px" }}>
-							<FilterField
-								label={i18n.t("Ideal Duration (Months)")}
-								name="idealDuration"
-								type="text"
-								required
-							/>
-						</div>
-						<div style={{ padding: "5px" }}>
-							<FilterField
-								label={i18n.t("Completion Minimum Doses")}
-								name="completionMinimumDoses"
-								type="text"
-								required
-							/>
-						</div>
-						<div style={{ padding: "5px" }}>
-							<FilterField
-								label={i18n.t(
-									"Completion Maximum Duration (Months)",
-								)}
-								name="completionMaximumDuration"
-								type="text"
-								required
-							/>
-						</div>
+						<FormProvider {...form}>
+							<div style={{ padding: "5px" }}>
+								<FilterField
+									options={
+										addNew
+											? availableRegimen
+											: currentRegimen
+									}
+									label={i18n.t("Regimen")}
+									name="regimen"
+									type="select"
+									required
+								/>
+							</div>
+							<div style={{ padding: "5px" }}>
+								<FilterField
+									options={administrationOptions}
+									label={i18n.t("Administration")}
+									name="administration"
+									type="select"
+									required
+								/>
+							</div>
+							<div style={{ padding: "5px" }}>
+								<FilterField
+									label={i18n.t("Ideal Doses")}
+									name="idealDoses"
+									type="text"
+									required
+								/>
+							</div>
+							<div style={{ padding: "5px" }}>
+								<FilterField
+									label={i18n.t("Ideal Duration (Months)")}
+									name="idealDuration"
+									type="text"
+									required
+								/>
+							</div>
+							<div style={{ padding: "5px" }}>
+								<FilterField
+									label={i18n.t("Completion Minimum Doses")}
+									name="completionMinimumDoses"
+									type="text"
+									required
+								/>
+							</div>
+							<div style={{ padding: "5px" }}>
+								<FilterField
+									label={i18n.t(
+										"Completion Maximum Duration (Months)",
+									)}
+									name="completionMaximumDuration"
+									type="text"
+									required
+								/>
+							</div>
+						</FormProvider>
 					</div>
 				</ModalContent>
 				<ModalActions>
@@ -269,10 +253,8 @@ const AddSetting = ({
 							{i18n.t("Hide")}
 						</Button>
 						<Button
-							disabled={disabled}
-							onClick={() => {
-								addNew ? onSave() : onEdit();
-							}}
+							loading={form.formState.isSubmitting}
+							onClick={form.handleSubmit(onSubmit)}
 							primary
 						>
 							{i18n.t("Save")}

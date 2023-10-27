@@ -9,11 +9,11 @@ import { Pagination } from "@hisptz/dhis2-utils";
 import { isEmpty } from "lodash";
 import { FullPageLoader } from "../../../../shared/components/Loaders";
 import { ActionButton } from "../../../../shared/components/ActionButton";
-import { edit, remove } from "../state";
+import { editRegimen, remove } from "../state";
 import { useRecoilState } from "recoil";
 
 import { regimenSetting } from "../../../../shared/constants";
-import AddSetting from "./EditRegimen";
+import AddSetting, { RegimenFormData } from "./EditRegimen";
 import DeleteSetting from "./DeleteRegimen";
 
 export interface regimensTableProps {
@@ -26,10 +26,8 @@ export default function RegimenTable({
 	regimens,
 }: regimensTableProps) {
 	const [, setDelete] = useRecoilState<boolean>(remove);
-	const [, setEdit] = useRecoilState<boolean>(edit);
-	const [selectedRegimen, setSelectedRegimen] = useState<
-		regimenSetting | undefined
-	>();
+	const [, setEdit] = useRecoilState<boolean>(editRegimen);
+	const [selectedRegimen, setSelectedRegimen] = useState<RegimenFormData>();
 	const [index, setIndex] = useState<number>();
 
 	const regimensColumns = [
@@ -75,7 +73,7 @@ export default function RegimenTable({
 		},
 	];
 
-	function getActions(regimen: regimenSetting, index: number) {
+	function getActions(regimen: RegimenFormData, index: number) {
 		return (
 			<>
 				<ActionButton
@@ -115,7 +113,7 @@ export default function RegimenTable({
 								};
 							})}
 						/>
-						<AddSetting regimen={selectedRegimen} index={index} />
+						<AddSetting data={selectedRegimen} index={index} />
 						<DeleteSetting regimen={selectedRegimen?.regimen} />
 					</>
 				)}
