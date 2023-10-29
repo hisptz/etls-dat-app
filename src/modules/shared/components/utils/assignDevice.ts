@@ -1,4 +1,4 @@
-import { useDataMutation } from "@dhis2/app-runtime";
+import { useAlert, useDataMutation } from "@dhis2/app-runtime";
 import { useSetting } from "@dhis2/app-service-datastore";
 import { useSearchParams } from "react-router-dom";
 
@@ -20,56 +20,55 @@ export function useAssignDevice() {
 		(attribute) => attribute.attribute === TEA_ID,
 	);
 
-	const { enrollments, ...updatedTeiWithoutEnrollments } = patientTei;
-
-	const updatedAttributes =
-		attributeIndex === -1
-			? [
-					...patientTei!.attributes,
-					{
-						attribute: TEA_ID,
-						value: newValue,
-					},
-			  ]
-			: patientTei!.attributes.map((attribute, index) =>
-					index === attributeIndex
-						? { ...attribute, value: newValue }
-						: attribute,
-			  );
-
-	const updatedTei = {
-		...enrollments[0],
-		attributes: updatedAttributes,
-	};
-
-	delete updatedTei.events;
-	delete updatedTei.relationships;
-	delete updatedTei.followUp;
-
-	console.log({
-		enrollments: [updatedTei],
-	});
+	const { trackedEntity, trackedEntityType, orgUnit } = patientTei;
 
 	const newDevice: any = {
 		type: "create",
 		resource: "tracker",
-		data: {
-			enrollments: [updatedTei],
-		},
-		importStrategy: "CREATE_AND_UPDATE",
-		async: true,
+		data: ({ data }: any) => data,
+		async: false,
 	};
-
-	const [mutate, { error }] = useDataMutation(newDevice);
-
-	const handleAssignDevice = () => {
-		mutate()
-			.then((response) => {
-				console.log(response);
-			})
-			.catch((error) => {
-				console.log(error);
+	const { show } = useAlert(
+		({ message }) => message,
+		({ type }) => ({ ...type, duration: 3000 }),
+	);
+	const [update, { error }] = useDataMutation(newDevice, {
+		onError: (error) => {
+			show({
+				message: `Could not update: ${error.message}`,
+				type: { info: true },
 			});
+		},
+		onComplete: () => {
+			show({ message: "Update successful", type: { success: true } });
+		},
+	});
+
+	const handleAssignDevice = async () => {
+		const updatedAttributes =
+			attributeIndex === -1
+				? [
+						...patientTei!.attributes,
+						{
+							attribute: TEA_ID,
+							value: newValue,
+						},
+				  ]
+				: patientTei!.attributes.map((attribute, index) =>
+						index === attributeIndex
+							? { ...attribute, value: newValue }
+							: attribute,
+				  );
+		const updatedTei = {
+			attributes: updatedAttributes,
+			trackedEntity,
+			trackedEntityType,
+			orgUnit,
+		};
+
+		await update({
+			data: { trackedEntities: [updatedTei] },
+		});
 	};
 
 	return {
