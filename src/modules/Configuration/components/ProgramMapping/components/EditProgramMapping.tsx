@@ -78,6 +78,7 @@ function Edit({
 	};
 
 	const onClose = () => {
+		setHide(true);
 		form.reset({});
 	};
 
@@ -100,13 +101,7 @@ function Edit({
 
 	return (
 		<div>
-			<Modal
-				position="middle"
-				hide={hideEdit}
-				onClose={() => {
-					setHide(true);
-				}}
-			>
+			<Modal position="middle" hide={hideEdit} onClose={onClose}>
 				<ModalTitle>
 					<h3
 						className="m-0"
@@ -220,12 +215,7 @@ function Edit({
 				</ModalContent>
 				<ModalActions>
 					<ButtonStrip end>
-						<Button
-							onClick={() => {
-								setHide(true);
-							}}
-							secondary
-						>
+						<Button onClick={onClose} secondary>
 							{i18n.t("Hide")}
 						</Button>
 						<Button

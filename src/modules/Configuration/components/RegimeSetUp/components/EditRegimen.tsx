@@ -12,12 +12,9 @@ import i18n from "@dhis2/d2-i18n";
 import { useRecoilState } from "recoil";
 import { FilterField } from "../../ProgramMapping/components/FilterField";
 import { add, editRegimen } from "../state";
-import { useSearchParams } from "react-router-dom";
-import { getDefaultFilters } from "../../constants/filters";
 import { useSetting } from "@dhis2/app-service-datastore";
 import { regimenSetting } from "../../../../shared/constants";
 import { Option, useRegimens } from "../hooks/data";
-import { getEditFilters } from "../hooks/save";
 import { isEmpty } from "lodash";
 import { FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -93,8 +90,14 @@ const AddSetting = ({
 		setAvailableRegimen(transformedSettings);
 	}, [hide, index]);
 
-	const onResetClick = () => {
+	const onResetClick = async () => {
 		form.reset({});
+	};
+
+	const onClose = async () => {
+		form.reset({});
+		setHide(true);
+		setAdd(false);
 	};
 
 	const currentRegimen: Option[] = [
@@ -147,13 +150,25 @@ const AddSetting = ({
 		addNew ? await onSave(data) : await onEdit(data);
 	};
 
-	useEffect(() => {
-		if (data) {
-			form.reset(data);
-		}
-	}, [data, index]);
-
 	const form = useForm<RegimenFormData>({
+		defaultValues: async () => {
+			return new Promise((resolve) =>
+				resolve(
+					addNew
+						? {}
+						: {
+								regimen: currentRegimen[0].name,
+								idealDuration: data?.idealDuration,
+								idealDoses: data?.idealDoses,
+								completionMinimumDoses:
+									data?.completionMinimumDoses,
+								completionMaximumDuration:
+									data?.completionMaximumDuration,
+								administration: data?.administration,
+						  },
+				),
+			);
+		},
 		resolver: zodResolver(schema),
 	});
 
@@ -161,15 +176,7 @@ const AddSetting = ({
 		<></>
 	) : (
 		<div>
-			<Modal
-				position="middle"
-				hide={hide}
-				onClose={() => {
-					setHide(true);
-					setAdd(false);
-					onResetClick();
-				}}
-			>
+			<Modal position="middle" hide={hide} onClose={onClose}>
 				<ModalTitle>
 					<h3
 						className="m-0"
@@ -242,14 +249,7 @@ const AddSetting = ({
 				</ModalContent>
 				<ModalActions>
 					<ButtonStrip end>
-						<Button
-							onClick={() => {
-								setHide(true);
-								setAdd(false);
-								onResetClick();
-							}}
-							secondary
-						>
+						<Button onClick={onClose} secondary>
 							{i18n.t("Hide")}
 						</Button>
 						<Button

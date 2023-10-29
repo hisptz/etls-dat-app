@@ -10,7 +10,7 @@ import { useSetting } from "@dhis2/app-service-datastore";
 
 export function DATDevicelists() {
 	const [, setAdd] = useRecoilState<boolean>(add);
-	const [, setHide] = useRecoilState<boolean>(editDevice);
+	const [hide, setHide] = useRecoilState<boolean>(editDevice);
 	const [deviceEmeiList] = useSetting("deviceEmeiList", { global: true });
 
 	return (
@@ -35,7 +35,7 @@ export function DATDevicelists() {
 							{i18n.t("Add Device")}
 						</Button>
 					</div>
-					<EditDevice />
+					{!hide && <EditDevice />}
 					<DeviceListTable devices={deviceEmeiList} loading={false} />
 				</div>
 			</Card>

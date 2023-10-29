@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
 	Button,
 	Modal,
@@ -27,8 +27,8 @@ const schema = z.object({
 	inUse: z.boolean().optional(),
 	name: z.string().optional(),
 	code: z.string().optional(),
-	// file: z.optional(),
 });
+const schema2 = z.object({});
 
 export type DeviceFormData = z.infer<typeof schema>;
 
@@ -101,6 +101,9 @@ const EditDevice = ({ data }: { data?: DeviceFormData }) => {
 	};
 
 	const onClose = () => {
+		setHide(true);
+		setAdd(false);
+		setBulkUpload(false);
 		form.reset({});
 	};
 
@@ -112,28 +115,27 @@ const EditDevice = ({ data }: { data?: DeviceFormData }) => {
 		form.reset({});
 	};
 
-	useEffect(() => {
-		if (data) {
-			form.reset(data);
-		}
-	}, [data]);
-
 	const form = useForm<DeviceFormData>({
-		resolver: zodResolver(schema),
+		defaultValues: async () => {
+			return new Promise((resolve) =>
+				resolve(
+					addNew
+						? {}
+						: {
+								emei: data?.emei ?? "",
+								code: data?.code,
+								inUse: data?.inUse,
+								name: data?.name,
+						  },
+				),
+			);
+		},
+		resolver: zodResolver(bulkUpload ? schema2 : schema),
 	});
-	const isDirty = form.formState.isDirty;
+
 	return (
 		<div>
-			<Modal
-				position="middle"
-				hide={hide}
-				onClose={() => {
-					setHide(true);
-					setAdd(false);
-					setBulkUpload(false);
-					onClose();
-				}}
-			>
+			<Modal position="middle" hide={hide} onClose={onClose}>
 				<ModalTitle>
 					<h3
 						className="m-0"
@@ -220,15 +222,7 @@ const EditDevice = ({ data }: { data?: DeviceFormData }) => {
 				</ModalContent>
 				<ModalActions>
 					<ButtonStrip end>
-						<Button
-							onClick={() => {
-								setHide(true);
-								setAdd(false);
-								setBulkUpload(false);
-								onClose();
-							}}
-							secondary
-						>
+						<Button onClick={onClose} secondary>
 							{i18n.t("Hide")}
 						</Button>
 						<Button
