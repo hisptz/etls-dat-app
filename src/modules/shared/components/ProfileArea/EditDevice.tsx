@@ -65,9 +65,13 @@ function EditDevice({ name, value, refetch }: editDeviceProps) {
 			!loading && refetch ? refetch() : null;
 		}
 	};
-
+	const onClose = async () => {
+		form.reset();
+		setHide(true);
+	};
 	const onSubmit = async (data: DeviceData) => {
 		await onSave(data);
+		form.reset();
 	};
 
 	useEffect(() => {
@@ -81,13 +85,7 @@ function EditDevice({ name, value, refetch }: editDeviceProps) {
 	});
 	return (
 		<div>
-			<Modal
-				position="middle"
-				hide={hide}
-				onClose={() => {
-					setHide(true);
-				}}
-			>
+			<Modal position="middle" hide={hide} onClose={onClose}>
 				<ModalTitle>
 					<h3
 						className="m-0"
@@ -120,12 +118,7 @@ function EditDevice({ name, value, refetch }: editDeviceProps) {
 				</ModalContent>
 				<ModalActions>
 					<ButtonStrip end>
-						<Button
-							onClick={() => {
-								setHide(true);
-							}}
-							secondary
-						>
+						<Button onClick={onClose} secondary>
 							{i18n.t("Hide")}
 						</Button>
 						<Button

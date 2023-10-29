@@ -43,6 +43,7 @@ function EditAlarm({ nextDose, nextRefill }: addAlarmProps) {
 
 	const onClose = async () => {
 		form.reset();
+		setHide(true);
 	};
 
 	useEffect(() => {
@@ -57,14 +58,7 @@ function EditAlarm({ nextDose, nextRefill }: addAlarmProps) {
 
 	return (
 		<div>
-			<Modal
-				position="middle"
-				hide={hide}
-				onClose={() => {
-					setHide(true);
-					onClose();
-				}}
-			>
+			<Modal position="middle" hide={hide} onClose={onClose}>
 				<ModalTitle>
 					<h3
 						className="m-0"
@@ -135,13 +129,7 @@ function EditAlarm({ nextDose, nextRefill }: addAlarmProps) {
 				</ModalContent>
 				<ModalActions>
 					<ButtonStrip end>
-						<Button
-							onClick={() => {
-								setHide(true);
-								onClose();
-							}}
-							secondary
-						>
+						<Button onClick={onClose} secondary>
 							{i18n.t("Hide")}
 						</Button>
 						<Button

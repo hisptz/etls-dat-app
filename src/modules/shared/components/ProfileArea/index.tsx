@@ -1,7 +1,7 @@
 import i18n from "@dhis2/d2-i18n";
 import styles from "./ProfileArea.module.css";
 import { Button, IconEdit24, Card, ButtonStrip, IconClock24 } from "@dhis2/ui";
-import React from "react";
+import React, { useState } from "react";
 import EditDevice from "./EditDevice";
 import { PatientProfile } from "../../models";
 import { useRecoilState } from "recoil";
@@ -17,6 +17,7 @@ export interface ProfileAreaProps {
 export function ProfileArea({ profile, refetch }: ProfileAreaProps) {
 	const [, setHideDevice] = useRecoilState<boolean>(AddDevice);
 	const [, setHideAlarm] = useRecoilState<boolean>(AddAlarm);
+	const [hide, setHide] = useState<boolean>(true);
 
 	return (
 		<div>
@@ -154,7 +155,10 @@ export function ProfileArea({ profile, refetch }: ProfileAreaProps) {
 							<Button
 								secondary
 								icon={<IconEdit24 />}
-								onClick={() => setHideDevice(false)}
+								onClick={() => {
+									setHide(false);
+									setHideDevice(false);
+								}}
 							>
 								{i18n.t("Edit Device")}
 							</Button>
@@ -162,7 +166,10 @@ export function ProfileArea({ profile, refetch }: ProfileAreaProps) {
 								<Button
 									secondary
 									icon={<IconClock24 />}
-									onClick={() => setHideAlarm(false)}
+									onClick={() => {
+										setHide(false);
+										setHideAlarm(false);
+									}}
 								>
 									{i18n.t("Set Alarm")}
 								</Button>
@@ -268,16 +275,20 @@ export function ProfileArea({ profile, refetch }: ProfileAreaProps) {
 					)}
 				</Card>
 			</div>
-			<EditDevice
-				value={
-					profile.deviceIMEINumber == "N/A"
-						? ""
-						: profile.deviceIMEINumber
-				}
-				name={profile.name}
-				refetch={refetch}
-			/>
-			<EditAlarm nextDose="" nextRefill="" />
+			{!hide && (
+				<>
+					<EditDevice
+						value={
+							profile.deviceIMEINumber == "N/A"
+								? ""
+								: profile.deviceIMEINumber
+						}
+						name={profile.name}
+						refetch={refetch}
+					/>
+					<EditAlarm nextDose="" nextRefill="" />
+				</>
+			)}
 		</div>
 	);
 }
