@@ -25,7 +25,9 @@ interface editDeviceProps {
 }
 
 const schema = z.object({
-	emei: z.string().nonempty("Device IMEI number is required"),
+	emei: z
+		.string({ required_error: "Device IMEI number is required" })
+		.nonempty("Device IMEI number is required"),
 });
 
 export type DeviceData = z.infer<typeof schema>;
@@ -74,13 +76,11 @@ function EditDevice({ name, value, refetch }: editDeviceProps) {
 		form.reset();
 	};
 
-	useEffect(() => {
-		if (value) {
-			form.reset({ emei: value });
-		}
-	}, [value]);
-
 	const form = useForm<DeviceData>({
+		defaultValues: async () => {
+			return new Promise((resolve) => resolve({ emei: value }));
+		},
+
 		resolver: zodResolver(schema),
 	});
 	return (

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import {
 	Button,
 	Modal,
@@ -9,7 +9,7 @@ import {
 } from "@dhis2/ui";
 import i18n from "@dhis2/d2-i18n";
 import { useRecoilState } from "recoil";
-import { AddAlarm, AddDevice } from "../../state";
+import { AddAlarm } from "../../state";
 import { FilterField } from "../../../Configuration/components/ProgramMapping/components/FilterField";
 import { useSetting } from "@dhis2/app-service-datastore";
 
@@ -18,18 +18,22 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 
 interface addAlarmProps {
-	nextDose: string;
-	nextRefill: string;
+	nextRefillAlarm: string;
+	nextRefillDate: string;
 }
 
 const schema = z.object({
-	nextRefillDate: z.string().nonempty("Next Refill Date is required"),
-	nextRefillAlarm: z.string().nonempty("Next Refill Alarm is required"),
+	nextRefillDate: z
+		.string({ required_error: "Next Refill Date is required" })
+		.nonempty("Next Refill Date is required"),
+	nextRefillAlarm: z
+		.string({ required_error: "Next Refill Date is required" })
+		.nonempty("Next Refill Alarm is required"),
 });
 
 export type AlarmFormData = z.infer<typeof schema>;
 
-function EditAlarm({ nextDose, nextRefill }: addAlarmProps) {
+function EditAlarm({ nextRefillAlarm, nextRefillDate }: addAlarmProps) {
 	const [hide, setHide] = useRecoilState<boolean>(AddAlarm);
 	const [devices, { set: updateDevice }] = useSetting("deviceEmeiList", {
 		global: true,
@@ -42,17 +46,19 @@ function EditAlarm({ nextDose, nextRefill }: addAlarmProps) {
 	};
 
 	const onClose = async () => {
-		form.reset();
+		form.reset({});
 		setHide(true);
 	};
 
-	useEffect(() => {
-		if (nextDose && nextRefill) {
-			form.reset({ nextRefillDate: nextRefill });
-		}
-	}, [nextDose, nextRefill]);
-
 	const form = useForm<AlarmFormData>({
+		defaultValues: async () => {
+			return new Promise((resolve) =>
+				resolve({
+					nextRefillDate: nextRefillDate,
+					nextRefillAlarm: nextRefillAlarm,
+				}),
+			);
+		},
 		resolver: zodResolver(schema),
 	});
 

@@ -1,7 +1,7 @@
 import i18n from "@dhis2/d2-i18n";
 import styles from "./ProfileArea.module.css";
 import { Button, IconEdit24, Card, ButtonStrip, IconClock24 } from "@dhis2/ui";
-import React, { useState } from "react";
+import React from "react";
 import EditDevice from "./EditDevice";
 import { PatientProfile } from "../../models";
 import { useRecoilState } from "recoil";
@@ -15,9 +15,8 @@ export interface ProfileAreaProps {
 }
 
 export function ProfileArea({ profile, refetch }: ProfileAreaProps) {
-	const [, setHideDevice] = useRecoilState<boolean>(AddDevice);
-	const [, setHideAlarm] = useRecoilState<boolean>(AddAlarm);
-	const [hide, setHide] = useState<boolean>(true);
+	const [hide, setHideDevice] = useRecoilState<boolean>(AddDevice);
+	const [hideAlarm, setHideAlarm] = useRecoilState<boolean>(AddAlarm);
 
 	return (
 		<div>
@@ -156,7 +155,6 @@ export function ProfileArea({ profile, refetch }: ProfileAreaProps) {
 								secondary
 								icon={<IconEdit24 />}
 								onClick={() => {
-									setHide(false);
 									setHideDevice(false);
 								}}
 							>
@@ -167,7 +165,6 @@ export function ProfileArea({ profile, refetch }: ProfileAreaProps) {
 									secondary
 									icon={<IconClock24 />}
 									onClick={() => {
-										setHide(false);
 										setHideAlarm(false);
 									}}
 								>
@@ -276,19 +273,17 @@ export function ProfileArea({ profile, refetch }: ProfileAreaProps) {
 				</Card>
 			</div>
 			{!hide && (
-				<>
-					<EditDevice
-						value={
-							profile.deviceIMEINumber == "N/A"
-								? ""
-								: profile.deviceIMEINumber
-						}
-						name={profile.name}
-						refetch={refetch}
-					/>
-					<EditAlarm nextDose="" nextRefill="" />
-				</>
+				<EditDevice
+					value={
+						profile.deviceIMEINumber == "N/A"
+							? ""
+							: profile.deviceIMEINumber
+					}
+					name={profile.name}
+					refetch={refetch}
+				/>
 			)}
+			{!hideAlarm && <EditAlarm nextRefillDate="" nextRefillAlarm="" />}
 		</div>
 	);
 }
