@@ -21,15 +21,23 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 
 const schema = z.object({
-	regimen: z.string().nonempty("Regmien is required"),
-	administration: z.string().nonempty("Administration is required"),
-	idealDoses: z.string().nonempty("Ideal Doses is required"),
-	idealDuration: z.string().nonempty("Ideal Duration is required"),
+	regimen: z
+		.string({ required_error: "Regimen is required" })
+		.nonempty("Regmien is required"),
+	administration: z
+		.string({ required_error: "Administration is required" })
+		.nonempty("Administration is required"),
+	idealDoses: z
+		.string({ required_error: "Ideal Doses is required" })
+		.nonempty("Ideal Doses is required"),
+	idealDuration: z
+		.string({ required_error: "Ideal Duration is required" })
+		.nonempty("Ideal Duration is required"),
 	completionMinimumDoses: z
-		.string()
+		.string({ required_error: "Completion Minimum is required" })
 		.nonempty("Completion Minimum Doses is required"),
 	completionMaximumDuration: z
-		.string()
+		.string({ required_error: "Completion Maximum is required" })
 		.nonempty("Completion Maximum Duration is required"),
 });
 

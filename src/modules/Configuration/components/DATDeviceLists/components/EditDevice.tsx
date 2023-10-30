@@ -23,7 +23,9 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 const schema = z.object({
-	emei: z.string().nonempty("Device IMEI number is required"),
+	emei: z
+		.string({ required_error: "Device IMEI number is required" })
+		.nonempty("Device IMEI number is required"),
 	inUse: z.boolean().optional(),
 	name: z.string().optional(),
 	code: z.string().optional(),

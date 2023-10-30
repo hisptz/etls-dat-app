@@ -28,19 +28,41 @@ interface EditProps {
 }
 
 const schema = z.object({
-	program: z.string().nonempty("Mapped TB Program is required"),
+	program: z
+		.string({ required_error: "Mapped TB Program is required" })
+		.nonempty("Mapped TB Program is required"),
 	programStage: z.string().optional(),
-	mediatorUrl: z.string().nonempty("Mediator Url is required"),
-	apiKey: z.string().nonempty("API Key is required"),
+	mediatorUrl: z
+		.string({ required_error: "Mediator Url is required" })
+		.nonempty("Mediator Url is required"),
+	apiKey: z
+		.string({ required_error: "API Key is required" })
+		.nonempty("API Key is required"),
 	attributes: z.object({
-		firstName: z.string().nonempty("First Name attribute is required"),
-		surname: z.string().nonempty("Surname attribute is required"),
-		tbDistrictNumber: z.string().nonempty("TB District Number is required"),
-		age: z.string().nonempty("Age attribute is required"),
-		sex: z.string().nonempty("Sex attribute is required"),
-		regimen: z.string().nonempty("Regimen attribute is required"),
-		phoneNumber: z.string().nonempty("Phone Number attribute is required"),
-		deviceIMEInumber: z.string().nonempty("Device IMEI Number is required"),
+		firstName: z
+			.string({ required_error: "First Name attribute is required" })
+			.nonempty("First Name attribute is required"),
+		surname: z
+			.string({ required_error: "Surname attribute is required" })
+			.nonempty("Surname attribute is required"),
+		tbDistrictNumber: z
+			.string({ required_error: "TB District Number is required" })
+			.nonempty("TB District Number is required"),
+		age: z
+			.string({ required_error: "Age attribute is required" })
+			.nonempty("Age attribute is required"),
+		sex: z
+			.string({ required_error: "Sex attribute is required" })
+			.nonempty("Sex attribute is required"),
+		regimen: z
+			.string({ required_error: "Regimen attribute is required" })
+			.nonempty("Regimen attribute is required"),
+		phoneNumber: z
+			.string({ required_error: "Phone Number attribute is required" })
+			.nonempty("Phone Number attribute is required"),
+		deviceIMEInumber: z
+			.string({ required_error: "Device IMEI Number is required" })
+			.nonempty("Device IMEI Number is required"),
 	}),
 });
 
