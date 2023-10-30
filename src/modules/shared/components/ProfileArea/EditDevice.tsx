@@ -17,11 +17,12 @@ import { useAssignDevice } from "../utils/assignDevice";
 import { FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { useDataQuery } from "@dhis2/app-runtime";
 
 interface editDeviceProps {
 	name: string;
 	value: string;
-	refetch?: () => void;
+	refetch: ReturnType<typeof useDataQuery>["refetch"];
 }
 
 const schema = z.object({
@@ -64,7 +65,6 @@ function EditDevice({ name, value, refetch }: editDeviceProps) {
 			assignDevice(data.emei);
 			setHide(true);
 			updateDevice(updatedDevices);
-			!loading && refetch ? refetch() : null;
 		}
 	};
 	const onClose = async () => {
@@ -73,6 +73,7 @@ function EditDevice({ name, value, refetch }: editDeviceProps) {
 	};
 	const onSubmit = async (data: DeviceData) => {
 		await onSave(data);
+		refetch({});
 		form.reset();
 	};
 

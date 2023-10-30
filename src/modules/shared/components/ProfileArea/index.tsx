@@ -8,10 +8,11 @@ import { useRecoilState } from "recoil";
 import { AddAlarm, AddDevice } from "../../state";
 import EditAlarm from "./AddAlarm";
 import NoDeviceAssigned from "./NoDeviceAssigned";
+import { useDataQuery } from "@dhis2/app-runtime";
 
 export interface ProfileAreaProps {
 	profile: PatientProfile;
-	refetch: () => void;
+	refetch: ReturnType<typeof useDataQuery>["refetch"];
 }
 
 export function ProfileArea({ profile, refetch }: ProfileAreaProps) {
