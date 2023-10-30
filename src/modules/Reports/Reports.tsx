@@ -20,7 +20,9 @@ export function Reports() {
 	const orgUnit = params.get("ou");
 	const { reports, pagination, loading, refetch } = useReportTableData();
 	const [enabled, setenabled] = useState<boolean>(false);
-	const periods = PeriodUtility.getPeriodById(period ?? "TODAY");
+	const periods = PeriodUtility.getPeriodById(
+		!isEmpty(period) ? period : "TODAY",
+	);
 	const s = DateTime.fromISO(periods.start);
 	const startDate = s.toFormat("yyyy-MM-dd");
 	const e = DateTime.fromISO(periods.end);

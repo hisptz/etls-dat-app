@@ -117,7 +117,9 @@ export function useReportTableData() {
 	const reportType = params.get("reportType");
 	const [reportConfigs] = useSetting("reports", { global: true });
 
-	const periods = PeriodUtility.getPeriodById(period ?? "TODAY");
+	const periods = PeriodUtility.getPeriodById(
+		!isEmpty(period) ? period : "TODAY",
+	);
 	const s = DateTime.fromISO(periods.start);
 	const startDate = s.toFormat("yyyy-MM-dd");
 	const e = DateTime.fromISO(periods.end);

@@ -220,49 +220,60 @@ export function FilterField({
 					}}
 				/>
 			)}
-			<PeriodSelectorModal
-				enablePeriodSelector
-				singleSelection
-				hide={periods}
-				selectedPeriods={type == "periods" ? value?.split(",") : []}
-				onClose={() => {
-					setPeriods(!periods);
-				}}
-				onUpdate={async (val: any) => {
-					setPeriods(!periods);
-					onChange({ value: val });
-				}}
-			/>
-			<Modal
-				hide={reports}
-				onClose={() => {
-					setReports(!reports);
-				}}
-			>
-				<ModalTitle> {i18n.t("Report Types")}</ModalTitle>
-				<ModalContent>
-					{reportConfig?.map((report: ReportConfig, i: number) => {
-						return (
-							<div
-								key={i}
-								style={{
-									padding: "10px",
-								}}
-							>
-								<MenuItem
-									key={i}
-									icon={<IconTable24 />}
-									onClick={async () => {
-										onChange({ value: report.id });
-										setReports(!reports);
-									}}
-									label={report.name}
-								/>
-							</div>
-						);
-					})}
-				</ModalContent>
-			</Modal>
+			{!periods && (
+				<PeriodSelectorModal
+					enablePeriodSelector
+					singleSelection
+					hide={periods}
+					selectedPeriods={
+						type == "periods" && !isEmpty(value)
+							? value?.split(",")
+							: []
+					}
+					onClose={() => {
+						setPeriods(!periods);
+					}}
+					onUpdate={async (val: any) => {
+						setPeriods(!periods);
+						onChange({ value: val });
+						console.log(val);
+					}}
+				/>
+			)}
+			{!reports && (
+				<Modal
+					hide={reports}
+					onClose={() => {
+						setReports(!reports);
+					}}
+				>
+					<ModalTitle> {i18n.t("Report Types")}</ModalTitle>
+					<ModalContent>
+						{reportConfig?.map(
+							(report: ReportConfig, i: number) => {
+								return (
+									<div
+										key={i}
+										style={{
+											padding: "10px",
+										}}
+									>
+										<MenuItem
+											key={i}
+											icon={<IconTable24 />}
+											onClick={async () => {
+												onChange({ value: report.id });
+												setReports(!reports);
+											}}
+											label={report.name}
+										/>
+									</div>
+								);
+							},
+						)}
+					</ModalContent>
+				</Modal>
+			)}
 		</div>
 	);
 }
