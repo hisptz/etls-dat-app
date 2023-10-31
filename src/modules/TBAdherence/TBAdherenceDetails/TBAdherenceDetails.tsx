@@ -53,7 +53,7 @@ export function TBAdherenceDetails() {
 			<div className="column gap-16">
 				<div>
 					<Button
-						onClick={() => navigate("/")}
+						onClick={() => navigate(-1)}
 						icon={<IconArrowLeft24 />}
 					>
 						{i18n.t("Back")}

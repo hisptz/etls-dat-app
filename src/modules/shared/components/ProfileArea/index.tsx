@@ -8,15 +8,16 @@ import { useRecoilState } from "recoil";
 import { AddAlarm, AddDevice } from "../../state";
 import EditAlarm from "./AddAlarm";
 import NoDeviceAssigned from "./NoDeviceAssigned";
+import { useDataQuery } from "@dhis2/app-runtime";
 
 export interface ProfileAreaProps {
 	profile: PatientProfile;
-	refetch: () => void;
+	refetch: ReturnType<typeof useDataQuery>["refetch"];
 }
 
 export function ProfileArea({ profile, refetch }: ProfileAreaProps) {
-	const [, setHideDevice] = useRecoilState<boolean>(AddDevice);
-	const [, setHideAlarm] = useRecoilState<boolean>(AddAlarm);
+	const [hide, setHideDevice] = useRecoilState<boolean>(AddDevice);
+	const [hideAlarm, setHideAlarm] = useRecoilState<boolean>(AddAlarm);
 
 	return (
 		<div>
@@ -154,7 +155,9 @@ export function ProfileArea({ profile, refetch }: ProfileAreaProps) {
 							<Button
 								secondary
 								icon={<IconEdit24 />}
-								onClick={() => setHideDevice(false)}
+								onClick={() => {
+									setHideDevice(false);
+								}}
 							>
 								{i18n.t("Edit Device")}
 							</Button>
@@ -162,7 +165,9 @@ export function ProfileArea({ profile, refetch }: ProfileAreaProps) {
 								<Button
 									secondary
 									icon={<IconClock24 />}
-									onClick={() => setHideAlarm(false)}
+									onClick={() => {
+										setHideAlarm(false);
+									}}
 								>
 									{i18n.t("Set Alarm")}
 								</Button>
@@ -268,16 +273,18 @@ export function ProfileArea({ profile, refetch }: ProfileAreaProps) {
 					)}
 				</Card>
 			</div>
-			<EditDevice
-				value={
-					profile.deviceIMEINumber == "N/A"
-						? ""
-						: profile.deviceIMEINumber
-				}
-				name={profile.name}
-				refetch={refetch}
-			/>
-			<EditAlarm nextDose="" nextRefill="" />
+			{!hide && (
+				<EditDevice
+					value={
+						profile.deviceIMEINumber == "N/A"
+							? ""
+							: profile.deviceIMEINumber
+					}
+					name={profile.name}
+					refetch={refetch}
+				/>
+			)}
+			{!hideAlarm && <EditAlarm nextRefillDate="" nextRefillAlarm="" />}
 		</div>
 	);
 }

@@ -44,19 +44,19 @@ export function useAssignDevice() {
 		},
 	});
 
-	const handleAssignDevice = async () => {
+	const handleAssignDevice = async (data: string) => {
 		const updatedAttributes =
 			attributeIndex === -1
 				? [
 						...patientTei!.attributes,
 						{
 							attribute: TEA_ID,
-							value: newValue,
+							value: data,
 						},
 				  ]
 				: patientTei!.attributes.map((attribute, index) =>
 						index === attributeIndex
-							? { ...attribute, value: newValue }
+							? { ...attribute, value: data }
 							: attribute,
 				  );
 		const updatedTei = {

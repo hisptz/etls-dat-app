@@ -17,22 +17,23 @@ import { useAssignDevice } from "../utils/assignDevice";
 import { FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { useDataQuery } from "@dhis2/app-runtime";
 
 interface editDeviceProps {
 	name: string;
 	value: string;
-	refetch?: () => void;
+	refetch: ReturnType<typeof useDataQuery>["refetch"];
 }
 
-
 const schema = z.object({
-	emei: z.string().optional(),
+	emei: z
+		.string({ required_error: "Device IMEI number is required" })
+		.nonempty("Device IMEI number is required"),
 });
 
 export type DeviceData = z.infer<typeof schema>;
 
 function EditDevice({ name, value, refetch }: editDeviceProps) {
-
 	const [hide, setHide] = useRecoilState<boolean>(AddDevice);
 	const [devices, { set: updateDevice }] = useSetting("deviceEmeiList", {
 		global: true,
@@ -61,36 +62,31 @@ function EditDevice({ name, value, refetch }: editDeviceProps) {
 						? false
 						: device.inUse,
 			}));
-			assignDevice();
+			assignDevice(data.emei);
 			setHide(true);
 			updateDevice(updatedDevices);
-			!loading && refetch ? refetch() : null;
 		}
 	};
-
+	const onClose = async () => {
+		form.reset();
+		setHide(true);
+	};
 	const onSubmit = async (data: DeviceData) => {
-		console.log(data);
-		// await onSave(data);
+		await onSave(data);
+		refetch({});
+		form.reset();
 	};
-
-	useEffect(() => {
-		if (value) {
-			form.reset({ emei: value });
-		}
-	}, [value]);
 
 	const form = useForm<DeviceData>({
+		defaultValues: async () => {
+			return new Promise((resolve) => resolve({ emei: value }));
+		},
+
 		resolver: zodResolver(schema),
 	});
 	return (
 		<div>
-			<Modal
-				position="middle"
-				hide={hide}
-				onClose={() => {
-					setHide(true);
-				}}
-			>
+			<Modal position="middle" hide={hide} onClose={onClose}>
 				<ModalTitle>
 					<h3
 						className="m-0"
@@ -123,12 +119,7 @@ function EditDevice({ name, value, refetch }: editDeviceProps) {
 				</ModalContent>
 				<ModalActions>
 					<ButtonStrip end>
-						<Button
-							onClick={() => {
-								setHide(true);
-							}}
-							secondary
-						>
+						<Button onClick={onClose} secondary>
 							{i18n.t("Hide")}
 						</Button>
 						<Button
