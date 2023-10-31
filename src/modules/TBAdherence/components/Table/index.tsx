@@ -13,7 +13,11 @@ import { FullPageLoader } from "../../../shared/components/Loaders";
 import { isEmpty } from "lodash";
 import { useNavigate } from "react-router-dom";
 import { PatientProfile } from "../../../shared/models/profile";
-import AdherenceStreak from "../../../shared/components/AdherenceStreak/AdherenceStreak";
+import AdherenceStreak, {
+	DateEvent,
+} from "../../../shared/components/AdherenceStreak/AdherenceStreak";
+import { useAdherenceEvents } from "../../../shared/components/ProfileArea/utils";
+import { DateTime } from "luxon";
 
 export interface AdherenceTableProps {
 	loading: boolean;
@@ -28,6 +32,9 @@ export default function TBAdherenceTable({
 }: AdherenceTableProps) {
 	const [TBAdherence] = useSetting("TBAdherence", { global: true });
 	const navigate = useNavigate();
+	const [programMapping] = useSetting("programMapping", {
+		global: true,
+	});
 
 	const onRowClick = (id: string) => {
 		const row = patients.find((patient) => patient.id === id);
@@ -36,13 +43,32 @@ export default function TBAdherenceTable({
 			navigate(`/tbadherence/${row.id}`);
 		}
 	};
+
 	function getAdherenceStreak(patient: PatientProfile) {
-		const events: any = [
+		const { filteredEvents } = useAdherenceEvents(
+			patient.events,
+			programMapping.programStage,
+		);
+
+		const adherenceEvents = filteredEvents.map((item: any) => {
+			return {
+				date: DateTime.fromISO(item.occurredAt).toISODate(),
+				event:
+					item.dataValues[0].value == "Opened Once"
+						? "takenDose"
+						: item.dataValues[0].value == "Opened Multiple"
+						? "takenDose"
+						: item.dataValues[0].value == "None"
+						? "notTakenDose"
+						: "notTakenDose",
+			};
+		});
+		const events: DateEvent[] = [
+			...adherenceEvents,
 			{
 				date: patient.enrollmentDate,
 				event: "enrolled",
 			},
-			patient.deviceSignal,
 		];
 		return (
 			<div style={{ width: "120px" }}>

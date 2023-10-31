@@ -1,7 +1,7 @@
 import i18n from "@dhis2/d2-i18n";
 import styles from "./ProfileArea.module.css";
 import { Button, IconEdit24, Card, ButtonStrip, IconClock24 } from "@dhis2/ui";
-import React from "react";
+import React, { useEffect } from "react";
 import EditDevice from "./EditDevice";
 import { PatientProfile } from "../../models";
 import { useRecoilState } from "recoil";
@@ -9,6 +9,7 @@ import { AddAlarm, AddDevice } from "../../state";
 import EditAlarm from "./AddAlarm";
 import NoDeviceAssigned from "./NoDeviceAssigned";
 import { useDataQuery } from "@dhis2/app-runtime";
+import { useDeviceData } from "./utils";
 
 export interface ProfileAreaProps {
 	profile: PatientProfile;
@@ -18,6 +19,17 @@ export interface ProfileAreaProps {
 export function ProfileArea({ profile, refetch }: ProfileAreaProps) {
 	const [hide, setHideDevice] = useRecoilState<boolean>(AddDevice);
 	const [hideAlarm, setHideAlarm] = useRecoilState<boolean>(AddAlarm);
+	const { data, error, loading } = useDeviceData(profile.deviceIMEINumber);
+
+	// useEffect(() => {
+	// 	if (loading) {
+	// 		console.log(loading);
+	// 	} else if (error) {
+	// 		console.log(error);
+	// 	} else if (data) {
+	// 		console.log(data);
+	// 	}
+	// }, [data, error, loading]);
 
 	return (
 		<div>
