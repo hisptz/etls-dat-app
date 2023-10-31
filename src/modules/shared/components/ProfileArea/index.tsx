@@ -12,7 +12,7 @@ import { useDataQuery } from "@dhis2/app-runtime";
 
 export interface ProfileAreaProps {
 	profile: PatientProfile;
-	refetch: ReturnType<typeof useDataQuery>["refetch"];
+	refetch: () => void;
 }
 
 export function ProfileArea({ profile, refetch }: ProfileAreaProps) {

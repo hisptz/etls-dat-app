@@ -87,17 +87,28 @@ export function useProgramStage() {
 		programStages: [
 			{
 				id: programMapping.programStage,
-				name: "Device Program stage",
+				name: "DAT-Adherence Records",
 				program: { id: programId ?? programMapping.program ?? null },
 				programStageDataElements: [
 					{
-						dataElement: { id: "Vc6c6OjvvHO" },
+						dataElement: {
+							id: "Vc6c6OjvvHO",
+						},
 					},
 					{
-						dataElement: { id: "QH0OjHcBBpO" },
+						dataElement: {
+							id: "QH0OjHcBBpO",
+						},
 					},
 					{
-						dataElement: { id: "FOHv6pUjBjv" },
+						dataElement: {
+							id: "FOHv6pUjBjv",
+						},
+					},
+					{
+						dataElement: {
+							id: "oHBM5fsFc6p",
+						},
 					},
 				],
 			},
@@ -110,7 +121,7 @@ export function useProgramStage() {
 				shortName: "Device health",
 				aggregationType: "NONE",
 				domainType: "TRACKER",
-				valueType: "NUMBER",
+				valueType: "TEXT",
 			},
 			{
 				code: "WISE_PILL_002",
@@ -128,7 +139,78 @@ export function useProgramStage() {
 				shortName: "Dosage time",
 				aggregationType: "NONE",
 				domainType: "TRACKER",
-				valueType: "NUMBER",
+				valueType: "DATETIME",
+			},
+			{
+				code: "WISE_PILL_004",
+				id: "oHBM5fsFc6p",
+				name: "Device signal",
+				shortName: "Device signal",
+				aggregationType: "NONE",
+				domainType: "TRACKER",
+				valueType: "TEXT",
+				optionSet: {
+					id: "lpMwLxkJor6",
+				},
+			},
+		],
+		optionSets: [
+			{
+				id: "lpMwLxkJor6",
+				name: "Device signal",
+				valueType: "TEXT",
+				options: [
+					{
+						id: "rzRYYkh8jaq",
+					},
+					{
+						id: "bXCWzsKQiIe",
+					},
+					{
+						id: "J4u3MgT8ll3",
+					},
+					{
+						id: "rqvQqekCxF3",
+					},
+				],
+			},
+		],
+		options: [
+			{
+				id: "rzRYYkh8jaq",
+				code: "Once",
+				name: "Opened Once",
+				sortOrder: 1,
+				optionSet: {
+					id: "lpMwLxkJor6",
+				},
+			},
+			{
+				id: "bXCWzsKQiIe",
+				code: "Multiple",
+				name: "Opened Multiple",
+				sortOrder: 2,
+				optionSet: {
+					id: "lpMwLxkJor6",
+				},
+			},
+			{
+				id: "J4u3MgT8ll3",
+				code: "None",
+				name: "None",
+				sortOrder: 3,
+				optionSet: {
+					id: "lpMwLxkJor6",
+				},
+			},
+			{
+				id: "rqvQqekCxF3",
+				code: "Heartbeat",
+				name: "Heartbeat",
+				sortOrder: 4,
+				optionSet: {
+					id: "lpMwLxkJor6",
+				},
 			},
 		],
 	};

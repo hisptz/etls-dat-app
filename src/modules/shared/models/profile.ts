@@ -109,6 +109,23 @@ export class PatientProfile extends TrackedEntityModel {
 		return this.datDeviceInfoEvent?.deviceInfo.dosageTime;
 	}
 
+	get deviceSignal() {
+		const signal = this.datDeviceInfoEvent?.deviceInfo.deviceSignal;
+		if (signal == "Opened Once" || signal == "Opened Multiple") {
+			return {
+				date: "2023-08-07",
+				event: "takenDose",
+			};
+		}
+		if (signal == "None" || signal == "Heartbeat") {
+			return {
+				date: "2023-08-08",
+				event: "notTakenDose",
+			};
+		}
+		return { date: "", event: "" };
+	}
+
 	get tableData(): Record<string, any> {
 		const name = this.name;
 		const tbDistrictNumber = this.tbDistrictNumber;
@@ -121,6 +138,7 @@ export class PatientProfile extends TrackedEntityModel {
 		const batteryHealth = this.batteryHealth;
 		const dosageTime = this.dosageTime;
 		const enrollmentDate = this.enrollmentDate;
+		const deviceSignal = this.deviceSignal;
 
 		return {
 			id: this.id as string,
@@ -135,6 +153,7 @@ export class PatientProfile extends TrackedEntityModel {
 			batteryHealth,
 			dosageTime,
 			enrollmentDate,
+			deviceSignal,
 		};
 	}
 

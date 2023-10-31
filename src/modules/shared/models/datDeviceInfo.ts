@@ -6,11 +6,13 @@ export class DatDeviceInfoEventModel extends DHIS2EventModel {
 		deviceHealth: string;
 		batteryHealth: string;
 		dosageTime: string;
+		deviceSignal: string;
 	} {
 		return {
 			deviceHealth: this.getDataValue(DATA_ELEMENTS.DEVICE_HEALTH),
 			batteryHealth: this.getDataValue(DATA_ELEMENTS.BATTERY_HEALTH),
 			dosageTime: this.getDataValue(DATA_ELEMENTS.DOSAGE_TIME),
+			deviceSignal: this.getDataValue(DATA_ELEMENTS.DEVICE_SIGNAL),
 		};
 	}
 }

@@ -40,31 +40,7 @@ function AdherenceCalendar({ profile }: ProfileAreaProps) {
 			date: profile.enrollmentDate,
 			event: "enrolled",
 		},
-		{
-			date: "2023-08-07",
-			event: "takenDose",
-		},
-		{
-			date: "2023-09-20",
-			event: "notTakenDose",
-		},
-		{
-			date: "2023-09-30",
-			event: "takenDose",
-		},
-		{
-			date: "2023-10-18",
-			event: "takenDose",
-		},
-		{
-			date: "2023-11-30",
-			event: "notTakenDose",
-		},
-
-		{
-			date: "2023-10-31",
-			event: "notTakenDose",
-		},
+		profile.deviceSignal,
 	];
 	return (
 		<div

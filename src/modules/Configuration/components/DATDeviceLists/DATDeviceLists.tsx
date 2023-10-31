@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { Card, Button } from "@dhis2/ui";
 import i18n from "@dhis2/d2-i18n";
 import { DATA_TEST_PREFIX } from "../../../shared/constants";
