@@ -76,11 +76,19 @@ const EditDevice = ({ data }: { data?: DeviceFormData }) => {
 						deviceEMInumber["devices"].toString(),
 					),
 			);
+
 			const uniqueDevicesMap = new Map();
 
-			devices.concat(devicesFromExcel).forEach((device: any) => {
+			devices.forEach((device: any) => {
 				uniqueDevicesMap.set(device.emei, device);
 			});
+
+			devicesFromExcel.forEach((device) => {
+				if (!uniqueDevicesMap.has(device.emei)) {
+					uniqueDevicesMap.set(device.emei, device);
+				}
+			});
+
 			const updatedDevices = [...uniqueDevicesMap.values()];
 			updateDeviceListAndShowSuccess(updatedDevices);
 		}
