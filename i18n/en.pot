@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2023-10-16T05:21:08.381Z\n"
-"PO-Revision-Date: 2023-10-16T05:21:08.381Z\n"
+"POT-Creation-Date: 2023-10-19T17:38:06.398Z\n"
+"PO-Revision-Date: 2023-10-19T17:38:06.398Z\n"
 
 msgid "39"
 msgstr "39"
@@ -140,6 +140,36 @@ msgstr "Setting updated successfully"
 msgid "Regimens Settings not found"
 msgstr "Regimens Settings not found"
 
+msgid "Excel"
+msgstr "Excel"
+
+msgid "CSV"
+msgstr "CSV"
+
+msgid "JSON"
+msgstr "JSON"
+
+msgid "Download"
+msgstr "Download"
+
+msgid "Reports"
+msgstr "Reports"
+
+msgid "Select type of report, organisation unit and periods above to get started!"
+msgstr "Select type of report, organisation unit and periods above to get started!"
+
+msgid "Loading..."
+msgstr "Loading..."
+
+msgid "Report Types"
+msgstr "Report Types"
+
+msgid "There is no report data for the selected filters"
+msgstr "There is no report data for the selected filters"
+
+msgid "Downloading..."
+msgstr "Downloading..."
+
 msgid "Something went wrong"
 msgstr "Something went wrong"
 
@@ -154,9 +184,6 @@ msgstr "TB Adherence"
 
 msgid "Dashboards"
 msgstr "Dashboards"
-
-msgid "Reports"
-msgstr "Reports"
 
 msgid "Configuration"
 msgstr "Configuration"
@@ -218,9 +245,6 @@ msgstr "Device EMI Number"
 
 msgid "There is no data for the selected filters"
 msgstr "There is no data for the selected filters"
-
-msgid "Downloading..."
-msgstr "Downloading..."
 
 msgid "View"
 msgstr "View"

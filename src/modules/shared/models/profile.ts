@@ -101,6 +101,7 @@ export class PatientProfile extends TrackedEntityModel {
 	get tableData(): Record<string, any> {
 		const name = this.name;
 		const tbDistrictNumber = this.tbDistrictNumber;
+		const tbIdentificationNumber = this.tbDistrictNumber;
 		const age = this.age;
 		const sex = this.sex;
 		const phoneNumber = this.phoneNumber;
@@ -113,6 +114,7 @@ export class PatientProfile extends TrackedEntityModel {
 		return {
 			id: this.id as string,
 			tbDistrictNumber,
+			tbIdentificationNumber,
 			name,
 			age,
 			sex,
