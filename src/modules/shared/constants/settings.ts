@@ -34,6 +34,111 @@ export interface programMapping {
 		deviceIMEInumber?: string;
 	};
 }
+export interface ReportConfig {
+	name: string;
+	id: string;
+	columns: Array<{
+		key: string;
+		label: string;
+		path: string | Array<string | number>;
+	}>;
+}
+
+export const reports: ReportConfig[] = [
+	{
+		name: "TB Adherence Report",
+		id: "tb-adherence-report",
+		columns: [
+			{
+				key: "tbIdentificationNumber",
+				label: "TB Identification Number",
+				path: "tbIdentificationNumber",
+			},
+			{
+				key: "name",
+				label: "Name",
+				path: "name",
+			},
+			{
+				key: "phoneNumber",
+				label: "Phone Number",
+				path: "phoneNumber",
+			},
+			{
+				key: "adherenceFrequency",
+				label: "Adherence Frequency",
+				path: "adherenceFrequency",
+			},
+			{
+				key: "adherencePercentage",
+				label: "Adherence Percentage",
+				path: "adherencePercentage",
+			},
+		],
+	},
+	{
+		name: "DAT Device Summary Report",
+		id: "dat-device-summary-report",
+		columns: [
+			{
+				key: "deviceIMEINumber",
+				label: "Device IMEI",
+				path: "deviceIMEINumber",
+			},
+			{
+				key: "daysInUse",
+				label: "Number of Days in Use",
+				path: "name",
+			},
+			{
+				key: "lastHeartbeat",
+				label: "Last Heartbeat",
+				path: "lastHeartbeat",
+			},
+			{
+				key: "lastOpened",
+				label: "Last Opened",
+				path: "lastOpened",
+			},
+			{
+				key: "lastBatteryLevel",
+				label: "Last Battery Level",
+				path: "lastBatteryLevel",
+			},
+		],
+	},
+	{
+		name: "Patients Who Missed Doses",
+		id: "patients-who-missed-doses",
+		columns: [
+			{
+				key: "tbIdentificationNumber",
+				label: "TB Identification Number",
+				path: "tbIdentificationNumber",
+			},
+			{
+				key: "name",
+				label: "Name",
+				path: "name",
+			},
+			{
+				key: "phoneNumber",
+				label: "Phone Number",
+				path: "phoneNumber",
+			},
+			{
+				key: "adherenceFrequency",
+				label: "Adherence Frequency",
+				path: "adherenceFrequency",
+			},
+			{
+				key: "numberOfMissedDoses",
+				label: "Number of Missed Doses",
+				path: "numberOfMissedDoses",
+			},
+		],
+	},
+];
 
 export const TBAdherence: TBAdherenceConfig[] = [
 	{
@@ -75,6 +180,7 @@ export const DEFAULT_SETTINGS = {
 	programMapping,
 	deviceEmeiList,
 	regimenSetting,
+	reports,
 } as const;
 
 export const IN_APP_SETTINGS = {};
