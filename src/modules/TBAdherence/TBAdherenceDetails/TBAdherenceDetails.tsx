@@ -19,8 +19,6 @@ export function TBAdherenceDetails() {
 		patient?.deviceIMEINumber ?? "",
 	);
 
-	console.log(data);
-
 	const Dose = [
 		{
 			color: "#42a5f5",

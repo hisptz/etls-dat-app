@@ -27,20 +27,23 @@ export function ProfileArea({
 	const [hide, setHideDevice] = useRecoilState<boolean>(AddDevice);
 	const [hideAlarm, setHideAlarm] = useRecoilState<boolean>(AddAlarm);
 
-	const refillAlarm = DateTime.fromFormat(
-		data.refillAlarm,
-		"yyyy-MM-dd HH:mm:ss",
-	).toFormat("MMMM dd, yyyy hh:mm a");
+	const refillAlarm =
+		DateTime.fromFormat(
+			data?.refillAlarm ?? "",
+			"yyyy-MM-dd HH:mm:ss",
+		).toFormat("MMMM dd, yyyy hh:mm a") ?? "";
 
-	const lastUpdated = DateTime.fromFormat(
-		data.lastOpened,
-		"yyyy-MM-dd HH:mm:ss",
-	).toFormat("MMMM dd, yyyy hh:mm a");
+	const lastUpdated =
+		DateTime.fromFormat(
+			data?.lastOpened ?? "",
+			"yyyy-MM-dd HH:mm:ss",
+		).toFormat("MMMM dd, yyyy hh:mm a") ?? "";
 
-	const doseAlarm = DateTime.fromFormat(
-		data.alarmTime,
-		"yyyy-MM-dd HH:mm:ss",
-	).toFormat("MMMM dd, yyyy hh:mm a");
+	const doseAlarm =
+		DateTime.fromFormat(
+			data?.alarmTime ?? "",
+			"yyyy-MM-dd HH:mm:ss",
+		).toFormat("MMMM dd, yyyy hh:mm a") ?? "";
 
 	return loading ? (
 		<></>
@@ -245,7 +248,7 @@ export function ProfileArea({
 										className={styles["label-value"]}
 										htmlFor="value"
 									>
-										{data.batteryLevel}
+										{data?.batteryLevel ?? ""}
 									</label>
 								</div>
 								<div className={styles["grid-item"]}>

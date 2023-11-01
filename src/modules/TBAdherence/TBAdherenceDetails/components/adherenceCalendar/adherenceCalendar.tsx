@@ -70,24 +70,25 @@ function AdherenceCalendar({ profile, data, laoding }: ProfileAreaProps) {
 		},
 	];
 
-	const refillAlarm = DateTime.fromFormat(
-		data.refillAlarm,
-		"yyyy-MM-dd HH:mm:ss",
-	).toFormat("MMMM dd, yyyy hh:mm a");
+	const refillAlarm =
+		DateTime.fromFormat(
+			data?.refillAlarm ?? "",
+			"yyyy-MM-dd HH:mm:ss",
+		).toFormat("MMMM dd, yyyy hh:mm a") ?? "";
 
-	const lastUpdated = DateTime.fromFormat(
-		data.lastOpened,
-		"yyyy-MM-dd HH:mm:ss",
-	).toFormat("MMMM dd, yyyy hh:mm a");
+	const lastUpdated =
+		DateTime.fromFormat(
+			data?.lastOpened ?? "",
+			"yyyy-MM-dd HH:mm:ss",
+		).toFormat("MMMM dd, yyyy hh:mm a") ?? "";
 
-	const doseAlarm = DateTime.fromFormat(
-		data.alarmTime,
-		"yyyy-MM-dd HH:mm:ss",
-	).toFormat("MMMM dd, yyyy hh:mm a");
+	const doseAlarm =
+		DateTime.fromFormat(
+			data?.alarmTime ?? "",
+			"yyyy-MM-dd HH:mm:ss",
+		).toFormat("MMMM dd, yyyy hh:mm a") ?? "";
 
-	return laoding ? (
-		<></>
-	) : (
+	return (
 		<div
 			style={{
 				display: "flex",
@@ -242,7 +243,7 @@ function AdherenceCalendar({ profile, data, laoding }: ProfileAreaProps) {
 									htmlFor="value"
 								>
 									{eventCode == "green" || eventCode == "blue"
-										? data.batteryLevel
+										? data?.batteryLevel ?? ""
 										: i18n.t("N/A")}
 								</label>
 							</div>
