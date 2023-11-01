@@ -2732,7 +2732,7 @@
     use-context-selector "^1.4.1"
     usehooks-ts "^2.9.1"
 
-"@hisptz/dhis2-utils@^1.0.52", "@hisptz/dhis2-utils@^1.0.58":
+"@hisptz/dhis2-utils@^1.0.58":
   version "1.0.58"
   resolved "https://registry.yarnpkg.com/@hisptz/dhis2-utils/-/dhis2-utils-1.0.58.tgz#b95c62adf5d3ecbef23ab948d4a146ce44a474cf"
   integrity sha512-GKXbsPep6Xs3eBxPTcutOkT7s1lNm1ALLAmUTfRe5F7/KvgzJuVdo/2oyHcZ3KKAxyE7syn3bsJe4t0438/cww==
