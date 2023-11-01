@@ -38,7 +38,7 @@ export function RegimenSetUp() {
 							{i18n.t("Add Setting")}
 						</Button>
 					</div>
-					{!hide && <AddSetting />}
+					<AddSetting />
 					<RegimenTable regimens={settings} loading={false} />
 				</div>
 			</Card>
