@@ -1,35 +1,55 @@
 import i18n from "@dhis2/d2-i18n";
 import styles from "./ProfileArea.module.css";
 import { Button, IconEdit24, Card, ButtonStrip, IconClock24 } from "@dhis2/ui";
-import React, { useEffect } from "react";
+import React from "react";
 import EditDevice from "./EditDevice";
 import { PatientProfile } from "../../models";
 import { useRecoilState } from "recoil";
 import { AddAlarm, AddDevice } from "../../state";
 import EditAlarm from "./AddAlarm";
 import NoDeviceAssigned from "./NoDeviceAssigned";
-import { useDataQuery } from "@dhis2/app-runtime";
+
+import { DateTime } from "luxon";
 
 export interface ProfileAreaProps {
 	profile: PatientProfile;
 	refetch: () => void;
+	data: any;
+	loading: boolean;
 }
 
-export function ProfileArea({ profile, refetch }: ProfileAreaProps) {
+export function ProfileArea({
+	profile,
+	refetch,
+	data,
+	loading,
+}: ProfileAreaProps) {
 	const [hide, setHideDevice] = useRecoilState<boolean>(AddDevice);
 	const [hideAlarm, setHideAlarm] = useRecoilState<boolean>(AddAlarm);
 
-	// useEffect(() => {
-	// 	if (loading) {
-	// 		console.log(loading);
-	// 	} else if (error) {
-	// 		console.log(error);
-	// 	} else if (data) {
-	// 		console.log(data);
-	// 	}
-	// }, [data, error, loading]);
+	const refillAlarm =
+		DateTime.fromFormat(
+			data?.refillAlarm ?? "",
+			"yyyy-MM-dd HH:mm:ss",
+		).toFormat("MMMM dd, yyyy hh:mm a") ?? "";
 
-	return (
+	const lastUpdated =
+		DateTime.fromFormat(
+			data?.lastOpened ?? "",
+			"yyyy-MM-dd HH:mm:ss",
+		).toFormat("MMMM dd, yyyy hh:mm a") ?? "";
+
+	const doseAlarm =
+		DateTime.fromFormat(
+			data?.alarmTime ?? "",
+			"yyyy-MM-dd HH:mm:ss",
+		).toFormat("MMMM dd, yyyy hh:mm a") ?? "";
+
+	const batteryLevel = data?.batteryLevel ? data.batteryLevel + "%" : "N/A";
+
+	return loading ? (
+		<></>
+	) : (
 		<div>
 			<div
 				style={{
@@ -205,7 +225,7 @@ export function ProfileArea({ profile, refetch }: ProfileAreaProps) {
 										className={styles["label-value"]}
 										htmlFor="value"
 									>
-										{i18n.t("39")}
+										{i18n.t("")}
 									</label>
 								</div>
 								<div className={styles["grid-item"]}>
@@ -233,7 +253,7 @@ export function ProfileArea({ profile, refetch }: ProfileAreaProps) {
 										className={styles["label-value"]}
 										htmlFor="value"
 									>
-										{profile.batteryHealth}
+										{batteryLevel}
 									</label>
 								</div>
 								<div className={styles["grid-item"]}>
@@ -247,7 +267,9 @@ export function ProfileArea({ profile, refetch }: ProfileAreaProps) {
 										className={styles["label-value"]}
 										htmlFor="value"
 									>
-										{profile.dosageTime}
+										{doseAlarm != "Invalid DateTime"
+											? doseAlarm
+											: "N/A"}
 									</label>
 								</div>
 
@@ -262,8 +284,9 @@ export function ProfileArea({ profile, refetch }: ProfileAreaProps) {
 										className={styles["label-value"]}
 										htmlFor="value"
 									>
-										{" "}
-										{i18n.t("Next refill Alarm")}{" "}
+										{refillAlarm != "Invalid DateTime"
+											? refillAlarm
+											: "N/A"}
 									</label>
 								</div>
 
@@ -278,7 +301,9 @@ export function ProfileArea({ profile, refetch }: ProfileAreaProps) {
 										className={styles["label-value"]}
 										htmlFor="value"
 									>
-										{i18n.t("Last updated")}
+										{lastUpdated != "Invalid DateTime"
+											? lastUpdated
+											: "N/A"}
 									</label>
 								</div>
 							</div>

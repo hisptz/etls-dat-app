@@ -9,12 +9,6 @@ export function useAssignDevice() {
 	const [programMapping] = useSetting("programMapping", { global: true });
 	const { patientTei, loading } = usePatient();
 	const TEA_ID = programMapping.attributes.deviceIMEInumber;
-	const [params] = useSearchParams();
-	const [newValue, setNewValue] = useState<string | null>();
-
-	useEffect(() => {
-		setNewValue(params.get("deviceEMInumber"));
-	}, [params.get("deviceEMInumber")]);
 
 	const attributeIndex = patientTei?.attributes.findIndex(
 		(attribute) => attribute.attribute === TEA_ID,

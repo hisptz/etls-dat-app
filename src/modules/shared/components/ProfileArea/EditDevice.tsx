@@ -22,7 +22,7 @@ import { useDataQuery } from "@dhis2/app-runtime";
 interface editDeviceProps {
 	name: string;
 	value: string;
-	refetch: ReturnType<typeof useDataQuery>["refetch"];
+	refetch: () => void;
 }
 
 const schema = z.object({
@@ -67,13 +67,14 @@ function EditDevice({ name, value, refetch }: editDeviceProps) {
 			updateDevice(updatedDevices);
 		}
 	};
+
 	const onClose = async () => {
 		form.reset();
 		setHide(true);
 	};
 	const onSubmit = async (data: DeviceData) => {
 		await onSave(data);
-		refetch({});
+		refetch();
 		form.reset();
 	};
 

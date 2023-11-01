@@ -10,7 +10,8 @@ import RegimenTable from "./components/RegimenTable";
 
 export function RegimenSetUp() {
 	const [, setAdd] = useRecoilState<boolean>(add);
-	const [, setHide] = useRecoilState<boolean>(editRegimen);
+	const [hide, setHide] = useRecoilState<boolean>(editRegimen);
+
 	const [settings] = useSetting("regimenSetting", {
 		global: true,
 	});
