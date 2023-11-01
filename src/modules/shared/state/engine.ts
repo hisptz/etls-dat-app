@@ -6,6 +6,11 @@ export const DataEngineState = atom<DHIS2DataEngine>({
 });
 
 export const AddDevice = atom<boolean>({
-	key: "add-device-state",
+	key: "assign-device-state",
+	default: true,
+});
+
+export const AddAlarm = atom<boolean>({
+	key: "add-alarm-state",
 	default: true,
 });

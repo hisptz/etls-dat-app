@@ -11,7 +11,7 @@ import DoseStatus from "./components/doseStatus/doseStatus";
 import AdherenceCalendar from "./components/adherenceCalendar/adherenceCalendar";
 
 export function TBAdherenceDetails() {
-	const { patient, error, loading } = usePatient();
+	const { patient, error, loading, refresh } = usePatient();
 	const navigate = useNavigate();
 
 	const dose = [
@@ -53,14 +53,14 @@ export function TBAdherenceDetails() {
 			<div className="column gap-16">
 				<div>
 					<Button
-						onClick={() => navigate("/")}
+						onClick={() => navigate(-1)}
 						icon={<IconArrowLeft24 />}
 					>
 						{i18n.t("Back")}
 					</Button>
 				</div>
 				<div className="w-100">
-					<ProfileArea profile={patient} />
+					<ProfileArea profile={patient} refetch={refresh} />
 				</div>
 				<div
 					style={{

@@ -10,6 +10,7 @@ import {
 } from "./modules/shared/constants";
 import { useDataEngine } from "@dhis2/app-runtime";
 import { DataEngineState } from "./modules/shared/state";
+import "react-tooltip/dist/react-tooltip.css";
 
 function MyApp() {
 	const engine = useDataEngine();

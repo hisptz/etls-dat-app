@@ -13,37 +13,36 @@ import { RHFDHIS2FormField } from "@hisptz/dhis2-ui";
 import i18n from "@dhis2/d2-i18n";
 import { useRecoilState } from "recoil";
 import { FilterField } from "../../ProgramMapping/components/FilterField";
-import { add, edit } from "../state";
-import { useSearchParams } from "react-router-dom";
-import { getDefaultFilters } from "../../constants/filters";
+import { add, editDevice } from "../state";
+
 import { useSetting } from "@dhis2/app-service-datastore";
 import { deviceEmeiList } from "../../../../shared/constants";
 import { FormProvider, useForm } from "react-hook-form";
 import { readXLSXFile } from "../hooks/data";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 
-const EditDevice = ({ emei }: { emei?: string }) => {
-	const [hide, setHide] = useRecoilState<boolean>(edit);
+const schema = z.object({
+	emei: z.string().nonempty("Device IMEI number is required"),
+	inUse: z.boolean().optional(),
+	name: z.string().optional(),
+	code: z.string().optional(),
+	// file: z.optional(),
+});
+
+export type DeviceFormData = z.infer<typeof schema>;
+
+const EditDevice = ({ data }: { data?: DeviceFormData }) => {
+	const [hide, setHide] = useRecoilState<boolean>(editDevice);
 	const [addNew, setAdd] = useRecoilState<boolean>(add);
 	const [bulkUpload, setBulkUpload] = useState<boolean>(false);
-	const [disabled, setDisabled] = useState<boolean>(true);
 	const [deviceFile, setDeviceFile] = useState<File>();
 	const [excelFile, setExcelFile] = useState<{ imeiNumbers: [object] }>();
-	const [params, setParams] = useSearchParams();
 	const [devices, { set: addDevice }] = useSetting("deviceEmeiList", {
 		global: true,
 	});
-	const deviceEMInumber = params.get("deviceEMInumber");
 	const [showSuccess, setShowSuccess] = useState<boolean>(false);
-
-	useEffect(() => {
-		setDisabled(!deviceEMInumber);
-	}, [deviceEMInumber]);
-
-	const onResetClick = () => {
-		const defaultValue = getDefaultFilters();
-		setParams(defaultValue);
-	};
-	const methods = useForm();
+	const [showError, setShowError] = useState<boolean>(false);
 
 	const createDeviceFromEMINumber = (deviceEMInumber: string) => ({
 		name: deviceEMInumber,
@@ -59,32 +58,41 @@ const EditDevice = ({ emei }: { emei?: string }) => {
 		setShowSuccess(true);
 	};
 
-	const onSave = () => {
-		if (deviceEMInumber && !bulkUpload) {
-			const newDevice = createDeviceFromEMINumber(deviceEMInumber);
-			const updatedDevices = [...devices, newDevice];
-			updateDeviceListAndShowSuccess(updatedDevices);
+	const onSave = async (deviceData: DeviceFormData) => {
+		if (deviceData.emei && !bulkUpload) {
+			const updatedDevices = [...devices, deviceData];
+			const isDeviceAlreadyPresent = devices.some(
+				(device: any) => device.emei === deviceData.emei,
+			);
+			isDeviceAlreadyPresent
+				? setShowError(true)
+				: updateDeviceListAndShowSuccess(updatedDevices);
 		} else if (excelFile) {
 			const devicesFromExcel = excelFile.imeiNumbers.map(
 				(deviceEMInumber: any) =>
 					createDeviceFromEMINumber(
-						deviceEMInumber["9.34022E+11"].toString(),
+						deviceEMInumber["devices"].toString(),
 					),
 			);
-			const updatedDevices = [...devices, ...devicesFromExcel];
+			const uniqueDevicesMap = new Map();
+
+			devices.concat(devicesFromExcel).forEach((device: any) => {
+				uniqueDevicesMap.set(device.emei, device);
+			});
+			const updatedDevices = [...uniqueDevicesMap.values()];
 			updateDeviceListAndShowSuccess(updatedDevices);
 		}
 	};
 
-	const onEdit = () => {
-		if (emei && deviceEMInumber) {
+	const onEdit = async (deviceData: DeviceFormData) => {
+		if (data?.emei && deviceData.emei) {
 			const updatedDevices = devices.map((device: deviceEmeiList) =>
-				device.emei === emei
+				device.emei === data.emei
 					? {
 							...device,
-							emei: deviceEMInumber,
-							code: deviceEMInumber,
-							name: deviceEMInumber,
+							emei: deviceData.emei,
+							code: deviceData.code,
+							name: deviceData.name,
 					  }
 					: device,
 			);
@@ -92,6 +100,28 @@ const EditDevice = ({ emei }: { emei?: string }) => {
 		}
 	};
 
+	const onClose = () => {
+		form.reset({});
+	};
+
+	const onSubmit = async (data: DeviceFormData) => {
+		data.code = data.emei;
+		data.inUse = false;
+		data.name = data.emei;
+		addNew ? await onSave(data) : await onEdit(data);
+		form.reset({});
+	};
+
+	useEffect(() => {
+		if (data) {
+			form.reset(data);
+		}
+	}, [data]);
+
+	const form = useForm<DeviceFormData>({
+		resolver: zodResolver(schema),
+	});
+	const isDirty = form.formState.isDirty;
 	return (
 		<div>
 			<Modal
@@ -101,7 +131,7 @@ const EditDevice = ({ emei }: { emei?: string }) => {
 					setHide(true);
 					setAdd(false);
 					setBulkUpload(false);
-					onResetClick();
+					onClose();
 				}}
 			>
 				<ModalTitle>
@@ -114,18 +144,20 @@ const EditDevice = ({ emei }: { emei?: string }) => {
 				</ModalTitle>
 				<ModalContent>
 					<div style={{ height: "300px" }}>
-						{addNew && (
-							<div>
-								<SwitchField
-									label={i18n.t("Bulk Upload")}
-									name="bulkUpload"
-									onChange={() => setBulkUpload(!bulkUpload)}
-									checked={bulkUpload}
-								/>
-								<br />
-								{bulkUpload && (
-									<div>
-										<FormProvider {...methods}>
+						<FormProvider {...form}>
+							{addNew && (
+								<div>
+									<SwitchField
+										label={i18n.t("Bulk Upload")}
+										name="bulkUpload"
+										onChange={() =>
+											setBulkUpload(!bulkUpload)
+										}
+										checked={bulkUpload}
+									/>
+									<br />
+									{bulkUpload && (
+										<div>
 											<RHFDHIS2FormField
 												name="file"
 												valueType="FILE_RESOURCE"
@@ -135,7 +167,7 @@ const EditDevice = ({ emei }: { emei?: string }) => {
 												}
 												onChange={(val: File) => {
 													setDeviceFile(val);
-													setDisabled(false);
+
 													readXLSXFile(val).then(
 														(result) => {
 															setExcelFile(
@@ -149,27 +181,41 @@ const EditDevice = ({ emei }: { emei?: string }) => {
 												)}
 												accept=".xlsx"
 											/>
-										</FormProvider>
-										<br />
-									</div>
-								)}
-							</div>
-						)}
-						{!bulkUpload && (
-							<div>
-								<FilterField
-									label={i18n.t("Device IMEI number")}
-									name="deviceEMInumber"
-									type="text"
-									initialValue={addNew ? undefined : emei}
-								/>
-								<label style={{ fontSize: "12px" }}>
-									{i18n.t(
-										"Add the EMEI number as seen on the device",
+
+											<br />
+										</div>
 									)}
+								</div>
+							)}
+							{!bulkUpload && (
+								<div
+									onClick={() => {
+										setShowError(false);
+									}}
+								>
+									<FilterField
+										label={i18n.t("Device IMEI number")}
+										name="emei"
+										type="text"
+									/>
+									<label style={{ fontSize: "12px" }}>
+										{i18n.t(
+											"Add the EMEI number as seen on the device",
+										)}
+									</label>
+								</div>
+							)}
+							{showError ? (
+								<label
+									style={{
+										fontSize: "14px",
+										color: "red",
+									}}
+								>
+									{i18n.t("Device already exists!")}
 								</label>
-							</div>
-						)}
+							) : null}
+						</FormProvider>
 					</div>
 				</ModalContent>
 				<ModalActions>
@@ -179,18 +225,15 @@ const EditDevice = ({ emei }: { emei?: string }) => {
 								setHide(true);
 								setAdd(false);
 								setBulkUpload(false);
-								onResetClick();
+								onClose();
 							}}
 							secondary
 						>
 							{i18n.t("Hide")}
 						</Button>
 						<Button
-							disabled={disabled}
-							onClick={() => {
-								addNew ? onSave() : onEdit();
-								onResetClick();
-							}}
+							loading={form.formState.isSubmitting}
+							onClick={form.handleSubmit(onSubmit)}
 							primary
 						>
 							{i18n.t("Save")}
@@ -213,7 +256,7 @@ const EditDevice = ({ emei }: { emei?: string }) => {
 							setShowSuccess(!showSuccess);
 						}}
 					>
-						{i18n.t("Device updated successfully")}
+						{i18n.t("Devices updated successfully")}
 					</AlertBar>
 				</div>
 			)}
