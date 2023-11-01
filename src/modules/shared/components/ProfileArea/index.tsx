@@ -31,6 +31,16 @@ export function ProfileArea({ profile, refetch }: ProfileAreaProps) {
 	// 	}
 	// }, [data, error, loading]);
 
+	// useEffect(() => {
+	// 	if (loading) {
+	// 		console.log(loading);
+	// 	} else if (error) {
+	// 		console.log(error);
+	// 	} else if (data) {
+	// 		console.log(data);
+	// 	}
+	// }, [data, error, loading]);
+
 	return (
 		<div>
 			<div
