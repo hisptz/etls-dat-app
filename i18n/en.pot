@@ -5,11 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2023-10-19T17:38:06.398Z\n"
-"PO-Revision-Date: 2023-10-19T17:38:06.398Z\n"
-
-msgid "39"
-msgstr "39"
+"POT-Creation-Date: 2023-11-01T06:15:23.285Z\n"
+"PO-Revision-Date: 2023-11-01T06:15:23.285Z\n"
 
 msgid "Configurations"
 msgstr "Configurations"
@@ -59,11 +56,14 @@ msgstr "Device IMEI number"
 msgid "Add the EMEI number as seen on the device"
 msgstr "Add the EMEI number as seen on the device"
 
+msgid "Device already exists!"
+msgstr "Device already exists!"
+
 msgid "Save"
 msgstr "Save"
 
-msgid "Device updated successfully"
-msgstr "Device updated successfully"
+msgid "Devices updated successfully"
+msgstr "Devices updated successfully"
 
 msgid "Program Mapping"
 msgstr "Program Mapping"
@@ -210,6 +210,21 @@ msgstr "Summary"
 msgid "Enrollment time"
 msgstr "Enrollment time"
 
+msgid "Dose Taken"
+msgstr "Dose Taken"
+
+msgid "Yes"
+msgstr "Yes"
+
+msgid "No"
+msgstr "No"
+
+msgid "N/A"
+msgstr "N/A"
+
+msgid "Dose Taken at"
+msgstr "Dose Taken at"
+
 msgid "Device Health"
 msgstr "Device Health"
 
@@ -252,8 +267,23 @@ msgstr "View"
 msgid "Reload"
 msgstr "Reload"
 
+msgid "Set Device Alarm"
+msgstr "Set Device Alarm"
+
+msgid "Next Dose Date"
+msgstr "Next Dose Date"
+
+msgid "Alarm"
+msgstr "Alarm"
+
+msgid "Next Refill Date"
+msgstr "Next Refill Date"
+
 msgid "Assign the device number, or click clear to clear previous device"
 msgstr "Assign the device number, or click clear to clear previous device"
+
+msgid "Missing Dose Data"
+msgstr "Missing Dose Data"
 
 msgid "TB Client"
 msgstr "TB Client"
@@ -272,6 +302,9 @@ msgstr "DAT device information"
 
 msgid "Edit Device"
 msgstr "Edit Device"
+
+msgid "Set Alarm"
+msgstr "Set Alarm"
 
 msgid "Total Openings"
 msgstr "Total Openings"

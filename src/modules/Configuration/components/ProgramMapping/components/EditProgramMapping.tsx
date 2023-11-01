@@ -12,11 +12,13 @@ import { useRecoilState } from "recoil";
 import { edit } from "../state";
 import { FilterField } from "./FilterField";
 import { Option } from "../hooks/data";
-import { useProgramMapping, useProgramStage } from "../hooks/save";
+import { generateUid, useProgramStage } from "../hooks/save";
 import { useSetting } from "@dhis2/app-service-datastore";
-import { useSearchParams } from "react-router-dom";
 import { useDataQuery } from "@dhis2/app-runtime";
 import { isEmpty } from "lodash";
+import { FormProvider, useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 interface EditProps {
 	programOptions: Option[];
@@ -25,57 +27,103 @@ interface EditProps {
 	onUpdate: ReturnType<typeof useDataQuery>["refetch"];
 }
 
+const schema = z.object({
+	program: z
+		.string({ required_error: "Mapped TB Program is required" })
+		.nonempty("Mapped TB Program is required"),
+	programStage: z.string().optional(),
+	mediatorUrl: z
+		.string({ required_error: "Mediator Url is required" })
+		.nonempty("Mediator Url is required"),
+	apiKey: z
+		.string({ required_error: "API Key is required" })
+		.nonempty("API Key is required"),
+	attributes: z.object({
+		firstName: z
+			.string({ required_error: "First Name attribute is required" })
+			.nonempty("First Name attribute is required"),
+		surname: z
+			.string({ required_error: "Surname attribute is required" })
+			.nonempty("Surname attribute is required"),
+		tbDistrictNumber: z
+			.string({ required_error: "TB District Number is required" })
+			.nonempty("TB District Number is required"),
+		age: z
+			.string({ required_error: "Age attribute is required" })
+			.nonempty("Age attribute is required"),
+		sex: z
+			.string({ required_error: "Sex attribute is required" })
+			.nonempty("Sex attribute is required"),
+		regimen: z
+			.string({ required_error: "Regimen attribute is required" })
+			.nonempty("Regimen attribute is required"),
+		phoneNumber: z
+			.string({ required_error: "Phone Number attribute is required" })
+			.nonempty("Phone Number attribute is required"),
+		deviceIMEInumber: z
+			.string({ required_error: "Device IMEI Number is required" })
+			.nonempty("Device IMEI Number is required"),
+	}),
+});
+
+type ProgramFormData = z.infer<typeof schema>;
+
 function Edit({
 	programOptions,
 	attributeOptions,
 	error,
 	onUpdate,
 }: EditProps) {
-	const [params] = useSearchParams();
 	const [hideEdit, setHide] = useRecoilState<boolean>(edit);
 	const [importMeta, setImport] = useState<boolean>(false);
-	const [disabled, setDisabled] = useState<boolean>(true);
-	const program = params.get("mappedTbProgram");
-	const { programMapping } = useProgramMapping();
 	const { importProgramStage } = useProgramStage();
-	const [pM, { set: setProgramMapping }] = useSetting("programMapping", {
-		global: true,
-	});
+	const [programMapping, { set: setProgramMapping }] = useSetting(
+		"programMapping",
+		{
+			global: true,
+		},
+	);
 
-	const onSave = () => {
-		if (!isEmpty(programMapping.program)) {
-			setProgramMapping(programMapping);
-			setHide(true);
-			onUpdate({
-				programID: program,
-			});
-			setImport(!importMeta);
-		}
+	const onSubmit = async (data: ProgramFormData) => {
+		const programStageID =
+			data.program === programMapping.program
+				? programMapping.programStage
+				: generateUid();
+		data.programStage = programStageID;
+		await setProgramMapping(data);
+		await onUpdate({
+			programID: data.program,
+		});
+		setHide(true);
+		setImport(!importMeta);
+		console.log(data);
+	};
+
+	const onClose = () => {
+		setHide(true);
+		form.reset({});
 	};
 
 	useEffect(() => {
-		if (!isEmpty(pM.program)) {
+		if (!isEmpty(programMapping.program)) {
 			importProgramStage();
 		}
 	}, [importMeta]);
-
-	useEffect(() => {
-		setDisabled(!program);
-	}, [program]);
 
 	if (error) {
 		throw error;
 	}
 
+	const form = useForm<ProgramFormData>({
+		defaultValues: async () => {
+			return new Promise((resolve) => resolve(programMapping));
+		},
+		resolver: zodResolver(schema),
+	});
+
 	return (
 		<div>
-			<Modal
-				position="middle"
-				hide={hideEdit}
-				onClose={() => {
-					setHide(true);
-				}}
-			>
+			<Modal position="middle" hide={hideEdit} onClose={onClose}>
 				<ModalTitle>
 					<h3
 						className="m-0"
@@ -86,120 +134,115 @@ function Edit({
 				</ModalTitle>
 				<ModalContent>
 					<div style={{ height: "400px" }}>
-						<div style={{ padding: "5px" }}>
-							<FilterField
-								required={true}
-								options={programOptions}
-								name="mappedTbProgram"
-								label={i18n.t("Mapped TB Program")}
-								type="select"
-							/>
-						</div>
-						<div style={{ padding: "5px" }}>
-							<FilterField
-								options={attributeOptions}
-								required={true}
-								name="firstName"
-								label={i18n.t("First Name")}
-								type="select"
-							/>
-						</div>
-						<div style={{ padding: "5px" }}>
-							<FilterField
-								options={attributeOptions}
-								required={true}
-								name="surname"
-								label={i18n.t("Surname")}
-								type="select"
-							/>
-						</div>
-						<div style={{ padding: "5px" }}>
-							<FilterField
-								options={attributeOptions}
-								required={true}
-								name="tbDistrictNumber"
-								label={i18n.t("TB District Number")}
-								type="select"
-							/>
-						</div>
-						<div style={{ padding: "5px" }}>
-							<FilterField
-								options={attributeOptions}
-								required={true}
-								name="age"
-								label={i18n.t("Age")}
-								type="select"
-							/>
-						</div>
-						<div style={{ padding: "5px" }}>
-							<FilterField
-								options={attributeOptions}
-								required={true}
-								name="sex"
-								label={i18n.t("Sex")}
-								type="select"
-							/>
-						</div>
-						<div style={{ padding: "5px" }}>
-							<FilterField
-								options={attributeOptions}
-								required={true}
-								name="regimen"
-								label={i18n.t("Regimen")}
-								type="select"
-							/>
-						</div>
-						<div style={{ padding: "5px" }}>
-							<FilterField
-								options={attributeOptions}
-								required={true}
-								name="phoneNumber"
-								label={i18n.t("Phone Number")}
-								type="select"
-							/>
-						</div>
-						<div style={{ padding: "5px" }}>
-							<FilterField
-								options={attributeOptions}
-								required={true}
-								name="deviceIMEInumber"
-								label={i18n.t("Device IMEI Number")}
-								type="select"
-							/>
-						</div>
-						<div style={{ padding: "5px" }}>
-							<FilterField
-								required={true}
-								name="mediatorUrl"
-								label={i18n.t("Mediator Url")}
-								type="text"
-							/>
-						</div>
-						<div style={{ padding: "5px" }}>
-							<FilterField
-								required={true}
-								name="apiKey"
-								label={i18n.t("API Key")}
-								type="text"
-							/>
-						</div>
+						<FormProvider {...form}>
+							<div style={{ padding: "5px" }}>
+								<FilterField
+									required={true}
+									options={programOptions}
+									name="program"
+									label={i18n.t("Mapped TB Program")}
+									type="select"
+								/>
+							</div>
+							<div style={{ padding: "5px" }}>
+								<FilterField
+									options={attributeOptions}
+									required={true}
+									name="attributes.firstName"
+									label={i18n.t("First Name")}
+									type="select"
+								/>
+							</div>
+							<div style={{ padding: "5px" }}>
+								<FilterField
+									options={attributeOptions}
+									required={true}
+									name="attributes.surname"
+									label={i18n.t("Surname")}
+									type="select"
+								/>
+							</div>
+							<div style={{ padding: "5px" }}>
+								<FilterField
+									options={attributeOptions}
+									required={true}
+									name="attributes.tbDistrictNumber"
+									label={i18n.t("TB District Number")}
+									type="select"
+								/>
+							</div>
+							<div style={{ padding: "5px" }}>
+								<FilterField
+									options={attributeOptions}
+									required={true}
+									name="attributes.age"
+									label={i18n.t("Age")}
+									type="select"
+								/>
+							</div>
+							<div style={{ padding: "5px" }}>
+								<FilterField
+									options={attributeOptions}
+									required={true}
+									name="attributes.sex"
+									label={i18n.t("Sex")}
+									type="select"
+								/>
+							</div>
+							<div style={{ padding: "5px" }}>
+								<FilterField
+									options={attributeOptions}
+									required={true}
+									name="attributes.regimen"
+									label={i18n.t("Regimen")}
+									type="select"
+								/>
+							</div>
+							<div style={{ padding: "5px" }}>
+								<FilterField
+									options={attributeOptions}
+									required={true}
+									name="attributes.phoneNumber"
+									label={i18n.t("Phone Number")}
+									type="select"
+								/>
+							</div>
+							<div style={{ padding: "5px" }}>
+								<FilterField
+									options={attributeOptions}
+									required={true}
+									name="attributes.deviceIMEInumber"
+									label={i18n.t("Device IMEI Number")}
+									type="select"
+								/>
+							</div>
+							<div style={{ padding: "5px" }}>
+								<FilterField
+									required={true}
+									name="mediatorUrl"
+									label={i18n.t("Mediator Url")}
+									type="text"
+								/>
+							</div>
+							<div style={{ padding: "5px" }}>
+								<FilterField
+									required={true}
+									name="apiKey"
+									label={i18n.t("API Key")}
+									type="text"
+								/>
+							</div>
+						</FormProvider>
 					</div>
 				</ModalContent>
 				<ModalActions>
 					<ButtonStrip end>
-						<Button
-							onClick={() => {
-								setHide(true);
-							}}
-							secondary
-						>
+						<Button onClick={onClose} secondary>
 							{i18n.t("Hide")}
 						</Button>
 						<Button
-							disabled={disabled}
-							onClick={() => {
-								onSave();
-							}}
+							loading={form.formState.isSubmitting}
+							onClick={form.handleSubmit(onSubmit)}
 							primary
 						>
 							{i18n.t("Save")}

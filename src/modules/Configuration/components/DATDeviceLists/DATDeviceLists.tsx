@@ -4,13 +4,13 @@ import i18n from "@dhis2/d2-i18n";
 import { DATA_TEST_PREFIX } from "../../../shared/constants";
 import { useRecoilState } from "recoil";
 import DeviceListTable from "./components/DeviceListTable";
-import { add, edit } from "./state";
+import { add, editDevice } from "./state";
 import EditDevice from "./components/EditDevice";
 import { useSetting } from "@dhis2/app-service-datastore";
 
 export function DATDevicelists() {
 	const [, setAdd] = useRecoilState<boolean>(add);
-	const [, setHide] = useRecoilState<boolean>(edit);
+	const [hide, setHide] = useRecoilState<boolean>(editDevice);
 	const [deviceEmeiList] = useSetting("deviceEmeiList", { global: true });
 
 	return (
@@ -35,7 +35,7 @@ export function DATDevicelists() {
 							{i18n.t("Add Device")}
 						</Button>
 					</div>
-					<EditDevice />
+					{!hide && <EditDevice />}
 					<DeviceListTable devices={deviceEmeiList} loading={false} />
 				</div>
 			</Card>

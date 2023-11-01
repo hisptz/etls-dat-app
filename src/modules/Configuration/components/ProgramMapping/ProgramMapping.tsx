@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import i18n from "@dhis2/d2-i18n";
 import { Card, CircularLoader, Button } from "@dhis2/ui";
 import styles from "./programMapping.module.css";
@@ -8,12 +8,9 @@ import { useRecoilState } from "recoil";
 import Edit from "./components/EditProgramMapping";
 import { usePrograms } from "./hooks/data";
 import { useSetting } from "@dhis2/app-service-datastore";
-import { useSearchParams } from "react-router-dom";
-import { getDefaultFilters } from "./hooks/save";
 
 export function ProgramMapping() {
-	const [, setParams] = useSearchParams();
-	const [, setHide] = useRecoilState<boolean>(edit);
+	const [hide, setHide] = useRecoilState<boolean>(edit);
 	const {
 		program,
 		attributeOptions,
@@ -23,10 +20,6 @@ export function ProgramMapping() {
 		refetch,
 	} = usePrograms();
 	const [programMapping] = useSetting("programMapping", { global: true });
-	const defaultValue = getDefaultFilters();
-	useEffect(() => {
-		setParams(defaultValue);
-	}, []);
 
 	return loading ? (
 		<div
@@ -105,12 +98,14 @@ export function ProgramMapping() {
 					</div>
 				</div>
 			</Card>
-			<Edit
-				attributeOptions={attributeOptions}
-				programOptions={programOptions}
-				error={error}
-				onUpdate={refetch}
-			/>
+			{!hide && (
+				<Edit
+					attributeOptions={attributeOptions}
+					programOptions={programOptions}
+					error={error}
+					onUpdate={refetch}
+				/>
+			)}
 		</div>
 	);
 }

@@ -12,10 +12,10 @@ import { useSetting } from "@dhis2/app-service-datastore";
 import { isEmpty } from "lodash";
 import { FullPageLoader } from "../../../../shared/components/Loaders";
 import { ActionButton } from "../../../../shared/components/ActionButton";
-import { edit, remove } from "../state";
+import { editDevice, remove } from "../state";
 import { useRecoilState } from "recoil";
 import DeleteDevice from "./DeleteDevice";
-import EditDevice from "./EditDevice";
+import EditDevice, { DeviceFormData } from "./EditDevice";
 import { deviceEmeiList } from "../../../../shared/constants";
 
 export interface DevicesTableProps {
@@ -27,10 +27,9 @@ export default function DeviceListTable({
 	loading,
 	devices,
 }: DevicesTableProps) {
-	const [, setDelete] = useRecoilState<boolean>(remove);
-	const [, setEdit] = useRecoilState<boolean>(edit);
-	const [selectedDevice, setSelectedDevice] =
-		useState<deviceEmeiList | null>();
+	const [hideDel, setDelete] = useRecoilState<boolean>(remove);
+	const [hide, setEdit] = useRecoilState<boolean>(editDevice);
+	const [selectedDevice, setSelectedDevice] = useState<DeviceFormData>();
 
 	const devicesColumns = [
 		{
@@ -50,7 +49,7 @@ export default function DeviceListTable({
 		},
 	];
 
-	function getActions(device: deviceEmeiList) {
+	function getActions(device: DeviceFormData) {
 		return (
 			<>
 				<ActionButton
@@ -89,11 +88,13 @@ export default function DeviceListTable({
 								};
 							})}
 						/>
-						<EditDevice emei={selectedDevice?.emei} />
-						<DeleteDevice
-							emei={selectedDevice?.emei}
-							inUse={selectedDevice?.inUse}
-						/>
+						{!hide && <EditDevice data={selectedDevice} />}
+						{!hideDel && (
+							<DeleteDevice
+								emei={selectedDevice?.emei}
+								inUse={selectedDevice?.inUse}
+							/>
+						)}
 					</>
 				)}
 			</div>

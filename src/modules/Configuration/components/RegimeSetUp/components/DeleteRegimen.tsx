@@ -12,9 +12,7 @@ import i18n from "@dhis2/d2-i18n";
 import { remove } from "../state";
 import { useRecoilState } from "recoil";
 import { useSetting } from "@dhis2/app-service-datastore";
-import { regimenSetting } from "../../../../shared/constants";
-import { getDefaultFilters } from "../../constants/filters";
-import { useSearchParams } from "react-router-dom";
+import { RegimenFormData } from "./EditRegimen";
 
 interface DeleteSetting {
 	regimen?: string;
@@ -26,22 +24,15 @@ function DeleteSetting({ regimen }: DeleteSetting) {
 		global: true,
 	});
 	const [showSuccess, setShowSuccess] = useState<boolean>(false);
-	const [, setParams] = useSearchParams();
-
-	const defaultValue = getDefaultFilters();
-	useEffect(() => {
-		setParams(defaultValue);
-	}, []);
 
 	const onDelete = () => {
 		if (regimen) {
 			const updatedRegimens = regimens.filter(
-				(item: regimenSetting) => item["regimen"] !== regimen,
+				(item: RegimenFormData) => item["regimen"] !== regimen,
 			);
 			deleteSetting(updatedRegimens);
 			setShowSuccess(true);
 			setHide(true);
-			setParams(defaultValue);
 		}
 	};
 

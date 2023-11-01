@@ -9,12 +9,15 @@ import { DATA_TEST_PREFIX } from "../../shared/constants";
 import { ProfileArea } from "../../shared/components/ProfileArea";
 import DoseStatus from "./components/doseStatus/doseStatus";
 import AdherenceCalendar from "./components/adherenceCalendar/adherenceCalendar";
+import { useDeviceData } from "../../shared/components/ProfileArea/utils";
 
 export function TBAdherenceDetails() {
-	const { patient, error, loading } = usePatient();
+	const { patient, error, loading, refresh } = usePatient();
 	const navigate = useNavigate();
 
-	const Dose = [
+	const { data, loadingDevice } = useDeviceData(patient?.deviceIMEINumber);
+
+	const dose = [
 		{
 			color: "#42a5f5",
 			status: "Enrollment Date",
@@ -53,15 +56,19 @@ export function TBAdherenceDetails() {
 			<div className="column gap-16">
 				<div>
 					<Button
-						onClick={() => navigate("/")}
+						onClick={() => navigate(-1)}
 						icon={<IconArrowLeft24 />}
 					>
 						{i18n.t("Back")}
 					</Button>
 				</div>
-
 				<div className="w-100">
-					<ProfileArea profile={patient} />
+					<ProfileArea
+						profile={patient}
+						refetch={refresh}
+						data={data}
+						loading={loading}
+					/>
 				</div>
 				<div
 					style={{
@@ -78,7 +85,7 @@ export function TBAdherenceDetails() {
 									flexWrap: "wrap",
 								}}
 							>
-								{Dose.map((dose, index) => {
+								{dose.map((dose, index) => {
 									return (
 										<DoseStatus
 											key={index}
@@ -88,7 +95,11 @@ export function TBAdherenceDetails() {
 									);
 								})}
 							</div>
-							<AdherenceCalendar profile={patient} />
+							<AdherenceCalendar
+								profile={patient}
+								data={data}
+								laoding={loadingDevice}
+							/>
 						</div>
 					</Card>
 				</div>

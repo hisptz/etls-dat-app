@@ -13,25 +13,34 @@ import { AddDevice } from "../../state";
 import { FilterField } from "../../../Configuration/components/ProgramMapping/components/FilterField";
 import { useSetting } from "@dhis2/app-service-datastore";
 import { deviceEmeiList } from "../../constants";
-import { useSearchParams } from "react-router-dom";
 import { useAssignDevice } from "../utils/assignDevice";
+import { FormProvider, useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { useDataQuery } from "@dhis2/app-runtime";
 
 interface editDeviceProps {
 	name: string;
 	value: string;
+	refetch: () => void;
 }
 
-function EditDevice({ name, value }: editDeviceProps) {
+const schema = z.object({
+	emei: z
+		.string({ required_error: "Device IMEI number is required" })
+		.nonempty("Device IMEI number is required"),
+});
+
+export type DeviceData = z.infer<typeof schema>;
+
+function EditDevice({ name, value, refetch }: editDeviceProps) {
 	const [hide, setHide] = useRecoilState<boolean>(AddDevice);
-	const [disabled, setDisabled] = useState<boolean>(true);
 	const [devices, { set: updateDevice }] = useSetting("deviceEmeiList", {
 		global: true,
 	});
-	const [params] = useSearchParams();
-	const deviceEMInumber = params.get("deviceEMInumber");
 	const [availableDevices, setAvailableDevices] =
 		useState<deviceEmeiList[]>();
-	const { assignDevice } = useAssignDevice();
+	const { loading, assignDevice } = useAssignDevice();
 
 	useEffect(() => {
 		setAvailableDevices(
@@ -40,34 +49,45 @@ function EditDevice({ name, value }: editDeviceProps) {
 					!device.inUse || device.emei === value,
 			),
 		);
-		setDisabled(!deviceEMInumber);
-	}, [deviceEMInumber]);
+	}, []);
 
-	const onSave = () => {
-		if (deviceEMInumber) {
+	const onSave = async (data: DeviceData) => {
+		if (data) {
 			const updatedDevices = devices.map((device: deviceEmeiList) => ({
 				...device,
 				inUse:
-					device.emei === deviceEMInumber
+					device.emei === data.emei
 						? true
-						: device.emei === value && value !== deviceEMInumber
+						: device.emei === value && value !== data.emei
 						? false
 						: device.inUse,
 			}));
-			assignDevice();
+			assignDevice(data.emei);
 			setHide(true);
 			updateDevice(updatedDevices);
 		}
 	};
+
+	const onClose = async () => {
+		form.reset();
+		setHide(true);
+	};
+	const onSubmit = async (data: DeviceData) => {
+		await onSave(data);
+		refetch();
+		form.reset();
+	};
+
+	const form = useForm<DeviceData>({
+		defaultValues: async () => {
+			return new Promise((resolve) => resolve({ emei: value }));
+		},
+
+		resolver: zodResolver(schema),
+	});
 	return (
 		<div>
-			<Modal
-				position="middle"
-				hide={hide}
-				onClose={() => {
-					setHide(true);
-				}}
-			>
+			<Modal position="middle" hide={hide} onClose={onClose}>
 				<ModalTitle>
 					<h3
 						className="m-0"
@@ -77,41 +97,35 @@ function EditDevice({ name, value }: editDeviceProps) {
 					</h3>
 				</ModalTitle>
 				<ModalContent>
-					<div
-						style={{
-							height: "300px",
-						}}
-					>
-						<FilterField
-							label={i18n.t("Device IMEI number")}
-							name={"deviceEMInumber"}
-							initialValue={value}
-							type="select"
-							options={availableDevices}
-						/>
+					<FormProvider {...form}>
+						<div
+							style={{
+								height: "300px",
+							}}
+						>
+							<FilterField
+								label={i18n.t("Device IMEI number")}
+								name="emei"
+								type="select"
+								options={availableDevices}
+							/>
 
-						<label style={{ fontSize: "12px" }}>
-							{i18n.t(
-								"Assign the device number, or click clear to clear previous device",
-							)}
-						</label>
-					</div>
+							<label style={{ fontSize: "12px" }}>
+								{i18n.t(
+									"Assign the device number, or click clear to clear previous device",
+								)}
+							</label>
+						</div>
+					</FormProvider>
 				</ModalContent>
 				<ModalActions>
 					<ButtonStrip end>
-						<Button
-							onClick={() => {
-								setHide(true);
-							}}
-							secondary
-						>
+						<Button onClick={onClose} secondary>
 							{i18n.t("Hide")}
 						</Button>
 						<Button
-							disabled={disabled}
-							onClick={() => {
-								onSave();
-							}}
+							loading={form.formState.isSubmitting}
+							onClick={form.handleSubmit(onSubmit)}
 							primary
 						>
 							{i18n.t("Save")}

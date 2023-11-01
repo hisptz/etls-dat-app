@@ -6,6 +6,7 @@ export enum DATA_ELEMENTS {
 	DEVICE_HEALTH = "QH0OjHcBBpO",
 	BATTERY_HEALTH = "Vc6c6OjvvHO",
 	DOSAGE_TIME = "FOHv6pUjBjv",
+	DEVICE_SIGNAL = "oHBM5fsFc6p",
 }
 
 export enum PROGRAM_STAGES {}

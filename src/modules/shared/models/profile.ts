@@ -3,6 +3,7 @@ import { programMapping, regimenSetting } from "../constants";
 import { DatDeviceInfoEventModel } from "./datDeviceInfo";
 import { TrackedEntity } from "../types";
 import { filter, head } from "lodash";
+import { DateTime } from "luxon";
 
 export class PatientProfile extends TrackedEntityModel {
 	programMapping?: programMapping;
@@ -55,6 +56,14 @@ export class PatientProfile extends TrackedEntityModel {
 		return sex == "M" ? "Male" : sex == "F" ? "Female" : null;
 	}
 
+	get enrollmentDate(): string {
+		return (
+			DateTime.fromISO(
+				this.enrollment?.enrolledAt as string,
+			).toISODate() ?? ""
+		);
+	}
+
 	get age() {
 		return this.getAttributeValue(
 			this.programMapping?.attributes?.age ?? "",
@@ -68,9 +77,11 @@ export class PatientProfile extends TrackedEntityModel {
 	}
 
 	get deviceIMEINumber() {
-		return this.getAttributeValue(
+		const device = this.getAttributeValue(
 			this.programMapping?.attributes?.deviceIMEInumber ?? "",
 		) as string;
+
+		return device == "" ? "N/A" : device;
 	}
 	get adherenceFrequency() {
 		const regimen = this.getAttributeValue(
@@ -98,6 +109,23 @@ export class PatientProfile extends TrackedEntityModel {
 		return this.datDeviceInfoEvent?.deviceInfo.dosageTime;
 	}
 
+	get deviceSignal() {
+		const signal = this.datDeviceInfoEvent?.deviceInfo.deviceSignal;
+		if (signal == "Opened Once" || signal == "Opened Multiple") {
+			return {
+				date: "2023-08-07",
+				event: "takenDose",
+			};
+		}
+		if (signal == "None" || signal == "Heartbeat") {
+			return {
+				date: "2023-08-08",
+				event: "notTakenDose",
+			};
+		}
+		return { date: "", event: "" };
+	}
+
 	get tableData(): Record<string, any> {
 		const name = this.name;
 		const tbDistrictNumber = this.tbDistrictNumber;
@@ -110,6 +138,8 @@ export class PatientProfile extends TrackedEntityModel {
 		const deviceHealth = this.deviceHealth;
 		const batteryHealth = this.batteryHealth;
 		const dosageTime = this.dosageTime;
+		const enrollmentDate = this.enrollmentDate;
+		const deviceSignal = this.deviceSignal;
 
 		return {
 			id: this.id as string,
@@ -124,6 +154,8 @@ export class PatientProfile extends TrackedEntityModel {
 			deviceHealth,
 			batteryHealth,
 			dosageTime,
+			enrollmentDate,
+			deviceSignal,
 		};
 	}
 
