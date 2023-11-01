@@ -9,10 +9,17 @@ import { DATA_TEST_PREFIX } from "../../shared/constants";
 import { ProfileArea } from "../../shared/components/ProfileArea";
 import DoseStatus from "./components/doseStatus/doseStatus";
 import AdherenceCalendar from "./components/adherenceCalendar/adherenceCalendar";
+import { useDeviceData } from "../../shared/components/ProfileArea/utils";
 
 export function TBAdherenceDetails() {
 	const { patient, error, loading, refresh } = usePatient();
 	const navigate = useNavigate();
+
+	const { data, loadingDevice } = useDeviceData(
+		patient?.deviceIMEINumber ?? "",
+	);
+
+	console.log(data);
 
 	const Dose = [
 		{
@@ -61,7 +68,12 @@ export function TBAdherenceDetails() {
 				</div>
 
 				<div className="w-100">
-					<ProfileArea profile={patient} refetch={refresh} />
+					<ProfileArea
+						profile={patient}
+						refetch={refresh}
+						data={data}
+						loading={loading}
+					/>
 				</div>
 				<div
 					style={{
@@ -88,7 +100,11 @@ export function TBAdherenceDetails() {
 									);
 								})}
 							</div>
-							<AdherenceCalendar profile={patient} />
+							<AdherenceCalendar
+								profile={patient}
+								data={data}
+								laoding={loadingDevice}
+							/>
 						</div>
 					</Card>
 				</div>

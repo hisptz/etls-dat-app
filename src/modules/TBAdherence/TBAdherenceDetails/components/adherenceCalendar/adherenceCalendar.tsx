@@ -10,9 +10,11 @@ import { useSetting } from "@dhis2/app-service-datastore";
 
 export interface ProfileAreaProps {
 	profile: PatientProfile;
+	data: any;
+	laoding: boolean;
 }
 
-function AdherenceCalendar({ profile }: ProfileAreaProps) {
+function AdherenceCalendar({ profile, data, laoding }: ProfileAreaProps) {
 	const [programMapping] = useSetting("programMapping", {
 		global: true,
 	});
@@ -68,8 +70,24 @@ function AdherenceCalendar({ profile }: ProfileAreaProps) {
 		},
 	];
 
-	console.log(events);
-	return (
+	const refillAlarm = DateTime.fromFormat(
+		data.refillAlarm,
+		"yyyy-MM-dd HH:mm:ss",
+	).toFormat("MMMM dd, yyyy hh:mm a");
+
+	const lastUpdated = DateTime.fromFormat(
+		data.lastOpened,
+		"yyyy-MM-dd HH:mm:ss",
+	).toFormat("MMMM dd, yyyy hh:mm a");
+
+	const doseAlarm = DateTime.fromFormat(
+		data.alarmTime,
+		"yyyy-MM-dd HH:mm:ss",
+	).toFormat("MMMM dd, yyyy hh:mm a");
+
+	return laoding ? (
+		<></>
+	) : (
 		<div
 			style={{
 				display: "flex",
@@ -189,10 +207,7 @@ function AdherenceCalendar({ profile }: ProfileAreaProps) {
 											htmlFor="value"
 										>
 											{eventCode == "green"
-												? i18n.t(
-														formattedDateWithTime ??
-															"",
-												  )
+												? lastUpdated
 												: i18n.t("N/A")}
 										</label>
 									</div>
@@ -227,7 +242,7 @@ function AdherenceCalendar({ profile }: ProfileAreaProps) {
 									htmlFor="value"
 								>
 									{eventCode == "green" || eventCode == "blue"
-										? i18n.t(profile.batteryHealth ?? "")
+										? data.batteryLevel
 										: i18n.t("N/A")}
 								</label>
 							</div>
