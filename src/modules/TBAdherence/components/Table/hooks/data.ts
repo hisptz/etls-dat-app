@@ -7,8 +7,8 @@ import { useDownloadData } from "../../../utils/download";
 import { PatientProfile } from "../../../../shared/models";
 import {
 	DAT_PROGRAM,
-	TEI_FIELDS,
 	programMapping,
+	TEI_FIELDS,
 } from "../../../../shared/constants";
 import { TrackedEntity } from "../../../../shared/types";
 import { useSetting } from "@dhis2/app-service-datastore";
@@ -56,6 +56,7 @@ type Data = {
 		total: number;
 	};
 };
+
 export function filterObject(programMapping: programMapping) {
 	const filtersConfig: any = {
 		tbDistrictNumber: {
@@ -119,7 +120,6 @@ export function useTBAdherenceTableData() {
 			filters,
 			orgUnit,
 		},
-		lazy: true,
 	});
 
 	const onPageChange = (page: number) => {

@@ -14,7 +14,7 @@ export function TBAdherenceDetails() {
 	const { patient, error, loading, refresh } = usePatient();
 	const navigate = useNavigate();
 
-	const Dose = [
+	const dose = [
 		{
 			color: "#42a5f5",
 			status: "Enrollment Date",
@@ -59,7 +59,6 @@ export function TBAdherenceDetails() {
 						{i18n.t("Back")}
 					</Button>
 				</div>
-
 				<div className="w-100">
 					<ProfileArea profile={patient} refetch={refresh} />
 				</div>
@@ -78,7 +77,7 @@ export function TBAdherenceDetails() {
 									flexWrap: "wrap",
 								}}
 							>
-								{Dose.map((dose, index) => {
+								{dose.map((dose, index) => {
 									return (
 										<DoseStatus
 											key={index}
