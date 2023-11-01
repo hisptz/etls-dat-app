@@ -10,7 +10,7 @@ import { usePrograms } from "./hooks/data";
 import { useSetting } from "@dhis2/app-service-datastore";
 
 export function ProgramMapping() {
-	const [, setHide] = useRecoilState<boolean>(edit);
+	const [hide, setHide] = useRecoilState<boolean>(edit);
 	const {
 		program,
 		attributeOptions,
@@ -98,12 +98,14 @@ export function ProgramMapping() {
 					</div>
 				</div>
 			</Card>
-			<Edit
-				attributeOptions={attributeOptions}
-				programOptions={programOptions}
-				error={error}
-				onUpdate={refetch}
-			/>
+			{!hide && (
+				<Edit
+					attributeOptions={attributeOptions}
+					programOptions={programOptions}
+					error={error}
+					onUpdate={refetch}
+				/>
+			)}
 		</div>
 	);
 }

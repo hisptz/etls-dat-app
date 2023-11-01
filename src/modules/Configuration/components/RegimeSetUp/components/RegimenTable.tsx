@@ -25,8 +25,8 @@ export default function RegimenTable({
 	loading,
 	regimens,
 }: regimensTableProps) {
-	const [, setDelete] = useRecoilState<boolean>(remove);
-	const [, setEdit] = useRecoilState<boolean>(editRegimen);
+	const [hideDel, setDelete] = useRecoilState<boolean>(remove);
+	const [hide, setEdit] = useRecoilState<boolean>(editRegimen);
 	const [selectedRegimen, setSelectedRegimen] = useState<RegimenFormData>();
 	const [index, setIndex] = useState<number>();
 
@@ -113,8 +113,13 @@ export default function RegimenTable({
 								};
 							})}
 						/>
-						<AddSetting data={selectedRegimen} index={index} />
-						<DeleteSetting regimen={selectedRegimen?.regimen} />
+
+						{!hide && (
+							<AddSetting data={selectedRegimen} index={index} />
+						)}
+						{!hideDel && (
+							<DeleteSetting regimen={selectedRegimen?.regimen} />
+						)}
 					</>
 				)}
 			</div>

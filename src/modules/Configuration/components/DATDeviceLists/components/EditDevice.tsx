@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
 	Button,
 	Modal,
@@ -23,12 +23,14 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 const schema = z.object({
-	emei: z.string().nonempty("Device IMEI number is required"),
+	emei: z
+		.string({ required_error: "Device IMEI number is required" })
+		.nonempty("Device IMEI number is required"),
 	inUse: z.boolean().optional(),
 	name: z.string().optional(),
 	code: z.string().optional(),
-	// file: z.optional(),
 });
+const schema2 = z.object({});
 
 export type DeviceFormData = z.infer<typeof schema>;
 
@@ -74,11 +76,19 @@ const EditDevice = ({ data }: { data?: DeviceFormData }) => {
 						deviceEMInumber["devices"].toString(),
 					),
 			);
+
 			const uniqueDevicesMap = new Map();
 
-			devices.concat(devicesFromExcel).forEach((device: any) => {
+			devices.forEach((device: any) => {
 				uniqueDevicesMap.set(device.emei, device);
 			});
+
+			devicesFromExcel.forEach((device) => {
+				if (!uniqueDevicesMap.has(device.emei)) {
+					uniqueDevicesMap.set(device.emei, device);
+				}
+			});
+
 			const updatedDevices = [...uniqueDevicesMap.values()];
 			updateDeviceListAndShowSuccess(updatedDevices);
 		}
@@ -101,6 +111,9 @@ const EditDevice = ({ data }: { data?: DeviceFormData }) => {
 	};
 
 	const onClose = () => {
+		setHide(true);
+		setAdd(false);
+		setBulkUpload(false);
 		form.reset({});
 	};
 
@@ -112,28 +125,27 @@ const EditDevice = ({ data }: { data?: DeviceFormData }) => {
 		form.reset({});
 	};
 
-	useEffect(() => {
-		if (data) {
-			form.reset(data);
-		}
-	}, [data]);
-
 	const form = useForm<DeviceFormData>({
-		resolver: zodResolver(schema),
+		defaultValues: async () => {
+			return new Promise((resolve) =>
+				resolve(
+					addNew
+						? {}
+						: {
+								emei: data?.emei ?? "",
+								code: data?.code,
+								inUse: data?.inUse,
+								name: data?.name,
+						  },
+				),
+			);
+		},
+		resolver: zodResolver(bulkUpload ? schema2 : schema),
 	});
-	const isDirty = form.formState.isDirty;
+
 	return (
 		<div>
-			<Modal
-				position="middle"
-				hide={hide}
-				onClose={() => {
-					setHide(true);
-					setAdd(false);
-					setBulkUpload(false);
-					onClose();
-				}}
-			>
+			<Modal position="middle" hide={hide} onClose={onClose}>
 				<ModalTitle>
 					<h3
 						className="m-0"
@@ -220,15 +232,7 @@ const EditDevice = ({ data }: { data?: DeviceFormData }) => {
 				</ModalContent>
 				<ModalActions>
 					<ButtonStrip end>
-						<Button
-							onClick={() => {
-								setHide(true);
-								setAdd(false);
-								setBulkUpload(false);
-								onClose();
-							}}
-							secondary
-						>
+						<Button onClick={onClose} secondary>
 							{i18n.t("Hide")}
 						</Button>
 						<Button

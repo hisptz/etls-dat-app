@@ -27,8 +27,8 @@ export default function DeviceListTable({
 	loading,
 	devices,
 }: DevicesTableProps) {
-	const [, setDelete] = useRecoilState<boolean>(remove);
-	const [, setEdit] = useRecoilState<boolean>(editDevice);
+	const [hideDel, setDelete] = useRecoilState<boolean>(remove);
+	const [hide, setEdit] = useRecoilState<boolean>(editDevice);
 	const [selectedDevice, setSelectedDevice] = useState<DeviceFormData>();
 
 	const devicesColumns = [
@@ -88,11 +88,13 @@ export default function DeviceListTable({
 								};
 							})}
 						/>
-						<EditDevice data={selectedDevice} />
-						<DeleteDevice
-							emei={selectedDevice?.emei}
-							inUse={selectedDevice?.inUse}
-						/>
+						{!hide && <EditDevice data={selectedDevice} />}
+						{!hideDel && (
+							<DeleteDevice
+								emei={selectedDevice?.emei}
+								inUse={selectedDevice?.inUse}
+							/>
+						)}
 					</>
 				)}
 			</div>

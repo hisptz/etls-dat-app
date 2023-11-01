@@ -5,7 +5,7 @@ import { IconChevronRight24, IconChevronLeft24 } from "@dhis2/ui";
 
 export interface DateEvent {
 	date: string;
-	event: "enrolled" | "takenDose" | "notTakenDose";
+	event: "enrolled" | "takenDose" | "notTakenDose" | string;
 }
 
 interface CalendarProps {

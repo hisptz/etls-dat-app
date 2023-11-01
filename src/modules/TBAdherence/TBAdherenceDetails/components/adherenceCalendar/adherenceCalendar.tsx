@@ -4,12 +4,23 @@ import styles from "./adherenceCalendar.module.css";
 import { PatientProfile } from "../../../../shared/models";
 import Calendar, { DateEvent } from "./components/calendar";
 import NoDeviceAssigned from "../../../../shared/components/ProfileArea/NoDeviceAssigned";
+import { useAdherenceEvents } from "../../../../shared/components/ProfileArea/utils";
+import { DateTime } from "luxon";
+import { useSetting } from "@dhis2/app-service-datastore";
 
 export interface ProfileAreaProps {
 	profile: PatientProfile;
 }
 
 function AdherenceCalendar({ profile }: ProfileAreaProps) {
+	const [programMapping] = useSetting("programMapping", {
+		global: true,
+	});
+	const { filteredEvents } = useAdherenceEvents(
+		profile.events,
+		programMapping.programStage,
+	);
+
 	const formatDateWithTime = (date: Date) => {
 		const options = {
 			year: "numeric",
@@ -35,37 +46,29 @@ function AdherenceCalendar({ profile }: ProfileAreaProps) {
 
 	const [eventCode, setEventCode] = useState<string>();
 
+	const adherenceEvents = filteredEvents.map((item: any) => {
+		return {
+			date: DateTime.fromISO(item.occurredAt).toISODate(),
+			event:
+				item.dataValues[0].value == "Opened Once"
+					? "takenDose"
+					: item.dataValues[0].value == "Opened Multiple"
+					? "takenDose"
+					: item.dataValues[0].value == "None"
+					? "notTakenDose"
+					: "notTakenDose",
+		};
+	});
+
 	const events: DateEvent[] = [
+		...adherenceEvents,
 		{
 			date: profile.enrollmentDate,
 			event: "enrolled",
 		},
-		{
-			date: "2023-08-07",
-			event: "takenDose",
-		},
-		{
-			date: "2023-09-20",
-			event: "notTakenDose",
-		},
-		{
-			date: "2023-09-30",
-			event: "takenDose",
-		},
-		{
-			date: "2023-10-18",
-			event: "takenDose",
-		},
-		{
-			date: "2023-11-30",
-			event: "notTakenDose",
-		},
-
-		{
-			date: "2023-10-31",
-			event: "notTakenDose",
-		},
 	];
+
+	console.log(events);
 	return (
 		<div
 			style={{
