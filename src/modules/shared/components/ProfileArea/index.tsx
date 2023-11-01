@@ -45,6 +45,8 @@ export function ProfileArea({
 			"yyyy-MM-dd HH:mm:ss",
 		).toFormat("MMMM dd, yyyy hh:mm a") ?? "";
 
+	const batteryLevel = data?.batteryLevel ? data.batteryLevel + "%" : "N/A";
+
 	return loading ? (
 		<></>
 	) : (
@@ -251,7 +253,7 @@ export function ProfileArea({
 										className={styles["label-value"]}
 										htmlFor="value"
 									>
-										{data?.batteryLevel ?? ""}
+										{batteryLevel}
 									</label>
 								</div>
 								<div className={styles["grid-item"]}>
@@ -265,7 +267,9 @@ export function ProfileArea({
 										className={styles["label-value"]}
 										htmlFor="value"
 									>
-										{doseAlarm ?? ""}
+										{doseAlarm != "Invalid DateTime"
+											? doseAlarm
+											: "N/A"}
 									</label>
 								</div>
 
@@ -280,7 +284,9 @@ export function ProfileArea({
 										className={styles["label-value"]}
 										htmlFor="value"
 									>
-										{refillAlarm ?? ""}
+										{refillAlarm != "Invalid DateTime"
+											? refillAlarm
+											: "N/A"}
 									</label>
 								</div>
 
@@ -295,7 +301,9 @@ export function ProfileArea({
 										className={styles["label-value"]}
 										htmlFor="value"
 									>
-										{lastUpdated ?? ""}
+										{lastUpdated != "Invalid DateTime"
+											? lastUpdated
+											: "N/A"}
 									</label>
 								</div>
 							</div>

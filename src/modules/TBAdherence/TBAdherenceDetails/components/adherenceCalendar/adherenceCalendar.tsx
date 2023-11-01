@@ -88,6 +88,8 @@ function AdherenceCalendar({ profile, data, laoding }: ProfileAreaProps) {
 			"yyyy-MM-dd HH:mm:ss",
 		).toFormat("MMMM dd, yyyy hh:mm a") ?? "";
 
+	const batteryLevel = data?.batteryLevel ? data.batteryLevel + "%" : "N/A";
+
 	return (
 		<div
 			style={{
@@ -208,7 +210,10 @@ function AdherenceCalendar({ profile, data, laoding }: ProfileAreaProps) {
 											htmlFor="value"
 										>
 											{eventCode == "green"
-												? lastUpdated
+												? lastUpdated !=
+												  "Invalid DateTime"
+													? lastUpdated
+													: "N/A"
 												: i18n.t("N/A")}
 										</label>
 									</div>
@@ -243,11 +248,11 @@ function AdherenceCalendar({ profile, data, laoding }: ProfileAreaProps) {
 									htmlFor="value"
 								>
 									{eventCode == "green" || eventCode == "blue"
-										? data?.batteryLevel ?? ""
+										? batteryLevel
 										: i18n.t("N/A")}
 								</label>
 							</div>
-						</div>{" "}
+						</div>
 					</>
 				)}
 			</div>

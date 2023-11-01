@@ -15,9 +15,7 @@ export function TBAdherenceDetails() {
 	const { patient, error, loading, refresh } = usePatient();
 	const navigate = useNavigate();
 
-	const { data, loadingDevice } = useDeviceData(
-		patient?.deviceIMEINumber ?? "",
-	);
+	const { data, loadingDevice } = useDeviceData(patient?.deviceIMEINumber);
 
 	const dose = [
 		{

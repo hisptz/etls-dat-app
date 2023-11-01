@@ -1,7 +1,7 @@
 import axios from "axios";
 import { useState, useEffect } from "react";
 
-export const useDeviceData = (imei: string) => {
+export const useDeviceData = (imei?: string) => {
 	const [data, setData] = useState<any>();
 	const [errorDevice, setError] = useState<any>();
 	const [loadingDevice, setLoading] = useState(true);
@@ -26,7 +26,7 @@ export const useDeviceData = (imei: string) => {
 		};
 
 		fetchData();
-	}, [loadingDevice]);
+	}, [imei]);
 
 	return { data, errorDevice, loadingDevice };
 };
