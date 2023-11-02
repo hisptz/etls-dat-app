@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2023-11-02T11:24:57.291Z\n"
-"PO-Revision-Date: 2023-11-02T11:24:57.291Z\n"
+"POT-Creation-Date: 2023-11-02T14:02:00.712Z\n"
+"PO-Revision-Date: 2023-11-02T14:02:00.713Z\n"
 
 msgid "Configurations"
 msgstr "Configurations"
@@ -71,8 +71,8 @@ msgstr "Program Mapping"
 msgid "Edit"
 msgstr "Edit"
 
-msgid "Mapped TB Program"
-msgstr "Mapped TB Program"
+msgid "Mapped Program"
+msgstr "Mapped Program"
 
 msgid "First Name"
 msgstr "First Name"
@@ -80,8 +80,8 @@ msgstr "First Name"
 msgid "Surname"
 msgstr "Surname"
 
-msgid "TB District Number"
-msgstr "TB District Number"
+msgid "Patient Number"
+msgstr "Patient Number"
 
 msgid "Age"
 msgstr "Age"
@@ -284,6 +284,9 @@ msgstr "Missing Dose Data"
 
 msgid "TB Client"
 msgstr "TB Client"
+
+msgid "TB District Number"
+msgstr "TB District Number"
 
 msgid "Name"
 msgstr "Name"

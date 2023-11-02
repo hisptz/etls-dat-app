@@ -20,7 +20,7 @@ export interface FilterFieldProps {
 	initialValue?: string;
 	options?: [{ name: string; code: string }] | Option[] | deviceEmeiList[];
 	update?: (val: number) => void;
-	type: "date" | "text" | "select" | "time";
+	type: "date" | "text" | "select" | "time" | "password";
 	multiSelect?: boolean;
 }
 
@@ -113,9 +113,7 @@ export function FilterField({
 			type={type}
 			error={!!fieldState.error}
 			validationText={fieldState.error?.message}
-
 			inputWidth={type == "time" ? "120px" : null}
-
 			required={required}
 			onChange={({ value }) => {
 				field.onChange(value);

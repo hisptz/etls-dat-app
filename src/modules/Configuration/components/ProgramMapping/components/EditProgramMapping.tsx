@@ -229,7 +229,7 @@ function Edit({
 									required={true}
 									name="apiKey"
 									label={i18n.t("API Key")}
-									type="text"
+									type="password"
 								/>
 							</div>
 						</FormProvider>
