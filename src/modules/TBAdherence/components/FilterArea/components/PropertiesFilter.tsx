@@ -17,8 +17,8 @@ export function PropertiesFilter() {
 				}}
 			>
 				<FilterField
-					name="tbDistrictNumber"
-					label={i18n.t("TB District Number")}
+					name="patientNumber"
+					label={i18n.t("Patient Number")}
 					type="text"
 				/>
 				<FilterField

@@ -143,7 +143,7 @@ export const reports: ReportConfig[] = [
 export const TBAdherence: TBAdherenceConfig[] = [
 	{
 		key: "tbDistrictNumber",
-		label: "TB District Number",
+		label: "Patient Number",
 		path: "tbDistrictNumber",
 	},
 	{
