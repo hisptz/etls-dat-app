@@ -11,7 +11,7 @@ export function PropertiesFilter() {
 			<div
 				style={{
 					display: "grid",
-					gridTemplateColumns: "repeat(auto-fill, 360px)",
+					gridTemplateColumns: "repeat(5, 280px)",
 					gap: "16px",
 					width: "100%",
 				}}
@@ -19,6 +19,16 @@ export function PropertiesFilter() {
 				<FilterField
 					name="tbDistrictNumber"
 					label={i18n.t("TB District Number")}
+					type="text"
+				/>
+				<FilterField
+					name="firstName"
+					label={i18n.t("First Name")}
+					type="text"
+				/>
+				<FilterField
+					name="surname"
+					label={i18n.t("Surname")}
 					type="text"
 				/>
 				<FilterField

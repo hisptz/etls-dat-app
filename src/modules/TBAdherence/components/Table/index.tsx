@@ -40,7 +40,7 @@ export default function TBAdherenceTable({
 		const row = patients.find((patient) => patient.id === id);
 
 		if (row) {
-			navigate(`/tbadherence/${row.id}`);
+			navigate(`/treatment-adherence/${row.id}`);
 		}
 	};
 

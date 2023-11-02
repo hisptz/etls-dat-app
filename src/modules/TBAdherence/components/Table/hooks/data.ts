@@ -67,6 +67,14 @@ export function filterObject(programMapping: programMapping) {
 			attribute: programMapping.attributes?.deviceIMEInumber,
 			operator: "eq",
 		},
+		firstName: {
+			attribute: programMapping.attributes?.firstName,
+			operator: "in",
+		},
+		surname: {
+			attribute: programMapping.attributes?.surname,
+			operator: "in",
+		},
 	};
 
 	return { filtersConfig: filtersConfig };

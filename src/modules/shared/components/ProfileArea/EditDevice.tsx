@@ -17,9 +17,9 @@ import { useAssignDevice } from "../utils/assignDevice";
 import { FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { useDataQuery } from "@dhis2/app-runtime";
 
 interface editDeviceProps {
+	patientId: string;
 	name: string;
 	value: string;
 	refetch: () => void;
@@ -33,14 +33,14 @@ const schema = z.object({
 
 export type DeviceData = z.infer<typeof schema>;
 
-function EditDevice({ name, value, refetch }: editDeviceProps) {
+function EditDevice({ name, value, patientId, refetch }: editDeviceProps) {
 	const [hide, setHide] = useRecoilState<boolean>(AddDevice);
 	const [devices, { set: updateDevice }] = useSetting("deviceEmeiList", {
 		global: true,
 	});
 	const [availableDevices, setAvailableDevices] =
 		useState<deviceEmeiList[]>();
-	const { loading, assignDevice } = useAssignDevice();
+	const { assignDevice, assignDeviceWisePill } = useAssignDevice();
 
 	useEffect(() => {
 		setAvailableDevices(
@@ -62,9 +62,19 @@ function EditDevice({ name, value, refetch }: editDeviceProps) {
 						? false
 						: device.inUse,
 			}));
-			assignDevice(data.emei);
-			setHide(true);
-			updateDevice(updatedDevices);
+
+			await assignDeviceWisePill({
+				imei: data.emei,
+				patientId: patientId,
+			}).then(async (response) => {
+				console.log(response);
+				if (response.res) {
+					await assignDevice(data.emei).then(() => {
+						updateDevice(updatedDevices);
+						setHide(true);
+					});
+				}
+			});
 		}
 	};
 
@@ -74,7 +84,6 @@ function EditDevice({ name, value, refetch }: editDeviceProps) {
 	};
 	const onSubmit = async (data: DeviceData) => {
 		await onSave(data);
-		refetch();
 		form.reset();
 	};
 

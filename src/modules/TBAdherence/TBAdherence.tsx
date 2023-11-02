@@ -9,7 +9,7 @@ import { useTBAdherenceTableData } from "./components/Table/hooks/data";
 import { useSetting } from "@dhis2/app-service-datastore";
 import { isEmpty } from "lodash";
 
-export function TBAdherenceOutlet() {
+export function TreatmentAdherenceOutlet() {
 	return <Outlet />;
 }
 
@@ -25,7 +25,7 @@ export function TBAdherencePage() {
 			data-test={`${DATA_TEST_PREFIX}-tb-adherence-container`}
 		>
 			<h1 className="m-0" style={{ marginBottom: "16px" }}>
-				{i18n.t("TB Adherence")}
+				{i18n.t("Treatment Adherence")}
 			</h1>
 			<FilterArea loading={loading} onFetch={refetch} />
 			<div className="flex-1">

@@ -225,22 +225,6 @@ function AdherenceCalendar({ profile, data, laoding }: ProfileAreaProps) {
 									className={styles["label-title"]}
 									htmlFor="name"
 								>
-									{i18n.t("Device Health")}
-								</label>
-								<label
-									className={styles["label-value"]}
-									htmlFor="value"
-								>
-									{eventCode == "green" || eventCode == "blue"
-										? i18n.t(profile.deviceHealth ?? "")
-										: i18n.t("N/A")}
-								</label>
-							</div>
-							<div className={styles["grid-item"]}>
-								<label
-									className={styles["label-title"]}
-									htmlFor="name"
-								>
 									{i18n.t("Battery Health")}
 								</label>
 								<label
