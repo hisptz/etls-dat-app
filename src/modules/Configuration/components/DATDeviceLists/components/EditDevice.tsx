@@ -7,7 +7,6 @@ import {
 	ModalActions,
 	ButtonStrip,
 	SwitchField,
-	AlertBar,
 } from "@dhis2/ui";
 import { RHFDHIS2FormField } from "@hisptz/dhis2-ui";
 import i18n from "@dhis2/d2-i18n";
@@ -21,6 +20,7 @@ import { FormProvider, useForm } from "react-hook-form";
 import { readXLSXFile } from "../hooks/data";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useAlert } from "@dhis2/app-runtime";
 
 const schema = z.object({
 	emei: z
@@ -43,8 +43,6 @@ const EditDevice = ({ data }: { data?: DeviceFormData }) => {
 	const [devices, { set: addDevice }] = useSetting("deviceEmeiList", {
 		global: true,
 	});
-	const [showSuccess, setShowSuccess] = useState<boolean>(false);
-	const [showError, setShowError] = useState<boolean>(false);
 
 	const createDeviceFromEMINumber = (deviceEMInumber: string) => ({
 		name: deviceEMInumber,
@@ -52,12 +50,19 @@ const EditDevice = ({ data }: { data?: DeviceFormData }) => {
 		emei: deviceEMInumber,
 		inUse: false,
 	});
+	const { show } = useAlert(
+		({ message }) => message,
+		({ type }) => ({ ...type, duration: 3000 }),
+	);
 
 	const updateDeviceListAndShowSuccess = (updatedDevices: any) => {
 		addDevice(updatedDevices);
 		setHide(true);
 		setAdd(false);
-		setShowSuccess(true);
+		show({
+			message: "Devices Updated Successfully",
+			type: { success: true },
+		});
 	};
 
 	const onSave = async (deviceData: DeviceFormData) => {
@@ -67,7 +72,10 @@ const EditDevice = ({ data }: { data?: DeviceFormData }) => {
 				(device: any) => device.emei === deviceData.emei,
 			);
 			isDeviceAlreadyPresent
-				? setShowError(true)
+				? show({
+						message: "Device Already Exists!",
+						type: { error: true },
+				  })
 				: updateDeviceListAndShowSuccess(updatedDevices);
 		} else if (excelFile) {
 			const devicesFromExcel = excelFile.imeiNumbers.map(
@@ -200,11 +208,7 @@ const EditDevice = ({ data }: { data?: DeviceFormData }) => {
 								</div>
 							)}
 							{!bulkUpload && (
-								<div
-									onClick={() => {
-										setShowError(false);
-									}}
-								>
+								<div>
 									<FilterField
 										label={i18n.t("Device IMEI number")}
 										name="emei"
@@ -217,16 +221,6 @@ const EditDevice = ({ data }: { data?: DeviceFormData }) => {
 									</label>
 								</div>
 							)}
-							{showError ? (
-								<label
-									style={{
-										fontSize: "14px",
-										color: "red",
-									}}
-								>
-									{i18n.t("Device already exists!")}
-								</label>
-							) : null}
 						</FormProvider>
 					</div>
 				</ModalContent>
@@ -245,25 +239,6 @@ const EditDevice = ({ data }: { data?: DeviceFormData }) => {
 					</ButtonStrip>
 				</ModalActions>
 			</Modal>
-			{showSuccess && (
-				<div
-					style={{
-						position: "fixed",
-						bottom: "0",
-						left: "50%",
-						transform: "translateX(-50%)",
-					}}
-				>
-					<AlertBar
-						duration={2000}
-						onHidden={() => {
-							setShowSuccess(!showSuccess);
-						}}
-					>
-						{i18n.t("Devices updated successfully")}
-					</AlertBar>
-				</div>
-			)}
 		</div>
 	);
 };

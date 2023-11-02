@@ -6,7 +6,6 @@ import {
 	ModalContent,
 	ModalActions,
 	ButtonStrip,
-	AlertBar,
 } from "@dhis2/ui";
 import i18n from "@dhis2/d2-i18n";
 import { useRecoilState } from "recoil";
@@ -19,6 +18,7 @@ import { isEmpty } from "lodash";
 import { FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { useAlert } from "@dhis2/app-runtime";
 
 const schema = z.object({
 	regimen: z
@@ -59,7 +59,7 @@ const AddSetting = ({
 	const [programMapping] = useSetting("programMapping", {
 		global: true,
 	});
-	const [showSuccess, setShowSuccess] = useState<boolean>(false);
+
 	const { regimenOptions, administrationOptions, loading, refetch } =
 		useRegimens();
 	const [availableRegimen, setAvailableRegimen] = useState<Option[]>();
@@ -71,6 +71,10 @@ const AddSetting = ({
 			(item: regimenSetting) => item.regimen === regimen,
 		);
 	});
+	const { show } = useAlert(
+		({ message }) => message,
+		({ type }) => ({ ...type, duration: 3000 }),
+	);
 
 	useEffect(() => {
 		if (!isEmpty(programMapping.attributes.regimen)) {
@@ -121,7 +125,10 @@ const AddSetting = ({
 		addRegimen(updatedRegimen);
 		setHide(true);
 		setAdd(false);
-		setShowSuccess(true);
+		show({
+			message: "Setting Updated Successfully",
+			type: { success: true },
+		});
 	};
 
 	const onSave = async (regimenData: RegimenFormData) => {
@@ -270,25 +277,6 @@ const AddSetting = ({
 					</ButtonStrip>
 				</ModalActions>
 			</Modal>
-			{showSuccess && (
-				<div
-					style={{
-						position: "fixed",
-						bottom: "0",
-						left: "50%",
-						transform: "translateX(-50%)",
-					}}
-				>
-					<AlertBar
-						duration={2000}
-						onHidden={() => {
-							setShowSuccess(!showSuccess);
-						}}
-					>
-						{i18n.t("Setting updated successfully")}
-					</AlertBar>
-				</div>
-			)}
 		</div>
 	);
 };

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import {
 	Button,
 	Modal,
@@ -6,13 +6,13 @@ import {
 	ModalContent,
 	ModalActions,
 	ButtonStrip,
-	AlertBar,
 } from "@dhis2/ui";
 import i18n from "@dhis2/d2-i18n";
 import { remove } from "../state";
 import { useRecoilState } from "recoil";
 import { useSetting } from "@dhis2/app-service-datastore";
 import { deviceEmeiList } from "../../../../shared/constants";
+import { useAlert } from "@dhis2/app-runtime";
 
 interface DeleteDevice {
 	emei?: string;
@@ -24,8 +24,11 @@ function DeleteDevice({ emei, inUse }: DeleteDevice) {
 	const [devices, { set: deleteDevice }] = useSetting("deviceEmeiList", {
 		global: true,
 	});
-	const [showError, setShowError] = useState<boolean>(false);
-	const [showSuccess, setShowSuccess] = useState<boolean>(false);
+
+	const { show } = useAlert(
+		({ message }) => message,
+		({ type }) => ({ ...type, duration: 3000 }),
+	);
 
 	const onDelete = () => {
 		if (emei) {
@@ -34,11 +37,17 @@ function DeleteDevice({ emei, inUse }: DeleteDevice) {
 					(item: deviceEmeiList) => item["emei"] !== emei,
 				);
 				deleteDevice(updatedDevices);
-				setShowSuccess(true);
+				show({
+					message: "Device Deleted Successfully",
+					type: { success: true },
+				});
 				setHide(true);
 			} else {
 				setHide(true);
-				setShowError(true);
+				show({
+					message: `Device with emei ${emei} can not be deleted since it has dependencies with a client`,
+					type: { info: true },
+				});
 			}
 		}
 	};
@@ -103,52 +112,6 @@ function DeleteDevice({ emei, inUse }: DeleteDevice) {
 					</ButtonStrip>
 				</ModalActions>
 			</Modal>
-			{showSuccess && (
-				<div
-					style={{
-						position: "fixed",
-						bottom: "0",
-						left: "50%",
-						transform: "translateX(-50%)",
-					}}
-				>
-					<AlertBar
-						duration={2000}
-						onHidden={() => {
-							setShowSuccess(!showSuccess);
-						}}
-					>
-						{i18n.t("Device deleted successfully")}
-					</AlertBar>
-				</div>
-			)}
-			{showError && (
-				<div
-					style={{
-						position: "fixed",
-						bottom: "0",
-						left: "50%",
-						transform: "translateX(-50%)",
-					}}
-				>
-					<AlertBar
-						duration={5000}
-						onHidden={() => {
-							setShowError(!showError);
-						}}
-					>
-						<span>
-							{i18n.t("Device with emei ")}
-							<strong style={{ fontWeight: "bold" }}>
-								{emei}
-							</strong>
-							{i18n.t(
-								" can not be deleted since it has dependencies with a client",
-							)}
-						</span>
-					</AlertBar>
-				</div>
-			)}
 		</div>
 	);
 }

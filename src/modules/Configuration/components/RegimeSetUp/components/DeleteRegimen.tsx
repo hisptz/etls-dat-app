@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import {
 	Button,
 	Modal,
@@ -6,13 +6,13 @@ import {
 	ModalContent,
 	ModalActions,
 	ButtonStrip,
-	AlertBar,
 } from "@dhis2/ui";
 import i18n from "@dhis2/d2-i18n";
 import { remove } from "../state";
 import { useRecoilState } from "recoil";
 import { useSetting } from "@dhis2/app-service-datastore";
 import { RegimenFormData } from "./EditRegimen";
+import { useAlert } from "@dhis2/app-runtime";
 
 interface DeleteSetting {
 	regimen?: string;
@@ -23,7 +23,11 @@ function DeleteSetting({ regimen }: DeleteSetting) {
 	const [regimens, { set: deleteSetting }] = useSetting("regimenSetting", {
 		global: true,
 	});
-	const [showSuccess, setShowSuccess] = useState<boolean>(false);
+
+	const { show } = useAlert(
+		({ message }) => message,
+		({ type }) => ({ ...type, duration: 3000 }),
+	);
 
 	const onDelete = () => {
 		if (regimen) {
@@ -31,7 +35,10 @@ function DeleteSetting({ regimen }: DeleteSetting) {
 				(item: RegimenFormData) => item["regimen"] !== regimen,
 			);
 			deleteSetting(updatedRegimens);
-			setShowSuccess(true);
+			show({
+				message: "Regimen Deleted Successfully",
+				type: { success: true },
+			});
 			setHide(true);
 		}
 	};
@@ -96,25 +103,6 @@ function DeleteSetting({ regimen }: DeleteSetting) {
 					</ButtonStrip>
 				</ModalActions>
 			</Modal>
-			{showSuccess && (
-				<div
-					style={{
-						position: "fixed",
-						bottom: "0",
-						left: "50%",
-						transform: "translateX(-50%)",
-					}}
-				>
-					<AlertBar
-						duration={2000}
-						onHidden={() => {
-							setShowSuccess(!showSuccess);
-						}}
-					>
-						{i18n.t("Regimen deleted successfully")}
-					</AlertBar>
-				</div>
-			)}
 		</div>
 	);
 }
