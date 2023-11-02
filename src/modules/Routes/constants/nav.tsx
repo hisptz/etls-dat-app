@@ -1,5 +1,5 @@
 import React from "react";
-import { TBAdherenceOutlet, TBAdherencePage } from "../../TBAdherence";
+import { TBAdherencePage, TreatmentAdherenceOutlet } from "../../TBAdherence";
 import { Reports } from "../../Reports";
 
 import {
@@ -11,8 +11,6 @@ import i18n from "@dhis2/d2-i18n";
 
 import { Navigate } from "react-router-dom";
 
-import { getDefaultTBAdherenceFilters } from "../../TBAdherence/constants/filters";
-
 import { TBAdherenceDetails } from "../../TBAdherence/TBAdherenceDetails/TBAdherenceDetails";
 
 import { Configuration } from "../../Configuration";
@@ -21,6 +19,7 @@ import { ProgramMapping } from "../../Configuration/components/ProgramMapping";
 import { DATDevicelists } from "../../Configuration/components/DATDeviceLists";
 import { RegimenSetUp } from "../../Configuration/components/RegimeSetUp";
 import { getDefaultReportFilters } from "../../Reports/constants/filters";
+import { getDefaultTBAdherenceFilters } from "../../TBAdherence/constants/filters";
 
 export interface NavItem {
 	label?: string | ((data: any) => any);
@@ -33,15 +32,15 @@ export interface NavItem {
 
 export const ROUTES: NavItem[] = [
 	{
-		id: "tbadherence",
-		path: "tbadherence",
-		element: TBAdherenceOutlet,
+		id: "treatment-adherence",
+		path: "treatment-adherence",
+		element: TreatmentAdherenceOutlet,
 		icon: IconVisualizationColumn24,
-		label: i18n.t("TB Adherence"),
+		label: i18n.t("Treatment Adherence"),
 		subItems: [
 			{
 				path: "",
-				id: "tbadherence-redirect",
+				id: "treatment-adherence-redirect",
 				element: () => {
 					const defaultParams = getDefaultTBAdherenceFilters();
 					return <Navigate to={`list?${defaultParams.toString()}`} />;
@@ -49,12 +48,12 @@ export const ROUTES: NavItem[] = [
 			},
 			{
 				path: "list",
-				id: "tbadherence-list",
+				id: "treatment-adherence-list",
 				element: TBAdherencePage,
 			},
 			{
 				path: ":id",
-				id: "tbadherence-details",
+				id: "treatment-adherence-details",
 				element: TBAdherenceDetails,
 			},
 		],

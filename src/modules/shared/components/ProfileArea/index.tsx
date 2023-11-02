@@ -194,7 +194,8 @@ export function ProfileArea({
 							>
 								{i18n.t("Edit Device")}
 							</Button>
-							{profile.deviceIMEINumber == "N/A" ? null : (
+							{profile.deviceIMEINumber == "N/A" ||
+							profile.adherenceFrequency == "Monthly" ? null : (
 								<Button
 									secondary
 									icon={<IconClock24 />}
@@ -226,20 +227,6 @@ export function ProfileArea({
 										htmlFor="value"
 									>
 										{i18n.t("")}
-									</label>
-								</div>
-								<div className={styles["grid-item"]}>
-									<label
-										className={styles["label-title"]}
-										htmlFor="name"
-									>
-										{i18n.t("Device Health")}
-									</label>
-									<label
-										className={styles["label-value"]}
-										htmlFor="value"
-									>
-										{profile.deviceHealth}
 									</label>
 								</div>
 								<div className={styles["grid-item"]}>
@@ -319,6 +306,7 @@ export function ProfileArea({
 							: profile.deviceIMEINumber
 					}
 					name={profile.name}
+					patientId={profile.tbDistrictNumber}
 					refetch={refetch}
 				/>
 			)}

@@ -1,14 +1,16 @@
 import { useAlert, useDataMutation } from "@dhis2/app-runtime";
 import { useSetting } from "@dhis2/app-service-datastore";
-import { useSearchParams } from "react-router-dom";
+import axios from "axios";
 
 import { usePatient } from "../../../TBAdherence/TBAdherenceDetails/hooks/data";
 import { useEffect, useState } from "react";
 
 export function useAssignDevice() {
 	const [programMapping] = useSetting("programMapping", { global: true });
-	const { patientTei, loading } = usePatient();
+	const { patientTei } = usePatient();
 	const TEA_ID = programMapping.attributes.deviceIMEInumber;
+	const MediatorUrl = programMapping.mediatorUrl;
+	const ApiKey = programMapping.apiKey;
 
 	const attributeIndex = patientTei?.attributes.findIndex(
 		(attribute) => attribute.attribute === TEA_ID,
@@ -26,7 +28,7 @@ export function useAssignDevice() {
 		({ message }) => message,
 		({ type }) => ({ ...type, duration: 3000 }),
 	);
-	const [update, { error }] = useDataMutation(newDevice, {
+	const [update] = useDataMutation(newDevice, {
 		onError: (error) => {
 			show({
 				message: `Could not update: ${error.message}`,
@@ -60,14 +62,46 @@ export function useAssignDevice() {
 			orgUnit,
 		};
 
-		await update({
-			data: { trackedEntities: [updatedTei] },
-		});
+		if (data) {
+			await update({
+				data: { trackedEntities: [updatedTei] },
+			});
+		}
+	};
+
+	const handleAssignDeviceToWisepill = async ({
+		imei,
+		patientId,
+	}: {
+		imei: string;
+		patientId: string;
+	}) => {
+		let loading = true;
+		try {
+			const data = {
+				imei: imei,
+				patientId: patientId,
+			};
+			const response = await axios.post(
+				`${MediatorUrl}/api/devices/assign`,
+				data,
+				{
+					headers: {
+						"x-api-key": ApiKey,
+					},
+				},
+			);
+			loading = false;
+
+			return { response: response, error: null, loading };
+		} catch (error) {
+			loading = false;
+			return { response: null, error, loading };
+		}
 	};
 
 	return {
 		assignDevice: handleAssignDevice,
-		loading,
-		error,
+		assignDeviceWisePill: handleAssignDeviceToWisepill,
 	};
 }
