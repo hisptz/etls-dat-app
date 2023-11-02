@@ -17,6 +17,7 @@ import { useAssignDevice } from "../utils/assignDevice";
 import { FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { useAlert } from "@dhis2/app-runtime";
 
 interface editDeviceProps {
 	patientId: string;
@@ -50,6 +51,10 @@ function EditDevice({ name, value, patientId, refetch }: editDeviceProps) {
 			),
 		);
 	}, []);
+	const { show } = useAlert(
+		({ message }) => message,
+		({ type }) => ({ ...type, duration: 3000 }),
+	);
 
 	const onSave = async (data: DeviceData) => {
 		if (data) {
@@ -67,11 +72,15 @@ function EditDevice({ name, value, patientId, refetch }: editDeviceProps) {
 				imei: data.emei,
 				patientId: patientId,
 			}).then(async (response) => {
-				console.log(response);
-				if (response.res) {
+				if (response.response) {
 					await assignDevice(data.emei).then(() => {
 						updateDevice(updatedDevices);
 						setHide(true);
+					});
+				} else if (response.error) {
+					show({
+						message: `Could not update: ${response.error.response.data.message}`,
+						type: { info: true },
 					});
 				}
 			});

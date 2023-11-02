@@ -68,9 +68,7 @@ export function useAssignDevice() {
 			});
 		}
 	};
-	const [res, setRes] = useState<any>();
-	const [error, setError] = useState<any>();
-	const [loading, setLoading] = useState(true);
+
 	const handleAssignDeviceToWisepill = async ({
 		imei,
 		patientId,
@@ -78,27 +76,28 @@ export function useAssignDevice() {
 		imei: string;
 		patientId: string;
 	}) => {
+		let loading = true;
 		try {
 			const data = {
 				imei: imei,
 				patientId: patientId,
 			};
-			await axios
-				.post(`${MediatorUrl}/api/devices/assign`, data, {
+			const response = await axios.post(
+				`${MediatorUrl}/api/devices/assign`,
+				data,
+				{
 					headers: {
 						"x-api-key": ApiKey,
 					},
-				})
-				.then((response) => {
-					setRes(response);
-					setLoading(false);
-				});
-		} catch (error) {
-			setError(error);
-			setLoading(false);
-		}
+				},
+			);
+			loading = false;
 
-		return { res, error, loading };
+			return { response: response, error: null, loading };
+		} catch (error) {
+			loading = false;
+			return { response: null, error, loading };
+		}
 	};
 
 	return {
