@@ -11,7 +11,7 @@ export function PropertiesFilter() {
 			<div
 				style={{
 					display: "grid",
-					gridTemplateColumns: "repeat(5, 280px)",
+					gridTemplateColumns: "repeat(auto-fill, 280px)",
 					gap: "16px",
 					width: "100%",
 				}}
