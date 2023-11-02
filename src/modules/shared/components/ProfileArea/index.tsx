@@ -233,20 +233,6 @@ export function ProfileArea({
 										className={styles["label-title"]}
 										htmlFor="name"
 									>
-										{i18n.t("Device Health")}
-									</label>
-									<label
-										className={styles["label-value"]}
-										htmlFor="value"
-									>
-										{profile.deviceHealth}
-									</label>
-								</div>
-								<div className={styles["grid-item"]}>
-									<label
-										className={styles["label-title"]}
-										htmlFor="name"
-									>
 										{i18n.t("Battery Level")}
 									</label>
 									<label
@@ -319,6 +305,7 @@ export function ProfileArea({
 							: profile.deviceIMEINumber
 					}
 					name={profile.name}
+					patientId={profile.tbDistrictNumber}
 					refetch={refetch}
 				/>
 			)}

@@ -1,19 +1,23 @@
+import { useSetting } from "@dhis2/app-service-datastore";
 import axios from "axios";
 import { useState, useEffect } from "react";
 
 export const useDeviceData = (imei?: string) => {
+	const [programMapping] = useSetting("programMapping", { global: true });
 	const [data, setData] = useState<any>();
 	const [errorDevice, setError] = useState<any>();
 	const [loadingDevice, setLoading] = useState(true);
+	const MediatorUrl = programMapping.mediatorUrl;
+	const ApiKey = programMapping.apiKey;
 
 	useEffect(() => {
 		const fetchData = async () => {
 			try {
 				const response = await axios.get(
-					`https://dev.hisptz.com/dhis2etl/server/api/devices/details?imei=${imei}`,
+					`${MediatorUrl}/api/devices/details?imei=${imei}`,
 					{
 						headers: {
-							"x-api-key": "ImASecret",
+							"x-api-key": ApiKey,
 						},
 					},
 				);
@@ -25,7 +29,9 @@ export const useDeviceData = (imei?: string) => {
 			}
 		};
 
-		fetchData();
+		if (imei) {
+			fetchData();
+		}
 	}, [imei]);
 
 	return { data, errorDevice, loadingDevice };

@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2023-11-01T06:15:23.285Z\n"
-"PO-Revision-Date: 2023-11-01T06:15:23.285Z\n"
+"POT-Creation-Date: 2023-11-02T11:24:57.291Z\n"
+"PO-Revision-Date: 2023-11-02T11:24:57.291Z\n"
 
 msgid "Configurations"
 msgstr "Configurations"
@@ -179,8 +179,8 @@ msgstr "The page you are looking for does not exist."
 msgid "Go to home page"
 msgstr "Go to home page"
 
-msgid "TB Adherence"
-msgstr "TB Adherence"
+msgid "Treatment Adherence"
+msgstr "Treatment Adherence"
 
 msgid "Dashboards"
 msgstr "Dashboards"
@@ -224,9 +224,6 @@ msgstr "N/A"
 
 msgid "Dose Taken at"
 msgstr "Dose Taken at"
-
-msgid "Device Health"
-msgstr "Device Health"
 
 msgid "Battery Health"
 msgstr "Battery Health"

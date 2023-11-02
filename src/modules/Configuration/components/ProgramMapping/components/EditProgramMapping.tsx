@@ -140,7 +140,7 @@ function Edit({
 									required={true}
 									options={programOptions}
 									name="program"
-									label={i18n.t("Mapped TB Program")}
+									label={i18n.t("Mapped Program")}
 									type="select"
 								/>
 							</div>
@@ -167,7 +167,7 @@ function Edit({
 									options={attributeOptions}
 									required={true}
 									name="attributes.tbDistrictNumber"
-									label={i18n.t("TB District Number")}
+									label={i18n.t("Patient Number")}
 									type="select"
 								/>
 							</div>
