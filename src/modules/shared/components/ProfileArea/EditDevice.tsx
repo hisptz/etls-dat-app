@@ -73,9 +73,11 @@ function EditDevice({ name, value, patientId, refetch }: editDeviceProps) {
 				patientId: patientId,
 			}).then(async (response) => {
 				if (response.response) {
-					await assignDevice(data.emei).then(() => {
-						updateDevice(updatedDevices);
-						setHide(true);
+					await assignDevice(data.emei).then(async () => {
+						await updateDevice(updatedDevices).then(async () => {
+							refetch();
+							setHide(true);
+						});
 					});
 				} else if (response.error) {
 					show({

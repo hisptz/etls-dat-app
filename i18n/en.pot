@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2023-11-02T14:02:00.712Z\n"
-"PO-Revision-Date: 2023-11-02T14:02:00.713Z\n"
+"POT-Creation-Date: 2023-11-03T07:36:34.373Z\n"
+"PO-Revision-Date: 2023-11-03T07:36:34.373Z\n"
 
 msgid "Configurations"
 msgstr "Configurations"
@@ -25,15 +25,6 @@ msgstr "Hide"
 
 msgid "Delete"
 msgstr "Delete"
-
-msgid "Device deleted successfully"
-msgstr "Device deleted successfully"
-
-msgid "Device with emei "
-msgstr "Device with emei "
-
-msgid " can not be deleted since it has dependencies with a client"
-msgstr " can not be deleted since it has dependencies with a client"
 
 msgid "There are no devices"
 msgstr "There are no devices"
@@ -56,14 +47,8 @@ msgstr "Device IMEI number"
 msgid "Add the EMEI number as seen on the device"
 msgstr "Add the EMEI number as seen on the device"
 
-msgid "Device already exists!"
-msgstr "Device already exists!"
-
 msgid "Save"
 msgstr "Save"
-
-msgid "Devices updated successfully"
-msgstr "Devices updated successfully"
 
 msgid "Program Mapping"
 msgstr "Program Mapping"
@@ -113,9 +98,6 @@ msgstr "Delete Regimen Setting"
 msgid "Are you sure you want to delete this regimen setting "
 msgstr "Are you sure you want to delete this regimen setting "
 
-msgid "Regimen deleted successfully"
-msgstr "Regimen deleted successfully"
-
 msgid "Regimen Setting Form"
 msgstr "Regimen Setting Form"
 
@@ -133,9 +115,6 @@ msgstr "Completion Minimum Doses"
 
 msgid "Completion Maximum Duration (Months)"
 msgstr "Completion Maximum Duration (Months)"
-
-msgid "Setting updated successfully"
-msgstr "Setting updated successfully"
 
 msgid "Regimens Settings not found"
 msgstr "Regimens Settings not found"
