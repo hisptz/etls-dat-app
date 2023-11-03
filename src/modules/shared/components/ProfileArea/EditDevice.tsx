@@ -74,7 +74,6 @@ function EditDevice({ name, value, patientId, refetch }: editDeviceProps) {
 			}).then(async (response) => {
 				if (response.response) {
 					await assignDevice(data.emei).then(async (res) => {
-						console.log(res);
 						if (res?.updated != 0) {
 							await updateDevice(updatedDevices).then(
 								async () => {

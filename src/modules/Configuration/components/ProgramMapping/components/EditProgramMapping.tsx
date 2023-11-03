@@ -96,7 +96,6 @@ function Edit({
 		});
 		setHide(true);
 		setImport(!importMeta);
-		console.log(data);
 	};
 
 	const onClose = () => {
