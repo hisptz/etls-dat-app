@@ -196,16 +196,16 @@ export function ProfileArea({
 							</Button>
 							{profile.deviceIMEINumber == "N/A" ||
 							profile.adherenceFrequency == "Monthly" ? null : (
-								<Button
-									secondary
-									icon={<IconClock24 />}
-									onClick={() => {
-										setHideAlarm(false);
-									}}
-								>
-									{i18n.t("Set Alarm")}
-								</Button>
-							)}
+									<Button
+										secondary
+										icon={<IconClock24 />}
+										onClick={() => {
+											setHideAlarm(false);
+										}}
+									>
+										{i18n.t("Set Alarm")}
+									</Button>
+								)}
 						</ButtonStrip>
 					</div>
 					{profile.deviceIMEINumber == "N/A" ? (

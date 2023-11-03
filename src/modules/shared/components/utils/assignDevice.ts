@@ -4,6 +4,7 @@ import axios from "axios";
 
 import { usePatient } from "../../../TBAdherence/TBAdherenceDetails/hooks/data";
 import { useEffect, useState } from "react";
+import { TrackedEntity } from "../../types";
 
 export function useAssignDevice() {
 	const [programMapping] = useSetting("programMapping", { global: true });
@@ -16,11 +17,14 @@ export function useAssignDevice() {
 		(attribute) => attribute.attribute === TEA_ID,
 	);
 
-	const { trackedEntity, trackedEntityType, orgUnit } = patientTei;
+	const { trackedEntity, trackedEntityType, orgUnit } = patientTei as TrackedEntity;
 
-	const newDevice: any = {
+	const trackedEntityAttributesMutation: any = {
 		type: "create",
 		resource: "tracker",
+		params: {
+			async: false,
+		},
 		data: ({ data }: any) => data,
 		async: false,
 	};
@@ -28,7 +32,7 @@ export function useAssignDevice() {
 		({ message }) => message,
 		({ type }) => ({ ...type, duration: 3000 }),
 	);
-	const [update] = useDataMutation(newDevice, {
+	const [update] = useDataMutation(trackedEntityAttributesMutation, {
 		onError: (error) => {
 			show({
 				message: `Could not update: ${error.message}`,
@@ -44,17 +48,15 @@ export function useAssignDevice() {
 		const updatedAttributes =
 			attributeIndex === -1
 				? [
-						...patientTei!.attributes,
-						{
-							attribute: TEA_ID,
-							value: data,
-						},
-				  ]
+					...patientTei!.attributes,
+					{
+						attribute: TEA_ID,
+						value: data,
+					}]
 				: patientTei!.attributes.map((attribute, index) =>
-						index === attributeIndex
-							? { ...attribute, value: data }
-							: attribute,
-				  );
+					index === attributeIndex
+						? { ...attribute, value: data }
+						: attribute);
 		const updatedTei = {
 			attributes: updatedAttributes,
 			trackedEntity,
