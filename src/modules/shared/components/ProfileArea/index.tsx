@@ -8,7 +8,6 @@ import { useRecoilState } from "recoil";
 import { AddAlarm, AddDevice } from "../../state";
 import EditAlarm from "./AddAlarm";
 import NoDeviceAssigned from "./NoDeviceAssigned";
-
 import { DateTime } from "luxon";
 
 export interface ProfileAreaProps {
@@ -196,16 +195,16 @@ export function ProfileArea({
 							</Button>
 							{profile.deviceIMEINumber == "N/A" ||
 							profile.adherenceFrequency == "Monthly" ? null : (
-									<Button
-										secondary
-										icon={<IconClock24 />}
-										onClick={() => {
-											setHideAlarm(false);
-										}}
-									>
-										{i18n.t("Set Alarm")}
-									</Button>
-								)}
+								<Button
+									secondary
+									icon={<IconClock24 />}
+									onClick={() => {
+										setHideAlarm(false);
+									}}
+								>
+									{i18n.t("Set Alarm")}
+								</Button>
+							)}
 						</ButtonStrip>
 					</div>
 					{profile.deviceIMEINumber == "N/A" ? (

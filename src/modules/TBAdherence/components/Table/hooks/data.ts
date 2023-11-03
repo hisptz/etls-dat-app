@@ -69,11 +69,11 @@ export function filterObject(programMapping: programMapping) {
 		},
 		firstName: {
 			attribute: programMapping.attributes?.firstName,
-			operator: "in",
+			operator: "like",
 		},
 		surname: {
 			attribute: programMapping.attributes?.surname,
-			operator: "in",
+			operator: "like",
 		},
 	};
 

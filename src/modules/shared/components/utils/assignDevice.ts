@@ -1,9 +1,7 @@
 import { useAlert, useDataMutation } from "@dhis2/app-runtime";
 import { useSetting } from "@dhis2/app-service-datastore";
 import axios from "axios";
-
 import { usePatient } from "../../../TBAdherence/TBAdherenceDetails/hooks/data";
-import { useEffect, useState } from "react";
 import { TrackedEntity } from "../../types";
 
 export function useAssignDevice() {
@@ -17,7 +15,8 @@ export function useAssignDevice() {
 		(attribute) => attribute.attribute === TEA_ID,
 	);
 
-	const { trackedEntity, trackedEntityType, orgUnit } = patientTei as TrackedEntity;
+	const { trackedEntity, trackedEntityType, orgUnit } =
+		patientTei as TrackedEntity;
 
 	const trackedEntityAttributesMutation: any = {
 		type: "create",
@@ -48,15 +47,17 @@ export function useAssignDevice() {
 		const updatedAttributes =
 			attributeIndex === -1
 				? [
-					...patientTei!.attributes,
-					{
-						attribute: TEA_ID,
-						value: data,
-					}]
+						...patientTei!.attributes,
+						{
+							attribute: TEA_ID,
+							value: data,
+						},
+				  ]
 				: patientTei!.attributes.map((attribute, index) =>
-					index === attributeIndex
-						? { ...attribute, value: data }
-						: attribute);
+						index === attributeIndex
+							? { ...attribute, value: data }
+							: attribute,
+				  );
 		const updatedTei = {
 			attributes: updatedAttributes,
 			trackedEntity,
