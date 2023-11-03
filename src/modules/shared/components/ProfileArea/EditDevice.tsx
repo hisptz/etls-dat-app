@@ -73,11 +73,24 @@ function EditDevice({ name, value, patientId, refetch }: editDeviceProps) {
 				patientId: patientId,
 			}).then(async (response) => {
 				if (response.response) {
-					await assignDevice(data.emei).then(async () => {
-						await updateDevice(updatedDevices).then(async () => {
-							refetch();
-							setHide(true);
-						});
+					await assignDevice(data.emei).then(async (res) => {
+						console.log(res);
+						if (res?.updated != 0) {
+							await updateDevice(updatedDevices).then(
+								async () => {
+									show({
+										message: "Update successful",
+										type: { success: true },
+									});
+									refetch();
+								},
+							);
+						} else if (res.ignored != 0) {
+							show({
+								message: `Could not update: ${res.error[0].message}`,
+								type: { info: true },
+							});
+						}
 					});
 				} else if (response.error) {
 					show({
@@ -95,6 +108,7 @@ function EditDevice({ name, value, patientId, refetch }: editDeviceProps) {
 	};
 	const onSubmit = async (data: DeviceData) => {
 		await onSave(data);
+		setHide(true);
 		form.reset();
 	};
 

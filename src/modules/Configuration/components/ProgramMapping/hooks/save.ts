@@ -88,6 +88,7 @@ export function useProgramStage() {
 			{
 				id: programMapping.programStage,
 				name: "DAT-Adherence Records",
+				repeatable: true,
 				program: { id: programId ?? programMapping.program ?? null },
 				programStageDataElements: [
 					{

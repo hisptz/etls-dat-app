@@ -18,6 +18,11 @@ export function useAssignDevice() {
 	const { trackedEntity, trackedEntityType, orgUnit } =
 		patientTei as TrackedEntity;
 
+	const { show } = useAlert(
+		({ message }) => message,
+		({ type }) => ({ ...type, duration: 3000 }),
+	);
+
 	const trackedEntityAttributesMutation: any = {
 		type: "create",
 		resource: "tracker",
@@ -27,19 +32,13 @@ export function useAssignDevice() {
 		data: ({ data }: any) => data,
 		async: false,
 	};
-	const { show } = useAlert(
-		({ message }) => message,
-		({ type }) => ({ ...type, duration: 3000 }),
-	);
+
 	const [update] = useDataMutation(trackedEntityAttributesMutation, {
 		onError: (error) => {
 			show({
-				message: `Could not update: ${error.message}`,
+				message: `Could not update: ${error}`,
 				type: { info: true },
 			});
-		},
-		onComplete: () => {
-			show({ message: "Update successful", type: { success: true } });
 		},
 	});
 
@@ -66,9 +65,22 @@ export function useAssignDevice() {
 		};
 
 		if (data) {
-			await update({
+			const res = await update({
 				data: { trackedEntities: [updatedTei] },
 			});
+
+			return {
+				updated:
+					res?.bundleReport.typeReportMap.TRACKED_ENTITY.stats
+						.updated,
+
+				ignored:
+					res?.bundleReport.typeReportMap.TRACKED_ENTITY.stats
+						.ignored,
+
+				error: res?.bundleReport.typeReportMap.TRACKED_ENTITY
+					.objectReports[0].errorReports,
+			};
 		}
 	};
 
