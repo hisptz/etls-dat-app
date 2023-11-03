@@ -9,6 +9,8 @@ import { AddAlarm, AddDevice } from "../../state";
 import EditAlarm from "./AddAlarm";
 import NoDeviceAssigned from "./NoDeviceAssigned";
 import { DateTime } from "luxon";
+import { useAdherenceEvents } from "./utils";
+import { useSetting } from "@dhis2/app-service-datastore";
 
 export interface ProfileAreaProps {
 	profile: PatientProfile;
@@ -25,6 +27,16 @@ export function ProfileArea({
 }: ProfileAreaProps) {
 	const [hide, setHideDevice] = useRecoilState<boolean>(AddDevice);
 	const [hideAlarm, setHideAlarm] = useRecoilState<boolean>(AddAlarm);
+	const [programMapping] = useSetting("programMapping", {
+		global: true,
+	});
+
+	const { filteredEvents } = useAdherenceEvents(
+		profile.events,
+		programMapping.programStage,
+	);
+
+	const totalOpenings = filteredEvents.length;
 
 	const refillAlarm =
 		DateTime.fromFormat(
@@ -225,7 +237,7 @@ export function ProfileArea({
 										className={styles["label-value"]}
 										htmlFor="value"
 									>
-										{i18n.t("")}
+										{totalOpenings}
 									</label>
 								</div>
 								<div className={styles["grid-item"]}>
