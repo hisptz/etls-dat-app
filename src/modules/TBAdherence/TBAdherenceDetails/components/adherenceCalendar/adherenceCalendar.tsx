@@ -56,9 +56,11 @@ function AdherenceCalendar({ profile, data, laoding }: ProfileAreaProps) {
 					? "takenDose"
 					: item.dataValues[0].value == "Opened Multiple"
 					? "takenDose"
-					: item.dataValues[0].value == "None"
+					: item.dataValues[0].value == "Heartbeat"
 					? "notTakenDose"
-					: "notTakenDose",
+					: item.dataValues[0].value == "None"
+					? ""
+					: "",
 		};
 	});
 
@@ -210,10 +212,7 @@ function AdherenceCalendar({ profile, data, laoding }: ProfileAreaProps) {
 											htmlFor="value"
 										>
 											{eventCode == "green"
-												? lastUpdated !=
-												  "Invalid DateTime"
-													? lastUpdated
-													: "N/A"
+												? formattedDateWithTime
 												: i18n.t("N/A")}
 										</label>
 									</div>

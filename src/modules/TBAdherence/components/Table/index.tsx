@@ -58,9 +58,11 @@ export default function TBAdherenceTable({
 						? "takenDose"
 						: item.dataValues[0].value == "Opened Multiple"
 						? "takenDose"
-						: item.dataValues[0].value == "None"
+						: item.dataValues[0].value == "Heartbeat"
 						? "notTakenDose"
-						: "notTakenDose",
+						: item.dataValues[0].value == "None"
+						? ""
+						: "",
 			};
 		});
 		const events: DateEvent[] = [

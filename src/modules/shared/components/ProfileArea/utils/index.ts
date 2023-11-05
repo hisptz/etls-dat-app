@@ -37,9 +37,9 @@ export const useDeviceData = (imei?: string) => {
 	return { data, errorDevice, loadingDevice };
 };
 
-export const useAdherenceEvents = (data: any, desiredEvent: string) => {
+export const useAdherenceEvents = (data: any, programStage: string) => {
 	const filteredEvents = data
-		.filter((event: any) => event.event === desiredEvent)
+		.filter((event: any) => event.programStage === programStage)
 		.map((event: any) => ({
 			dataValues: event.dataValues,
 			occurredAt: event.occurredAt,
