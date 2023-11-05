@@ -13,7 +13,7 @@ import { DATA_TEST_PREFIX } from "../../../../../shared/constants";
 export default function OrganisationUnitSelector() {
 	const [hide, setHide] = useState(true);
 	const [organizationUnits, setOrganizationUnitState] = useRecoilState(
-		OrganizationUnitState
+		OrganizationUnitState,
 	);
 	const [params, setParams] = useSearchParams();
 	const { loading, orgUnit: orgUnitWithData } = useOrgUnit();
@@ -53,7 +53,7 @@ export default function OrganisationUnitSelector() {
 									{index < organizationUnits!.length - 1 &&
 										",\u00A0"}
 								</div>
-							)
+							),
 					  )}
 			</Button>
 			{loading ? null : (
