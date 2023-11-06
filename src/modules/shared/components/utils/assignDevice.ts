@@ -1,40 +1,44 @@
 import { useAlert, useDataMutation } from "@dhis2/app-runtime";
 import { useSetting } from "@dhis2/app-service-datastore";
-import { useSearchParams } from "react-router-dom";
-
+import axios from "axios";
 import { usePatient } from "../../../TBAdherence/TBAdherenceDetails/hooks/data";
-import { useEffect, useState } from "react";
+import { TrackedEntity } from "../../types";
 
 export function useAssignDevice() {
 	const [programMapping] = useSetting("programMapping", { global: true });
-	const { patientTei, loading } = usePatient();
+	const { patientTei } = usePatient();
 	const TEA_ID = programMapping.attributes.deviceIMEInumber;
+	const MediatorUrl = programMapping.mediatorUrl;
+	const ApiKey = programMapping.apiKey;
 
 	const attributeIndex = patientTei?.attributes.findIndex(
 		(attribute) => attribute.attribute === TEA_ID,
 	);
 
-	const { trackedEntity, trackedEntityType, orgUnit } = patientTei;
+	const { trackedEntity, trackedEntityType, orgUnit } =
+		patientTei as TrackedEntity;
 
-	const newDevice: any = {
-		type: "create",
-		resource: "tracker",
-		data: ({ data }: any) => data,
-		async: false,
-	};
 	const { show } = useAlert(
 		({ message }) => message,
 		({ type }) => ({ ...type, duration: 3000 }),
 	);
-	const [update, { error }] = useDataMutation(newDevice, {
+
+	const trackedEntityAttributesMutation: any = {
+		type: "create",
+		resource: "tracker",
+		params: {
+			async: false,
+		},
+		data: ({ data }: any) => data,
+		async: false,
+	};
+
+	const [update] = useDataMutation(trackedEntityAttributesMutation, {
 		onError: (error) => {
 			show({
-				message: `Could not update: ${error.message}`,
+				message: `Could not update: ${error}`,
 				type: { info: true },
 			});
-		},
-		onComplete: () => {
-			show({ message: "Update successful", type: { success: true } });
 		},
 	});
 
@@ -60,14 +64,59 @@ export function useAssignDevice() {
 			orgUnit,
 		};
 
-		await update({
-			data: { trackedEntities: [updatedTei] },
-		});
+		if (data) {
+			const res = await update({
+				data: { trackedEntities: [updatedTei] },
+			});
+
+			return {
+				updated:
+					res?.bundleReport.typeReportMap.TRACKED_ENTITY.stats
+						.updated,
+
+				ignored:
+					res?.bundleReport.typeReportMap.TRACKED_ENTITY.stats
+						.ignored,
+
+				error: res?.bundleReport.typeReportMap.TRACKED_ENTITY
+					.objectReports[0].errorReports,
+			};
+		}
+	};
+
+	const handleAssignDeviceToWisepill = async ({
+		imei,
+		patientId,
+	}: {
+		imei: string;
+		patientId: string;
+	}) => {
+		let loading = true;
+		try {
+			const data = {
+				imei: imei,
+				patientId: patientId,
+			};
+			const response = await axios.post(
+				`${MediatorUrl}/api/devices/assign`,
+				data,
+				{
+					headers: {
+						"x-api-key": ApiKey,
+					},
+				},
+			);
+			loading = false;
+
+			return { response: response, error: null, loading };
+		} catch (error) {
+			loading = false;
+			return { response: null, error, loading };
+		}
 	};
 
 	return {
 		assignDevice: handleAssignDevice,
-		loading,
-		error,
+		assignDeviceWisePill: handleAssignDeviceToWisepill,
 	};
 }

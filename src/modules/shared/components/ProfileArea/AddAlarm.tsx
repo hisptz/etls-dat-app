@@ -40,7 +40,6 @@ function EditAlarm({ nextRefillAlarm, nextRefillDate }: addAlarmProps) {
 	});
 
 	const onSubmit = async (data: AlarmFormData) => {
-		console.log(data);
 		setHide(true);
 		onClose();
 	};

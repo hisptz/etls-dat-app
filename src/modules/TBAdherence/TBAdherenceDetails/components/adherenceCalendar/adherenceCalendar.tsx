@@ -10,9 +10,10 @@ import { useSetting } from "@dhis2/app-service-datastore";
 
 export interface ProfileAreaProps {
 	profile: PatientProfile;
+	data: any;
 }
 
-function AdherenceCalendar({ profile }: ProfileAreaProps) {
+function AdherenceCalendar({ profile, data }: ProfileAreaProps) {
 	const [programMapping] = useSetting("programMapping", {
 		global: true,
 	});
@@ -50,13 +51,15 @@ function AdherenceCalendar({ profile }: ProfileAreaProps) {
 		return {
 			date: DateTime.fromISO(item.occurredAt).toISODate(),
 			event:
-				item.dataValues[0].value == "Opened Once"
+				item.dataValues[0].value == "Once"
 					? "takenDose"
-					: item.dataValues[0].value == "Opened Multiple"
+					: item.dataValues[0].value == "Multiple"
 					? "takenDose"
-					: item.dataValues[0].value == "None"
+					: item.dataValues[0].value == "Heartbeat"
 					? "notTakenDose"
-					: "notTakenDose",
+					: item.dataValues[0].value == "None"
+					? ""
+					: "",
 		};
 	});
 
@@ -68,7 +71,26 @@ function AdherenceCalendar({ profile }: ProfileAreaProps) {
 		},
 	];
 
-	console.log(events);
+	const refillAlarm =
+		DateTime.fromFormat(
+			data?.refillAlarm ?? "",
+			"yyyy-MM-dd HH:mm:ss",
+		).toFormat("MMMM dd, yyyy hh:mm a") ?? "";
+
+	const lastUpdated =
+		DateTime.fromFormat(
+			data?.lastOpened ?? "",
+			"yyyy-MM-dd HH:mm:ss",
+		).toFormat("MMMM dd, yyyy hh:mm a") ?? "";
+
+	const doseAlarm =
+		DateTime.fromFormat(
+			data?.alarmTime ?? "",
+			"yyyy-MM-dd HH:mm:ss",
+		).toFormat("MMMM dd, yyyy hh:mm a") ?? "";
+
+	const batteryLevel = data?.batteryLevel ? data.batteryLevel + "%" : "N/A";
+
 	return (
 		<div
 			style={{
@@ -189,32 +211,13 @@ function AdherenceCalendar({ profile }: ProfileAreaProps) {
 											htmlFor="value"
 										>
 											{eventCode == "green"
-												? i18n.t(
-														formattedDateWithTime ??
-															"",
-												  )
+												? formattedDateWithTime
 												: i18n.t("N/A")}
 										</label>
 									</div>
 								</>
 							) : null}
 
-							<div className={styles["grid-item"]}>
-								<label
-									className={styles["label-title"]}
-									htmlFor="name"
-								>
-									{i18n.t("Device Health")}
-								</label>
-								<label
-									className={styles["label-value"]}
-									htmlFor="value"
-								>
-									{eventCode == "green" || eventCode == "blue"
-										? i18n.t(profile.deviceHealth ?? "")
-										: i18n.t("N/A")}
-								</label>
-							</div>
 							<div className={styles["grid-item"]}>
 								<label
 									className={styles["label-title"]}
@@ -227,11 +230,11 @@ function AdherenceCalendar({ profile }: ProfileAreaProps) {
 									htmlFor="value"
 								>
 									{eventCode == "green" || eventCode == "blue"
-										? i18n.t(profile.batteryHealth ?? "")
+										? batteryLevel
 										: i18n.t("N/A")}
 								</label>
 							</div>
-						</div>{" "}
+						</div>
 					</>
 				)}
 			</div>

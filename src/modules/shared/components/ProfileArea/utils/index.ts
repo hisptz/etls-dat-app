@@ -1,41 +1,55 @@
+import { useSetting } from "@dhis2/app-service-datastore";
 import axios from "axios";
 import { useState, useEffect } from "react";
+import { DATA_ELEMENTS } from "../../../constants";
 
-export const useDeviceData = (imei: string) => {
+export const useDeviceData = (imei?: string) => {
+	const [programMapping] = useSetting("programMapping", { global: true });
 	const [data, setData] = useState<any>();
-	const [error, setError] = useState<any>();
-	const [loading, setLoading] = useState(true);
+	const [errorDevice, setError] = useState<any>();
+	const [loadingDevice, setLoading] = useState(true);
+	const MediatorUrl = programMapping.mediatorUrl;
+	const ApiKey = programMapping.apiKey;
 
 	useEffect(() => {
-		const fetchData = async () => {
-			try {
-				const response = await axios.get(
-					"https://dev.hisptz.com/dhis2etl/server/api/devices/",
-					{
-						headers: {
-							"x-api-key": "ImASecret",
+		if (imei != "N/A") {
+			const fetchData = async () => {
+				try {
+					const response = await axios.get(
+						`${MediatorUrl}/api/devices/details?imei=${imei}`,
+						{
+							headers: {
+								"x-api-key": ApiKey,
+							},
 						},
-					},
-				);
-				setData(response);
-				setLoading(false);
-			} catch (error) {
-				setError(error);
-				setLoading(false);
-			}
-		};
+					);
+					setData(response.data);
 
-		fetchData();
-	}, [loading]);
+					setLoading(false);
+				} catch (error) {
+					setError(error);
 
-	return { data, error, loading };
+					setLoading(false);
+				}
+			};
+
+			fetchData();
+		} else {
+			setLoading(false);
+		}
+	}, [imei]);
+
+	return { data, errorDevice, loadingDevice };
 };
 
-export const useAdherenceEvents = (data: any, desiredEvent: string) => {
+export const useAdherenceEvents = (data: any, programStage: string) => {
 	const filteredEvents = data
-		.filter((event: any) => event.event === desiredEvent)
+		.filter((event: any) => event.programStage === programStage)
 		.map((event: any) => ({
-			dataValues: event.dataValues,
+			dataValues: event.dataValues.filter(
+				(value: any) =>
+					value.dataElement === DATA_ELEMENTS.DEVICE_SIGNAL,
+			),
 			occurredAt: event.occurredAt,
 		}));
 

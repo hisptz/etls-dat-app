@@ -1,6 +1,6 @@
 const config = {
 	type: "app",
-	title: "Tanzania ETLs",
+	title: "Treatment Adherence",
 	entryPoints: {
 		app: "./src/App.tsx",
 	},

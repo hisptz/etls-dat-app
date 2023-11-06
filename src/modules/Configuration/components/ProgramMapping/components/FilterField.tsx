@@ -20,8 +20,9 @@ export interface FilterFieldProps {
 	initialValue?: string;
 	options?: [{ name: string; code: string }] | Option[] | deviceEmeiList[];
 	update?: (val: number) => void;
-	type: "date" | "text" | "select" | "time";
+	type: "date" | "text" | "select" | "time" | "password";
 	multiSelect?: boolean;
+	loading?: boolean;
 }
 
 export function FilterField({
@@ -33,6 +34,7 @@ export function FilterField({
 	initialValue,
 	type,
 	multiSelect,
+	...props
 }: FilterFieldProps) {
 	const [params, setParams] = useSearchParams();
 	const onChange = ({ value }: { value: string }) => {
@@ -53,6 +55,7 @@ export function FilterField({
 		if (multiSelect) {
 			return (
 				<MultiSelectField
+					{...props}
 					dataTest={`${DATA_TEST_PREFIX}-${name}`}
 					id={name}
 					clearable
@@ -82,12 +85,17 @@ export function FilterField({
 		}
 		return (
 			<SingleSelectField
+				{...props}
 				dataTest={`${DATA_TEST_PREFIX}-${name}`}
 				id={name}
 				clearable
 				error={!!fieldState.error}
 				validationText={fieldState.error?.message}
-				selected={field.value}
+				selected={
+					options?.some(({ code }) => code === field.value)
+						? field.value
+						: undefined
+				}
 				required={required}
 				filterable={(options?.length ?? 0) > 5}
 				onChange={({ selected }: { selected: string }) => {
@@ -110,12 +118,11 @@ export function FilterField({
 
 	return (
 		<InputField
+			{...props}
 			type={type}
 			error={!!fieldState.error}
 			validationText={fieldState.error?.message}
-
 			inputWidth={type == "time" ? "120px" : null}
-
 			required={required}
 			onChange={({ value }) => {
 				field.onChange(value);

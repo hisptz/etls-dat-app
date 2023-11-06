@@ -1,7 +1,7 @@
 import { useDataMutation } from "@dhis2/app-runtime";
 import { useSetting } from "@dhis2/app-service-datastore";
 import { useSearchParams } from "react-router-dom";
-import { programMapping } from "../../../../shared/constants";
+import { DATA_ELEMENTS, programMapping } from "../../../../shared/constants";
 
 export function useProgramMapping() {
 	const [params] = useSearchParams();
@@ -88,26 +88,27 @@ export function useProgramStage() {
 			{
 				id: programMapping.programStage,
 				name: "DAT-Adherence Records",
+				repeatable: true,
 				program: { id: programId ?? programMapping.program ?? null },
 				programStageDataElements: [
 					{
 						dataElement: {
-							id: "Vc6c6OjvvHO",
+							id: DATA_ELEMENTS.DEVICE_HEALTH,
 						},
 					},
 					{
 						dataElement: {
-							id: "QH0OjHcBBpO",
+							id: DATA_ELEMENTS.BATTERY_HEALTH,
 						},
 					},
 					{
 						dataElement: {
-							id: "FOHv6pUjBjv",
+							id: DATA_ELEMENTS.DOSAGE_TIME,
 						},
 					},
 					{
 						dataElement: {
-							id: "oHBM5fsFc6p",
+							id: DATA_ELEMENTS.DEVICE_SIGNAL,
 						},
 					},
 				],
@@ -116,7 +117,7 @@ export function useProgramStage() {
 		dataElements: [
 			{
 				code: "WISE_PILL_001",
-				id: "QH0OjHcBBpO",
+				id: DATA_ELEMENTS.DEVICE_HEALTH,
 				name: "Device health",
 				shortName: "Device health",
 				aggregationType: "NONE",
@@ -125,7 +126,7 @@ export function useProgramStage() {
 			},
 			{
 				code: "WISE_PILL_002",
-				id: "Vc6c6OjvvHO",
+				id: DATA_ELEMENTS.BATTERY_HEALTH,
 				name: "Battery health",
 				shortName: "Battery health",
 				aggregationType: "NONE",
@@ -134,7 +135,7 @@ export function useProgramStage() {
 			},
 			{
 				code: "WISE_PILL_003",
-				id: "FOHv6pUjBjv",
+				id: DATA_ELEMENTS.DOSAGE_TIME,
 				name: "Dosage time",
 				shortName: "Dosage time",
 				aggregationType: "NONE",
@@ -143,7 +144,7 @@ export function useProgramStage() {
 			},
 			{
 				code: "WISE_PILL_004",
-				id: "oHBM5fsFc6p",
+				id: DATA_ELEMENTS.DEVICE_SIGNAL,
 				name: "Device signal",
 				shortName: "Device signal",
 				aggregationType: "NONE",

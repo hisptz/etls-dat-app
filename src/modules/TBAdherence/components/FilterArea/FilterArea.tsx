@@ -8,6 +8,8 @@ import { useDataQuery } from "@dhis2/app-runtime";
 import { useFilters } from "../Table/hooks/data";
 import { useSetting } from "@dhis2/app-service-datastore";
 import { isEmpty } from "lodash";
+import { OrganizationUnitState } from "../../state/filters";
+import { useRecoilState } from "recoil";
 
 export interface FilterAreaProps {
 	loading: boolean;
@@ -18,6 +20,7 @@ export function FilterArea({ loading, onFetch }: FilterAreaProps) {
 	const [params, setParams] = useSearchParams();
 	const { filters, startDate } = useFilters();
 	const [programMapping] = useSetting("programMapping", { global: true });
+	const [, setOrganizationUnitState] = useRecoilState(OrganizationUnitState);
 
 	const orgUnit = params.get("ou") ?? null;
 	const onFilterClick = () => {
@@ -28,9 +31,18 @@ export function FilterArea({ loading, onFetch }: FilterAreaProps) {
 			orgUnit,
 		});
 	};
+
+	const defaultOrg = {
+		id: "CAWjYmd5Dea",
+		displayName: "United Republic of Tanzania",
+		path: "/CAWjYmd5Dea",
+		children: [],
+	};
+
 	const onResetClick = () => {
 		const defaultValue = getDefaultFilters();
 		setParams(defaultValue);
+		setOrganizationUnitState([defaultOrg]);
 	};
 
 	return (

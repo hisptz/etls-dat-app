@@ -5,13 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-
-"POT-Creation-Date: 2023-10-25T07:30:07.860Z\n"
-"PO-Revision-Date: 2023-10-25T07:30:07.860Z\n"
-
-
-msgid "39"
-msgstr "39"
+"POT-Creation-Date: 2023-11-06T07:45:32.715Z\n"
+"PO-Revision-Date: 2023-11-06T07:45:32.715Z\n"
 
 msgid "Configurations"
 msgstr "Configurations"
@@ -30,15 +25,6 @@ msgstr "Hide"
 
 msgid "Delete"
 msgstr "Delete"
-
-msgid "Device deleted successfully"
-msgstr "Device deleted successfully"
-
-msgid "Device with emei "
-msgstr "Device with emei "
-
-msgid " can not be deleted since it has dependencies with a client"
-msgstr " can not be deleted since it has dependencies with a client"
 
 msgid "There are no devices"
 msgstr "There are no devices"
@@ -61,14 +47,8 @@ msgstr "Device IMEI number"
 msgid "Add the EMEI number as seen on the device"
 msgstr "Add the EMEI number as seen on the device"
 
-msgid "Device already exists!"
-msgstr "Device already exists!"
-
 msgid "Save"
 msgstr "Save"
-
-msgid "Devices updated successfully"
-msgstr "Devices updated successfully"
 
 msgid "Program Mapping"
 msgstr "Program Mapping"
@@ -76,8 +56,8 @@ msgstr "Program Mapping"
 msgid "Edit"
 msgstr "Edit"
 
-msgid "Mapped TB Program"
-msgstr "Mapped TB Program"
+msgid "Mapped Program"
+msgstr "Mapped Program"
 
 msgid "First Name"
 msgstr "First Name"
@@ -85,8 +65,8 @@ msgstr "First Name"
 msgid "Surname"
 msgstr "Surname"
 
-msgid "TB District Number"
-msgstr "TB District Number"
+msgid "Patient Number"
+msgstr "Patient Number"
 
 msgid "Age"
 msgstr "Age"
@@ -118,9 +98,6 @@ msgstr "Delete Regimen Setting"
 msgid "Are you sure you want to delete this regimen setting "
 msgstr "Are you sure you want to delete this regimen setting "
 
-msgid "Regimen deleted successfully"
-msgstr "Regimen deleted successfully"
-
 msgid "Regimen Setting Form"
 msgstr "Regimen Setting Form"
 
@@ -139,11 +116,11 @@ msgstr "Completion Minimum Doses"
 msgid "Completion Maximum Duration (Months)"
 msgstr "Completion Maximum Duration (Months)"
 
-msgid "Setting updated successfully"
-msgstr "Setting updated successfully"
-
 msgid "Regimens Settings not found"
 msgstr "Regimens Settings not found"
+
+msgid "Dashboards"
+msgstr "Dashboards"
 
 msgid "Excel"
 msgstr "Excel"
@@ -184,11 +161,8 @@ msgstr "The page you are looking for does not exist."
 msgid "Go to home page"
 msgstr "Go to home page"
 
-msgid "TB Adherence"
-msgstr "TB Adherence"
-
-msgid "Dashboards"
-msgstr "Dashboards"
+msgid "Treatment Adherence"
+msgstr "Treatment Adherence"
 
 msgid "Configuration"
 msgstr "Configuration"
@@ -229,9 +203,6 @@ msgstr "N/A"
 
 msgid "Dose Taken at"
 msgstr "Dose Taken at"
-
-msgid "Device Health"
-msgstr "Device Health"
 
 msgid "Battery Health"
 msgstr "Battery Health"
@@ -292,6 +263,9 @@ msgstr "Missing Dose Data"
 
 msgid "TB Client"
 msgstr "TB Client"
+
+msgid "TB District Number"
+msgstr "TB District Number"
 
 msgid "Name"
 msgstr "Name"

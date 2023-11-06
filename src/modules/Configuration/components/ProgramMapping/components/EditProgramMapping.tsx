@@ -29,8 +29,8 @@ interface EditProps {
 
 const schema = z.object({
 	program: z
-		.string({ required_error: "Mapped TB Program is required" })
-		.nonempty("Mapped TB Program is required"),
+		.string({ required_error: "Mapped Program is required" })
+		.nonempty("Mapped Program is required"),
 	programStage: z.string().optional(),
 	mediatorUrl: z
 		.string({ required_error: "Mediator Url is required" })
@@ -46,8 +46,8 @@ const schema = z.object({
 			.string({ required_error: "Surname attribute is required" })
 			.nonempty("Surname attribute is required"),
 		tbDistrictNumber: z
-			.string({ required_error: "TB District Number is required" })
-			.nonempty("TB District Number is required"),
+			.string({ required_error: "Patient Number is required" })
+			.nonempty("Patient Number is required"),
 		age: z
 			.string({ required_error: "Age attribute is required" })
 			.nonempty("Age attribute is required"),
@@ -96,7 +96,6 @@ function Edit({
 		});
 		setHide(true);
 		setImport(!importMeta);
-		console.log(data);
 	};
 
 	const onClose = () => {
@@ -140,7 +139,7 @@ function Edit({
 									required={true}
 									options={programOptions}
 									name="program"
-									label={i18n.t("Mapped TB Program")}
+									label={i18n.t("Mapped Program")}
 									type="select"
 								/>
 							</div>
@@ -167,7 +166,7 @@ function Edit({
 									options={attributeOptions}
 									required={true}
 									name="attributes.tbDistrictNumber"
-									label={i18n.t("TB District Number")}
+									label={i18n.t("Patient Number")}
 									type="select"
 								/>
 							</div>
@@ -229,7 +228,7 @@ function Edit({
 									required={true}
 									name="apiKey"
 									label={i18n.t("API Key")}
-									type="text"
+									type="password"
 								/>
 							</div>
 						</FormProvider>

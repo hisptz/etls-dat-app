@@ -236,7 +236,6 @@ export function FilterField({
 					onUpdate={async (val: any) => {
 						setPeriods(!periods);
 						onChange({ value: val });
-						console.log(val);
 					}}
 				/>
 			)}
