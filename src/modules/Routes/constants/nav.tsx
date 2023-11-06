@@ -4,7 +4,9 @@ import { Reports } from "../../Reports";
 
 import {
 	IconDashboardWindow24,
+	IconTable24,
 	IconSettings24,
+	IconVisualizationLinelist24,
 	IconVisualizationColumn24,
 } from "@dhis2/ui";
 import i18n from "@dhis2/d2-i18n";
@@ -35,7 +37,7 @@ export const ROUTES: NavItem[] = [
 		id: "treatment-adherence",
 		path: "treatment-adherence",
 		element: TreatmentAdherenceOutlet,
-		icon: IconVisualizationColumn24,
+		icon: IconTable24,
 		label: i18n.t("Treatment Adherence"),
 		subItems: [
 			{
@@ -69,7 +71,7 @@ export const ROUTES: NavItem[] = [
 		id: "reports",
 		path: "reports",
 		element: Reports,
-		icon: IconDashboardWindow24,
+		icon: IconVisualizationLinelist24,
 		label: i18n.t("Reports"),
 	},
 
