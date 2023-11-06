@@ -21,7 +21,7 @@ export const useDeviceData = (imei?: string) => {
 						},
 					},
 				);
-				setData(response.data);
+				setData(response?.data);
 				setLoading(false);
 			} catch (error) {
 				setError(error);
@@ -29,7 +29,7 @@ export const useDeviceData = (imei?: string) => {
 			}
 		};
 
-		if (imei) {
+		if (imei && imei !== "N/A") {
 			fetchData();
 		}
 	}, [imei]);
