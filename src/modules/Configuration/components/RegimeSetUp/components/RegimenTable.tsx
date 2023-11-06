@@ -114,9 +114,8 @@ export default function RegimenTable({
 							})}
 						/>
 
-						{!hide && (
-							<AddSetting data={selectedRegimen} index={index} />
-						)}
+						<AddSetting data={selectedRegimen} index={index} />
+
 						{!hideDel && (
 							<DeleteSetting regimen={selectedRegimen?.regimen} />
 						)}

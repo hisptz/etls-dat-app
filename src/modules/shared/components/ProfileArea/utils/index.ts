@@ -11,26 +11,30 @@ export const useDeviceData = (imei?: string) => {
 	const ApiKey = programMapping.apiKey;
 
 	useEffect(() => {
-		const fetchData = async () => {
-			try {
-				const response = await axios.get(
-					`${MediatorUrl}/api/devices/details?imei=${imei}`,
-					{
-						headers: {
-							"x-api-key": ApiKey,
+		if (imei != "N/A") {
+			const fetchData = async () => {
+				try {
+					const response = await axios.get(
+						`${MediatorUrl}/api/devices/details?imei=${imei}`,
+						{
+							headers: {
+								"x-api-key": ApiKey,
+							},
 						},
-					},
-				);
-				setData(response.data);
-				setLoading(false);
-			} catch (error) {
-				setError(error);
-				setLoading(false);
-			}
-		};
+					);
+					setData(response.data);
 
-		if (imei) {
+					setLoading(false);
+				} catch (error) {
+					setError(error);
+
+					setLoading(false);
+				}
+			};
+
 			fetchData();
+		} else {
+			setLoading(false);
 		}
 	}, [imei]);
 

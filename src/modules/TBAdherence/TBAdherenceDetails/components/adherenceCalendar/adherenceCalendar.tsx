@@ -11,10 +11,9 @@ import { useSetting } from "@dhis2/app-service-datastore";
 export interface ProfileAreaProps {
 	profile: PatientProfile;
 	data: any;
-	laoding: boolean;
 }
 
-function AdherenceCalendar({ profile, data, laoding }: ProfileAreaProps) {
+function AdherenceCalendar({ profile, data }: ProfileAreaProps) {
 	const [programMapping] = useSetting("programMapping", {
 		global: true,
 	});
