@@ -1,6 +1,7 @@
 import { useSetting } from "@dhis2/app-service-datastore";
 import axios from "axios";
 import { useState, useEffect } from "react";
+import { DATA_ELEMENTS } from "../../../constants";
 
 export const useDeviceData = (imei?: string) => {
 	const [programMapping] = useSetting("programMapping", { global: true });
@@ -11,26 +12,30 @@ export const useDeviceData = (imei?: string) => {
 	const ApiKey = programMapping.apiKey;
 
 	useEffect(() => {
-		const fetchData = async () => {
-			try {
-				const response = await axios.get(
-					`${MediatorUrl}/api/devices/details?imei=${imei}`,
-					{
-						headers: {
-							"x-api-key": ApiKey,
+		if (imei != "N/A") {
+			const fetchData = async () => {
+				try {
+					const response = await axios.get(
+						`${MediatorUrl}/api/devices/details?imei=${imei}`,
+						{
+							headers: {
+								"x-api-key": ApiKey,
+							},
 						},
-					},
-				);
-				setData(response?.data);
-				setLoading(false);
-			} catch (error) {
-				setError(error);
-				setLoading(false);
-			}
-		};
+					);
+					setData(response.data);
 
-		if (imei && imei !== "N/A") {
+					setLoading(false);
+				} catch (error) {
+					setError(error);
+
+					setLoading(false);
+				}
+			};
+
 			fetchData();
+		} else {
+			setLoading(false);
 		}
 	}, [imei]);
 
@@ -41,7 +46,10 @@ export const useAdherenceEvents = (data: any, programStage: string) => {
 	const filteredEvents = data
 		.filter((event: any) => event.programStage === programStage)
 		.map((event: any) => ({
-			dataValues: event.dataValues,
+			dataValues: event.dataValues.filter(
+				(value: any) =>
+					value.dataElement === DATA_ELEMENTS.DEVICE_SIGNAL,
+			),
 			occurredAt: event.occurredAt,
 		}));
 

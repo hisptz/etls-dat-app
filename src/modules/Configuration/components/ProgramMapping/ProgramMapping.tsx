@@ -61,7 +61,7 @@ export function ProgramMapping() {
 								className={styles["label-title"]}
 								htmlFor="name"
 							>
-								{i18n.t("Mapped TB Program:")}
+								{i18n.t("Mapped Program:")}
 							</label>
 							<label
 								className={styles["label-value"]}

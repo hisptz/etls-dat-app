@@ -29,8 +29,8 @@ interface EditProps {
 
 const schema = z.object({
 	program: z
-		.string({ required_error: "Mapped TB Program is required" })
-		.nonempty("Mapped TB Program is required"),
+		.string({ required_error: "Mapped Program is required" })
+		.nonempty("Mapped Program is required"),
 	programStage: z.string().optional(),
 	mediatorUrl: z
 		.string({ required_error: "Mediator Url is required" })
@@ -46,8 +46,8 @@ const schema = z.object({
 			.string({ required_error: "Surname attribute is required" })
 			.nonempty("Surname attribute is required"),
 		tbDistrictNumber: z
-			.string({ required_error: "TB District Number is required" })
-			.nonempty("TB District Number is required"),
+			.string({ required_error: "Patient Number is required" })
+			.nonempty("Patient Number is required"),
 		age: z
 			.string({ required_error: "Age attribute is required" })
 			.nonempty("Age attribute is required"),

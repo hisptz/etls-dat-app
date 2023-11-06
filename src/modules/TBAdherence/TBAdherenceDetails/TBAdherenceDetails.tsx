@@ -36,7 +36,7 @@ export function TBAdherenceDetails() {
 		},
 	];
 
-	if (loading && !patient) {
+	if ((loading && !patient) || loadingDevice) {
 		return <FullPageLoader />;
 	}
 
@@ -95,11 +95,7 @@ export function TBAdherenceDetails() {
 									);
 								})}
 							</div>
-							<AdherenceCalendar
-								profile={patient}
-								data={data}
-								laoding={loadingDevice}
-							/>
+							<AdherenceCalendar profile={patient} data={data} />
 						</div>
 					</Card>
 				</div>

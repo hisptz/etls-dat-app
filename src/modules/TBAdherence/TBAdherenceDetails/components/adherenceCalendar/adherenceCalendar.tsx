@@ -11,10 +11,9 @@ import { useSetting } from "@dhis2/app-service-datastore";
 export interface ProfileAreaProps {
 	profile: PatientProfile;
 	data: any;
-	laoding: boolean;
 }
 
-function AdherenceCalendar({ profile, data, laoding }: ProfileAreaProps) {
+function AdherenceCalendar({ profile, data }: ProfileAreaProps) {
 	const [programMapping] = useSetting("programMapping", {
 		global: true,
 	});
@@ -52,9 +51,9 @@ function AdherenceCalendar({ profile, data, laoding }: ProfileAreaProps) {
 		return {
 			date: DateTime.fromISO(item.occurredAt).toISODate(),
 			event:
-				item.dataValues[0].value == "Opened Once"
+				item.dataValues[0].value == "Once"
 					? "takenDose"
-					: item.dataValues[0].value == "Opened Multiple"
+					: item.dataValues[0].value == "Multiple"
 					? "takenDose"
 					: item.dataValues[0].value == "Heartbeat"
 					? "notTakenDose"
