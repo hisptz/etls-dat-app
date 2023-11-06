@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2023-11-03T07:36:34.373Z\n"
-"PO-Revision-Date: 2023-11-03T07:36:34.373Z\n"
+"POT-Creation-Date: 2023-11-06T07:45:32.715Z\n"
+"PO-Revision-Date: 2023-11-06T07:45:32.715Z\n"
 
 msgid "Configurations"
 msgstr "Configurations"
@@ -119,6 +119,9 @@ msgstr "Completion Maximum Duration (Months)"
 msgid "Regimens Settings not found"
 msgstr "Regimens Settings not found"
 
+msgid "Dashboards"
+msgstr "Dashboards"
+
 msgid "Excel"
 msgstr "Excel"
 
@@ -160,9 +163,6 @@ msgstr "Go to home page"
 
 msgid "Treatment Adherence"
 msgstr "Treatment Adherence"
-
-msgid "Dashboards"
-msgstr "Dashboards"
 
 msgid "Configuration"
 msgstr "Configuration"
