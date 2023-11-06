@@ -1,6 +1,6 @@
 const config = {
 	type: "app",
-	title: "Tanzania Treatment Adherence",
+	title: "Treatment Adherence",
 	entryPoints: {
 		app: "./src/App.tsx",
 	},
