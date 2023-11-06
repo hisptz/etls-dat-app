@@ -79,10 +79,7 @@ export function ProfileArea({
 								className="row"
 							>
 								<div>
-									<h2
-										className=" m-0"
-										style={{ marginBottom: "16px" }}
-									>
+									<h2 className=" m-0">
 										{i18n.t("Patient Summary")}
 									</h2>
 								</div>

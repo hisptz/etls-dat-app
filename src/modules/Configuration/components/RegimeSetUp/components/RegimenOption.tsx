@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { FilterField } from "../../ProgramMapping/components/FilterField";
 import { Option, useRegimens } from "../hooks/data";
 import i18n from "@dhis2/d2-i18n";
