@@ -83,7 +83,7 @@ export function ProfileArea({
 										className=" m-0"
 										style={{ marginBottom: "16px" }}
 									>
-										{i18n.t("TB Client")}
+										{i18n.t("Patient Summary")}
 									</h2>
 								</div>
 							</div>
@@ -95,7 +95,7 @@ export function ProfileArea({
 										className={styles["label-title"]}
 										htmlFor="name"
 									>
-										{i18n.t("TB District Number")}
+										{i18n.t("Patient Number")}
 									</label>
 									<label
 										className={styles["label-value"]}

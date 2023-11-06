@@ -54,9 +54,9 @@ export default function TBAdherenceTable({
 			return {
 				date: DateTime.fromISO(item.occurredAt).toISODate(),
 				event:
-					item.dataValues[0].value == "Opened Once"
+					item.dataValues[0].value == "Once"
 						? "takenDose"
-						: item.dataValues[0].value == "Opened Multiple"
+						: item.dataValues[0].value == "Multiple"
 						? "takenDose"
 						: item.dataValues[0].value == "Heartbeat"
 						? "notTakenDose"

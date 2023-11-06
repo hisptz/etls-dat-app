@@ -1,6 +1,7 @@
 import { useSetting } from "@dhis2/app-service-datastore";
 import axios from "axios";
 import { useState, useEffect } from "react";
+import { DATA_ELEMENTS } from "../../../constants";
 
 export const useDeviceData = (imei?: string) => {
 	const [programMapping] = useSetting("programMapping", { global: true });
@@ -45,7 +46,10 @@ export const useAdherenceEvents = (data: any, programStage: string) => {
 	const filteredEvents = data
 		.filter((event: any) => event.programStage === programStage)
 		.map((event: any) => ({
-			dataValues: event.dataValues,
+			dataValues: event.dataValues.filter(
+				(value: any) =>
+					value.dataElement === DATA_ELEMENTS.DEVICE_SIGNAL,
+			),
 			occurredAt: event.occurredAt,
 		}));
 
