@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import {
 	Button,
 	Modal,
@@ -8,17 +8,15 @@ import {
 	ButtonStrip,
 } from "@dhis2/ui";
 import i18n from "@dhis2/d2-i18n";
-import { useRecoilState } from "recoil";
 import { FilterField } from "../../ProgramMapping/components/FilterField";
-import { add, editRegimen } from "../state";
 import { useSetting } from "@dhis2/app-service-datastore";
 import { regimenSetting } from "../../../../shared/constants";
-import { Option, useRegimens } from "../hooks/data";
-import { isEmpty } from "lodash";
+import { Option } from "../hooks/data";
 import { FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useAlert } from "@dhis2/app-runtime";
+import RegimenOption from "./RegimenOption";
 
 const schema = z.object({
 	regimen: z
@@ -45,86 +43,47 @@ export type RegimenFormData = z.infer<typeof schema>;
 
 const AddSetting = ({
 	data,
-	index,
+	onHide,
+	hide,
 }: {
 	data?: RegimenFormData;
-	index?: number;
+	onHide: () => void;
+	hide: boolean;
 }) => {
-	const [hide, setHide] = useRecoilState<boolean>(editRegimen);
-	const [addNew, setAdd] = useRecoilState<boolean>(add);
+	const addNew = !data;
+	const administrationOptions: Option[] = [
+		{ name: "Daily", code: "Daily", id: "Daily", displayName: "Daily" },
+		{ name: "Weekly", code: "Weekly", id: "Weekly", displayName: "Weekly" },
+		{
+			name: "Monthly",
+			code: "Monthly",
+			id: "Monthly",
+			displayName: "Monthly",
+		},
+	];
 
 	const [settings, { set: addRegimen }] = useSetting("regimenSetting", {
 		global: true,
 	});
-	const [programMapping] = useSetting("programMapping", {
-		global: true,
-	});
 
-	const { regimenOptions, administrationOptions, loading, refetch } =
-		useRegimens();
-	const [availableRegimen, setAvailableRegimen] = useState<Option[]>();
-
-	const regimenOptionsArray = regimenOptions?.map((option) => option.code);
-
-	const filteredRegimenOptions = regimenOptionsArray?.filter((regimen) => {
-		return !settings.some(
-			(item: regimenSetting) => item.regimen === regimen,
-		);
-	});
 	const { show } = useAlert(
 		({ message }) => message,
 		({ type }) => ({ ...type, duration: 3000 }),
 	);
 
-	useEffect(() => {
-		if (!isEmpty(programMapping.attributes.regimen)) {
-			refetch();
-		}
-	}, []);
-
-	useEffect(() => {
-		if (!hide && !addNew) {
-			null;
-		} else {
-			onResetClick();
-		}
-
-		const transformedSettings: Option[] =
-			filteredRegimenOptions?.map((item: string) => {
-				return {
-					id: item,
-					name: item,
-					displayName: item,
-					code: item,
-				};
-			}) ?? [];
-
-		setAvailableRegimen(transformedSettings);
-	}, [hide, index]);
-
 	const onResetClick = async () => {
 		form.reset({});
+		onHide();
 	};
 
 	const onClose = async () => {
 		form.reset({});
-		setHide(true);
-		setAdd(false);
+		onHide();
 	};
-
-	const currentRegimen: Option[] = [
-		{
-			name: data?.regimen ?? "",
-			code: data?.regimen ?? "",
-			displayName: data?.regimen ?? "",
-			id: data?.regimen ?? "",
-		},
-	];
 
 	const updateRegimeSettingsAndShowSuccess = (updatedRegimen: any) => {
 		addRegimen(updatedRegimen);
-		setHide(true);
-		setAdd(false);
+
 		show({
 			message: "Setting Updated Successfully",
 			type: { success: true },
@@ -166,30 +125,11 @@ const AddSetting = ({
 	};
 
 	const form = useForm<RegimenFormData>({
-		defaultValues: async () => {
-			return new Promise((resolve) =>
-				resolve(
-					addNew
-						? {}
-						: {
-								regimen: currentRegimen[0].name,
-								idealDuration: data?.idealDuration,
-								idealDoses: data?.idealDoses,
-								completionMinimumDoses:
-									data?.completionMinimumDoses,
-								completionMaximumDuration:
-									data?.completionMaximumDuration,
-								administration: data?.administration,
-						  },
-				),
-			);
-		},
+		defaultValues: data,
 		resolver: zodResolver(schema),
 	});
 
-	return loading ? (
-		<></>
-	) : (
+	return (
 		<div>
 			<Modal position="middle" hide={hide} onClose={onClose}>
 				<ModalTitle>
@@ -204,17 +144,7 @@ const AddSetting = ({
 					<div>
 						<FormProvider {...form}>
 							<div style={{ padding: "5px" }}>
-								<FilterField
-									options={
-										addNew
-											? availableRegimen
-											: currentRegimen
-									}
-									label={i18n.t("Regimen")}
-									name="regimen"
-									type="select"
-									required
-								/>
+								<RegimenOption addNew={addNew} data={data} />
 							</div>
 							<div style={{ padding: "5px" }}>
 								<FilterField

@@ -1,5 +1,6 @@
 import { useSetting } from "@dhis2/app-service-datastore";
 import { useDataQuery } from "@dhis2/app-runtime";
+import { regimenSetting } from "../../../../shared/constants";
 
 const query = {
 	optionSet: {
@@ -28,28 +29,37 @@ interface QueryType {
 
 export function useRegimens() {
 	const [programMapping] = useSetting("programMapping", { global: true });
+	const [settings] = useSetting("regimenSetting", {
+		global: true,
+	});
 	const { data, loading, refetch, error } = useDataQuery<QueryType>(query, {
 		variables: {
 			optionsID: programMapping.attributes.regimen ?? "",
 		},
-		lazy: true,
+		lazy: !programMapping.attributes.regimen,
 	});
-	const administrationOptions: Option[] = [
-		{ name: "Daily", code: "Daily", id: "Daily", displayName: "Daily" },
-		{ name: "Weekly", code: "Weekly", id: "Weekly", displayName: "Weekly" },
-		{
-			name: "Monthly",
-			code: "Monthly",
-			id: "Monthly",
-			displayName: "Monthly",
-		},
-	];
+
+	const regimenOptions = data?.optionSet.optionSet.options;
+	const regimenOptionsArray = regimenOptions?.map((option) => option.code);
+	const filteredRegimenOptions = regimenOptionsArray?.filter((regimen) => {
+		return !settings.some(
+			(item: regimenSetting) => item.regimen === regimen,
+		);
+	});
+	const transformedSettings: Option[] =
+		filteredRegimenOptions?.map((item: string) => {
+			return {
+				id: item,
+				name: item,
+				displayName: item,
+				code: item,
+			};
+		}) ?? [];
 
 	return {
 		loading,
 		error,
 		refetch,
-		regimenOptions: data?.optionSet.optionSet.options,
-		administrationOptions,
+		regimenOptions: transformedSettings,
 	};
 }
