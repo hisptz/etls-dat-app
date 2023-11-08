@@ -1,4 +1,5 @@
 import { useSetting } from "@dhis2/app-service-datastore";
+import { Query } from "../interfaces";
 
 export const DATA_TEST_PREFIX = "d2-dat";
 export const DATASTORE_NAMESPACE = "hisptz-dat-app";
@@ -18,3 +19,12 @@ export const TEI_FIELDS = [
 	"attributes[*]",
 	"enrollments[orgUnitName,enrollment,enrolledAt,orgUnit,program,events[event,dataValues,programStage,enrollment,occurredAt,program,orgUnit]]",
 ];
+
+export const CURRENT_USER_QUERY: Query = {
+	me: {
+		resource: "me",
+		params: {
+			fields: "id,name,userGroups,organisationUnits[id,displayName,path]",
+		},
+	},
+};
