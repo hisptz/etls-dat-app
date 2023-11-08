@@ -2,7 +2,7 @@ import React from "react";
 import i18n from "@dhis2/d2-i18n";
 
 import { DATA_TEST_PREFIX } from "../shared/constants";
-
+import DashboardHeader from "./components/DashboardHeader";
 
 export function Dashboards() {
 	return (
@@ -13,6 +13,8 @@ export function Dashboards() {
 			<h1 className="m-0" style={{ marginBottom: "16px" }}>
 				{i18n.t("Dashboards")}
 			</h1>
+
+			<DashboardHeader />
 		</div>
 	);
 }
