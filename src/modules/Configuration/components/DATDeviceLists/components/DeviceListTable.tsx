@@ -67,7 +67,7 @@ export default function DeviceListTable({
 	}
 
 	return (
-		<div className="w-100 h-100" style={{ height: "69vh" }}>
+		<div className="w-100 h-100" style={{ height: "62vh" }}>
 			<div
 				className=" w-100 h-100 gap-16 column"
 				style={{ overflowY: "scroll" }}

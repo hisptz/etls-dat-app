@@ -2,21 +2,30 @@ import React, { useState } from "react";
 import { DropdownButton, FlyoutMenu, MenuItem } from "@dhis2/ui";
 import i18n from "@dhis2/d2-i18n";
 import { DATA_TEST_PREFIX } from "../../shared/constants";
-import { useReportTableData } from "../components/Table/hooks/data";
+import {
+	useDATDevices,
+	useReportTableData,
+} from "../components/Table/hooks/data";
+import { useSearchParams } from "react-router-dom";
 
 export default function Download({ enabled }: { enabled: boolean }) {
+	const [params] = useSearchParams();
+	const reportType = params.get("reportType");
 	const [downloadStateRef, setDownloadStateRef] = useState(false);
 	const { download, downloading } = useReportTableData();
+	const { downloadFile, downloadingDAT } = useDATDevices();
 	const onDownloadClick = (type: "xlsx" | "json" | "csv") => () => {
 		setDownloadStateRef(false);
-		download(type);
+		reportType === "dat-device-summary-report"
+			? downloadFile(type)
+			: download(type);
 	};
 
 	return (
 		<DropdownButton
 			dataTest={`${DATA_TEST_PREFIX}-${"download"}`}
 			disabled={!enabled}
-			loading={downloading}
+			loading={downloading || downloadingDAT}
 			onClick={() => setDownloadStateRef((prevState) => !prevState)}
 			open={downloadStateRef}
 			component={

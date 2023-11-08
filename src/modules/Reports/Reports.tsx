@@ -3,8 +3,11 @@ import React, { useEffect, useState } from "react";
 import i18n from "@dhis2/d2-i18n";
 import { Outlet, useSearchParams } from "react-router-dom";
 import { isEmpty } from "lodash";
-import { useReportTableData } from "./components/Table/hooks/data";
-import ReportTable from "./components/Table";
+import {
+	useDATDevices,
+	useReportTableData,
+} from "./components/Table/hooks/data";
+import { ReportTable, DATDeviceReportTable } from "./components/Table";
 import FilterArea from "./components/Table/FilterArea";
 import { PeriodUtility } from "@hisptz/dhis2-utils";
 import { DateTime } from "luxon";
@@ -19,6 +22,7 @@ export function Reports() {
 	const period = params.get("periods");
 	const orgUnit = params.get("ou");
 	const { reports, pagination, loading, refetch } = useReportTableData();
+	const { data, loadingDevice } = useDATDevices();
 	const [enabled, setenabled] = useState<boolean>(false);
 	const periods = PeriodUtility.getPeriodById(
 		!isEmpty(period) ? period : "TODAY",
@@ -29,16 +33,20 @@ export function Reports() {
 	const endDate = e.toFormat("yyyy-MM-dd");
 
 	useEffect(() => {
-		if (!isEmpty(reportType && period && orgUnit)) {
-			setenabled(true);
-			refetch({
-				page: 1,
-				orgUnit,
-				startDate,
-				endDate,
-			});
+		if (reportType != "dat-device-summary-report") {
+			if (!isEmpty(reportType && period && orgUnit)) {
+				refetch({
+					page: 1,
+					orgUnit,
+					startDate,
+					endDate,
+				});
+				setenabled(true);
+			} else {
+				setenabled(false);
+			}
 		} else {
-			setenabled(false);
+			setenabled(true);
 		}
 	}, [reportType, orgUnit, period]);
 
@@ -54,11 +62,19 @@ export function Reports() {
 			<div>
 				{enabled ? (
 					<div className="flex-1">
-						<ReportTable
-							reports={reports}
-							pagination={pagination}
-							loading={loading}
-						/>
+						{reportType != "dat-device-summary-report" ? (
+							<ReportTable
+								reports={reports}
+								pagination={pagination}
+								loading={loading}
+							/>
+						) : (
+							<DATDeviceReportTable
+								data={data}
+								loadingDevices={loadingDevice}
+								pagination={null}
+							/>
+						)}
 					</div>
 				) : (
 					<div
