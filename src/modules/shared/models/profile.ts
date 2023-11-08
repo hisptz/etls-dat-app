@@ -2,8 +2,9 @@ import { TrackedEntityModel } from "./trackedEntityModel";
 import { programMapping, regimenSetting } from "../constants";
 import { DatDeviceInfoEventModel } from "./datDeviceInfo";
 import { TrackedEntity } from "../types";
-import { filter, head } from "lodash";
+import { filter, head, isEmpty } from "lodash";
 import { DateTime } from "luxon";
+import { useAdherenceEvents } from "../components/ProfileArea/utils";
 
 export class PatientProfile extends TrackedEntityModel {
 	programMapping?: programMapping;
@@ -111,19 +112,7 @@ export class PatientProfile extends TrackedEntityModel {
 
 	get deviceSignal() {
 		const signal = this.datDeviceInfoEvent?.deviceInfo.deviceSignal;
-		if (signal == "Opened Once" || signal == "Opened Multiple") {
-			return {
-				date: "2023-08-07",
-				event: "takenDose",
-			};
-		}
-		if (signal == "None" || signal == "Heartbeat") {
-			return {
-				date: "2023-08-08",
-				event: "notTakenDose",
-			};
-		}
-		return { date: "", event: "" };
+		return signal;
 	}
 
 	get tableData(): Record<string, any> {
@@ -141,6 +130,44 @@ export class PatientProfile extends TrackedEntityModel {
 		const enrollmentDate = this.enrollmentDate;
 		const deviceSignal = this.deviceSignal;
 
+		const { filteredEvents } = useAdherenceEvents(
+			this.events,
+			this.programStageID ?? "",
+		);
+
+		const MissedDoses = filteredEvents.filter((item: any) => {
+			return item.dataValues.some(
+				(dataValue: any) => dataValue.value === "Heartbeat",
+			);
+		});
+
+		const numberOfMissedDoses = MissedDoses.length;
+
+		const takenDoses = filteredEvents.filter((item: any) => {
+			return item.dataValues.some((dataValue: any) => {
+				const value = dataValue.value;
+				return value === "Once" || value === "Multiple";
+			});
+		});
+
+		const percentage = !isEmpty(this.regimenSettings)
+			? this.regimenSettings.map((option: regimenSetting) => {
+					if (option.administration == this.adherenceFrequency) {
+						return (
+							(
+								(takenDoses.length /
+									parseInt(option.idealDoses)) *
+								100
+							).toFixed(2) + "%"
+						);
+					} else {
+						return "N/A";
+					}
+			  })
+			: "N/A";
+
+		const adherencePercentage = percentage != "N/A" ? percentage[0] : "N/A";
+
 		return {
 			id: this.id as string,
 			tbDistrictNumber,
@@ -156,6 +183,8 @@ export class PatientProfile extends TrackedEntityModel {
 			dosageTime,
 			enrollmentDate,
 			deviceSignal,
+			adherencePercentage,
+			numberOfMissedDoses,
 		};
 	}
 

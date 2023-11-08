@@ -7,7 +7,7 @@ import {
 	useDATDevices,
 	useReportTableData,
 } from "./components/Table/hooks/data";
-import { ReportTable, DATDeviceReportTable } from "./components/Table";
+import ReportTable from "./components/Table";
 import FilterArea from "./components/Table/FilterArea";
 import { PeriodUtility } from "@hisptz/dhis2-utils";
 import { DateTime } from "luxon";
@@ -62,19 +62,13 @@ export function Reports() {
 			<div>
 				{enabled ? (
 					<div className="flex-1">
-						{reportType != "dat-device-summary-report" ? (
-							<ReportTable
-								reports={reports}
-								pagination={pagination}
-								loading={loading}
-							/>
-						) : (
-							<DATDeviceReportTable
-								data={data}
-								loadingDevices={loadingDevice}
-								pagination={null}
-							/>
-						)}
+						<ReportTable
+							reports={reports}
+							pagination={pagination}
+							loading={loading}
+							data={data}
+							loadingDevices={loadingDevice}
+						/>
 					</div>
 				) : (
 					<div

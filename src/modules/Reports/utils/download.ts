@@ -94,7 +94,7 @@ export function useDownloadData({
 }) {
 	const { show, hide } = useAlert(
 		({ message }) => message,
-		({ type }) => ({ ...type, duration: 10000 }),
+		({ type }) => ({ ...type, duration: 50000 }),
 	);
 
 	const [downloading, setDownloading] = useState(false);
