@@ -6,8 +6,6 @@ import FilterButton from "../FilterButton";
 export default function DashboardHeader(): React.ReactElement {
 	const [filter, setFilter] = useRecoilState(DashboardFilterState);
 
-	console.log({ filter });
-
 	return (
 		<>
 			<div>

@@ -3,6 +3,7 @@ import i18n from "@dhis2/d2-i18n";
 
 import { DATA_TEST_PREFIX } from "../shared/constants";
 import DashboardHeader from "./components/DashboardHeader";
+import DashboardContainer from "./components/DashboardContainer";
 
 export function Dashboards() {
 	return (
@@ -15,6 +16,8 @@ export function Dashboards() {
 			</h1>
 
 			<DashboardHeader />
+
+			<DashboardContainer />
 		</div>
 	);
 }

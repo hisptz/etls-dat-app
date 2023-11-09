@@ -2,7 +2,7 @@ import { atom, selector } from "recoil";
 import { CurrentUserSelector } from "../../shared/state/currentUser";
 import { DimensionFilter } from "../../shared/interfaces";
 
-export const DefaultDashboardFilter = selector({
+export const DefaultDashboardFilter = selector<DimensionFilter>({
 	key: "default-dashboard-filters",
 	get: async ({ get }) => {
 		const currentUser = await get(CurrentUserSelector);
