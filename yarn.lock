@@ -3517,6 +3517,11 @@
   resolved "https://registry.yarnpkg.com/@types/aria-query/-/aria-query-5.0.2.tgz#6f1225829d89794fd9f891989c9ce667422d7f64"
   integrity sha512-PHKZuMN+K5qgKIWhBodXzQslTo5P+K/6LqeKXS6O/4liIDdZqaX5RXrCK++LAw+y/nptN48YmUMFiQHRSWYwtQ==
 
+"@types/async@^3.2.23":
+  version "3.2.23"
+  resolved "https://registry.yarnpkg.com/@types/async/-/async-3.2.23.tgz#41d0b8dfae811c4a91f17c14be19a8fe6eef6294"
+  integrity sha512-/sDXs+HxCtt4/duO0AZFHs+ydQYHzd3qUybEFb+juRWQJNCFj3sYbqM2ABjWi8m7J93KXdJvIbDiARzqqIEESw==
+
 "@types/babel__core@^7.0.0", "@types/babel__core@^7.1.14":
   version "7.20.2"
   resolved "https://registry.yarnpkg.com/@types/babel__core/-/babel__core-7.20.2.tgz#215db4f4a35d710256579784a548907237728756"
@@ -4702,10 +4707,10 @@ astral-regex@^2.0.0:
   resolved "https://registry.yarnpkg.com/astral-regex/-/astral-regex-2.0.0.tgz#483143c567aeed4785759c0865786dc77d7d2e31"
   integrity sha512-Z7tMw1ytTXt5jqMcOP+OQteU1VuNK9Y02uuJtKQ1Sv69jXQKKg5cibLwGJow8yzZP+eAc18EmLGPal0bp36rvQ==
 
-async-es@^3.2.4:
-  version "3.2.4"
-  resolved "https://registry.yarnpkg.com/async-es/-/async-es-3.2.4.tgz#92b1a15d575c9847f232be729cbfdae188013162"
-  integrity sha512-GFHAAfmW7GzEiHFR6DvE5WMm6+js9pb+RLm+m1UpsyMX+I4j/R4QVw2Te664q+fvDVOz7Y0bORPDNvQS7BJ3Hw==
+async-es@^3.2.5:
+  version "3.2.5"
+  resolved "https://registry.yarnpkg.com/async-es/-/async-es-3.2.5.tgz#d5855ba36ed87c528e3fad6c3567831ad628ba99"
+  integrity sha512-oXGVkIf1wSg34CtmK7js8brsxUZWwMGjNa63YJFY+fDHb6RQQd7N0d7N2yP53VaqvXh5DTPuOl0hH+vDFKPHuQ==
 
 async@^2.6.3:
   version "2.6.4"
