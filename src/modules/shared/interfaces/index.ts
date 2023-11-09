@@ -1,5 +1,15 @@
 import { OrgUnitSelection } from "@hisptz/dhis2-utils";
 
+export interface DashboardItem {
+	id: string;
+	span: number;
+	type: "visualization" | "custom";
+	options?: {
+		renderAs?: "singleValue" | "progress" | "pie";
+		title: string;
+	};
+}
+
 export interface DimensionFilter {
 	orgUnit?: OrgUnitSelection;
 	periods?: any[];

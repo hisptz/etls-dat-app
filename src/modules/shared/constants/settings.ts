@@ -1,3 +1,5 @@
+import { DashboardItem } from "../interfaces";
+
 export interface TBAdherenceConfig {
 	key: string;
 	label: string;
@@ -168,6 +170,36 @@ export const TBAdherence: TBAdherenceConfig[] = [
 	},
 ];
 
+export const dashboards: DashboardItem[] = [
+	{
+		id: "device-usage",
+		span: 3,
+		type: "custom",
+		options: {
+			renderAs: "singleValue",
+			title: "Devices Usage Summary",
+		},
+	},
+	{
+		id: "adherence-percentage",
+		span: 1,
+		type: "custom",
+		options: {
+			renderAs: "progress",
+			title: "Realtime Adherence Percentage",
+		},
+	},
+	{
+		id: "dat-enrollment",
+		span: 2,
+		type: "custom",
+		options: {
+			renderAs: "pie",
+			title: "Patients Enrolled into DAT",
+		},
+	},
+];
+
 export const deviceEmeiList: deviceEmeiList[] = [];
 
 export const regimenSetting: regimenSetting[] = [];
@@ -181,6 +213,7 @@ export const DEFAULT_SETTINGS = {
 	deviceEmeiList,
 	regimenSetting,
 	reports,
+	dashboards,
 } as const;
 
 export const IN_APP_SETTINGS = {};
