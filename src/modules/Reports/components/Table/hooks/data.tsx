@@ -18,6 +18,8 @@ import { DateTime } from "luxon";
 import { PeriodUtility } from "@hisptz/dhis2-utils";
 import axios from "axios";
 import { saveAs } from "file-saver";
+import { useRecoilState } from "recoil";
+import { SelectedReport } from "../FilterArea/components/FilterField";
 
 const query: any = {
 	reports: {
@@ -238,12 +240,14 @@ export function useReportTableData() {
 
 export const useDATDevices = () => {
 	const [programMapping] = useSetting("programMapping", { global: true });
+	const [report] = useRecoilState<ReportConfig>(SelectedReport);
 	const [data, setData] = useState<any>();
 	const [errorDevice, setError] = useState<any>();
 	const [loadingDevice, setLoading] = useState(true);
 	const MediatorUrl = programMapping.mediatorUrl;
 	const ApiKey = programMapping.apiKey;
 	const [downloadingDAT, setDownloading] = useState(false);
+
 	const { show, hide } = useAlert(
 		({ message }) => message,
 		({ type }) => ({ ...type, duration: 1500 }),
@@ -285,14 +289,14 @@ export const useDATDevices = () => {
 							type: "json",
 						},
 					),
-					"DAT Device Summary Report.json",
+					`${report.name}.json`,
 				);
 			} else if (type === "xlsx") {
 				const excel = await import("xlsx");
 				const workbook = excel.utils.book_new();
 				const worksheet = excel.utils.json_to_sheet(data.devices);
 				excel.utils.book_append_sheet(workbook, worksheet, "data");
-				excel.writeFile(workbook, "DAT Device Summary Report.xlsx");
+				excel.writeFile(workbook, `${report.name}.xlsx`);
 			} else if (type === "csv") {
 				const excel = await import("xlsx");
 				const worksheet = excel.utils.json_to_sheet(data.devices);
@@ -301,7 +305,7 @@ export const useDATDevices = () => {
 					new File([csvData], "data.csv", {
 						type: "csv",
 					}),
-					"DAT Device Summary Report.csv",
+					`${report.name}.csv`,
 				);
 			}
 			show({

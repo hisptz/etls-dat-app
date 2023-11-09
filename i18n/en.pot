@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2023-11-06T12:19:59.356Z\n"
-"PO-Revision-Date: 2023-11-06T12:19:59.356Z\n"
+"POT-Creation-Date: 2023-11-09T05:25:07.457Z\n"
+"PO-Revision-Date: 2023-11-09T05:25:07.457Z\n"
 
 msgid "Configurations"
 msgstr "Configurations"
@@ -146,11 +146,11 @@ msgstr "Loading..."
 msgid "Report Types"
 msgstr "Report Types"
 
-msgid "There is no report data for the selected filters"
-msgstr "There is no report data for the selected filters"
-
 msgid "Downloading..."
 msgstr "Downloading..."
+
+msgid "There is no report data for the selected filters"
+msgstr "There is no report data for the selected filters"
 
 msgid "Something went wrong"
 msgstr "Something went wrong"

@@ -36,7 +36,14 @@ export function ProfileArea({
 		programMapping.programStage,
 	);
 
-	const totalOpenings = filteredEvents.length;
+	const takenDoses = filteredEvents.filter((item: any) => {
+		return item.dataValues.some((dataValue: any) => {
+			const value = dataValue.value;
+			return value === "Once" || value === "Multiple";
+		});
+	});
+
+	const totalOpenings = takenDoses.length;
 
 	const refillAlarm =
 		DateTime.fromFormat(

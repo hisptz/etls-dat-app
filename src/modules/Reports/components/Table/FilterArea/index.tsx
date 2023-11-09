@@ -1,11 +1,11 @@
 import React from "react";
 import i18n from "@dhis2/d2-i18n";
-import { FilterField } from "./components/FilterField";
-import { useSearchParams } from "react-router-dom";
+import { FilterField, SelectedReport } from "./components/FilterField";
+import { useRecoilState } from "recoil";
+import { ReportConfig } from "../../../../shared/constants";
 
 export default function FilterArea() {
-	const [params] = useSearchParams();
-	const reportType = params.get("reportType");
+	const [report] = useRecoilState<ReportConfig>(SelectedReport);
 	return (
 		<div
 			style={{
@@ -15,22 +15,26 @@ export default function FilterArea() {
 				borderBottom: "2px solid #d8e0e7",
 			}}
 		>
-			<FilterField name="reportType" label="Report" type="report" />
+			<FilterField
+				name="reportType"
+				label={i18n.t("Report")}
+				type="report"
+			/>
 
-			{reportType == "dat-device-summary-report" ? null : (
-				<>
-					<FilterField
-						name="ou"
-						label="Organisation units"
-						type="organisation units"
-					/>
-					<FilterField
-						name="periods"
-						label="Periods"
-						type="periods"
-					/>
-				</>
-			)}
+			{report.filters.includes("ou") ? (
+				<FilterField
+					name="ou"
+					label={i18n.t("Organisation units")}
+					type="organisation units"
+				/>
+			) : null}
+			{report.filters.includes("pe") ? (
+				<FilterField
+					name="periods"
+					label={i18n.t("Periods")}
+					type="periods"
+				/>
+			) : null}
 		</div>
 	);
 }

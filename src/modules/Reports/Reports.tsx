@@ -1,4 +1,4 @@
-import { DATA_TEST_PREFIX } from "../shared/constants";
+import { DATA_TEST_PREFIX, ReportConfig } from "../shared/constants";
 import React, { useEffect, useState } from "react";
 import i18n from "@dhis2/d2-i18n";
 import { Outlet, useSearchParams } from "react-router-dom";
@@ -11,6 +11,8 @@ import ReportTable from "./components/Table";
 import FilterArea from "./components/Table/FilterArea";
 import { PeriodUtility } from "@hisptz/dhis2-utils";
 import { DateTime } from "luxon";
+import { SelectedReport } from "./components/Table/FilterArea/components/FilterField";
+import { useRecoilState } from "recoil";
 
 export function ReportsOutlet() {
 	return <Outlet />;
@@ -24,6 +26,7 @@ export function Reports() {
 	const { reports, pagination, loading, refetch } = useReportTableData();
 	const { data, loadingDevice } = useDATDevices();
 	const [enabled, setenabled] = useState<boolean>(false);
+	const [report] = useRecoilState<ReportConfig>(SelectedReport);
 	const periods = PeriodUtility.getPeriodById(
 		!isEmpty(period) ? period : "TODAY",
 	);
@@ -52,7 +55,7 @@ export function Reports() {
 
 	return (
 		<div
-			className="column gap-32 p-16 h-100 w-100"
+			className="column gap-16 p-16 h-100 w-100"
 			data-test={`${DATA_TEST_PREFIX}-reports-container`}
 		>
 			<h1 className="m-0" style={{ marginBottom: "16px" }}>
@@ -81,7 +84,12 @@ export function Reports() {
 						}}
 					>
 						{i18n.t(
-							"Select type of report, organisation unit and periods above to get started!",
+							`Select type of report ${
+								report.name !== "DAT Device Summary Report" &&
+								report.name !== ""
+									? ", organisation unit and periods above to get started!"
+									: ""
+							}`,
 						)}
 					</div>
 				)}

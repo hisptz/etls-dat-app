@@ -37,6 +37,7 @@ export interface programMapping {
 export interface ReportConfig {
 	name: string;
 	id: string;
+	filters: string[];
 	columns: Array<{
 		key: string;
 		label: string;
@@ -48,6 +49,7 @@ export const reports: ReportConfig[] = [
 	{
 		name: "TB Adherence Report",
 		id: "tb-adherence-report",
+		filters: ["ou", "pe"],
 		columns: [
 			{
 				key: "tbIdentificationNumber",
@@ -79,6 +81,7 @@ export const reports: ReportConfig[] = [
 	{
 		name: "DAT Device Summary Report",
 		id: "dat-device-summary-report",
+		filters: [],
 		columns: [
 			{
 				key: "deviceIMEINumber",
@@ -110,6 +113,7 @@ export const reports: ReportConfig[] = [
 	{
 		name: "Patients Who Missed Doses",
 		id: "patients-who-missed-doses",
+		filters: ["ou", "pe"],
 		columns: [
 			{
 				key: "tbIdentificationNumber",
