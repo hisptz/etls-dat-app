@@ -12,23 +12,28 @@ import {
 } from "../constants";
 import { PeriodUtility, TrackedEntityInstance } from "@hisptz/dhis2-utils";
 import { useSetting } from "@dhis2/app-service-datastore";
-import { OrganisationUnit } from "../../shared/types";
+import { getDhis2FormattedDate } from "../../shared/utils";
 
 export function useDefaultDashboardData() {
 	const [loading, setLoading] = useState<boolean>(false);
 	const [error, setError] = useState<any>(null);
-	const [teis, setTeis] = useState<TrackedEntityInstance[]>();
 	const engine = useDataEngine();
 	const controller = new AbortController();
 	const { orgUnit: selectedOrgUnits, periods: selectedPeriods } =
 		useRecoilValue(DashboardFilterState);
-	const [programMapping] = useSetting("programMapping");
+	const [programMapping] = useSetting("programMapping", { global: true });
 
 	const { start: startDate, end: endDate } = PeriodUtility.getPeriodById(
-		head(selectedPeriods) ?? "",
+		head(selectedPeriods),
 	);
+	const ou = head(selectedOrgUnits?.orgUnits)?.id ?? "";
 
-	const ou = head<OrganisationUnit>(selectedOrgUnits.orgUnits)?.id ?? "";
+	const queryParams = {
+		program: programMapping?.program ?? "",
+		ou,
+		startDate: getDhis2FormattedDate(startDate),
+		endDate: getDhis2FormattedDate(endDate),
+	};
 
 	const getTrackedEntityInstancePages = (totalItems: number): number[] => {
 		let pages: number[] = [];
@@ -49,11 +54,8 @@ export function useDefaultDashboardData() {
 		try {
 			const data = await engine.query(TRACKED_ENTITY_INSTANCE_QUERY, {
 				variables: {
-					ou,
-					program: programMapping?.program ?? "",
+					...queryParams,
 					page,
-					startDate,
-					endDate,
 				},
 				signal: controller.signal,
 			});
@@ -74,16 +76,12 @@ export function useDefaultDashboardData() {
 	useEffect(() => {
 		async function getDefaultDashboardData() {
 			setLoading(true);
+			setError(null);
 
 			try {
 				await engine
 					.query(TRACKED_ENTITY_INSTANCE_PAGINATION_QUERY, {
-						variables: {
-							program: programMapping?.program ?? "",
-							ou,
-							startDate,
-							endDate,
-						},
+						variables: queryParams,
 					})
 					.then(
 						async (data: any) => {
@@ -91,8 +89,6 @@ export function useDefaultDashboardData() {
 							const totalPages = getTrackedEntityInstancePages(
 								pager.total ?? 0,
 							);
-
-							console.log({ pager, totalPages });
 							let trackedEntityInstances = await mapLimit(
 								totalPages,
 								5,
@@ -105,19 +101,15 @@ export function useDefaultDashboardData() {
 							trackedEntityInstances = flattenDeep(
 								trackedEntityInstances,
 							);
-
-							setTeis(
-								trackedEntityInstances as TrackedEntityInstance[],
-							);
 						},
 						(error) => {
-							console.log(error);
-							console.log(error);
+							console.log(`pagination: ${error?.toString()}`);
+							setError(error?.toString());
 						},
 					);
 			} catch (error) {
-				console.log(error);
-				setError(error);
+				console.log(`pagination: ${error?.toString()}`);
+				setError(error?.toString());
 				setLoading(false);
 			} finally {
 				setLoading(false);
@@ -135,6 +127,5 @@ export function useDefaultDashboardData() {
 	return {
 		loading,
 		error,
-		trackedEntityInstances: teis,
 	};
 }

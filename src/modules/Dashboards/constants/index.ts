@@ -17,7 +17,7 @@ export const TRACKED_ENTITY_INSTANCE_QUERY = {
 				"orgUnit",
 				"created",
 				"attributes[attribute,value]",
-				"enrollments[enrollmentDate,orgUnitName,events[event,eventDate]]",
+				"enrollments[enrollmentDate,orgUnitName,events[event,eventDate,programStage,dataValues[dataElement,value]]]",
 			],
 		}),
 	},
