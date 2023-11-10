@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2023-11-09T05:25:07.457Z\n"
-"PO-Revision-Date: 2023-11-09T05:25:07.457Z\n"
+"POT-Creation-Date: 2023-11-09T12:38:14.989Z\n"
+"PO-Revision-Date: 2023-11-09T12:38:14.989Z\n"
 
 msgid "Configurations"
 msgstr "Configurations"
@@ -137,14 +137,20 @@ msgstr "Download"
 msgid "Reports"
 msgstr "Reports"
 
-msgid "Select type of report, organisation unit and periods above to get started!"
-msgstr "Select type of report, organisation unit and periods above to get started!"
-
 msgid "Loading..."
 msgstr "Loading..."
 
 msgid "Report Types"
 msgstr "Report Types"
+
+msgid "Report"
+msgstr "Report"
+
+msgid "Organisation units"
+msgstr "Organisation units"
+
+msgid "Periods"
+msgstr "Periods"
 
 msgid "Downloading..."
 msgstr "Downloading..."

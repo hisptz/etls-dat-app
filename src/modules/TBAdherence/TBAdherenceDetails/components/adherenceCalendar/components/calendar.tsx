@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import styles from "./calendar.module.css";
 import i18n from "@dhis2/d2-i18n";
 import { IconChevronRight24, IconChevronLeft24 } from "@dhis2/ui";
+import { DateTime } from "luxon";
 
 export interface DateEvent {
 	date: string;
@@ -11,7 +12,7 @@ export interface DateEvent {
 interface CalendarProps {
 	events: DateEvent[];
 	frequency: "Daily" | "Weekly" | "Monthly" | string;
-	onClick: ({ date, event }: { date: Date; event: string }) => void;
+	onClick: ({ date, event }: { date: string; event: string }) => void;
 }
 
 function Calendar({ events, frequency, onClick }: CalendarProps) {
@@ -24,25 +25,30 @@ function Calendar({ events, frequency, onClick }: CalendarProps) {
 	const year = new Date().getFullYear();
 
 	useEffect(() => {
-		let targetDate: Date | null = null;
+		let targetDate: string | null = null;
 		let targetColor = "";
 
 		switch (frequency) {
 			case "Daily":
-				targetDate = new Date();
+				targetDate = DateTime.fromJSDate(new Date()).toISO();
 				targetColor = getCellColor(
-					new Date().toISOString().split("T")[0],
-				);
+					DateTime.fromJSDate(new Date()).toISODate(),
+				)[0];
 				break;
 			case "Weekly":
 				const startDateW = new Date(year, month, 1);
 				const endDateW = new Date(year, month, 7);
 				events.forEach((event) => {
 					const eventDate = new Date(event.date);
-					if (eventDate >= startDateW && eventDate <= endDateW) {
+					if (
+						DateTime.fromJSDate(eventDate) >=
+							DateTime.fromJSDate(startDateW) &&
+						DateTime.fromJSDate(eventDate) <=
+							DateTime.fromJSDate(endDateW)
+					) {
 						targetColor = cellColors[event.event];
 						if (targetDate === null) {
-							targetDate = new Date(event.date);
+							targetDate = event.date;
 						}
 					}
 				});
@@ -52,10 +58,15 @@ function Calendar({ events, frequency, onClick }: CalendarProps) {
 				const endDateM = new Date(year, month + 1, 0);
 				events.forEach((event) => {
 					const eventDate = new Date(event.date);
-					if (eventDate >= startDateM && eventDate <= endDateM) {
+					if (
+						DateTime.fromJSDate(eventDate) >=
+							DateTime.fromJSDate(startDateM) &&
+						DateTime.fromJSDate(eventDate) <=
+							DateTime.fromJSDate(endDateM)
+					) {
 						if (targetDate === null) {
-							targetDate = new Date(event.date);
-							targetColor = cellColors[event.event];
+							(targetDate = event.date),
+								(targetColor = cellColors[event.event]);
 						}
 					}
 				});
@@ -70,8 +81,13 @@ function Calendar({ events, frequency, onClick }: CalendarProps) {
 	}, []);
 
 	const getCellColor = (date: any) => {
-		const event = events.find((event) => event.date === date);
-		return event ? cellColors[event.event] : "";
+		let dateTime;
+		const event = events.find((event) => {
+			const eventDate = DateTime.fromISO(event.date).toISODate();
+			dateTime = event.date;
+			return eventDate === date;
+		});
+		return event ? [cellColors[event.event], dateTime] : "";
 	};
 
 	const [currentMonth, setCurrentMonth] = useState(month);
@@ -92,7 +108,7 @@ function Calendar({ events, frequency, onClick }: CalendarProps) {
 		));
 	};
 
-	const showDetails = (date: Date, event: string) => {
+	const showDetails = (date: string, event: string) => {
 		onClick({ date, event });
 	};
 
@@ -125,19 +141,21 @@ function Calendar({ events, frequency, onClick }: CalendarProps) {
 		}
 
 		for (let i = 1; i <= numDays; i++) {
-			const currentDate = new Date(currentYear, currentMonth, i + 1);
+			const currentDate = new Date(currentYear, currentMonth, i);
 			const cellColor = getCellColor(
-				currentDate.toISOString().split("T")[0],
+				DateTime.fromJSDate(currentDate).toISODate(),
 			);
 			const date = new Date(currentYear, currentMonth, i);
 			calendarCells.push(
 				<div
 					key={i}
-					className={`${styles["calendar-cell"]} ${styles[cellColor]}`}
+					className={`${styles["calendar-cell"]} ${
+						styles[cellColor[0]]
+					}`}
 					style={{ fontSize: "18px" }}
 					onClick={() => {
 						if (cellColor) {
-							showDetails(date, cellColor);
+							showDetails(cellColor[1], cellColor[0]);
 						}
 					}}
 				>
@@ -182,7 +200,12 @@ function Calendar({ events, frequency, onClick }: CalendarProps) {
 
 			for (const event of events) {
 				const eventDate = new Date(event.date);
-				if (eventDate >= startDate && eventDate <= endDate) {
+				if (
+					DateTime.fromJSDate(eventDate) >=
+						DateTime.fromJSDate(startDate) &&
+					DateTime.fromJSDate(eventDate) <=
+						DateTime.fromJSDate(endDate)
+				) {
 					weekColor = cellColors[event.event];
 					break;
 				}
@@ -195,7 +218,7 @@ function Calendar({ events, frequency, onClick }: CalendarProps) {
 					style={{ fontSize: "18px" }}
 					onClick={() => {
 						if (weekColor) {
-							let date: Date | null = null;
+							let date: string | null = null;
 							events.map((event) => {
 								const eventDate = new Date(event.date);
 								if (
@@ -203,7 +226,7 @@ function Calendar({ events, frequency, onClick }: CalendarProps) {
 									eventDate <= endDate
 								) {
 									if (date == null) {
-										date = new Date(event.date);
+										date = event.date;
 									}
 								}
 							});
@@ -231,7 +254,12 @@ function Calendar({ events, frequency, onClick }: CalendarProps) {
 
 			for (const event of events) {
 				const eventDate = new Date(event.date);
-				if (eventDate >= startDate && eventDate <= endDate) {
+				if (
+					DateTime.fromJSDate(eventDate) >=
+						DateTime.fromJSDate(startDate) &&
+					DateTime.fromJSDate(eventDate) <=
+						DateTime.fromJSDate(endDate)
+				) {
 					monthColor = cellColors[event.event];
 					break;
 				}
@@ -244,7 +272,7 @@ function Calendar({ events, frequency, onClick }: CalendarProps) {
 					style={{ fontSize: "18px" }}
 					onClick={() => {
 						if (monthColor) {
-							let date: Date | null = null;
+							let date: string | null = null;
 							events.map((event) => {
 								const eventDate = new Date(event.date);
 								if (
@@ -252,7 +280,7 @@ function Calendar({ events, frequency, onClick }: CalendarProps) {
 									eventDate <= endDate
 								) {
 									if (date == null) {
-										date = new Date(event.date);
+										date = event.date;
 									}
 								}
 							});

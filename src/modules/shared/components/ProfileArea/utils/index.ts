@@ -50,7 +50,9 @@ export const useAdherenceEvents = (data: any, programStage: string) => {
 				(value: any) =>
 					value.dataElement === DATA_ELEMENTS.DEVICE_SIGNAL,
 			),
-			occurredAt: event.occurredAt,
+			occurredAt: event.dataValues.filter(
+				(value: any) => value.dataElement === DATA_ELEMENTS.DOSAGE_TIME,
+			),
 		}));
 
 	return { filteredEvents };
