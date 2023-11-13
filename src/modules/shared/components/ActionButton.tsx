@@ -35,18 +35,18 @@ export function ActionButton({
 					icon: <IconView24 />,
 			  }
 			: undefined,
-		onDelete
-			? {
-					label: i18n.t("Delete"),
-					onClick: onDelete,
-					icon: <IconDelete24 color={"red"} />,
-			  }
-			: undefined,
 		onEdit
 			? {
 					label: i18n.t("Edit"),
 					onClick: onEdit,
 					icon: <IconEdit24 />,
+			  }
+			: undefined,
+		onDelete
+			? {
+					label: i18n.t("Delete"),
+					onClick: onDelete,
+					icon: <IconDelete24 color={"red"} />,
 			  }
 			: undefined,
 
@@ -62,15 +62,16 @@ export function ActionButton({
 				width: "70px",
 			}}
 		>
-			{menu.map(({ label, onClick, icon }) => (
-				<MenuItem
-					dataTest={`${dataTest}-${label}`}
-					icon={icon}
+			{menu.map(({ label, onClick, icon }, index: number) => (
+				<div
 					key={`${label}-menu-item`}
+					style={{ paddingLeft: "10px", cursor: "pointer" }}
 					onClick={() => {
 						onClick();
 					}}
-				/>
+				>
+					{icon}
+				</div>
 			))}
 		</div>
 	);

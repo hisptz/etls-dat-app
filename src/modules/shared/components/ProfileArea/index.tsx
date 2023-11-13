@@ -1,11 +1,9 @@
 import i18n from "@dhis2/d2-i18n";
 import styles from "./ProfileArea.module.css";
 import { Button, IconEdit24, Card, ButtonStrip, IconClock24 } from "@dhis2/ui";
-import React from "react";
+import React, { useState } from "react";
 import EditDevice from "./EditDevice";
 import { PatientProfile } from "../../models";
-import { useRecoilState } from "recoil";
-import { AddAlarm, AddDevice } from "../../state";
 import EditAlarm from "./AddAlarm";
 import NoDeviceAssigned from "./NoDeviceAssigned";
 import { DateTime } from "luxon";
@@ -25,8 +23,8 @@ export function ProfileArea({
 	data,
 	loading,
 }: ProfileAreaProps) {
-	const [hide, setHideDevice] = useRecoilState<boolean>(AddDevice);
-	const [hideAlarm, setHideAlarm] = useRecoilState<boolean>(AddAlarm);
+	const [hide, setHideDevice] = useState<boolean>(true);
+	const [hideAlarm, setHideAlarm] = useState<boolean>(true);
 	const [programMapping] = useSetting("programMapping", {
 		global: true,
 	});
@@ -35,6 +33,14 @@ export function ProfileArea({
 		profile.events,
 		programMapping.programStage,
 	);
+
+	const onHide = () => {
+		setHideDevice(true);
+	};
+
+	const onHideAlarm = () => {
+		setHideAlarm(true);
+	};
 
 	const takenDoses = filteredEvents.filter((item: any) => {
 		return item.dataValues.some((dataValue: any) => {
@@ -235,6 +241,20 @@ export function ProfileArea({
 										className={styles["label-title"]}
 										htmlFor="name"
 									>
+										{i18n.t("Assigned Device")}
+									</label>
+									<label
+										className={styles["label-value"]}
+										htmlFor="value"
+									>
+										{profile.deviceIMEINumber}
+									</label>
+								</div>
+								<div className={styles["grid-item"]}>
+									<label
+										className={styles["label-title"]}
+										htmlFor="name"
+									>
 										{i18n.t("Total Openings")}
 									</label>
 									<label
@@ -323,9 +343,21 @@ export function ProfileArea({
 					name={profile.name}
 					patientId={profile.tbDistrictNumber}
 					refetch={refetch}
+					hide={hide}
+					onHide={onHide}
 				/>
 			)}
-			{!hideAlarm && <EditAlarm nextRefillDate="" nextRefillAlarm="" />}
+			{!hideAlarm && (
+				<EditAlarm
+					nextRefillDate=""
+					nextRefillTime=""
+					nextDoseDate=""
+					nextDoseTime=""
+					hide={hideAlarm}
+					onHide={onHideAlarm}
+					frequency={profile.adherenceFrequency}
+				/>
+			)}
 		</div>
 	);
 }

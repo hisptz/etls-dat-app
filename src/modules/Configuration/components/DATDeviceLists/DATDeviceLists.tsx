@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Card, Button } from "@dhis2/ui";
 import i18n from "@dhis2/d2-i18n";
 import { DATA_TEST_PREFIX } from "../../../shared/constants";
@@ -10,8 +10,12 @@ import { useSetting } from "@dhis2/app-service-datastore";
 
 export function DATDevicelists() {
 	const [, setAdd] = useRecoilState<boolean>(add);
-	const [hide, setHide] = useRecoilState<boolean>(editDevice);
-	const [deviceEmeiList] = useSetting("deviceEmeiList", { global: true });
+	const [hide, setHide] = useState<boolean>(true);
+	const [deviceIMEIList] = useSetting("deviceIMEIList", { global: true });
+
+	const onHide = () => {
+		setHide(true);
+	};
 
 	return (
 		<div data-test={`${DATA_TEST_PREFIX}-program-mapping-container`}>
@@ -35,8 +39,8 @@ export function DATDevicelists() {
 							{i18n.t("Add Device")}
 						</Button>
 					</div>
-					{!hide && <EditDevice />}
-					<DeviceListTable devices={deviceEmeiList} loading={false} />
+					{!hide && <EditDevice hide={hide} onHide={onHide} />}
+					<DeviceListTable devices={deviceIMEIList} loading={false} />
 				</div>
 			</Card>
 		</div>

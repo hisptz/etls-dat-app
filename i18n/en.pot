@@ -237,8 +237,6 @@ msgstr "Select Organisation unit"
 msgid "Search Criteria"
 msgstr "Search Criteria"
 
-msgid "Device EMI Number"
-msgstr "Device EMI Number"
 
 msgid "There is no data for the selected filters"
 msgstr "There is no data for the selected filters"

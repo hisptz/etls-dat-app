@@ -71,7 +71,7 @@ export function filterObject(programMapping: programMapping) {
 			attribute: programMapping.attributes?.tbDistrictNumber,
 			operator: "eq",
 		},
-		deviceEMInumber: {
+		deviceIMEInumber: {
 			attribute: programMapping.attributes?.deviceIMEInumber,
 			operator: "eq",
 		},
