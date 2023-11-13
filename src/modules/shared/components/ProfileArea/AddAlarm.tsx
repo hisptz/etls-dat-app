@@ -25,21 +25,29 @@ interface addAlarmProps {
 }
 
 const schema = z.object({
-	nextDoseDate: z
-		.string({ required_error: "Next Refill Date is required" })
-		.nonempty("Next Refill Date is required"),
+	dayInWeek: z.string(),
 	nextDoseTime: z
-		.string({ required_error: "Next Refill Date is required" })
-		.nonempty("Next Refill Alarm is required"),
+		.string({ required_error: "Next Dose Time is required" })
+		.nonempty("Next Dose Time is required"),
 	nextRefillDate: z
 		.string({ required_error: "Next Refill Date is required" })
 		.nonempty("Next Refill Date is required"),
 	nextRefillTime: z
-		.string({ required_error: "Next Refill Date is required" })
-		.nonempty("Next Refill Alarm is required"),
+		.string({ required_error: "Next Refill Time is required" })
+		.nonempty("Next Refill Time is required"),
 });
 
 export type AlarmFormData = z.infer<typeof schema>;
+
+export const daysInWeek: Option[] = [
+	{ name: "Sunday", code: "1" },
+	{ name: "Monday", code: "2" },
+	{ name: "Tuesday", code: "3" },
+	{ name: "Wednesday", code: "4" },
+	{ name: "Thursday", code: "5" },
+	{ name: "Friday", code: "6" },
+	{ name: "Saturday", code: "7" },
+];
 
 function EditAlarm({
 	nextRefillTime,
@@ -71,7 +79,7 @@ function EditAlarm({
 				resolve({
 					nextRefillDate: nextRefillDate,
 					nextRefillTime: nextRefillTime,
-					nextDoseDate: nextDoseDate,
+					dayInWeek: nextDoseDate,
 					nextDoseTime: nextDoseTime,
 				}),
 			);
@@ -97,31 +105,50 @@ function EditAlarm({
 								height: "300px",
 							}}
 						>
-							<div
-								style={{
-									display: "flex",
-									flexDirection: "row",
-								}}
-							>
+							{frequency == "Weekly" ? (
 								<div
 									style={{
-										width: "300px",
+										display: "flex",
+										flexDirection: "row",
+									}}
+								>
+									<div
+										style={{
+											width: "300px",
+											marginBottom: "20px",
+											marginRight: "10px",
+										}}
+									>
+										<FilterField
+											label={i18n.t(
+												"Select Day of the Dose",
+											)}
+											options={daysInWeek}
+											name="dayInWeek"
+											type="select"
+										/>
+									</div>
+									<FilterField
+										label={i18n.t("Time")}
+										name="nextDoseTime"
+										type="time"
+									/>
+								</div>
+							) : frequency == "Daily" ? (
+								<div
+									style={{
 										marginBottom: "20px",
-										marginRight: "10px",
 									}}
 								>
 									<FilterField
-										label={i18n.t("Next Dose Date")}
-										name="nextDoseDate"
-										type="date"
+										label={i18n.t("Next Dose Time")}
+										name="nextDoseTime"
+										type="time"
+										width="300px"
 									/>
 								</div>
-								<FilterField
-									label={i18n.t("Alarm")}
-									name="nextDoseTime"
-									type="time"
-								/>
-							</div>
+							) : null}
+
 							<div
 								style={{
 									display: "flex",
@@ -142,7 +169,7 @@ function EditAlarm({
 									/>
 								</div>
 								<FilterField
-									label={i18n.t("Alarm")}
+									label={i18n.t("Time")}
 									name="nextRefillTime"
 									type="time"
 								/>

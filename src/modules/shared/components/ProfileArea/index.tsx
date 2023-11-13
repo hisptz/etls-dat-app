@@ -215,8 +215,7 @@ export function ProfileArea({
 							>
 								{i18n.t("Edit Device")}
 							</Button>
-							{profile.deviceIMEINumber == "N/A" ||
-							profile.adherenceFrequency == "Monthly" ? null : (
+							{profile.deviceIMEINumber == "N/A" ? null : (
 								<Button
 									secondary
 									icon={<IconClock24 />}
