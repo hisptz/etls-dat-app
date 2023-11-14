@@ -1,4 +1,4 @@
-export const TEI_PAGE_SIZE = 500;
+export const DEFAULT_PAGE_SIZE = 500;
 
 export const TRACKED_ENTITY_INSTANCE_QUERY = {
 	query: {
@@ -8,7 +8,7 @@ export const TRACKED_ENTITY_INSTANCE_QUERY = {
 			ou,
 			totalPages: false,
 			page: page ?? 1,
-			pageSize: TEI_PAGE_SIZE,
+			pageSize: DEFAULT_PAGE_SIZE,
 			programStartDate: startDate,
 			programEndDate: endDate,
 			ouMode: "DESCENDANTS",
@@ -17,9 +17,44 @@ export const TRACKED_ENTITY_INSTANCE_QUERY = {
 				"orgUnit",
 				"created",
 				"attributes[attribute,value]",
-				"enrollments[enrollmentDate,orgUnitName,events[event,eventDate,programStage,dataValues[dataElement,value]]]",
 			],
 		}),
+	},
+};
+
+export const EVENTS_QUERY = {
+	query: {
+		resource: "trackedEntityInstances",
+		params: ({ programStage, page, orgUnit, startDate, endDate }: any) => ({
+			programStage,
+			orgUnit,
+			startDate,
+			endDate,
+			totalPages: false,
+			page: page ?? 1,
+			pageSize: DEFAULT_PAGE_SIZE,
+			ouMode: "DESCENDANTS",
+			fields: ["event", "eventDate", "dataValues[dataElement,value]"],
+		}),
+	},
+};
+
+export const EVENTS_PAGINATION_QUERY = {
+	query: {
+		resource: "events",
+		params: ({ orgUnit, programStage, startDate, endDate }: any) => {
+			return {
+				orgUnit,
+				programStage,
+				startDate,
+				endDate,
+				ouMode: "DESCENDANTS",
+				totalPages: true,
+				pageSize: 1,
+				page: 1,
+				fields: ["event"],
+			};
+		},
 	},
 };
 
