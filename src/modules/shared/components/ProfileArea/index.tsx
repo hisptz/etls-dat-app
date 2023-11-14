@@ -13,6 +13,7 @@ import { useSetting } from "@dhis2/app-service-datastore";
 export interface ProfileAreaProps {
 	profile: PatientProfile;
 	refetch: () => void;
+	refetchDevice: () => void;
 	data: any;
 	loading: boolean;
 }
@@ -20,11 +21,15 @@ export interface ProfileAreaProps {
 export function ProfileArea({
 	profile,
 	refetch,
+	refetchDevice,
 	data,
 	loading,
 }: ProfileAreaProps) {
 	const [hide, setHideDevice] = useState<boolean>(true);
 	const [hideAlarm, setHideAlarm] = useState<boolean>(true);
+	const [nextRefillDate, setNextRefillDate] = useState<string>("");
+	const [nextRefillTime, setNextRefillTime] = useState<string>("");
+	const [nextDoseTime, setNextDoseTime] = useState<string>("");
 	const [programMapping] = useSetting("programMapping", {
 		global: true,
 	});
@@ -221,6 +226,26 @@ export function ProfileArea({
 									icon={<IconClock24 />}
 									onClick={() => {
 										setHideAlarm(false);
+										setNextRefillDate(
+											DateTime.fromFormat(
+												data?.refillAlarm ?? "",
+												"yyyy-MM-dd HH:mm:ss",
+											).toFormat("yyyy-MM-dd") ?? "",
+										);
+										setNextRefillTime(
+											DateTime.fromFormat(
+												data?.refillAlarm ?? "",
+												"yyyy-MM-dd HH:mm:ss",
+											).toFormat("HH:mm") ?? "",
+										);
+										setNextDoseTime(
+											DateTime.fromFormat(
+												data?.alarmTime ?? "",
+												"yyyy-MM-dd HH:mm:ss",
+											).toFormat(
+												"MMMM dd, yyyy hh:mm a",
+											) ?? "",
+										);
 									}}
 								>
 									{i18n.t("Set Alarm")}
@@ -348,12 +373,24 @@ export function ProfileArea({
 			)}
 			{!hideAlarm && (
 				<EditAlarm
-					nextRefillDate=""
-					nextRefillTime=""
-					nextDoseDate=""
-					nextDoseTime=""
+					nextRefillDate={
+						nextRefillDate != "Invalid DateTime"
+							? nextRefillDate
+							: ""
+					}
+					nextRefillTime={
+						nextRefillTime != "Invalid DateTime"
+							? nextRefillTime
+							: ""
+					}
+					dayInWeek={""}
+					nextDoseTime={
+						nextDoseTime != "Invalid DateTime" ? nextDoseTime : ""
+					}
+					refetch={refetchDevice}
 					hide={hideAlarm}
 					onHide={onHideAlarm}
+					device={profile.deviceIMEINumber}
 					frequency={profile.adherenceFrequency}
 				/>
 			)}

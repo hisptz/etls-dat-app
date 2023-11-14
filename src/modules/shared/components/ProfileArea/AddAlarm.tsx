@@ -9,35 +9,23 @@ import {
 } from "@dhis2/ui";
 import i18n from "@dhis2/d2-i18n";
 import { FilterField } from "../../../Configuration/components/ProgramMapping/components/FilterField";
-import { useSetting } from "@dhis2/app-service-datastore";
 import { FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { useSetAlarm } from "../utils/assignAlarm";
+import { useAlert } from "@dhis2/app-runtime";
 
 interface addAlarmProps {
 	nextRefillTime: string;
 	nextRefillDate: string;
 	nextDoseTime: string;
-	nextDoseDate: string;
+	dayInWeek: string;
 	hide: boolean;
 	onHide: () => void;
+	refetch: () => void;
 	frequency: "Daily" | "Weekly" | "Monthly" | string;
+	device: string;
 }
-
-const schema = z.object({
-	dayInWeek: z.string(),
-	nextDoseTime: z
-		.string({ required_error: "Next Dose Time is required" })
-		.nonempty("Next Dose Time is required"),
-	nextRefillDate: z
-		.string({ required_error: "Next Refill Date is required" })
-		.nonempty("Next Refill Date is required"),
-	nextRefillTime: z
-		.string({ required_error: "Next Refill Time is required" })
-		.nonempty("Next Refill Time is required"),
-});
-
-export type AlarmFormData = z.infer<typeof schema>;
 
 export const daysInWeek: Option[] = [
 	{ name: "Sunday", code: "1" },
@@ -52,20 +40,92 @@ export const daysInWeek: Option[] = [
 function EditAlarm({
 	nextRefillTime,
 	nextRefillDate,
-	nextDoseDate,
+	dayInWeek,
 	nextDoseTime,
 	hide,
 	onHide,
+	refetch,
 	frequency,
+	device,
 }: addAlarmProps) {
-	const [devices, { set: updateDevice }] = useSetting("deviceIMEIList", {
-		global: true,
+	const { setAlarm } = useSetAlarm();
+
+	const schema = z.object({
+		dayInWeek:
+			frequency == "Weekly"
+				? z
+						.string({
+							required_error: "Day of the Dose is required",
+						})
+						.nonempty("Day of the Dose is required")
+				: z.string(),
+		nextDoseTime:
+			frequency == "Monthly"
+				? z.string()
+				: z
+						.string({
+							required_error: "Next Dose Time is required",
+						})
+						.nonempty("Next Dose Time is required"),
+		nextRefillDate: z
+			.string({ required_error: "Next Refill Date is required" })
+			.nonempty("Next Refill Date is required"),
+		nextRefillTime: z
+			.string({ required_error: "Next Refill Time is required" })
+			.nonempty("Next Refill Time is required"),
 	});
 
+	type AlarmFormData = z.infer<typeof schema>;
+
+	const { show } = useAlert(
+		({ message }) => message,
+		({ type }) => ({ ...type, duration: 4000 }),
+	);
+
+	function generateDays(selectedCode: string) {
+		const codeArray = Array(7).fill("0");
+		const selectedIndex = daysInWeek.findIndex(
+			(day) => day.code === selectedCode,
+		);
+
+		if (selectedIndex !== -1) {
+			codeArray[selectedIndex] = "1";
+		}
+		const codeString = codeArray.join("");
+
+		return codeString;
+	}
+
 	const onSubmit = async (data: AlarmFormData) => {
-		console.log(data);
-		onHide();
-		onClose();
+		const alarmData = {
+			imei: device,
+			alarm: frequency != "Monthly" ? data.nextDoseTime : null,
+			refillAlarm: data.nextRefillDate + " " + data.nextRefillTime,
+			days:
+				frequency == "Daily"
+					? "1111111"
+					: frequency == "Weekly"
+					? generateDays(data.dayInWeek)
+					: null,
+		};
+
+		await setAlarm({ data: alarmData }).then(async (res) => {
+			if (res.response) {
+				show({
+					message: `Alarm for ${device} has been set successfully`,
+					type: { success: true },
+				});
+				await onClose();
+				refetch();
+			}
+
+			if (res.error) {
+				show({
+					message: `Could not update: ${res.error.response.data.message}`,
+					type: { info: true },
+				});
+			}
+		});
 	};
 
 	const onClose = async () => {
@@ -74,15 +134,11 @@ function EditAlarm({
 	};
 
 	const form = useForm<AlarmFormData>({
-		defaultValues: async () => {
-			return new Promise((resolve) =>
-				resolve({
-					nextRefillDate: nextRefillDate,
-					nextRefillTime: nextRefillTime,
-					dayInWeek: nextDoseDate,
-					nextDoseTime: nextDoseTime,
-				}),
-			);
+		defaultValues: {
+			nextRefillDate: nextRefillDate,
+			nextRefillTime: nextRefillTime,
+			dayInWeek: dayInWeek,
+			nextDoseTime: nextDoseTime,
 		},
 		resolver: zodResolver(schema),
 	});
