@@ -215,7 +215,7 @@ export function useReportTableData() {
 		if (!isEmpty(orgUnit) && !isEmpty(startDate)) {
 			download(type, {
 				orgUnit,
-				pageSize: 300,
+				pageSize: 700,
 				startDate,
 				endDate,
 				program: programId,

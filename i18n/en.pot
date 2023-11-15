@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2023-11-13T22:09:51.184Z\n"
-"PO-Revision-Date: 2023-11-13T22:09:51.184Z\n"
+"POT-Creation-Date: 2023-11-15T05:28:51.002Z\n"
+"PO-Revision-Date: 2023-11-15T05:28:51.002Z\n"
 
 msgid "Configurations"
 msgstr "Configurations"
@@ -180,6 +180,12 @@ msgstr ""
 msgid "Back"
 msgstr "Back"
 
+msgid "Missing Dose Data"
+msgstr "Missing Dose Data"
+
+msgid " has no dose data recorded"
+msgstr " has no dose data recorded"
+
 msgid "Summary"
 msgstr "Summary"
 
@@ -255,9 +261,6 @@ msgstr "Next Refill Date"
 msgid "Assign the device number, or click clear to clear previous device"
 msgstr "Assign the device number, or click clear to clear previous device"
 
-msgid "Missing Dose Data"
-msgstr "Missing Dose Data"
-
 msgid "Patient Summary"
 msgstr "Patient Summary"
 
@@ -278,6 +281,12 @@ msgstr "Edit Device"
 
 msgid "Set Alarm"
 msgstr "Set Alarm"
+
+msgid "Missing Device Information"
+msgstr "Missing Device Information"
+
+msgid " has no linked DAT Device"
+msgstr " has no linked DAT Device"
 
 msgid "Assigned Device"
 msgstr "Assigned Device"

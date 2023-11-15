@@ -58,6 +58,7 @@
 		"@hookform/resolvers": "^3.3.0",
 		"async-es": "^3.2.4",
 		"axios": "^1.6.0",
+		"date-fns": "^2.30.0",
 		"eslint-config-react-app": "^7.0.1",
 		"file-saver": "^2.0.5",
 		"lodash": "^4.17.21",

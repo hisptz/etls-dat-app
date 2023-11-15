@@ -1,8 +1,11 @@
+/* eslint-disable no-mixed-spaces-and-tabs */
+/* eslint-disable indent */
 import React, { useEffect, useState } from "react";
 import styles from "./calendar.module.css";
 import i18n from "@dhis2/d2-i18n";
 import { IconChevronRight24, IconChevronLeft24 } from "@dhis2/ui";
 import { DateTime } from "luxon";
+import { isSameDay } from "date-fns";
 
 export interface DateEvent {
 	date: string;
@@ -140,26 +143,95 @@ function Calendar({ events, frequency, onClick }: CalendarProps) {
 			);
 		}
 
+		const getEventsForDate = (date: any) => {
+			return events.filter((event) =>
+				isSameDay(DateTime.fromISO(event.date).toJSDate(), date),
+			);
+		};
+
 		for (let i = 1; i <= numDays; i++) {
 			const currentDate = new Date(currentYear, currentMonth, i);
 			const cellColor = getCellColor(
 				DateTime.fromJSDate(currentDate).toISODate(),
 			);
+
 			const date = new Date(currentYear, currentMonth, i);
+			const eventsForDate = getEventsForDate(date);
+
+			const searchDate = DateTime.fromJSDate(date).toISODate();
+
+			const uniqueEvents: any = [];
+			const eventSet = new Set();
+
+			eventsForDate.forEach((event) => {
+				const eventKey = `${event.date}-${event.event}`;
+				if (!eventSet.has(eventKey) && event.event !== "") {
+					uniqueEvents.push(event);
+					eventSet.add(eventKey);
+				}
+			});
+
+			const isDatePresent = uniqueEvents.some((event: any) => {
+				const eventDate = DateTime.fromISO(event.date).toISODate();
+				return eventDate === searchDate && event.event !== "";
+			});
+
 			calendarCells.push(
 				<div
 					key={i}
-					className={`${styles["calendar-cell"]} ${
-						styles[cellColor[0]]
-					}`}
-					style={{ fontSize: "18px" }}
-					onClick={() => {
-						if (cellColor) {
-							showDetails(cellColor[1], cellColor[0]);
-						}
+					className={`${styles["calendar-cell"]}`}
+					style={{
+						fontSize: "18px",
+						display: "flex",
+						flexDirection: "row",
+						position: "relative",
 					}}
 				>
-					<span style={{ fontSize: "18px" }}>{i}</span>
+					<span
+						style={{
+							fontSize: "18px",
+							position: "absolute",
+							fontWeight: isDatePresent ? "600" : undefined,
+							zIndex: 1,
+							color: isDatePresent ? "white" : undefined,
+						}}
+					>
+						{i}
+					</span>
+
+					{uniqueEvents.length >= 1
+						? uniqueEvents.map((event: any, index: number) => {
+								if (event.event !== "") {
+									console.log(event);
+									return (
+										<div
+											onClick={() => {
+												if (cellColor) {
+													showDetails(
+														event.date,
+														cellColors[event.event],
+													);
+												}
+											}}
+											key={index}
+											className={`${
+												styles["calendar-cell-dot"]
+											}  ${
+												styles[
+													uniqueEvents.length !== 1
+														? index === 0
+															? "diagnaol-box-1"
+															: "diagnaol-box-2"
+														: ""
+												]
+											}  ${
+												styles[cellColors[event.event]]
+											}`}
+										></div>
+									);
+								}
+						  })
+						: null}
 				</div>,
 			);
 		}

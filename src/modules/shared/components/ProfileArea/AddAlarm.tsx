@@ -82,6 +82,9 @@ function EditAlarm({
 		({ type }) => ({ ...type, duration: 4000 }),
 	);
 
+	const dayIndex = dayInWeek.indexOf("1");
+	const selectedDay = daysInWeek[dayIndex]?.code;
+
 	function generateDays(selectedCode: string) {
 		const codeArray = Array(7).fill("0");
 		const selectedIndex = daysInWeek.findIndex(
@@ -137,7 +140,7 @@ function EditAlarm({
 		defaultValues: {
 			nextRefillDate: nextRefillDate,
 			nextRefillTime: nextRefillTime,
-			dayInWeek: dayInWeek,
+			dayInWeek: selectedDay,
 			nextDoseTime: nextDoseTime,
 		},
 		resolver: zodResolver(schema),

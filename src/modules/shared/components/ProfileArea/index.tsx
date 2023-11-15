@@ -30,6 +30,7 @@ export function ProfileArea({
 	const [nextRefillDate, setNextRefillDate] = useState<string>("");
 	const [nextRefillTime, setNextRefillTime] = useState<string>("");
 	const [nextDoseTime, setNextDoseTime] = useState<string>("");
+	const [dayInweek, setDayInWeek] = useState<string>("");
 	const [programMapping] = useSetting("programMapping", {
 		global: true,
 	});
@@ -69,10 +70,9 @@ export function ProfileArea({
 		).toFormat("MMMM dd, yyyy hh:mm a") ?? "";
 
 	const doseAlarm =
-		DateTime.fromFormat(
-			data?.alarmTime ?? "",
-			"yyyy-MM-dd HH:mm:ss",
-		).toFormat("MMMM dd, yyyy hh:mm a") ?? "";
+		DateTime.fromFormat(data?.alarmTime ?? "", "HH:mm:ss").toFormat(
+			"hh:mm a",
+		) ?? "";
 
 	const batteryLevel = data?.batteryLevel ? data.batteryLevel + "%" : "N/A";
 
@@ -241,11 +241,10 @@ export function ProfileArea({
 										setNextDoseTime(
 											DateTime.fromFormat(
 												data?.alarmTime ?? "",
-												"yyyy-MM-dd HH:mm:ss",
-											).toFormat(
-												"MMMM dd, yyyy hh:mm a",
-											) ?? "",
+												"HH:mm:ss",
+											).toFormat("HH:mm") ?? "",
 										);
+										setDayInWeek(data?.alarmDays ?? "");
 									}}
 								>
 									{i18n.t("Set Alarm")}
@@ -255,7 +254,15 @@ export function ProfileArea({
 					</div>
 					{profile.deviceIMEINumber == "N/A" ? (
 						<NoDeviceAssigned
-							message={`${profile.name} has no linked DAT Device`}
+							title={i18n.t("Missing Device Information")}
+							message={
+								<span>
+									<span style={{ fontWeight: "600" }}>
+										{profile.name}
+									</span>
+									{i18n.t(" has no linked DAT Device")}
+								</span>
+							}
 						/>
 					) : (
 						<div className={styles["profile"]}>
@@ -383,7 +390,7 @@ export function ProfileArea({
 							? nextRefillTime
 							: ""
 					}
-					dayInWeek={""}
+					dayInWeek={dayInweek}
 					nextDoseTime={
 						nextDoseTime != "Invalid DateTime" ? nextDoseTime : ""
 					}
