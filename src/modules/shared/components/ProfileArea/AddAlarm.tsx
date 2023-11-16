@@ -8,55 +8,140 @@ import {
 	ButtonStrip,
 } from "@dhis2/ui";
 import i18n from "@dhis2/d2-i18n";
-import { useRecoilState } from "recoil";
-import { AddAlarm } from "../../state";
 import { FilterField } from "../../../Configuration/components/ProgramMapping/components/FilterField";
-import { useSetting } from "@dhis2/app-service-datastore";
-
 import { FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { useSetAlarm } from "../utils/assignAlarm";
+import { useAlert } from "@dhis2/app-runtime";
 
 interface addAlarmProps {
-	nextRefillAlarm: string;
+	nextRefillTime: string;
 	nextRefillDate: string;
+	nextDoseTime: string;
+	dayInWeek: string;
+	hide: boolean;
+	onHide: () => void;
+	refetch: () => void;
+	frequency: "Daily" | "Weekly" | "Monthly" | string;
+	device: string;
 }
 
-const schema = z.object({
-	nextRefillDate: z
-		.string({ required_error: "Next Refill Date is required" })
-		.nonempty("Next Refill Date is required"),
-	nextRefillAlarm: z
-		.string({ required_error: "Next Refill Date is required" })
-		.nonempty("Next Refill Alarm is required"),
-});
+export const daysInWeek: Option[] = [
+	{ name: "Sunday", code: "1" },
+	{ name: "Monday", code: "2" },
+	{ name: "Tuesday", code: "3" },
+	{ name: "Wednesday", code: "4" },
+	{ name: "Thursday", code: "5" },
+	{ name: "Friday", code: "6" },
+	{ name: "Saturday", code: "7" },
+];
 
-export type AlarmFormData = z.infer<typeof schema>;
+function EditAlarm({
+	nextRefillTime,
+	nextRefillDate,
+	dayInWeek,
+	nextDoseTime,
+	hide,
+	onHide,
+	refetch,
+	frequency,
+	device,
+}: addAlarmProps) {
+	const { setAlarm } = useSetAlarm();
 
-function EditAlarm({ nextRefillAlarm, nextRefillDate }: addAlarmProps) {
-	const [hide, setHide] = useRecoilState<boolean>(AddAlarm);
-	const [devices, { set: updateDevice }] = useSetting("deviceEmeiList", {
-		global: true,
+	const schema = z.object({
+		dayInWeek:
+			frequency == "Weekly"
+				? z
+						.string({
+							required_error: "Day of the Dose is required",
+						})
+						.nonempty("Day of the Dose is required")
+				: z.string(),
+		nextDoseTime:
+			frequency == "Monthly"
+				? z.string()
+				: z
+						.string({
+							required_error: "Next Dose Time is required",
+						})
+						.nonempty("Next Dose Time is required"),
+		nextRefillDate: z
+			.string({ required_error: "Next Refill Date is required" })
+			.nonempty("Next Refill Date is required"),
+		nextRefillTime: z
+			.string({ required_error: "Next Refill Time is required" })
+			.nonempty("Next Refill Time is required"),
 	});
 
+	type AlarmFormData = z.infer<typeof schema>;
+
+	const { show } = useAlert(
+		({ message }) => message,
+		({ type }) => ({ ...type, duration: 4000 }),
+	);
+
+	const dayIndex = dayInWeek.indexOf("1");
+	const selectedDay = daysInWeek[dayIndex]?.code;
+
+	function generateDays(selectedCode: string) {
+		const codeArray = Array(7).fill("0");
+		const selectedIndex = daysInWeek.findIndex(
+			(day) => day.code === selectedCode,
+		);
+
+		if (selectedIndex !== -1) {
+			codeArray[selectedIndex] = "1";
+		}
+		const codeString = codeArray.join("");
+
+		return codeString;
+	}
+
 	const onSubmit = async (data: AlarmFormData) => {
-		setHide(true);
-		onClose();
+		const alarmData = {
+			imei: device,
+			alarm: frequency != "Monthly" ? data.nextDoseTime : null,
+			refillAlarm: data.nextRefillDate + " " + data.nextRefillTime,
+			days:
+				frequency == "Daily"
+					? "1111111"
+					: frequency == "Weekly"
+					? generateDays(data.dayInWeek)
+					: null,
+		};
+
+		await setAlarm({ data: alarmData }).then(async (res) => {
+			if (res.response) {
+				show({
+					message: `Alarm for ${device} has been set successfully`,
+					type: { success: true },
+				});
+				await onClose();
+				refetch();
+			}
+
+			if (res.error) {
+				show({
+					message: `Could not update: ${res.error.response.data.message}`,
+					type: { info: true },
+				});
+			}
+		});
 	};
 
 	const onClose = async () => {
 		form.reset({});
-		setHide(true);
+		onHide();
 	};
 
 	const form = useForm<AlarmFormData>({
-		defaultValues: async () => {
-			return new Promise((resolve) =>
-				resolve({
-					nextRefillDate: nextRefillDate,
-					nextRefillAlarm: nextRefillAlarm,
-				}),
-			);
+		defaultValues: {
+			nextRefillDate: nextRefillDate,
+			nextRefillTime: nextRefillTime,
+			dayInWeek: selectedDay,
+			nextDoseTime: nextDoseTime,
 		},
 		resolver: zodResolver(schema),
 	});
@@ -79,31 +164,50 @@ function EditAlarm({ nextRefillAlarm, nextRefillDate }: addAlarmProps) {
 								height: "300px",
 							}}
 						>
-							{/* <div
-							style={{
-								display: "flex",
-								flexDirection: "row",
-							}}
-						>
-							<div
-								style={{
-									width: "300px",
-									marginBottom: "20px",
-									marginRight: "10px",
-								}}
-							>
-								<FilterField
-									label={i18n.t("Next Dose Date")}
-									name={"nextDoseDate"}
-									type="date"
-								/>
-							</div>
-							<FilterField
-								label={i18n.t("Alarm")}
-								name={"nextDoseAlarm"}
-								type="time"
-							/>
-						</div> */}
+							{frequency == "Weekly" ? (
+								<div
+									style={{
+										display: "flex",
+										flexDirection: "row",
+									}}
+								>
+									<div
+										style={{
+											width: "300px",
+											marginBottom: "20px",
+											marginRight: "10px",
+										}}
+									>
+										<FilterField
+											label={i18n.t(
+												"Select Day of the Dose",
+											)}
+											options={daysInWeek}
+											name="dayInWeek"
+											type="select"
+										/>
+									</div>
+									<FilterField
+										label={i18n.t("Time")}
+										name="nextDoseTime"
+										type="time"
+									/>
+								</div>
+							) : frequency == "Daily" ? (
+								<div
+									style={{
+										marginBottom: "20px",
+									}}
+								>
+									<FilterField
+										label={i18n.t("Next Dose Time")}
+										name="nextDoseTime"
+										type="time"
+										width="300px"
+									/>
+								</div>
+							) : null}
+
 							<div
 								style={{
 									display: "flex",
@@ -124,8 +228,8 @@ function EditAlarm({ nextRefillAlarm, nextRefillDate }: addAlarmProps) {
 									/>
 								</div>
 								<FilterField
-									label={i18n.t("Alarm")}
-									name="nextRefillAlarm"
+									label={i18n.t("Time")}
+									name="nextRefillTime"
 									type="time"
 								/>
 							</div>

@@ -7,7 +7,7 @@ When(/^the user clicks on the "([^"]*)" tab$/, function (tab: string) {
 
 Then(/^inputs the device as "([^"]*)"$/, function (device: string) {
 	cy.get(
-		':nth-child(3) > [data-test="dhis2-uicore-centeredcontent"] > .jsx-498096601 > [data-test="dhis2-uicore-modal"] > [data-test="dhis2-uicore-card"] > .jsx-1532202667 > [data-test="dhis2-uicore-modalcontent"] > [style="height: 300px;"] > :nth-child(2) > [data-test="dhis2-uiwidgets-inputfield"] > [data-test="dhis2-uiwidgets-inputfield-content"] > [data-test="dhis2-uicore-box"] > [data-test="dhis2-uicore-input"] > #deviceEMInumber',
+		':nth-child(3) > [data-test="dhis2-uicore-centeredcontent"] > .jsx-498096601 > [data-test="dhis2-uicore-modal"] > [data-test="dhis2-uicore-card"] > .jsx-1532202667 > [data-test="dhis2-uicore-modalcontent"] > [style="height: 300px;"] > :nth-child(2) > [data-test="dhis2-uiwidgets-inputfield"] > [data-test="dhis2-uiwidgets-inputfield-content"] > [data-test="dhis2-uicore-box"] > [data-test="dhis2-uicore-input"] > #deviceIMEInumber',
 	)
 		.click()
 		.clear()
@@ -16,7 +16,7 @@ Then(/^inputs the device as "([^"]*)"$/, function (device: string) {
 
 Then(/^edits the device as "([^"]*)"$/, function (device: string) {
 	cy.get(
-		':nth-child(3) > [data-test="dhis2-uicore-centeredcontent"] > .jsx-498096601 > [data-test="dhis2-uicore-modal"] > [data-test="dhis2-uicore-card"] > .jsx-1532202667 > [data-test="dhis2-uicore-modalcontent"] > [style="height: 300px;"] > :nth-child(1) > [data-test="dhis2-uiwidgets-inputfield"] > [data-test="dhis2-uiwidgets-inputfield-content"] > [data-test="dhis2-uicore-box"] > [data-test="dhis2-uicore-input"] > #deviceEMInumber',
+		':nth-child(3) > [data-test="dhis2-uicore-centeredcontent"] > .jsx-498096601 > [data-test="dhis2-uicore-modal"] > [data-test="dhis2-uicore-card"] > .jsx-1532202667 > [data-test="dhis2-uicore-modalcontent"] > [style="height: 300px;"] > :nth-child(1) > [data-test="dhis2-uiwidgets-inputfield"] > [data-test="dhis2-uiwidgets-inputfield-content"] > [data-test="dhis2-uicore-box"] > [data-test="dhis2-uicore-input"] > #deviceIMEInumber',
 	)
 
 		.click()

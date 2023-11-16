@@ -8,8 +8,7 @@ import {
 	ButtonStrip,
 } from "@dhis2/ui";
 import i18n from "@dhis2/d2-i18n";
-import { useRecoilState } from "recoil";
-import { edit } from "../state";
+
 import { FilterField } from "./FilterField";
 import { Option } from "../hooks/data";
 import { generateUid, useProgramStage } from "../hooks/save";
@@ -25,6 +24,8 @@ interface EditProps {
 	attributeOptions: Option[];
 	error: any;
 	onUpdate: ReturnType<typeof useDataQuery>["refetch"];
+	hide: boolean;
+	onHide: () => void;
 }
 
 const schema = z.object({
@@ -73,8 +74,9 @@ function Edit({
 	attributeOptions,
 	error,
 	onUpdate,
+	hide,
+	onHide,
 }: EditProps) {
-	const [hideEdit, setHide] = useRecoilState<boolean>(edit);
 	const [importMeta, setImport] = useState<boolean>(false);
 	const { importProgramStage } = useProgramStage();
 	const [programMapping, { set: setProgramMapping }] = useSetting(
@@ -94,12 +96,12 @@ function Edit({
 		await onUpdate({
 			programID: data.program,
 		});
-		setHide(true);
+		onHide();
 		setImport(!importMeta);
 	};
 
 	const onClose = () => {
-		setHide(true);
+		onHide();
 		form.reset({});
 	};
 
@@ -122,7 +124,7 @@ function Edit({
 
 	return (
 		<div>
-			<Modal position="middle" hide={hideEdit} onClose={onClose}>
+			<Modal position="middle" hide={hide} onClose={onClose}>
 				<ModalTitle>
 					<h3
 						className="m-0"

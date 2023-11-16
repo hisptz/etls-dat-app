@@ -5,8 +5,8 @@ export interface TBAdherenceConfig {
 	label: string;
 	path: string | Array<string | number>;
 }
-export interface deviceEmeiList {
-	emei: string;
+export interface deviceIMEIList {
+	IMEI: string;
 	inUse: boolean;
 	name: string;
 	code: string;
@@ -16,9 +16,6 @@ export interface regimenSetting {
 	regimen: string;
 	administration: string;
 	idealDoses: string;
-	idealDuration: string;
-	completionMinimumDoses: string;
-	completionMaximumDuration: string;
 }
 export interface programMapping {
 	program?: string;
@@ -39,6 +36,7 @@ export interface programMapping {
 export interface ReportConfig {
 	name: string;
 	id: string;
+	filters: string[];
 	columns: Array<{
 		key: string;
 		label: string;
@@ -50,6 +48,7 @@ export const reports: ReportConfig[] = [
 	{
 		name: "TB Adherence Report",
 		id: "tb-adherence-report",
+		filters: ["ou", "pe"],
 		columns: [
 			{
 				key: "tbIdentificationNumber",
@@ -81,6 +80,7 @@ export const reports: ReportConfig[] = [
 	{
 		name: "DAT Device Summary Report",
 		id: "dat-device-summary-report",
+		filters: [],
 		columns: [
 			{
 				key: "deviceIMEINumber",
@@ -112,6 +112,7 @@ export const reports: ReportConfig[] = [
 	{
 		name: "Patients Who Missed Doses",
 		id: "patients-who-missed-doses",
+		filters: ["ou", "pe"],
 		columns: [
 			{
 				key: "tbIdentificationNumber",
@@ -200,7 +201,7 @@ export const dashboards: DashboardItem[] = [
 	},
 ];
 
-export const deviceEmeiList: deviceEmeiList[] = [];
+export const deviceIMEIList: deviceIMEIList[] = [];
 
 export const regimenSetting: regimenSetting[] = [];
 
@@ -210,7 +211,7 @@ export const DEFAULT_SETTINGS = {
 	settings: {},
 	TBAdherence,
 	programMapping,
-	deviceEmeiList,
+	deviceIMEIList,
 	regimenSetting,
 	reports,
 	dashboards,

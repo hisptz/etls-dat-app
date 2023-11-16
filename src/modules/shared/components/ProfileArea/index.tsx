@@ -1,11 +1,9 @@
 import i18n from "@dhis2/d2-i18n";
 import styles from "./ProfileArea.module.css";
 import { Button, IconEdit24, Card, ButtonStrip, IconClock24 } from "@dhis2/ui";
-import React from "react";
+import React, { useState } from "react";
 import EditDevice from "./EditDevice";
 import { PatientProfile } from "../../models";
-import { useRecoilState } from "recoil";
-import { AddAlarm, AddDevice } from "../../state";
 import EditAlarm from "./AddAlarm";
 import NoDeviceAssigned from "./NoDeviceAssigned";
 import { DateTime } from "luxon";
@@ -15,6 +13,7 @@ import { useSetting } from "@dhis2/app-service-datastore";
 export interface ProfileAreaProps {
 	profile: PatientProfile;
 	refetch: () => void;
+	refetchDevice: () => void;
 	data: any;
 	loading: boolean;
 }
@@ -22,11 +21,16 @@ export interface ProfileAreaProps {
 export function ProfileArea({
 	profile,
 	refetch,
+	refetchDevice,
 	data,
 	loading,
 }: ProfileAreaProps) {
-	const [hide, setHideDevice] = useRecoilState<boolean>(AddDevice);
-	const [hideAlarm, setHideAlarm] = useRecoilState<boolean>(AddAlarm);
+	const [hide, setHideDevice] = useState<boolean>(true);
+	const [hideAlarm, setHideAlarm] = useState<boolean>(true);
+	const [nextRefillDate, setNextRefillDate] = useState<string>("");
+	const [nextRefillTime, setNextRefillTime] = useState<string>("");
+	const [nextDoseTime, setNextDoseTime] = useState<string>("");
+	const [dayInweek, setDayInWeek] = useState<string>("");
 	const [programMapping] = useSetting("programMapping", {
 		global: true,
 	});
@@ -36,7 +40,22 @@ export function ProfileArea({
 		programMapping.programStage,
 	);
 
-	const totalOpenings = filteredEvents.length;
+	const onHide = () => {
+		setHideDevice(true);
+	};
+
+	const onHideAlarm = () => {
+		setHideAlarm(true);
+	};
+
+	const takenDoses = filteredEvents.filter((item: any) => {
+		return item.dataValues.some((dataValue: any) => {
+			const value = dataValue.value;
+			return value === "Once" || value === "Multiple";
+		});
+	});
+
+	const totalOpenings = takenDoses.length;
 
 	const refillAlarm =
 		DateTime.fromFormat(
@@ -51,10 +70,9 @@ export function ProfileArea({
 		).toFormat("MMMM dd, yyyy hh:mm a") ?? "";
 
 	const doseAlarm =
-		DateTime.fromFormat(
-			data?.alarmTime ?? "",
-			"yyyy-MM-dd HH:mm:ss",
-		).toFormat("MMMM dd, yyyy hh:mm a") ?? "";
+		DateTime.fromFormat(data?.alarmTime ?? "", "HH:mm:ss").toFormat(
+			"hh:mm a",
+		) ?? "";
 
 	const batteryLevel = data?.batteryLevel ? data.batteryLevel + "%" : "N/A";
 
@@ -79,10 +97,7 @@ export function ProfileArea({
 								className="row"
 							>
 								<div>
-									<h2
-										className=" m-0"
-										style={{ marginBottom: "16px" }}
-									>
+									<h2 className=" m-0">
 										{i18n.t("Patient Summary")}
 									</h2>
 								</div>
@@ -205,13 +220,31 @@ export function ProfileArea({
 							>
 								{i18n.t("Edit Device")}
 							</Button>
-							{profile.deviceIMEINumber == "N/A" ||
-							profile.adherenceFrequency == "Monthly" ? null : (
+							{profile.deviceIMEINumber == "N/A" ? null : (
 								<Button
 									secondary
 									icon={<IconClock24 />}
 									onClick={() => {
 										setHideAlarm(false);
+										setNextRefillDate(
+											DateTime.fromFormat(
+												data?.refillAlarm ?? "",
+												"yyyy-MM-dd HH:mm:ss",
+											).toFormat("yyyy-MM-dd") ?? "",
+										);
+										setNextRefillTime(
+											DateTime.fromFormat(
+												data?.refillAlarm ?? "",
+												"yyyy-MM-dd HH:mm:ss",
+											).toFormat("HH:mm") ?? "",
+										);
+										setNextDoseTime(
+											DateTime.fromFormat(
+												data?.alarmTime ?? "",
+												"HH:mm:ss",
+											).toFormat("HH:mm") ?? "",
+										);
+										setDayInWeek(data?.alarmDays ?? "");
 									}}
 								>
 									{i18n.t("Set Alarm")}
@@ -221,11 +254,33 @@ export function ProfileArea({
 					</div>
 					{profile.deviceIMEINumber == "N/A" ? (
 						<NoDeviceAssigned
-							message={`${profile.name} has no linked DAT Device`}
+							title={i18n.t("Missing Device Information")}
+							message={
+								<span>
+									<span style={{ fontWeight: "600" }}>
+										{profile.name}
+									</span>
+									{i18n.t(" has no linked DAT Device")}
+								</span>
+							}
 						/>
 					) : (
 						<div className={styles["profile"]}>
 							<div className={styles["profile-container"]}>
+								<div className={styles["grid-item"]}>
+									<label
+										className={styles["label-title"]}
+										htmlFor="name"
+									>
+										{i18n.t("Assigned Device")}
+									</label>
+									<label
+										className={styles["label-value"]}
+										htmlFor="value"
+									>
+										{profile.deviceIMEINumber}
+									</label>
+								</div>
 								<div className={styles["grid-item"]}>
 									<label
 										className={styles["label-title"]}
@@ -319,9 +374,33 @@ export function ProfileArea({
 					name={profile.name}
 					patientId={profile.tbDistrictNumber}
 					refetch={refetch}
+					hide={hide}
+					onHide={onHide}
 				/>
 			)}
-			{!hideAlarm && <EditAlarm nextRefillDate="" nextRefillAlarm="" />}
+			{!hideAlarm && (
+				<EditAlarm
+					nextRefillDate={
+						nextRefillDate != "Invalid DateTime"
+							? nextRefillDate
+							: ""
+					}
+					nextRefillTime={
+						nextRefillTime != "Invalid DateTime"
+							? nextRefillTime
+							: ""
+					}
+					dayInWeek={dayInweek}
+					nextDoseTime={
+						nextDoseTime != "Invalid DateTime" ? nextDoseTime : ""
+					}
+					refetch={refetchDevice}
+					hide={hideAlarm}
+					onHide={onHideAlarm}
+					device={profile.deviceIMEINumber}
+					frequency={profile.adherenceFrequency}
+				/>
+			)}
 		</div>
 	);
 }

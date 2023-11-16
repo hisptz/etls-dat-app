@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2023-11-08T08:35:18.216Z\n"
-"PO-Revision-Date: 2023-11-08T08:35:18.216Z\n"
+"POT-Creation-Date: 2023-11-15T05:28:51.002Z\n"
+"PO-Revision-Date: 2023-11-15T05:28:51.002Z\n"
 
 msgid "Configurations"
 msgstr "Configurations"
@@ -17,8 +17,8 @@ msgstr "Add Device"
 msgid "Delete DAT Device"
 msgstr "Delete DAT Device"
 
-msgid "Are you sure you want to delete the device with EMEI "
-msgstr "Are you sure you want to delete the device with EMEI "
+msgid "Are you sure you want to delete the device with IMEI "
+msgstr "Are you sure you want to delete the device with IMEI "
 
 msgid "Hide"
 msgstr "Hide"
@@ -44,8 +44,8 @@ msgstr "Add an excel file with the list of devices only"
 msgid "Device IMEI number"
 msgstr "Device IMEI number"
 
-msgid "Add the EMEI number as seen on the device"
-msgstr "Add the EMEI number as seen on the device"
+msgid "Add the IMEI number as seen on the device"
+msgstr "Add the IMEI number as seen on the device"
 
 msgid "Save"
 msgstr "Save"
@@ -107,15 +107,6 @@ msgstr "Administration"
 msgid "Ideal Doses"
 msgstr "Ideal Doses"
 
-msgid "Ideal Duration (Months)"
-msgstr "Ideal Duration (Months)"
-
-msgid "Completion Minimum Doses"
-msgstr "Completion Minimum Doses"
-
-msgid "Completion Maximum Duration (Months)"
-msgstr "Completion Maximum Duration (Months)"
-
 msgid "Regimens Settings not found"
 msgstr "Regimens Settings not found"
 
@@ -149,20 +140,26 @@ msgstr "Download"
 msgid "Reports"
 msgstr "Reports"
 
-msgid "Select type of report, organisation unit and periods above to get started!"
-msgstr "Select type of report, organisation unit and periods above to get started!"
-
 msgid "Loading..."
 msgstr "Loading..."
 
 msgid "Report Types"
 msgstr "Report Types"
 
-msgid "There is no report data for the selected filters"
-msgstr "There is no report data for the selected filters"
+msgid "Report"
+msgstr "Report"
+
+msgid "Organisation units"
+msgstr "Organisation units"
+
+msgid "Periods"
+msgstr "Periods"
 
 msgid "Downloading..."
 msgstr "Downloading..."
+
+msgid "There is no report data for the selected filters"
+msgstr "There is no report data for the selected filters"
 
 msgid "Something went wrong"
 msgstr "Something went wrong"
@@ -194,6 +191,12 @@ msgstr ""
 
 msgid "Back"
 msgstr "Back"
+
+msgid "Missing Dose Data"
+msgstr "Missing Dose Data"
+
+msgid " has no dose data recorded"
+msgstr " has no dose data recorded"
 
 msgid "Summary"
 msgstr "Summary"
@@ -240,9 +243,6 @@ msgstr "Select Organisation unit"
 msgid "Search Criteria"
 msgstr "Search Criteria"
 
-msgid "Device EMI Number"
-msgstr "Device EMI Number"
-
 msgid "There is no data for the selected filters"
 msgstr "There is no data for the selected filters"
 
@@ -255,20 +255,20 @@ msgstr "Reload"
 msgid "Set Device Alarm"
 msgstr "Set Device Alarm"
 
-msgid "Next Dose Date"
-msgstr "Next Dose Date"
+msgid "Select Day of the Dose"
+msgstr "Select Day of the Dose"
 
-msgid "Alarm"
-msgstr "Alarm"
+msgid "Time"
+msgstr "Time"
+
+msgid "Next Dose Time"
+msgstr "Next Dose Time"
 
 msgid "Next Refill Date"
 msgstr "Next Refill Date"
 
 msgid "Assign the device number, or click clear to clear previous device"
 msgstr "Assign the device number, or click clear to clear previous device"
-
-msgid "Missing Dose Data"
-msgstr "Missing Dose Data"
 
 msgid "Patient Summary"
 msgstr "Patient Summary"
@@ -290,6 +290,15 @@ msgstr "Edit Device"
 
 msgid "Set Alarm"
 msgstr "Set Alarm"
+
+msgid "Missing Device Information"
+msgstr "Missing Device Information"
+
+msgid " has no linked DAT Device"
+msgstr " has no linked DAT Device"
+
+msgid "Assigned Device"
+msgstr "Assigned Device"
 
 msgid "Total Openings"
 msgstr "Total Openings"

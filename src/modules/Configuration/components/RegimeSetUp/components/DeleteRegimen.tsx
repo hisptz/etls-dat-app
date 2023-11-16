@@ -8,18 +8,17 @@ import {
 	ButtonStrip,
 } from "@dhis2/ui";
 import i18n from "@dhis2/d2-i18n";
-import { remove } from "../state";
-import { useRecoilState } from "recoil";
 import { useSetting } from "@dhis2/app-service-datastore";
 import { RegimenFormData } from "./EditRegimen";
 import { useAlert } from "@dhis2/app-runtime";
 
 interface DeleteSetting {
 	regimen?: string;
+	onHide: () => void;
+	hide: boolean;
 }
 
-function DeleteSetting({ regimen }: DeleteSetting) {
-	const [hideModal, setHide] = useRecoilState<boolean>(remove);
+function DeleteSetting({ regimen, hide, onHide }: DeleteSetting) {
 	const [regimens, { set: deleteSetting }] = useSetting("regimenSetting", {
 		global: true,
 	});
@@ -39,7 +38,7 @@ function DeleteSetting({ regimen }: DeleteSetting) {
 				message: "Regimen Deleted Successfully",
 				type: { success: true },
 			});
-			setHide(true);
+			onHide();
 		}
 	};
 
@@ -47,9 +46,9 @@ function DeleteSetting({ regimen }: DeleteSetting) {
 		<div>
 			<Modal
 				position="middle"
-				hide={hideModal}
+				hide={hide}
 				onClose={() => {
-					setHide(true);
+					onHide();
 				}}
 			>
 				<ModalTitle>
@@ -86,7 +85,7 @@ function DeleteSetting({ regimen }: DeleteSetting) {
 					<ButtonStrip end>
 						<Button
 							onClick={() => {
-								setHide(true);
+								onHide();
 							}}
 							secondary
 						>

@@ -12,10 +12,10 @@ import { RHFDHIS2FormField } from "@hisptz/dhis2-ui";
 import i18n from "@dhis2/d2-i18n";
 import { useRecoilState } from "recoil";
 import { FilterField } from "../../ProgramMapping/components/FilterField";
-import { add, editDevice } from "../state";
+import { add } from "../state";
 
 import { useSetting } from "@dhis2/app-service-datastore";
-import { deviceEmeiList } from "../../../../shared/constants";
+import { deviceIMEIList } from "../../../../shared/constants";
 import { FormProvider, useForm } from "react-hook-form";
 import { readXLSXFile } from "../hooks/data";
 import { z } from "zod";
@@ -23,7 +23,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useAlert } from "@dhis2/app-runtime";
 
 const schema = z.object({
-	emei: z
+	IMEI: z
 		.string({ required_error: "Device IMEI number is required" })
 		.nonempty("Device IMEI number is required"),
 	inUse: z.boolean().optional(),
@@ -34,20 +34,27 @@ const schema2 = z.object({});
 
 export type DeviceFormData = z.infer<typeof schema>;
 
-const EditDevice = ({ data }: { data?: DeviceFormData }) => {
-	const [hide, setHide] = useRecoilState<boolean>(editDevice);
+const EditDevice = ({
+	data,
+	hide,
+	onHide,
+}: {
+	data?: DeviceFormData;
+	hide: boolean;
+	onHide: () => void;
+}) => {
 	const [addNew, setAdd] = useRecoilState<boolean>(add);
 	const [bulkUpload, setBulkUpload] = useState<boolean>(false);
 	const [deviceFile, setDeviceFile] = useState<File>();
 	const [excelFile, setExcelFile] = useState<{ imeiNumbers: [object] }>();
-	const [devices, { set: addDevice }] = useSetting("deviceEmeiList", {
+	const [devices, { set: addDevice }] = useSetting("deviceIMEIList", {
 		global: true,
 	});
 
-	const createDeviceFromEMINumber = (deviceEMInumber: string) => ({
-		name: deviceEMInumber,
-		code: deviceEMInumber,
-		emei: deviceEMInumber,
+	const createDeviceFromIMEINumber = (deviceIMEInumber: string) => ({
+		name: deviceIMEInumber,
+		code: deviceIMEInumber,
+		IMEI: deviceIMEInumber,
 		inUse: false,
 	});
 	const { show } = useAlert(
@@ -57,7 +64,7 @@ const EditDevice = ({ data }: { data?: DeviceFormData }) => {
 
 	const updateDeviceListAndShowSuccess = (updatedDevices: any) => {
 		addDevice(updatedDevices);
-		setHide(true);
+		onHide();
 		setAdd(false);
 		show({
 			message: "Devices Updated Successfully",
@@ -66,10 +73,10 @@ const EditDevice = ({ data }: { data?: DeviceFormData }) => {
 	};
 
 	const onSave = async (deviceData: DeviceFormData) => {
-		if (deviceData.emei && !bulkUpload) {
+		if (deviceData.IMEI && !bulkUpload) {
 			const updatedDevices = [...devices, deviceData];
 			const isDeviceAlreadyPresent = devices.some(
-				(device: any) => device.emei === deviceData.emei,
+				(device: any) => device.IMEI === deviceData.IMEI,
 			);
 			isDeviceAlreadyPresent
 				? show({
@@ -79,21 +86,21 @@ const EditDevice = ({ data }: { data?: DeviceFormData }) => {
 				: updateDeviceListAndShowSuccess(updatedDevices);
 		} else if (excelFile) {
 			const devicesFromExcel = excelFile.imeiNumbers.map(
-				(deviceEMInumber: any) =>
-					createDeviceFromEMINumber(
-						deviceEMInumber["devices"].toString(),
+				(deviceIMEInumber: any) =>
+					createDeviceFromIMEINumber(
+						deviceIMEInumber["devices"].toString(),
 					),
 			);
 
 			const uniqueDevicesMap = new Map();
 
 			devices.forEach((device: any) => {
-				uniqueDevicesMap.set(device.emei, device);
+				uniqueDevicesMap.set(device.IMEI, device);
 			});
 
 			devicesFromExcel.forEach((device) => {
-				if (!uniqueDevicesMap.has(device.emei)) {
-					uniqueDevicesMap.set(device.emei, device);
+				if (!uniqueDevicesMap.has(device.IMEI)) {
+					uniqueDevicesMap.set(device.IMEI, device);
 				}
 			});
 
@@ -103,12 +110,12 @@ const EditDevice = ({ data }: { data?: DeviceFormData }) => {
 	};
 
 	const onEdit = async (deviceData: DeviceFormData) => {
-		if (data?.emei && deviceData.emei) {
-			const updatedDevices = devices.map((device: deviceEmeiList) =>
-				device.emei === data.emei
+		if (data?.IMEI && deviceData.IMEI) {
+			const updatedDevices = devices.map((device: deviceIMEIList) =>
+				device.IMEI === data.IMEI
 					? {
 							...device,
-							emei: deviceData.emei,
+							IMEI: deviceData.IMEI,
 							code: deviceData.code,
 							name: deviceData.name,
 					  }
@@ -119,35 +126,22 @@ const EditDevice = ({ data }: { data?: DeviceFormData }) => {
 	};
 
 	const onClose = () => {
-		setHide(true);
 		setAdd(false);
 		setBulkUpload(false);
+		onHide();
 		form.reset({});
 	};
 
 	const onSubmit = async (data: DeviceFormData) => {
-		data.code = data.emei;
+		data.code = data.IMEI;
 		data.inUse = false;
-		data.name = data.emei;
+		data.name = data.IMEI;
 		addNew ? await onSave(data) : await onEdit(data);
 		form.reset({});
 	};
 
 	const form = useForm<DeviceFormData>({
-		defaultValues: async () => {
-			return new Promise((resolve) =>
-				resolve(
-					addNew
-						? {}
-						: {
-								emei: data?.emei ?? "",
-								code: data?.code,
-								inUse: data?.inUse,
-								name: data?.name,
-						  },
-				),
-			);
-		},
+		defaultValues: data,
 		resolver: zodResolver(bulkUpload ? schema2 : schema),
 	});
 
@@ -211,12 +205,12 @@ const EditDevice = ({ data }: { data?: DeviceFormData }) => {
 								<div>
 									<FilterField
 										label={i18n.t("Device IMEI number")}
-										name="emei"
+										name="IMEI"
 										type="text"
 									/>
 									<label style={{ fontSize: "12px" }}>
 										{i18n.t(
-											"Add the EMEI number as seen on the device",
+											"Add the IMEI number as seen on the device",
 										)}
 									</label>
 								</div>

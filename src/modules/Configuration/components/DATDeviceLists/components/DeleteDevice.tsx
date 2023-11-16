@@ -8,20 +8,19 @@ import {
 	ButtonStrip,
 } from "@dhis2/ui";
 import i18n from "@dhis2/d2-i18n";
-import { remove } from "../state";
-import { useRecoilState } from "recoil";
 import { useSetting } from "@dhis2/app-service-datastore";
-import { deviceEmeiList } from "../../../../shared/constants";
+import { deviceIMEIList } from "../../../../shared/constants";
 import { useAlert } from "@dhis2/app-runtime";
 
 interface DeleteDevice {
-	emei?: string;
+	IMEI?: string;
 	inUse?: boolean;
+	hide: boolean;
+	onHide: () => void;
 }
 
-function DeleteDevice({ emei, inUse }: DeleteDevice) {
-	const [hideModal, setHide] = useRecoilState<boolean>(remove);
-	const [devices, { set: deleteDevice }] = useSetting("deviceEmeiList", {
+function DeleteDevice({ IMEI, inUse, hide, onHide }: DeleteDevice) {
+	const [devices, { set: deleteDevice }] = useSetting("deviceIMEIList", {
 		global: true,
 	});
 
@@ -31,21 +30,21 @@ function DeleteDevice({ emei, inUse }: DeleteDevice) {
 	);
 
 	const onDelete = () => {
-		if (emei) {
+		if (IMEI) {
 			if (!inUse) {
 				const updatedDevices = devices.filter(
-					(item: deviceEmeiList) => item["emei"] !== emei,
+					(item: deviceIMEIList) => item["IMEI"] !== IMEI,
 				);
 				deleteDevice(updatedDevices);
 				show({
 					message: "Device Deleted Successfully",
 					type: { success: true },
 				});
-				setHide(true);
+				onHide();
 			} else {
-				setHide(true);
+				onHide();
 				show({
-					message: `Device with emei ${emei} can not be deleted since it has dependencies with a client`,
+					message: `Device with IMEI ${IMEI} can not be deleted since it has dependencies with a client`,
 					type: { info: true },
 				});
 			}
@@ -56,9 +55,9 @@ function DeleteDevice({ emei, inUse }: DeleteDevice) {
 		<div>
 			<Modal
 				position="middle"
-				hide={hideModal}
+				hide={hide}
 				onClose={() => {
-					setHide(true);
+					onHide();
 				}}
 			>
 				<ModalTitle>
@@ -83,11 +82,11 @@ function DeleteDevice({ emei, inUse }: DeleteDevice) {
 					>
 						<label style={{ fontSize: "16px" }}>
 							{i18n.t(
-								"Are you sure you want to delete the device with EMEI ",
+								"Are you sure you want to delete the device with IMEI ",
 							)}
 						</label>
 						<span style={{ fontWeight: "bold" }}>
-							{i18n.t(`${emei}`)}
+							{i18n.t(`${IMEI}`)}
 						</span>
 					</div>
 				</ModalContent>
@@ -95,7 +94,7 @@ function DeleteDevice({ emei, inUse }: DeleteDevice) {
 					<ButtonStrip end>
 						<Button
 							onClick={() => {
-								setHide(true);
+								onHide();
 							}}
 							secondary
 						>

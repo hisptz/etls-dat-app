@@ -57,7 +57,7 @@ function AdherenceStreak({ events, frequency }: CalendarProps) {
 
 			const tooltipId = `daily-tooltip-${i}`;
 			const tooltipContent = i18n.t(
-				`Date: ${formatDate(cellDate)} \n Status: ${
+				`Date: ${formatDate(cellDate)} Status: ${
 					cellColor
 						? cellColor == "green"
 							? "Dose Taken"
@@ -74,15 +74,17 @@ function AdherenceStreak({ events, frequency }: CalendarProps) {
 						key={i}
 						className={`${styles["calendar-cell"]} ${styles[cellColor]}`}
 						style={{ fontSize: "18px" }}
-						data-tooltip-id={tooltipId}
+						data-tooltip-id={!cellColor ? undefined : tooltipId}
 					></div>
-					<Tooltip
-						id={tooltipId}
-						content={tooltipContent}
-						delayShow={500}
-						closeOnResize
-						place="bottom"
-					/>
+					{cellColor !== "" && (
+						<Tooltip
+							id={tooltipId}
+							content={tooltipContent}
+							delayShow={500}
+							closeOnResize
+							place="bottom"
+						/>
+					)}
 				</>,
 			);
 		}
@@ -140,15 +142,19 @@ function AdherenceStreak({ events, frequency }: CalendarProps) {
 						key={i}
 						className={`${styles["calendar-cell"]} ${styles[monthStreakColor]}`}
 						style={{ fontSize: "18px" }}
-						data-tooltip-id={tooltipId}
+						data-tooltip-id={
+							!monthStreakColor ? undefined : tooltipId
+						}
 					></div>
-					<Tooltip
-						id={tooltipId}
-						content={tooltipContent}
-						delayShow={500}
-						closeOnResize
-						place="bottom"
-					/>
+					{monthStreakColor !== "" && (
+						<Tooltip
+							id={tooltipId}
+							content={tooltipContent}
+							delayShow={500}
+							closeOnResize
+							place="bottom"
+						/>
+					)}
 				</>,
 			);
 		}
@@ -198,15 +204,17 @@ function AdherenceStreak({ events, frequency }: CalendarProps) {
 						key={`before-${week}`}
 						className={`${styles["calendar-week-cell"]} ${styles[weekColor]}`}
 						style={{ fontSize: "18px" }}
-						data-tooltip-id={tooltipId}
+						data-tooltip-id={!weekColor ? undefined : tooltipId}
 					></div>
-					<Tooltip
-						id={tooltipId}
-						content={tooltipContent}
-						place="bottom"
-						delayShow={500}
-						closeOnResize
-					/>
+					{weekColor !== "" && (
+						<Tooltip
+							id={tooltipId}
+							content={tooltipContent}
+							delayShow={500}
+							closeOnResize
+							place="bottom"
+						/>
+					)}
 				</>,
 			);
 		}

@@ -15,7 +15,9 @@ export function TBAdherenceDetails() {
 	const { patient, error, loading, refresh } = usePatient();
 	const navigate = useNavigate();
 
-	const { data, loadingDevice } = useDeviceData(patient?.deviceIMEINumber);
+	const { data, loadingDevice, refetchDevice } = useDeviceData(
+		patient?.deviceIMEINumber,
+	);
 
 	const dose = [
 		{
@@ -36,7 +38,7 @@ export function TBAdherenceDetails() {
 		},
 	];
 
-	if ((loading && !patient) || loadingDevice) {
+	if (loading || loadingDevice) {
 		return <FullPageLoader />;
 	}
 
@@ -68,6 +70,7 @@ export function TBAdherenceDetails() {
 						refetch={refresh}
 						data={data}
 						loading={loading}
+						refetchDevice={refetchDevice}
 					/>
 				</div>
 				<div

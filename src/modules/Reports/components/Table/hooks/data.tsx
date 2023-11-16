@@ -1,7 +1,8 @@
-import { useDataQuery } from "@dhis2/app-runtime";
+import { useAlert, useDataQuery } from "@dhis2/app-runtime";
 import { useEffect, useState } from "react";
 import { Pagination } from "@hisptz/dhis2-utils";
 import { useSearchParams } from "react-router-dom";
+import i18n from "@dhis2/d2-i18n";
 import { compact, isEmpty } from "lodash";
 import { useDownloadData } from "../../../utils/download";
 import { PatientProfile } from "../../../../shared/models";
@@ -15,6 +16,10 @@ import { TrackedEntity } from "../../../../shared/types";
 import { useSetting } from "@dhis2/app-service-datastore";
 import { DateTime } from "luxon";
 import { PeriodUtility } from "@hisptz/dhis2-utils";
+import axios from "axios";
+import { saveAs } from "file-saver";
+import { useRecoilState } from "recoil";
+import { SelectedReport } from "../FilterArea/components/FilterField";
 
 const query: any = {
 	reports: {
@@ -66,7 +71,7 @@ export function filterObject(programMapping: programMapping) {
 			attribute: programMapping.attributes?.tbDistrictNumber,
 			operator: "eq",
 		},
-		deviceEMInumber: {
+		deviceIMEInumber: {
 			attribute: programMapping.attributes?.deviceIMEInumber,
 			operator: "eq",
 		},
@@ -103,7 +108,7 @@ export function useFilters() {
 
 export function useReportTableData() {
 	const { filters } = useFilters();
-	const [reports, setreports] = useState<PatientProfile[]>([]);
+	const [reports, setreports] = useState<PatientProfile[] | []>([]);
 	const [programMapping] = useSetting("programMapping", {
 		global: true,
 	});
@@ -210,7 +215,7 @@ export function useReportTableData() {
 		if (!isEmpty(orgUnit) && !isEmpty(startDate)) {
 			download(type, {
 				orgUnit,
-				filters,
+				pageSize: 700,
 				startDate,
 				endDate,
 				program: programId,
@@ -232,3 +237,97 @@ export function useReportTableData() {
 		refetch,
 	};
 }
+
+export const useDATDevices = () => {
+	const [programMapping] = useSetting("programMapping", { global: true });
+	const [report] = useRecoilState<ReportConfig>(SelectedReport);
+	const [data, setData] = useState<any>();
+	const [errorDevice, setError] = useState<any>();
+	const [loadingDevice, setLoading] = useState(true);
+	const MediatorUrl = programMapping.mediatorUrl;
+	const ApiKey = programMapping.apiKey;
+	const [downloadingDAT, setDownloading] = useState(false);
+
+	const { show, hide } = useAlert(
+		({ message }) => message,
+		({ type }) => ({ ...type, duration: 1500 }),
+	);
+
+	useEffect(() => {
+		const fetchData = async () => {
+			try {
+				const response = await axios.get(
+					`${MediatorUrl}/api/devices/`,
+					{
+						headers: {
+							"x-api-key": ApiKey,
+						},
+					},
+				);
+				setData(response.data);
+
+				setLoading(false);
+			} catch (error) {
+				setError(error);
+
+				setLoading(false);
+			}
+		};
+
+		fetchData();
+	}, []);
+
+	const downloadFile = async (type: "xlsx" | "json" | "csv") => {
+		setDownloading(true);
+		try {
+			if (type === "json") {
+				saveAs(
+					new File(
+						[JSON.stringify(data.devices)] as any,
+						"data.json",
+						{
+							type: "json",
+						},
+					),
+					`${report.name}.json`,
+				);
+			} else if (type === "xlsx") {
+				const excel = await import("xlsx");
+				const workbook = excel.utils.book_new();
+				const worksheet = excel.utils.json_to_sheet(data.devices);
+				excel.utils.book_append_sheet(workbook, worksheet, "data");
+				excel.writeFile(workbook, `${report.name}.xlsx`);
+			} else if (type === "csv") {
+				const excel = await import("xlsx");
+				const worksheet = excel.utils.json_to_sheet(data.devices);
+				const csvData = excel.utils.sheet_to_csv(worksheet);
+				saveAs(
+					new File([csvData], "data.csv", {
+						type: "csv",
+					}),
+					`${report.name}.csv`,
+				);
+			}
+			show({
+				type: {
+					info: true,
+				},
+				message: `${i18n.t("Downloading...")}`,
+			});
+		} catch (e: any) {
+			show({ message: e.message, type: { critical: true } });
+			setTimeout(() => hide(), 5000);
+		} finally {
+			setDownloading(false);
+			hide();
+		}
+	};
+
+	return {
+		data,
+		errorDevice,
+		loadingDevice,
+		downloadFile,
+		downloadingDAT,
+	};
+};

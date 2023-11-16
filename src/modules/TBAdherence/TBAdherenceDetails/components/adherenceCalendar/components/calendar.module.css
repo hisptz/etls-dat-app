@@ -1,15 +1,15 @@
 .calendar {
 	display: grid;
-	grid-template-columns: repeat(7, 135px);
-	max-width: 1200px;
+	grid-template-columns: repeat(7, 7vw);
+	max-width: 70vw;
 	margin: 0 auto;
 	font-family: Arial, sans-serif;
 }
 
 .calendar-week {
 	display: grid;
-	grid-template-columns: repeat(4, 220px);
-	max-width: 1200px;
+	grid-template-columns: repeat(4, 12vw);
+	max-width: 70vw;
 	margin: 0 auto;
 	font-family: Arial, sans-serif;
 	padding-top: 20px;
@@ -17,8 +17,8 @@
 
 .calendar-monthly {
 	display: grid;
-	grid-template-columns: repeat(4, 230px);
-	max-width: 1200px;
+	grid-template-columns: repeat(4, 13.5vw);
+	max-width: 70vw;
 	margin: 0 auto;
 	font-family: Arial, sans-serif;
 	padding-top: 20px;
@@ -34,7 +34,7 @@
 }
 
 .calendar-cell {
-	width: 135px;
+	width: 7vw;
 	height: 65px;
 	background-color: #f2f3f7;
 	display: flex;
@@ -42,10 +42,44 @@
 	justify-content: center;
 	font-weight: "500";
 	border: 0.1rem solid #cccccc6c;
+	position: relative;
+}
+
+.calendar-cell-dot {
+	width: 7vw;
+	height: 65px;
+	border: 0.1rem solid #cccccc6c;
+	position: absolute;
+}
+
+.calendar-week-cell-dot {
+	width: 11.9vw;
+	height: 70px;
+	border: 0.1rem solid #cccccc6c;
+	position: absolute;
+}
+
+.calendar-monthly-cell-dot {
+	width: 13.3vw;
+	height: 70px;
+	border: 0.1rem solid #cccccc6c;
+	position: absolute;
+}
+
+.event-dot {
+	width: 7vw;
+	height: 65px;
+	background-color: #f2f3f7;
+	display: "flex";
+	flex-direction: "row";
+	align-items: center;
+	justify-content: center;
+	font-weight: "500";
+	border: 0.1rem solid #cccccc6c;
 }
 
 .calendar-week-cell {
-	width: 230px;
+	width: 12vw;
 	height: 70px;
 	background-color: #f2f3f7;
 	display: flex;
@@ -53,10 +87,11 @@
 	justify-content: center;
 	font-weight: "500";
 	border: 0.1rem solid #cccccc6c;
+	position: relative;
 }
 
 .calendar-cell-monthly {
-	width: 230px;
+	width: 13.5vw;
 	height: 70px;
 	background-color: #f2f3f7;
 	display: flex;
@@ -64,15 +99,26 @@
 	justify-content: center;
 	font-weight: "500";
 	border: 0.1rem solid #cccccc6c;
+	position: relative;
 }
 
 .days {
-	width: 120px;
+	width: 7vw;
 	height: 50px;
 	background-color: "white";
 	display: flex;
 	align-items: center;
 	justify-content: center;
+}
+
+.diagnaol-box-1 {
+	left: 0;
+	clip-path: polygon(0% 0%, 100% 0%, 0% 100%);
+}
+
+.diagnaol-box-2 {
+	left: 0;
+	clip-path: polygon(100% 0%, 0% 100%, 100% 100%);
 }
 
 .blue {

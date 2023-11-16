@@ -8,7 +8,7 @@ import {
 } from "@dhis2/ui";
 import { useSearchParams } from "react-router-dom";
 import { isEmpty } from "lodash";
-import { DATA_TEST_PREFIX, deviceEmeiList } from "../../../../shared/constants";
+import { DATA_TEST_PREFIX, deviceIMEIList } from "../../../../shared/constants";
 import { Option } from "../hooks/data";
 import { useController } from "react-hook-form";
 
@@ -18,11 +18,12 @@ export interface FilterFieldProps {
 	required?: boolean;
 	validations?: Record<string, any>;
 	initialValue?: string;
-	options?: [{ name: string; code: string }] | Option[] | deviceEmeiList[];
+	options?: [{ name: string; code: string }] | Option[] | deviceIMEIList[];
 	update?: (val: number) => void;
 	type: "date" | "text" | "select" | "time" | "password";
 	multiSelect?: boolean;
 	loading?: boolean;
+	width?: string;
 }
 
 export function FilterField({
@@ -33,6 +34,7 @@ export function FilterField({
 	options,
 	initialValue,
 	type,
+	width,
 	multiSelect,
 	...props
 }: FilterFieldProps) {
@@ -122,7 +124,7 @@ export function FilterField({
 			type={type}
 			error={!!fieldState.error}
 			validationText={fieldState.error?.message}
-			inputWidth={type == "time" ? "120px" : null}
+			inputWidth={type == "time" ? width : null}
 			required={required}
 			onChange={({ value }) => {
 				field.onChange(value);
