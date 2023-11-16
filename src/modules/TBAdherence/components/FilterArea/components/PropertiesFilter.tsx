@@ -32,8 +32,8 @@ export function PropertiesFilter() {
 					type="text"
 				/>
 				<FilterField
-					name="deviceEMInumber"
-					label={i18n.t("Device EMI Number")}
+					name="deviceIMEInumber"
+					label={i18n.t("Device IMEI Number")}
 					type="text"
 				/>
 				<FilterField

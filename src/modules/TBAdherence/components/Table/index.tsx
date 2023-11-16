@@ -52,7 +52,7 @@ export default function TBAdherenceTable({
 
 		const adherenceEvents = filteredEvents.map((item: any) => {
 			return {
-				date: DateTime.fromISO(item.occurredAt).toISODate(),
+				date: item.occurredAt[0].value,
 				event:
 					item.dataValues[0].value == "Once"
 						? "takenDose"

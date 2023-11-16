@@ -6,25 +6,28 @@ import { useCallback, useEffect, useState } from "react";
 import { Pagination } from "@hisptz/dhis2-utils";
 import { flattenDeep, get, isEmpty, range } from "lodash";
 import { saveAs } from "file-saver";
+import { useRecoilState } from "recoil";
+import { ReportConfig } from "../../shared/constants";
+import { SelectedReport } from "../components/Table/FilterArea/components/FilterField";
 
 export async function downloadFile(
 	type: "xlsx" | "json" | "csv",
 	data: any[],
-	options?: { filename?: string },
+	filename?: string,
 ) {
 	if (type === "json") {
 		saveAs(
 			new File([JSON.stringify(data)] as any, "data.json", {
 				type: "json",
 			}),
-			`${options?.filename ?? "data"}.json`,
+			`${filename ?? "data"}.json`,
 		);
 	} else if (type === "xlsx") {
 		const excel = await import("xlsx");
 		const workbook = excel.utils.book_new();
 		const worksheet = excel.utils.json_to_sheet(data);
 		excel.utils.book_append_sheet(workbook, worksheet, "data");
-		excel.writeFile(workbook, `${options?.filename ?? "data"}.xlsx`);
+		excel.writeFile(workbook, `${filename ?? "data"}.xlsx`);
 	} else if (type === "csv") {
 		const excel = await import("xlsx");
 		const worksheet = excel.utils.json_to_sheet(data);
@@ -33,7 +36,7 @@ export async function downloadFile(
 			new File([csvData], "data.csv", {
 				type: "csv",
 			}),
-			`${options?.filename ?? "data"}.csv`,
+			`${filename ?? "data"}.csv`,
 		);
 	}
 }
@@ -94,12 +97,13 @@ export function useDownloadData({
 }) {
 	const { show, hide } = useAlert(
 		({ message }) => message,
-		({ type }) => ({ ...type, duration: 10000 }),
+		({ type }) => ({ ...type, duration: 55000 }),
 	);
 
 	const [downloading, setDownloading] = useState(false);
 	const [pageCount, setPageCount] = useState(0);
 	const [progress, setProgress] = useState(0);
+	const [report] = useRecoilState<ReportConfig>(SelectedReport);
 
 	const { refetch } = useDataQuery(query, { lazy: true });
 
@@ -160,7 +164,7 @@ export function useDownloadData({
 								asyncify(dataFetch),
 							),
 						);
-						await downloadFile(type, data);
+						await downloadFile(type, data, report.name);
 					}
 				}
 			} catch (e: any) {

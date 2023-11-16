@@ -8,11 +8,9 @@ import {
 	ButtonStrip,
 } from "@dhis2/ui";
 import i18n from "@dhis2/d2-i18n";
-import { useRecoilState } from "recoil";
-import { AddDevice } from "../../state";
 import { FilterField } from "../../../Configuration/components/ProgramMapping/components/FilterField";
 import { useSetting } from "@dhis2/app-service-datastore";
-import { deviceEmeiList } from "../../constants";
+import { deviceIMEIList } from "../../constants";
 import { useAssignDevice } from "../utils/assignDevice";
 import { FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -24,30 +22,38 @@ interface editDeviceProps {
 	name: string;
 	value: string;
 	refetch: () => void;
+	hide: boolean;
+	onHide: () => void;
 }
 
 const schema = z.object({
-	emei: z
+	IMEI: z
 		.string({ required_error: "Device IMEI number is required" })
 		.nonempty("Device IMEI number is required"),
 });
 
 export type DeviceData = z.infer<typeof schema>;
 
-function EditDevice({ name, value, patientId, refetch }: editDeviceProps) {
-	const [hide, setHide] = useRecoilState<boolean>(AddDevice);
-	const [devices, { set: updateDevice }] = useSetting("deviceEmeiList", {
+function EditDevice({
+	name,
+	value,
+	patientId,
+	refetch,
+	hide,
+	onHide,
+}: editDeviceProps) {
+	const [devices, { set: updateDevice }] = useSetting("deviceIMEIList", {
 		global: true,
 	});
 	const [availableDevices, setAvailableDevices] =
-		useState<deviceEmeiList[]>();
+		useState<deviceIMEIList[]>();
 	const { assignDevice, assignDeviceWisePill } = useAssignDevice();
 
 	useEffect(() => {
 		setAvailableDevices(
 			devices.filter(
-				(device: deviceEmeiList) =>
-					!device.inUse || device.emei === value,
+				(device: deviceIMEIList) =>
+					!device.inUse || device.IMEI === value,
 			),
 		);
 	}, []);
@@ -58,22 +64,22 @@ function EditDevice({ name, value, patientId, refetch }: editDeviceProps) {
 
 	const onSave = async (data: DeviceData) => {
 		if (data) {
-			const updatedDevices = devices.map((device: deviceEmeiList) => ({
+			const updatedDevices = devices.map((device: deviceIMEIList) => ({
 				...device,
 				inUse:
-					device.emei === data.emei
+					device.IMEI === data.IMEI
 						? true
-						: device.emei === value && value !== data.emei
+						: device.IMEI === value && value !== data.IMEI
 						? false
 						: device.inUse,
 			}));
 
 			await assignDeviceWisePill({
-				imei: data.emei,
+				imei: data.IMEI,
 				patientId: patientId,
 			}).then(async (response) => {
 				if (response.response) {
-					await assignDevice(data.emei).then(async (res) => {
+					await assignDevice(data.IMEI).then(async (res) => {
 						if (res?.updated != 0) {
 							await updateDevice(updatedDevices).then(
 								async () => {
@@ -103,17 +109,17 @@ function EditDevice({ name, value, patientId, refetch }: editDeviceProps) {
 
 	const onClose = async () => {
 		form.reset();
-		setHide(true);
+		onHide();
 	};
 	const onSubmit = async (data: DeviceData) => {
 		await onSave(data);
-		setHide(true);
+		onHide();
 		form.reset();
 	};
 
 	const form = useForm<DeviceData>({
 		defaultValues: async () => {
-			return new Promise((resolve) => resolve({ emei: value }));
+			return new Promise((resolve) => resolve({ IMEI: value }));
 		},
 
 		resolver: zodResolver(schema),
@@ -138,7 +144,7 @@ function EditDevice({ name, value, patientId, refetch }: editDeviceProps) {
 						>
 							<FilterField
 								label={i18n.t("Device IMEI number")}
-								name="emei"
+								name="IMEI"
 								type="select"
 								options={availableDevices}
 							/>

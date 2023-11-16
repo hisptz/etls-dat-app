@@ -9,9 +9,6 @@ import { Pagination } from "@hisptz/dhis2-utils";
 import { isEmpty } from "lodash";
 import { FullPageLoader } from "../../../../shared/components/Loaders";
 import { ActionButton } from "../../../../shared/components/ActionButton";
-import { editRegimen, remove } from "../state";
-import { useRecoilState } from "recoil";
-
 import { regimenSetting } from "../../../../shared/constants";
 import AddSetting, { RegimenFormData } from "./EditRegimen";
 import DeleteSetting from "./DeleteRegimen";
@@ -25,12 +22,15 @@ export default function RegimenTable({
 	loading,
 	regimens,
 }: regimensTableProps) {
-	const [hideDel, setDelete] = useRecoilState<boolean>(remove);
+	const [hideDel, setDelete] = useState<boolean>(true);
 	const [hide, setEdit] = useState<boolean>(true);
 	const [selectedRegimen, setSelectedRegimen] = useState<RegimenFormData>();
 
 	const onHide = () => {
 		setEdit(true);
+	};
+	const onHideDel = () => {
+		setDelete(true);
 	};
 
 	const regimensColumns = [
@@ -54,21 +54,7 @@ export default function RegimenTable({
 			label: "Ideal Doses",
 			path: "idealDoses",
 		},
-		{
-			key: "idealDuration",
-			label: "Ideal Duration(months)",
-			path: "idealDuration",
-		},
-		{
-			key: "completionMinimumDoses",
-			label: "Completion Minimum\nDoses",
-			path: "completionMinimumDoses",
-		},
-		{
-			key: "completionMaximumDuration",
-			label: "Completion Maximum\nDuration",
-			path: "completionMaximumDuration",
-		},
+
 		{
 			key: "action",
 			label: "Action",
@@ -81,12 +67,12 @@ export default function RegimenTable({
 			<>
 				<ActionButton
 					onDelete={() => {
-						setDelete(false);
 						setSelectedRegimen(regimen);
+						setDelete(false);
 					}}
 					onEdit={() => {
-						setEdit(false);
 						setSelectedRegimen(regimen);
+						setEdit(false);
 					}}
 				></ActionButton>
 			</>
@@ -125,7 +111,11 @@ export default function RegimenTable({
 							/>
 						)}
 						{!hideDel && (
-							<DeleteSetting regimen={selectedRegimen?.regimen} />
+							<DeleteSetting
+								regimen={selectedRegimen?.regimen}
+								onHide={onHideDel}
+								hide={hideDel}
+							/>
 						)}
 					</>
 				)}

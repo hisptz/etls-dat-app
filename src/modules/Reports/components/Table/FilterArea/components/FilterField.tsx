@@ -1,6 +1,5 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
-	InputField,
 	MultiSelectField,
 	MultiSelectOption,
 	SingleSelectField,
@@ -11,17 +10,15 @@ import {
 	Modal,
 	ModalTitle,
 	ModalContent,
-	ButtonStrip,
-	Button,
-	ModalActions,
 } from "@dhis2/ui";
 import { useSearchParams } from "react-router-dom";
-import { compact, isEmpty } from "lodash";
+import { isEmpty } from "lodash";
 import {
 	DATA_TEST_PREFIX,
 	ReportConfig,
 } from "../../../../../shared/constants";
 import { Option } from "../../../../../shared/types";
+import { atom, useRecoilState } from "recoil";
 import i18n from "@dhis2/d2-i18n";
 import { OrgUnitSelectorModal } from "@hisptz/dhis2-ui";
 import { PeriodSelectorModal } from "@hisptz/dhis2-ui";
@@ -43,6 +40,16 @@ export interface FilterFieldProps {
 	multiSelect?: boolean;
 }
 
+export const SelectedReport = atom<ReportConfig>({
+	key: "selected-report-state",
+	default: {
+		name: "",
+		id: "",
+		filters: [],
+		columns: [],
+	},
+});
+
 export function FilterField({
 	name,
 	label,
@@ -52,6 +59,7 @@ export function FilterField({
 }: FilterFieldProps) {
 	const [params, setParams] = useSearchParams();
 	const value = params.get(name);
+	const [, setSelectedReport] = useRecoilState<ReportConfig>(SelectedReport);
 	const [orgUnits, setOrgUnits] = useState<boolean>(true);
 	const [periods, setPeriods] = useState<boolean>(true);
 	const [reports, setReports] = useState<boolean>(true);
@@ -109,6 +117,7 @@ export function FilterField({
 		if (type === "report") {
 			return reportConfig?.map((report: ReportConfig) => {
 				if (report.id === value) {
+					setSelectedReport(report);
 					return report.name;
 				}
 			});

@@ -1,16 +1,14 @@
-import React from "react";
+import React, { useState } from "react";
 import i18n from "@dhis2/d2-i18n";
 import { Card, CircularLoader, Button } from "@dhis2/ui";
 import styles from "./programMapping.module.css";
 import { DATA_TEST_PREFIX } from "../../../shared/constants";
-import { edit } from "./state";
-import { useRecoilState } from "recoil";
 import Edit from "./components/EditProgramMapping";
 import { usePrograms } from "./hooks/data";
 import { useSetting } from "@dhis2/app-service-datastore";
 
 export function ProgramMapping() {
-	const [hide, setHide] = useRecoilState<boolean>(edit);
+	const [hide, setHide] = useState<boolean>(true);
 	const {
 		program,
 		attributeOptions,
@@ -20,6 +18,10 @@ export function ProgramMapping() {
 		refetch,
 	} = usePrograms();
 	const [programMapping] = useSetting("programMapping", { global: true });
+
+	const onHide = () => {
+		setHide(true);
+	};
 
 	return loading ? (
 		<div
@@ -104,6 +106,8 @@ export function ProgramMapping() {
 					programOptions={programOptions}
 					error={error}
 					onUpdate={refetch}
+					hide={hide}
+					onHide={onHide}
 				/>
 			)}
 		</div>

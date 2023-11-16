@@ -1,17 +1,17 @@
-import React from "react";
+import React, { ReactNode } from "react";
 import { IconWarningFilled24 } from "@dhis2/ui";
-import i18n from "@dhis2/d2-i18n";
 
 interface NoDeviceAssigned {
-	message: string;
+	message: ReactNode;
+	title: string;
 }
 
-function NoDeviceAssigned({ message }: NoDeviceAssigned) {
+function NoDeviceAssigned({ message, title }: NoDeviceAssigned) {
 	return (
 		<div
 			style={{
 				width: "25vw",
-				height: "10vh",
+				height: "12vh",
 				backgroundColor: "#fff8e1",
 				border: "2px solid #ffe491",
 				padding: "16px",
@@ -30,10 +30,16 @@ function NoDeviceAssigned({ message }: NoDeviceAssigned) {
 					paddingLeft: "20px",
 				}}
 			>
-				<span style={{ marginBottom: "16px" }}>
-					{i18n.t("Missing Dose Data")}
+				<span
+					style={{
+						marginBottom: "16px",
+						fontWeight: "500",
+						fontSize: "18px",
+					}}
+				>
+					{title}
 				</span>
-				<span>{i18n.t(message)}</span>
+				{message}
 			</div>
 		</div>
 	);

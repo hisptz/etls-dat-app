@@ -22,26 +22,21 @@ function AdherenceCalendar({ profile, data }: ProfileAreaProps) {
 		programMapping.programStage,
 	);
 
-	const formatDateWithTime = (date: Date) => {
-		const options = {
-			year: "numeric",
-			month: "short",
-			day: "numeric",
-			hour: "2-digit",
-			minute: "2-digit",
-			hour12: true,
-		};
-		return date.toLocaleDateString(undefined, options);
+	const formatDateWithTime = (date: string) => {
+		const eventDateTime = DateTime.fromISO(date).toFormat(
+			"MMMM dd, yyyy hh:mm a",
+		);
+
+		return eventDateTime;
 	};
-	const formatDate = (date: Date) => {
-		const options = {
-			year: "numeric",
-			month: "short",
-			day: "numeric",
-		};
-		return date.toLocaleDateString(undefined, options);
+
+	const formatDate = (date: string) => {
+		const eventDateTime = DateTime.fromISO(date).toFormat("MMMM dd, yyyy");
+
+		return eventDateTime;
 	};
 	const [formattedDate, setFormattedDate] = useState<string>();
+
 	const [formattedDateWithTime, setFormattedDateWithTime] =
 		useState<string>();
 
@@ -49,7 +44,7 @@ function AdherenceCalendar({ profile, data }: ProfileAreaProps) {
 
 	const adherenceEvents = filteredEvents.map((item: any) => {
 		return {
-			date: DateTime.fromISO(item.occurredAt).toISODate(),
+			date: item.occurredAt[0].value,
 			event:
 				item.dataValues[0].value == "Once"
 					? "takenDose"
@@ -65,9 +60,14 @@ function AdherenceCalendar({ profile, data }: ProfileAreaProps) {
 
 	const events: DateEvent[] = [
 		...adherenceEvents,
+
 		{
 			date: profile.enrollmentDate,
 			event: "enrolled",
+		},
+		{
+			date: "2023-02-02T07:47",
+			event: "takenDose",
 		},
 	];
 
@@ -84,10 +84,9 @@ function AdherenceCalendar({ profile, data }: ProfileAreaProps) {
 		).toFormat("MMMM dd, yyyy hh:mm a") ?? "";
 
 	const doseAlarm =
-		DateTime.fromFormat(
-			data?.alarmTime ?? "",
-			"yyyy-MM-dd HH:mm:ss",
-		).toFormat("MMMM dd, yyyy hh:mm a") ?? "";
+		DateTime.fromFormat(data?.alarmTime ?? "", "HH:mm:ss").toFormat(
+			"hh:mm a",
+		) ?? "";
 
 	const batteryLevel = data?.batteryLevel ? data.batteryLevel + "%" : "N/A";
 
@@ -127,11 +126,18 @@ function AdherenceCalendar({ profile, data }: ProfileAreaProps) {
 			>
 				{profile.deviceIMEINumber == "N/A" ? (
 					<NoDeviceAssigned
-						message={`${profile.name} has no dose data recorded`}
+						title={i18n.t("Missing Dose Data")}
+						message={
+							<span>
+								<span style={{ fontWeight: "600" }}>
+									{profile.name}
+								</span>
+								{i18n.t(" has no dose data recorded")}
+							</span>
+						}
 					/>
 				) : (
 					<>
-						{" "}
 						<label
 							className={styles["label-value"]}
 							htmlFor="value"

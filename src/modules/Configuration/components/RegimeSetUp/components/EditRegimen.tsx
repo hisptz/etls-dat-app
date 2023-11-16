@@ -28,15 +28,6 @@ const schema = z.object({
 	idealDoses: z
 		.string({ required_error: "Ideal Doses is required" })
 		.nonempty("Ideal Doses is required"),
-	idealDuration: z
-		.string({ required_error: "Ideal Duration is required" })
-		.nonempty("Ideal Duration is required"),
-	completionMinimumDoses: z
-		.string({ required_error: "Completion Minimum is required" })
-		.nonempty("Completion Minimum Doses is required"),
-	completionMaximumDuration: z
-		.string({ required_error: "Completion Maximum is required" })
-		.nonempty("Completion Maximum Duration is required"),
 });
 
 export type RegimenFormData = z.infer<typeof schema>;
@@ -107,11 +98,6 @@ const AddSetting = ({
 							regimen: regimenData.regimen,
 							administration: regimenData.administration,
 							idealDoses: regimenData.idealDoses,
-							idealDuration: regimenData.idealDuration,
-							completionMinimumDoses:
-								regimenData.completionMinimumDoses,
-							completionMaximumDuration:
-								regimenData.completionMaximumDuration,
 					  }
 					: setting,
 			);
@@ -159,32 +145,6 @@ const AddSetting = ({
 								<FilterField
 									label={i18n.t("Ideal Doses")}
 									name="idealDoses"
-									type="text"
-									required
-								/>
-							</div>
-							<div style={{ padding: "5px" }}>
-								<FilterField
-									label={i18n.t("Ideal Duration (Months)")}
-									name="idealDuration"
-									type="text"
-									required
-								/>
-							</div>
-							<div style={{ padding: "5px" }}>
-								<FilterField
-									label={i18n.t("Completion Minimum Doses")}
-									name="completionMinimumDoses"
-									type="text"
-									required
-								/>
-							</div>
-							<div style={{ padding: "5px" }}>
-								<FilterField
-									label={i18n.t(
-										"Completion Maximum Duration (Months)",
-									)}
-									name="completionMaximumDuration"
 									type="text"
 									required
 								/>
