@@ -37,6 +37,8 @@ function AdherenceCalendar({ profile, data }: ProfileAreaProps) {
 	};
 	const [formattedDate, setFormattedDate] = useState<string>();
 
+	const [batteryLevel, setBatteryLevel] = useState<any>();
+
 	const [formattedDateWithTime, setFormattedDateWithTime] =
 		useState<string>();
 
@@ -55,6 +57,7 @@ function AdherenceCalendar({ profile, data }: ProfileAreaProps) {
 					: item.dataValues[0].value == "None"
 					? ""
 					: "",
+			batteryLevel: item.batteryLevel[0]?.value ?? "",
 		};
 	});
 
@@ -88,7 +91,7 @@ function AdherenceCalendar({ profile, data }: ProfileAreaProps) {
 			"hh:mm a",
 		) ?? "";
 
-	const batteryLevel = data?.batteryLevel ? data.batteryLevel + "%" : "N/A";
+	data?.batteryLevel ? data.batteryLevel + "%" : "N/A";
 
 	return (
 		<div
@@ -111,6 +114,7 @@ function AdherenceCalendar({ profile, data }: ProfileAreaProps) {
 					events={events}
 					frequency={profile.adherenceFrequency}
 					onClick={(val) => {
+						setBatteryLevel(val.batteryLevel);
 						setFormattedDateWithTime(formatDateWithTime(val.date));
 						setFormattedDate(formatDate(val.date));
 						setEventCode(val.event);
@@ -236,7 +240,11 @@ function AdherenceCalendar({ profile, data }: ProfileAreaProps) {
 									htmlFor="value"
 								>
 									{eventCode == "green" || eventCode == "blue"
-										? batteryLevel
+										? batteryLevel === undefined
+											? "N/A"
+											: batteryLevel !== ""
+											? batteryLevel + "%"
+											: "N/A"
 										: i18n.t("N/A")}
 								</label>
 							</div>
