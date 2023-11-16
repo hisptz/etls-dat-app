@@ -396,51 +396,102 @@ function Calendar({ events, frequency, onClick }: CalendarProps) {
 		const calendarCells = [];
 		const monthsInYear = 12;
 
-		for (let month = 0; month < monthsInYear; month++) {
-			let monthColor = "";
+		const getEventsForMonth = (start, end) => {
+			return events.filter((event) => {
+				const eventDate = new Date(event.date);
+				return (
+					DateTime.fromJSDate(eventDate) >=
+						DateTime.fromJSDate(start) &&
+					DateTime.fromJSDate(eventDate) <= DateTime.fromJSDate(end)
+				);
+			});
+		};
 
+		for (let month = 0; month < monthsInYear; month++) {
 			const startDate = new Date(currentYear, month, 1);
 			const endDate = new Date(currentYear, month + 1, 0);
 
-			for (const event of events) {
-				const eventDate = new Date(event.date);
-				if (
-					DateTime.fromJSDate(eventDate) >=
-						DateTime.fromJSDate(startDate) &&
-					DateTime.fromJSDate(eventDate) <=
-						DateTime.fromJSDate(endDate)
-				) {
-					monthColor = cellColors[event.event];
-					break;
-				}
-			}
+			const monthEvents = getEventsForMonth(startDate, endDate);
 
-			calendarCells.push(
+			const filterUniqueEvents = () => {
+				const uniqueEvents = [];
+				const seenEvents = new Set();
+
+				for (const event of monthEvents) {
+					const eventKey = JSON.stringify(event);
+					if (!seenEvents.has(eventKey) && event.event !== "") {
+						seenEvents.add(eventKey);
+						uniqueEvents.push(event);
+					}
+				}
+				return uniqueEvents;
+			};
+
+			const uniqueMonthEvents = filterUniqueEvents();
+
+			const filterUnique = () => {
+				const uniqueEventsMap = {};
+
+				for (const event of uniqueMonthEvents) {
+					if (!uniqueEventsMap[event.event]) {
+						uniqueEventsMap[event.event] = event;
+					}
+				}
+
+				const uniqueEventsArray = Object.values(uniqueEventsMap);
+				return uniqueEventsArray;
+			};
+
+			const uniqueMonthlyEvents = filterUnique();
+
+			console.log(uniqueMonthlyEvents);
+
+			const cellContent = uniqueMonthlyEvents.map((event, index) => (
 				<div
-					key={`month-${month}`}
-					className={`${styles["calendar-cell-monthly"]} ${styles[monthColor]}`}
-					style={{ fontSize: "18px" }}
+					key={`color-${index}`}
+					className={`${styles["calendar-monthly-cell-dot"]} 	${
+						styles[
+							uniqueMonthlyEvents.length !== 1
+								? index === 0
+									? "diagnaol-box-1"
+									: "diagnaol-box-2"
+								: ""
+						]
+					}  ${styles[cellColors[event.event]]}`}
 					onClick={() => {
-						if (monthColor) {
-							let date: string | null = null;
-							events.map((event) => {
-								const eventDate = new Date(event.date);
-								if (
-									eventDate >= startDate &&
-									eventDate <= endDate
-								) {
-									if (date == null) {
-										date = event.date;
-									}
-								}
-							});
-							if (date != null) showDetails(date, monthColor);
-						}
+						showDetails(event.date, cellColors[event.event]);
+					}}
+				></div>
+			));
+
+			const monthname = (
+				<span
+					style={{
+						fontSize: "18px",
+						position: "absolute",
+						fontWeight:
+							uniqueMonthEvents.length !== 0 ? "500" : undefined,
+						color:
+							uniqueMonthEvents.length !== 0
+								? "white"
+								: undefined,
+						zIndex: 1,
 					}}
 				>
 					{new Date(currentYear, month, 1).toLocaleString("default", {
 						month: "long",
 					})}
+				</span>
+			);
+
+			calendarCells.push(
+				<div
+					key={`month-${month}`}
+					className={`${styles["calendar-cell-monthly"]}`}
+					style={{ fontSize: "18px" }}
+				>
+					{cellContent}
+					{monthname}
 				</div>,
 			);
 		}
