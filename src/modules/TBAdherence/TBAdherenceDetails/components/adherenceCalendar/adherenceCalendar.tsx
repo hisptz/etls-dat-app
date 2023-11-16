@@ -60,12 +60,13 @@ function AdherenceCalendar({ profile, data }: ProfileAreaProps) {
 
 	const events: DateEvent[] = [
 		...adherenceEvents,
+
 		{
 			date: profile.enrollmentDate,
 			event: "enrolled",
 		},
 		{
-			date: "2023-02-02T06:47:00",
+			date: "2023-02-02T07:47",
 			event: "takenDose",
 		},
 	];

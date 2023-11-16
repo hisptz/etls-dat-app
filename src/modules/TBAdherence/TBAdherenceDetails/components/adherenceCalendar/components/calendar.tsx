@@ -51,7 +51,9 @@ function Calendar({ events, frequency, onClick }: CalendarProps) {
 					) {
 						targetColor = cellColors[event.event];
 						if (targetDate === null) {
-							targetDate = event.date;
+							targetDate = DateTime.fromJSDate(
+								new Date(),
+							).toISO();
 						}
 					}
 				});
@@ -68,8 +70,10 @@ function Calendar({ events, frequency, onClick }: CalendarProps) {
 							DateTime.fromJSDate(endDateM)
 					) {
 						if (targetDate === null) {
-							(targetDate = event.date),
-								(targetColor = cellColors[event.event]);
+							targetDate = DateTime.fromJSDate(
+								new Date(),
+							).toISO();
+							targetColor = cellColors[event.event];
 						}
 					}
 				});
@@ -256,9 +260,14 @@ function Calendar({ events, frequency, onClick }: CalendarProps) {
 	const renderWeeklyCalendar = () => {
 		const calendarCells = [];
 		const weeksInMonth = 4;
-		for (let week = 1; week <= weeksInMonth; week++) {
-			let weekColor = "";
 
+		const getEventsForDate = (date: any) => {
+			return events.filter((event) =>
+				isSameDay(DateTime.fromISO(event.date).toJSDate(), date),
+			);
+		};
+
+		for (let week = 1; week <= weeksInMonth; week++) {
 			const startDate = new Date(
 				currentYear,
 				currentMonth,
@@ -270,43 +279,112 @@ function Calendar({ events, frequency, onClick }: CalendarProps) {
 				week == 4 ? week * 8 : week * 7,
 			);
 
+			const uniqueEvents: any = [];
+			const weekEvents: any[] = [];
+
 			for (const event of events) {
 				const eventDate = new Date(event.date);
-				if (
-					DateTime.fromJSDate(eventDate) >=
-						DateTime.fromJSDate(startDate) &&
-					DateTime.fromJSDate(eventDate) <=
-						DateTime.fromJSDate(endDate)
-				) {
-					weekColor = cellColors[event.event];
-					break;
-				}
+				const eventsForDate = getEventsForDate(eventDate);
+
+				const eventSet = new Set();
+
+				eventsForDate.forEach((event) => {
+					const eventKey = `${event.date}-${event.event}`;
+					if (!eventSet.has(eventKey) && event.event !== "") {
+						uniqueEvents.push(event);
+						eventSet.add(eventKey);
+					}
+				});
 			}
+
+			uniqueEvents.forEach((event: any) => {
+				const eventDate = DateTime.fromISO(event.date).toJSDate();
+				if (eventDate >= startDate && eventDate <= endDate) {
+					weekEvents.push(event);
+				}
+			});
+
+			const filterUniqueEvents = () => {
+				const uniqueEvents = [];
+				const seenEvents = new Set();
+
+				for (const event of weekEvents) {
+					const eventKey = JSON.stringify(event);
+					if (!seenEvents.has(eventKey)) {
+						seenEvents.add(eventKey);
+						uniqueEvents.push(event);
+					}
+				}
+
+				return uniqueEvents;
+			};
+
+			const WeekEvents = filterUniqueEvents();
+
+			const filterUnique = () => {
+				const uniqueEventsMap: any = {};
+
+				for (const event of WeekEvents) {
+					if (!uniqueEventsMap[event.event]) {
+						uniqueEventsMap[event.event] = event;
+					}
+				}
+
+				const uniqueEventsArray = Object.values(uniqueEventsMap);
+				return uniqueEventsArray;
+			};
+
+			const uniqueWeekEvents = filterUnique();
+
+			const cellContent = uniqueWeekEvents.map((event, index) => (
+				<div
+					key={`color-${index}`}
+					className={`${styles["calendar-week-cell-dot"]}  ${
+						styles[
+							weekEvents.length !== 1
+								? index === 0
+									? "diagnaol-box-1"
+									: "diagnaol-box-2"
+								: ""
+						]
+					}  ${styles[cellColors[event.event]]}`}
+					onClick={() => {
+						showDetails(event.date, cellColors[event.event]);
+					}}
+				></div>
+			));
+
+			const isDatePresent = uniqueWeekEvents.some((event: any) => {
+				const eventDate = DateTime.fromISO(event.date).toISODate();
+				return (
+					eventDate >= DateTime.fromJSDate(startDate).toISODate() &&
+					eventDate <= DateTime.fromJSDate(endDate).toISODate() &&
+					event.event !== ""
+				);
+			});
+
+			const weekno = (
+				<span
+					style={{
+						fontSize: "18px",
+						position: "absolute",
+						fontWeight: isDatePresent ? "500" : undefined,
+						color: isDatePresent ? "white" : undefined,
+						zIndex: 1,
+					}}
+				>
+					Week {week}
+				</span>
+			);
 
 			calendarCells.push(
 				<div
 					key={`before-${week}`}
-					className={`${styles["calendar-week-cell"]} ${styles[weekColor]}`}
+					className={`${styles["calendar-week-cell"]}`}
 					style={{ fontSize: "18px" }}
-					onClick={() => {
-						if (weekColor) {
-							let date: string | null = null;
-							events.map((event) => {
-								const eventDate = new Date(event.date);
-								if (
-									eventDate >= startDate &&
-									eventDate <= endDate
-								) {
-									if (date == null) {
-										date = event.date;
-									}
-								}
-							});
-							if (date != null) showDetails(date, weekColor);
-						}
-					}}
 				>
-					Week {week}
+					{cellContent}
+					{weekno}
 				</div>,
 			);
 		}

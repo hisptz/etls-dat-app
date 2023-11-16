@@ -42,11 +42,26 @@
 	justify-content: center;
 	font-weight: "500";
 	border: 0.1rem solid #cccccc6c;
+	position: relative;
 }
 
 .calendar-cell-dot {
 	width: 7vw;
 	height: 65px;
+	border: 0.1rem solid #cccccc6c;
+	position: absolute;
+}
+
+.calendar-week-cell-dot {
+	width: 11.9vw;
+	height: 70px;
+	border: 0.1rem solid #cccccc6c;
+	position: absolute;
+}
+
+.calendar-monthly-cell-dot {
+	width: 13.2vw;
+	height: 70px;
 	border: 0.1rem solid #cccccc6c;
 	position: absolute;
 }
@@ -72,6 +87,7 @@
 	justify-content: center;
 	font-weight: "500";
 	border: 0.1rem solid #cccccc6c;
+	position: relative;
 }
 
 .calendar-cell-monthly {
@@ -83,6 +99,7 @@
 	justify-content: center;
 	font-weight: "500";
 	border: 0.1rem solid #cccccc6c;
+	position: relative;
 }
 
 .days {
