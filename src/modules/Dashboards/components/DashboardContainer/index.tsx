@@ -2,13 +2,17 @@ import React from "react";
 import { useDefaultDashboardData } from "../../hooks/data";
 
 export default function DashboardContainer(): React.ReactElement {
-	const { loadingEnrollemntStatus, error } = useDefaultDashboardData();
+	const {
+		loadingEnrollemntStatus,
+		loadingAdherenceSummary,
+		enrollemntStatusError,
+	} = useDefaultDashboardData();
 
-	if (error) {
+	if (enrollemntStatusError) {
 		return <h3>Error</h3>;
 	}
 
-	if (loadingEnrollemntStatus) {
+	if (loadingEnrollemntStatus || loadingAdherenceSummary) {
 		return <h3>Loading...</h3>;
 	}
 
