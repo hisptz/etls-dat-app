@@ -187,7 +187,7 @@ export const dashboards: DashboardItem[] = [
 		type: "custom",
 		options: {
 			renderAs: "progress",
-			title: "Realtime Adherence Percentage",
+			title: "Last 1 day Patience Adherence ",
 		},
 	},
 	{

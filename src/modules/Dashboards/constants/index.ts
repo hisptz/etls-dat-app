@@ -24,7 +24,7 @@ export const TRACKED_ENTITY_INSTANCE_QUERY = {
 
 export const EVENTS_QUERY = {
 	query: {
-		resource: "trackedEntityInstances",
+		resource: "events",
 		params: ({ programStage, page, orgUnit, startDate, endDate }: any) => ({
 			programStage,
 			orgUnit,
@@ -34,7 +34,12 @@ export const EVENTS_QUERY = {
 			page: page ?? 1,
 			pageSize: DEFAULT_PAGE_SIZE,
 			ouMode: "DESCENDANTS",
-			fields: ["event", "eventDate", "dataValues[dataElement,value]"],
+			fields: [
+				"event",
+				"trackedEntityInstance",
+				"eventDate",
+				"dataValues[dataElement,value]",
+			],
 		}),
 	},
 };
