@@ -7,12 +7,14 @@ import { useDataEngine } from "@dhis2/app-runtime";
 
 import {
 	DEFAULT_PAGE_SIZE,
+	TRACKED_ENTITY_ATTRIBUTE_QUERY,
 	TRACKED_ENTITY_INSTANCE_PAGINATION_QUERY,
 	TRACKED_ENTITY_INSTANCE_QUERY,
 } from "../constants";
 import { PeriodUtility, TrackedEntityInstance } from "@hisptz/dhis2-utils";
 import { useSetting } from "@dhis2/app-service-datastore";
 import { getDhis2FormattedDate } from "../../shared/utils";
+import { Option, TrackedEntityAttribute } from "../../shared/types";
 
 interface EnrollmentSummary {
 	numberOfClientsWithDevices: number;
@@ -31,7 +33,9 @@ interface DefaultDashboardData extends EnrollmentSummary {
 function getEnrollmentSummary(
 	trackedEntityInstances: TrackedEntityInstance[],
 	attributes: Record<string, string>,
-): Record<string, string | number> {
+	sexAttributeOptions: any[],
+): Record<string, number | Record<string, number>> {
+	let enrollmentBySex: { [key: string]: number } = {};
 	const { sex, deviceIMEInumber } = attributes;
 
 	const enrolledClients = filter(trackedEntityInstances, ({ attributes }) => {
@@ -46,9 +50,23 @@ function getEnrollmentSummary(
 		);
 	});
 
+	for (const option of sexAttributeOptions) {
+		const { code, name } = option;
+		enrollmentBySex = {
+			...enrollmentBySex,
+			[name]: filter(trackedEntityInstances, ({ attributes }) => {
+				const sexAttribute = find(
+					attributes,
+					({ attribute }) => attribute === sex,
+				);
+				return sexAttribute?.value === code;
+			}).length,
+		};
+	}
+
 	return {
-		clientsRegisteredIntoDat: enrolledClients.length,
-		enrollmentBySex: 0,
+		clientsRegisteredIntoDAT: enrolledClients.length,
+		enrollmentBySex,
 	};
 }
 
@@ -127,6 +145,25 @@ export function useDefaultDashboardData() {
 		return trackedEntityInstances;
 	};
 
+	const getSexOptionsMapping = async (): Promise<
+		{ name: string; code: string }[]
+	> => {
+		const { sex: sexAttributeId } = programMapping?.attributes ?? {};
+		let options: { name: string; code: string }[] = [];
+		try {
+			const { query: teiAttribute } = (await engine.query(
+				TRACKED_ENTITY_ATTRIBUTE_QUERY,
+				{
+					variables: { id: sexAttributeId ?? "" },
+				},
+			)) as { query: TrackedEntityAttribute };
+			options = teiAttribute ? teiAttribute.optionSet.options : options;
+		} catch (error) {
+			// Options don't exist
+		}
+		return options;
+	};
+
 	useEffect(() => {
 		async function getDefaultDashboardData() {
 			setLoadingEnrollemntStatus(true);
@@ -151,16 +188,19 @@ export function useDefaultDashboardData() {
 						const numberOfClients = trackedEntityInstances.length;
 						const numberOfDevices = (devices ?? []).length;
 
-						const { clientsRegisteredIntoDat, enrollmentBySex } =
+						const sexAttributeOptions =
+							await getSexOptionsMapping();
+						const { clientsRegisteredIntoDAT, enrollmentBySex } =
 							getEnrollmentSummary(
 								trackedEntityInstances,
 								programMapping?.attributes,
+								sexAttributeOptions,
 							);
 
 						console.log({
 							numberOfClients,
 							numberOfDevices,
-							clientsRegisteredIntoDat,
+							clientsRegisteredIntoDAT,
 							enrollmentBySex,
 						});
 					},

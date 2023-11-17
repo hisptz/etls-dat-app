@@ -74,3 +74,13 @@ export const TRACKED_ENTITY_INSTANCE_PAGINATION_QUERY = {
 		}),
 	},
 };
+
+export const TRACKED_ENTITY_ATTRIBUTE_QUERY = {
+	query: {
+		resource: "trackedEntityAttributes",
+		id: ({ id }: any) => id,
+		params: {
+			fields: ["id", "name", "optionSet[options[name,code]]"],
+		},
+	},
+};
