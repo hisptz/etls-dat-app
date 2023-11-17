@@ -68,10 +68,6 @@ function AdherenceCalendar({ profile, data }: ProfileAreaProps) {
 			date: profile.enrollmentDate,
 			event: "enrolled",
 		},
-		{
-			date: "2023-02-02T07:47",
-			event: "takenDose",
-		},
 	];
 
 	const refillAlarm =
