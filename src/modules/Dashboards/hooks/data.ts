@@ -28,6 +28,7 @@ import { Event, Option, TrackedEntityAttribute } from "../../shared/types";
 import { DateTime } from "luxon";
 import { DATA_ELEMENTS } from "../../shared/constants";
 
+const CONCURRENT_REQUESTS = 5;
 interface EnrollmentSummary {
 	numberOfClients: number;
 	numberOfDevices: number;
@@ -38,14 +39,15 @@ interface EnrollmentSummary {
 }
 
 interface AdherenceSummary {
-	lastOneDayAdherencePercentage: number;
+	totalDeviceSignalEvents: number;
+	deviceSignalsForDoseTake: number;
 }
 
 function getEnrollmentSummary(
 	trackedEntityInstances: TrackedEntityInstance[],
 	attributes: Record<string, string>,
 	sexAttributeOptions: any[],
-): Record<string, number | Record<string, number>> {
+): any {
 	let enrollmentBySex: { [key: string]: number } = {};
 	const { sex, deviceIMEInumber } = attributes;
 
@@ -81,7 +83,7 @@ function getEnrollmentSummary(
 	};
 }
 
-function getAdherenceSummary(events: Event[]): number {
+function getAdherenceSummary(events: Event[]): AdherenceSummary {
 	const doseTakenSignals = ["Once", "Multiple"];
 
 	const eventForDoseTaken = filter(events, ({ dataValues }) => {
@@ -104,11 +106,10 @@ function getAdherenceSummary(events: Event[]): number {
 		groupBy(events, "trackedEntityInstance"),
 	).length;
 
-	return parseFloat(
-		((countOfEventsForDoseTaken / countOfEventUniqueByTei) * 100).toFixed(
-			2,
-		),
-	);
+	return {
+		totalDeviceSignalEvents: countOfEventUniqueByTei,
+		deviceSignalsForDoseTake: countOfEventsForDoseTaken,
+	};
 }
 
 function getPaginationList(totalItems: number): number[] {
@@ -130,6 +131,10 @@ export function useDefaultDashboardData() {
 		useState<boolean>(false);
 	const [enrollemntStatusError, setEnrollemntStatusError] = useState(null);
 	const [adherenceSummaryError, setAdherenceSummaryError] = useState(null);
+	const [enrollmentSummary, setEnrollmentSummary] =
+		useState<EnrollmentSummary | null>(null);
+	const [adherenceSummary, setAdherenceSummary] =
+		useState<AdherenceSummary | null>(null);
 
 	const engine = useDataEngine();
 	const controller = new AbortController();
@@ -237,83 +242,84 @@ export function useDefaultDashboardData() {
 		return options;
 	};
 
+	const fetchEnrollemntSummary = async (): Promise<void> => {
+		try {
+			setLoadingEnrollemntStatus(true);
+			setEnrollemntStatusError(null);
+			await getTrackedEntityInstancePaginations().then(
+				async (totalPages) => {
+					let trackedEntityInstances = await mapLimit(
+						totalPages,
+						CONCURRENT_REQUESTS,
+						async (page: number) => {
+							return await getTrackedEntityInstances(page);
+						},
+					);
+					trackedEntityInstances = flattenDeep(
+						trackedEntityInstances,
+					);
+
+					const numberOfClients = trackedEntityInstances.length;
+					const numberOfDevices = (devices ?? []).length;
+
+					const sexAttributeOptions = await getSexOptionsMapping();
+					const { clientsRegisteredIntoDAT, enrollmentBySex } =
+						getEnrollmentSummary(
+							trackedEntityInstances,
+							programMapping?.attributes,
+							sexAttributeOptions,
+						);
+
+					setEnrollmentSummary({
+						numberOfClients,
+						numberOfDevices,
+						clientsRegisteredIntoDAT,
+						enrollmentBySex,
+					});
+				},
+				(error) => {
+					setEnrollemntStatusError(error?.toString());
+				},
+			);
+		} catch (error: any) {
+			setEnrollemntStatusError(error);
+		} finally {
+			setLoadingEnrollemntStatus(false);
+		}
+	};
+
+	const fetchAdherenceSummary = async (): Promise<void> => {
+		try {
+			setLoadingAdherenceSummary(true);
+			await getEventsPaginations().then(
+				async (totalPages) => {
+					let events: Event[] = await mapLimit(
+						totalPages,
+						CONCURRENT_REQUESTS,
+						async (page: number) => {
+							return await getEvents(page);
+						},
+					);
+					events = flattenDeep(events);
+					setAdherenceSummary(getAdherenceSummary(events));
+				},
+				(error: any) => {
+					setAdherenceSummaryError(error);
+				},
+			);
+		} catch (error) {
+			setAdherenceSummaryError(error);
+		} finally {
+			setLoadingAdherenceSummary(false);
+		}
+	};
+
 	useEffect(() => {
 		async function getDefaultDashboardData() {
 			// Fetching enrollment summary
-			try {
-				setLoadingEnrollemntStatus(true);
-				setEnrollemntStatusError(null);
-				await getTrackedEntityInstancePaginations().then(
-					async (totalPages) => {
-						let trackedEntityInstances = await mapLimit(
-							totalPages,
-							5,
-							async (page: number) => {
-								return await getTrackedEntityInstances(page);
-							},
-						);
-						trackedEntityInstances = flattenDeep(
-							trackedEntityInstances,
-						);
-
-						// TODO get sanitized data
-						const numberOfClients = trackedEntityInstances.length;
-						const numberOfDevices = (devices ?? []).length;
-
-						const sexAttributeOptions =
-							await getSexOptionsMapping();
-						const { clientsRegisteredIntoDAT, enrollmentBySex } =
-							getEnrollmentSummary(
-								trackedEntityInstances,
-								programMapping?.attributes,
-								sexAttributeOptions,
-							);
-
-						console.log({
-							numberOfClients,
-							numberOfDevices,
-							clientsRegisteredIntoDAT,
-							enrollmentBySex,
-						});
-					},
-					(error) => {
-						setEnrollemntStatusError(error?.toString());
-					},
-				);
-			} catch (error: any) {
-				setEnrollemntStatusError(error);
-				setLoadingEnrollemntStatus(false);
-			} finally {
-				setLoadingEnrollemntStatus(false);
-			}
-
+			await fetchEnrollemntSummary();
 			// Fetching adherence summary
-			try {
-				setLoadingAdherenceSummary(true);
-				await getEventsPaginations().then(
-					async (totalPages) => {
-						let events: Event[] = await mapLimit(
-							totalPages,
-							5,
-							async (page: number) => {
-								return await getEvents(page);
-							},
-						);
-						events = flattenDeep(events);
-						const lastOneDayAdherencePercentage =
-							getAdherenceSummary(events);
-
-						console.log({ events, lastOneDayAdherencePercentage });
-					},
-					(error: any) => {
-						setAdherenceSummaryError(error);
-					},
-				);
-			} catch (error) {
-				//
-			} finally {
-				setLoadingAdherenceSummary(false);
-			}
+			await fetchAdherenceSummary();
 		}
 		setTimeout(() => {
 			getDefaultDashboardData();
@@ -329,5 +335,7 @@ export function useDefaultDashboardData() {
 		loadingAdherenceSummary,
 		enrollemntStatusError,
 		adherenceSummaryError,
+		enrollmentSummary,
+		adherenceSummary,
 	};
 }
