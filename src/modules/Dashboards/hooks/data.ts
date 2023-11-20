@@ -129,8 +129,8 @@ export function useDefaultDashboardData() {
 		useState<boolean>(false);
 	const [loadingAdherenceSummary, setLoadingAdherenceSummary] =
 		useState<boolean>(false);
-	const [enrollemntStatusError, setEnrollemntStatusError] = useState(null);
-	const [adherenceSummaryError, setAdherenceSummaryError] = useState(null);
+	const [enrollemntStatusError, setEnrollemntStatusError] = useState<any>(null);
+	const [adherenceSummaryError, setAdherenceSummaryError] = useState<any>(null);
 	const [enrollmentSummary, setEnrollmentSummary] =
 		useState<EnrollmentSummary | null>(null);
 	const [adherenceSummary, setAdherenceSummary] =
