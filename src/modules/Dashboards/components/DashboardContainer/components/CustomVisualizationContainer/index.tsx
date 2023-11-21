@@ -1,6 +1,7 @@
 import React from "react";
 import { DashboardItem } from "../../../../../shared/interfaces";
-import DashboardLoader from "../VisualizationLoader";
+import CustomVisualizationLoader from "./components/VisualizationLoader";
+import CustomVisualizationBody from "./components/VisualizationBody";
 
 interface CustomVisualizationProps {
 	config: DashboardItem;
@@ -33,11 +34,14 @@ export default function CustomVisualizationContainer({
 			{/* Chart loader */}
 			{loading && (
 				<div>
-					<DashboardLoader />
+					<CustomVisualizationLoader />
 				</div>
 			)}
 
 			{/* Chart body */}
+			{!loading && (
+				<CustomVisualizationBody data={data} config={config} />
+			)}
 		</div>
 	);
 }

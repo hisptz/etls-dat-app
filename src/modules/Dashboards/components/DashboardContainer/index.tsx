@@ -5,6 +5,17 @@ import { useDefaultDashboardData } from "../../hooks/data";
 import { useSetting } from "@dhis2/app-service-datastore";
 import { useAlert } from "@dhis2/app-runtime";
 import { DashboardItem } from "../../../shared/interfaces";
+import CustomVisualizationContainer from "./components/CustomVisualizationContainer";
+import D2VisualizationContainer from "./components/D2VisualizationContainer";
+import {
+	DEVICE_USAGE_DASHBOARD_ITEM_ID,
+	DAT_ENROLLMENT_DASHBOARD_ITEM_ID,
+} from "../../constants";
+
+const customEnrollmentDashboardItems = [
+	DEVICE_USAGE_DASHBOARD_ITEM_ID,
+	DAT_ENROLLMENT_DASHBOARD_ITEM_ID,
+];
 
 export default function DashboardContainer(): React.ReactElement {
 	const {
@@ -15,7 +26,22 @@ export default function DashboardContainer(): React.ReactElement {
 		enrollmentSummary,
 		adherenceSummary,
 	} = useDefaultDashboardData();
-	console.log({ enrollmentSummary, adherenceSummary });
+
+	const getCustomDashboardItemLoading = (config: DashboardItem): boolean => {
+		const { id } = config;
+		return customEnrollmentDashboardItems.includes(id)
+			? loadingEnrollemntStatus
+			: loadingAdherenceSummary;
+	};
+
+	const getCustomDashboardItemData = (
+		config: DashboardItem,
+	): Record<string, any> => {
+		const { id } = config;
+		return customEnrollmentDashboardItems.includes(id)
+			? enrollmentSummary ?? {}
+			: adherenceSummary ?? {};
+	};
 	const [dashboardConfigurations] = useSetting("dashboards", {
 		global: true,
 	});
@@ -60,11 +86,24 @@ export default function DashboardContainer(): React.ReactElement {
 					>
 						<Box height="100%" width="100%">
 							<Card>
-								<div style={{ padding: 8 }}>
-									<p>
-										{dashboardConfiguration.options?.title}
-									</p>
-								</div>
+								{dashboardConfiguration.type == "custom" ? (
+									<CustomVisualizationContainer
+										config={dashboardConfiguration}
+										loading={getCustomDashboardItemLoading(
+											dashboardConfiguration,
+										)}
+										data={getCustomDashboardItemData(
+											dashboardConfiguration,
+										)}
+									/>
+								) : dashboardConfiguration.type ==
+								  "visualization" ? (
+									<D2VisualizationContainer
+										{...dashboardConfiguration}
+									/>
+								) : (
+									<p>Not found</p>
+								)}
 							</Card>
 						</Box>
 					</div>

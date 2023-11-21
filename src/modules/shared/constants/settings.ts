@@ -1,3 +1,8 @@
+import {
+	ADHERENCE_PERCENTAGE_DASHBOARD_ITEM_ID,
+	DAT_ENROLLMENT_DASHBOARD_ITEM_ID,
+	DEVICE_USAGE_DASHBOARD_ITEM_ID,
+} from "../../Dashboards/constants";
 import { DashboardItem } from "../interfaces";
 
 export interface TBAdherenceConfig {
@@ -173,7 +178,7 @@ export const TBAdherence: TBAdherenceConfig[] = [
 
 export const dashboards: DashboardItem[] = [
 	{
-		id: "device-usage",
+		id: DEVICE_USAGE_DASHBOARD_ITEM_ID,
 		span: 3,
 		type: "custom",
 		options: {
@@ -182,7 +187,7 @@ export const dashboards: DashboardItem[] = [
 		},
 	},
 	{
-		id: "adherence-percentage",
+		id: ADHERENCE_PERCENTAGE_DASHBOARD_ITEM_ID,
 		span: 1,
 		type: "custom",
 		options: {
@@ -191,7 +196,7 @@ export const dashboards: DashboardItem[] = [
 		},
 	},
 	{
-		id: "dat-enrollment",
+		id: DAT_ENROLLMENT_DASHBOARD_ITEM_ID,
 		span: 2,
 		type: "custom",
 		options: {

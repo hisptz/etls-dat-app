@@ -1,4 +1,4 @@
-export const DEFAULT_PAGE_SIZE = 500;
+export const DEFAULT_PAGE_SIZE = 1000;
 
 export const TRACKED_ENTITY_INSTANCE_QUERY = {
 	query: {
@@ -89,3 +89,7 @@ export const TRACKED_ENTITY_ATTRIBUTE_QUERY = {
 		},
 	},
 };
+
+export const DEVICE_USAGE_DASHBOARD_ITEM_ID = "device-usage";
+export const DAT_ENROLLMENT_DASHBOARD_ITEM_ID = "dat-enrollment";
+export const ADHERENCE_PERCENTAGE_DASHBOARD_ITEM_ID = "adherence-percentage";

@@ -1,7 +1,7 @@
 import React, { ReactElement } from "react";
-import { CardLoader } from "../../../../../shared/components/Loaders";
+import { CardLoader } from "../../../../../../../shared/components/Loaders";
 
-export default function DashboardLoader(): ReactElement {
+export default function CustomVisualizationLoader(): ReactElement {
 	return (
 		<div
 			className="flex center align-center"
