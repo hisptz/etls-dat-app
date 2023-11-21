@@ -10,7 +10,7 @@ import {
 	groupBy,
 	keys,
 } from "lodash";
-import { mapLimit } from "async-es";
+import { mapLimit, parallel } from "async-es";
 import { useDataEngine } from "@dhis2/app-runtime";
 
 import {
@@ -129,8 +129,10 @@ export function useDefaultDashboardData() {
 		useState<boolean>(false);
 	const [loadingAdherenceSummary, setLoadingAdherenceSummary] =
 		useState<boolean>(false);
-	const [enrollemntStatusError, setEnrollemntStatusError] = useState<any>(null);
-	const [adherenceSummaryError, setAdherenceSummaryError] = useState<any>(null);
+	const [enrollemntStatusError, setEnrollemntStatusError] =
+		useState<any>(null);
+	const [adherenceSummaryError, setAdherenceSummaryError] =
+		useState<any>(null);
 	const [enrollmentSummary, setEnrollmentSummary] =
 		useState<EnrollmentSummary | null>(null);
 	const [adherenceSummary, setAdherenceSummary] =
@@ -316,10 +318,12 @@ export function useDefaultDashboardData() {
 
 	useEffect(() => {
 		async function getDefaultDashboardData() {
-			// Fetching enrollment summary
-			await fetchEnrollemntSummary();
-			// Fetching adherence summary
-			await fetchAdherenceSummary();
+			await parallel(
+				// Fetching enrollment summary
+				fetchEnrollemntSummary(),
+				// Fetching adherence summary
+				fetchAdherenceSummary(),
+			);
 		}
 		setTimeout(() => {
 			getDefaultDashboardData();
