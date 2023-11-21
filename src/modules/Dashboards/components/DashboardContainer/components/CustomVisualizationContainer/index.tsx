@@ -1,6 +1,6 @@
 import React from "react";
 import { DashboardItem } from "../../../../../shared/interfaces";
-import CustomVisualizationLoader from "./components/VisualizationLoader";
+import CustomVisualizationLoader from "../VisualizationLoader";
 import CustomVisualizationBody from "./components/VisualizationBody";
 
 interface CustomVisualizationProps {
