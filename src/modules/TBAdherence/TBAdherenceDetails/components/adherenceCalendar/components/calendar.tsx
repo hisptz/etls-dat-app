@@ -10,12 +10,21 @@ import { isSameDay } from "date-fns";
 export interface DateEvent {
 	date: string;
 	event: "enrolled" | "takenDose" | "notTakenDose" | string;
+	batteryLevel: string;
 }
 
 interface CalendarProps {
 	events: DateEvent[];
 	frequency: "Daily" | "Weekly" | "Monthly" | string;
-	onClick: ({ date, event }: { date: string; event: string }) => void;
+	onClick: ({
+		date,
+		event,
+		batteryLevel,
+	}: {
+		date: string;
+		event: string;
+		batteryLevel: string;
+	}) => void;
 }
 
 function Calendar({ events, frequency, onClick }: CalendarProps) {
@@ -115,8 +124,8 @@ function Calendar({ events, frequency, onClick }: CalendarProps) {
 		));
 	};
 
-	const showDetails = (date: string, event: string) => {
-		onClick({ date, event });
+	const showDetails = (date: string, event: string, batteryLevel: string) => {
+		onClick({ date, event, batteryLevel });
 	};
 
 	const renderDailyCalendar = () => {
@@ -206,7 +215,6 @@ function Calendar({ events, frequency, onClick }: CalendarProps) {
 					{uniqueEvents.length >= 1
 						? uniqueEvents.map((event: any, index: number) => {
 								if (event.event !== "") {
-									console.log(event);
 									return (
 										<div
 											onClick={() => {
@@ -214,6 +222,7 @@ function Calendar({ events, frequency, onClick }: CalendarProps) {
 													showDetails(
 														event.date,
 														cellColors[event.event],
+														event.batteryLevel,
 													);
 												}
 											}}
@@ -349,7 +358,11 @@ function Calendar({ events, frequency, onClick }: CalendarProps) {
 						]
 					}  ${styles[cellColors[event.event]]}`}
 					onClick={() => {
-						showDetails(event.date, cellColors[event.event]);
+						showDetails(
+							event.date,
+							cellColors[event.event],
+							event.batteryLevel,
+						);
 					}}
 				></div>
 			));
@@ -444,8 +457,6 @@ function Calendar({ events, frequency, onClick }: CalendarProps) {
 
 			const uniqueMonthlyEvents = filterUnique();
 
-			console.log(uniqueMonthlyEvents);
-
 			const cellContent = uniqueMonthlyEvents.map((event, index) => (
 				<div
 					key={`color-${index}`}
@@ -459,7 +470,11 @@ function Calendar({ events, frequency, onClick }: CalendarProps) {
 						]
 					}  ${styles[cellColors[event.event]]}`}
 					onClick={() => {
-						showDetails(event.date, cellColors[event.event]);
+						showDetails(
+							event.date,
+							cellColors[event.event],
+							event.batteryLevel,
+						);
 					}}
 				></div>
 			));

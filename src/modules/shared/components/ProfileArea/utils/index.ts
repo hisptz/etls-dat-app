@@ -56,6 +56,10 @@ export const useAdherenceEvents = (data: any, programStage: string) => {
 			occurredAt: event.dataValues.filter(
 				(value: any) => value.dataElement === DATA_ELEMENTS.DOSAGE_TIME,
 			),
+			batteryLevel: event.dataValues.filter(
+				(value: any) =>
+					value.dataElement === DATA_ELEMENTS.BATTERY_HEALTH,
+			),
 		}));
 
 	return { filteredEvents };

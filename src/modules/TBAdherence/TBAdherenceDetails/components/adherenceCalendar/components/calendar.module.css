@@ -1,7 +1,7 @@
 .calendar {
 	display: grid;
 	grid-template-columns: repeat(7, 7vw);
-	max-width: 70vw;
+	width: 50vw;
 	margin: 0 auto;
 	font-family: Arial, sans-serif;
 }
@@ -9,7 +9,7 @@
 .calendar-week {
 	display: grid;
 	grid-template-columns: repeat(4, 12vw);
-	max-width: 70vw;
+	width: 50vw;
 	margin: 0 auto;
 	font-family: Arial, sans-serif;
 	padding-top: 20px;
@@ -18,7 +18,7 @@
 .calendar-monthly {
 	display: grid;
 	grid-template-columns: repeat(4, 13.5vw);
-	max-width: 70vw;
+	width: 55vw;
 	margin: 0 auto;
 	font-family: Arial, sans-serif;
 	padding-top: 20px;
