@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2023-11-15T05:28:51.002Z\n"
-"PO-Revision-Date: 2023-11-15T05:28:51.002Z\n"
+"POT-Creation-Date: 2023-11-21T16:56:39.757Z\n"
+"PO-Revision-Date: 2023-11-21T16:56:39.757Z\n"
 
 msgid "Configurations"
 msgstr "Configurations"
@@ -112,6 +112,36 @@ msgstr "Regimens Settings not found"
 
 msgid "Dashboards"
 msgstr "Dashboards"
+
+msgid "Configured visualization does not exist"
+msgstr "Configured visualization does not exist"
+
+msgid "Total number of clients"
+msgstr "Total number of clients"
+
+msgid "Total number of devices"
+msgstr "Total number of devices"
+
+msgid "Clients registered with devices"
+msgstr "Clients registered with devices"
+
+msgid "Enrolled Patients"
+msgstr "Enrolled Patients"
+
+msgid "There are no dashboard configurations found!"
+msgstr "There are no dashboard configurations found!"
+
+msgid "Add filters"
+msgstr "Add filters"
+
+msgid "Filters"
+msgstr "Filters"
+
+msgid "Period"
+msgstr "Period"
+
+msgid "Organisation Unit"
+msgstr "Organisation Unit"
 
 msgid "Excel"
 msgstr "Excel"
@@ -224,9 +254,6 @@ msgstr "Searching..."
 
 msgid "Search"
 msgstr "Search"
-
-msgid "Organisation Unit"
-msgstr "Organisation Unit"
 
 msgid "Select Organisation unit"
 msgstr "Select Organisation unit"
