@@ -63,6 +63,7 @@
 		"date-fns": "^2.30.0",
 		"eslint-config-react-app": "^7.0.1",
 		"file-saver": "^2.0.5",
+		"highcharts": "^11.2.0",
 		"lodash": "^4.17.21",
 		"luxon": "^3.4.2",
 		"react": "16.14.0",
