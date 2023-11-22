@@ -2,7 +2,6 @@ import React from "react";
 import { Box, Button, ButtonStrip, Card, IconSearch24 } from "@dhis2/ui";
 import { PropertiesFilter } from "./components/PropertiesFilter";
 import i18n from "@dhis2/d2-i18n";
-import { getDefaultFilters } from "./constants/filters";
 import { useSearchParams } from "react-router-dom";
 import { useDataQuery } from "@dhis2/app-runtime";
 import { useFilters } from "../Table/hooks/data";
@@ -10,6 +9,7 @@ import { useSetting } from "@dhis2/app-service-datastore";
 import { isEmpty } from "lodash";
 import { OrganizationUnitState } from "../../state/filters";
 import { useRecoilState } from "recoil";
+import { getDefaultTBAdherenceFilters } from "../../constants/filters";
 
 export interface FilterAreaProps {
 	loading: boolean;
@@ -40,7 +40,7 @@ export function FilterArea({ loading, onFetch }: FilterAreaProps) {
 	};
 
 	const onResetClick = () => {
-		const defaultValue = getDefaultFilters();
+		const defaultValue = getDefaultTBAdherenceFilters();
 		setParams(defaultValue);
 		setOrganizationUnitState([defaultOrg]);
 	};
