@@ -20,7 +20,6 @@ export class PatientProfile extends TrackedEntityModel {
 		super(trackedEntity);
 		this.programMapping = programMapping;
 		this.datDeviceInfoEvent = this.getDatDeviceInfoEvent();
-		this.programStageID = programMapping.programStage;
 		this.regimenSettings = regimenSettings;
 	}
 
@@ -132,7 +131,7 @@ export class PatientProfile extends TrackedEntityModel {
 
 		const { filteredEvents } = useAdherenceEvents(
 			this.events,
-			this.programStageID ?? "",
+			this.programMapping?.programStage ?? "",
 		);
 
 		const MissedDoses = filteredEvents.filter((item: any) => {

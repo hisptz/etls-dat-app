@@ -8,6 +8,7 @@ import { Card, Center } from "@dhis2/ui";
 import { useTBAdherenceTableData } from "./components/Table/hooks/data";
 import { useSetting } from "@dhis2/app-service-datastore";
 import { isEmpty } from "lodash";
+import { ProgramsTab } from "./components/ProgramsTab";
 
 export function TreatmentAdherenceOutlet() {
 	return <Outlet />;
@@ -24,12 +25,13 @@ export function TBAdherencePage() {
 			className="column gap-32 p-16 h-100 w-100"
 			data-test={`${DATA_TEST_PREFIX}-tb-adherence-container`}
 		>
-			<h1 className="m-0" style={{ marginBottom: "16px" }}>
+			<h1 className="m-0" style={{ marginBottom: "5px" }}>
 				{i18n.t("Treatment Adherence")}
 			</h1>
+			{!isEmpty(programMapping) ? <ProgramsTab /> : null}
 			<FilterArea loading={loading} onFetch={refetch} />
 			<div className="flex-1">
-				{isEmpty(programMapping.program) ? (
+				{isEmpty(programMapping) ? (
 					<div style={{ marginTop: "16px" }}>
 						<Card>
 							<Center>
@@ -46,7 +48,7 @@ export function TBAdherencePage() {
 								>
 									<span>
 										{i18n.t(
-											"Program Mapping is not configured. Please click the link below to go to the configurations.",
+											"Program Mappings are not configured. Please click the link below to go to configurations.",
 										)}
 									</span>
 									<br />

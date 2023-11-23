@@ -1,13 +1,22 @@
 import { useSetting } from "@dhis2/app-service-datastore";
+
 import { Query } from "../interfaces";
+import { useSearchParams } from "react-router-dom";
 
 export const DATA_TEST_PREFIX = "d2-dat";
-export const DATASTORE_NAMESPACE = "hisptz-dat-app";
+export const DATASTORE_NAMESPACE = "dat-app";
 export const DAT_PROGRAM = (): string => {
 	const [programMapping] = useSetting("programMapping", {
 		global: true,
 	});
-	const program = programMapping.program;
+	const [params] = useSearchParams();
+	const currentProgram = params.get("program");
+
+	const prog = programMapping.filter(
+		(mapping: any) => mapping.program === currentProgram,
+	);
+
+	const program = prog[0]?.program ?? "";
 	return program;
 };
 

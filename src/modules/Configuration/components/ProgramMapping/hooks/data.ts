@@ -1,5 +1,6 @@
 import { useSetting } from "@dhis2/app-service-datastore";
 import { useDataQuery } from "@dhis2/app-runtime";
+import { ProgramFormData } from "../components/EditProgramMapping";
 
 const query = {
 	programs: {
@@ -8,13 +9,7 @@ const query = {
 			fields: ["id", "displayName"],
 		},
 	},
-	programID: {
-		resource: "programs",
-		id: ({ programID }: any) => programID,
-		params: {
-			fields: ["displayName"],
-		},
-	},
+
 	programAttributes: {
 		resource: "trackedEntityAttributes",
 		params: {
@@ -23,6 +18,27 @@ const query = {
 		},
 	},
 };
+
+const programQuery = {
+	programID: {
+		resource: "programs",
+		params: ({ filters }: { filters?: string }) => ({
+			filter: filters,
+			fields: ["id, displayName"],
+		}),
+	},
+};
+
+interface ProgramQueryType {
+	programID: {
+		programs: [
+			{
+				displayName: string;
+				id: string;
+			},
+		];
+	};
+}
 
 export interface Option {
 	id: string;
@@ -42,12 +58,10 @@ interface QueryType {
 }
 
 export function usePrograms() {
-	const [programMapping] = useSetting("programMapping", { global: true });
-	const { data, loading, refetch, error } = useDataQuery<QueryType>(query, {
-		variables: {
-			programID: programMapping.program ?? "",
-		},
-	});
+	const { data, loading, refetch, error } = useDataQuery<QueryType>(
+		query,
+		{},
+	);
 
 	const programOpts: Option[] = [];
 	const attributeOpts: Option[] = [];
@@ -72,8 +86,32 @@ export function usePrograms() {
 		loading,
 		error,
 		refetch,
-		program: data?.programID,
 		programOptions: programOpts,
 		attributeOptions: attributeOpts,
+	};
+}
+
+export function useProgramName() {
+	const [programMapping] = useSetting("programMapping", { global: true });
+
+	const programIDs = programMapping.map((mapping: ProgramFormData) => {
+		return mapping.program;
+	});
+
+	const { data, loading, refetch, error } = useDataQuery<ProgramQueryType>(
+		programQuery,
+		{
+			variables: {
+				filters: `id:in:[${programIDs}]`,
+			},
+			lazy: !programIDs,
+		},
+	);
+
+	return {
+		loadingNames: loading,
+		error,
+		refetch,
+		programName: data?.programID.programs,
 	};
 }

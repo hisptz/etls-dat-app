@@ -60,19 +60,19 @@ type Data = {
 export function filterObject(programMapping: programMapping) {
 	const filtersConfig: any = {
 		patientNumber: {
-			attribute: programMapping.attributes?.tbDistrictNumber,
+			attribute: programMapping?.attributes?.tbDistrictNumber,
 			operator: "eq",
 		},
 		deviceIMEInumber: {
-			attribute: programMapping.attributes?.deviceIMEInumber,
+			attribute: programMapping?.attributes?.deviceIMEInumber,
 			operator: "eq",
 		},
 		firstName: {
-			attribute: programMapping.attributes?.firstName,
+			attribute: programMapping?.attributes?.firstName,
 			operator: "like",
 		},
 		surname: {
-			attribute: programMapping.attributes?.surname,
+			attribute: programMapping?.attributes?.surname,
 			operator: "like",
 		},
 	};
@@ -86,10 +86,17 @@ export function useFilters() {
 		global: true,
 	});
 
+	const currentProgram = params.get("program");
+
+	const selectedProgram = programMapping.filter(
+		(mapping: programMapping) => mapping.program === currentProgram,
+	);
+
+	const mapping = selectedProgram[0];
+
 	const filters = compact(
 		Array.from(params.keys()).map((filter) => {
-			const filterConfig =
-				filterObject(programMapping).filtersConfig[filter];
+			const filterConfig = filterObject(mapping).filtersConfig[filter];
 			if (filterConfig) {
 				const value = params.get(filter);
 				if (value) {
@@ -118,16 +125,25 @@ export function useTBAdherenceTableData() {
 	const [pagination, setPagination] = useState<Pagination>();
 	const [params] = useSearchParams();
 	const orgUnit = params.get("ou");
+	const currentProgram = params.get("program");
+
+	const selectedProgram = programMapping.filter(
+		(mapping: programMapping) => mapping.program === currentProgram,
+	);
+
+	const mapping = selectedProgram[0];
 
 	const { data, loading, error, refetch } = useDataQuery<Data>(query, {
 		variables: {
 			page: 1,
 			pageSize: 10,
-			program: DAT_PROGRAM(),
+			program: mapping?.program,
 			startDate,
 			filters,
 			orgUnit,
 		},
+
+		lazy: !mapping,
 	});
 
 	const onPageChange = (page: number) => {
@@ -150,11 +166,7 @@ export function useTBAdherenceTableData() {
 		if (data) {
 			setPatients(
 				data?.patients.instances.map((tei) => {
-					return new PatientProfile(
-						tei,
-						programMapping,
-						regimenSetting,
-					);
+					return new PatientProfile(tei, mapping, regimenSetting);
 				}) ?? [],
 			);
 			setPagination({
@@ -166,15 +178,20 @@ export function useTBAdherenceTableData() {
 				),
 			});
 		}
-	}, [data]);
+	}, [data, currentProgram]);
+
+	useEffect(() => {
+		if (!isEmpty(programMapping)) {
+			refetch({ program: mapping?.program, page: 1, filters, orgUnit });
+		}
+	}, [currentProgram]);
 
 	const { download, downloading } = useDownloadData({
 		resource: "tracker/trackedEntities",
 		query: query,
 		queryKey: "report",
 		mapping: (data: TrackedEntity) => {
-			return new PatientProfile(data, programMapping, regimenSetting)
-				.tableData;
+			return new PatientProfile(data, mapping, regimenSetting).tableData;
 		},
 	});
 

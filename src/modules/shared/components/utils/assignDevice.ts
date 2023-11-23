@@ -3,13 +3,22 @@ import { useSetting } from "@dhis2/app-service-datastore";
 import axios from "axios";
 import { usePatient } from "../../../TBAdherence/TBAdherenceDetails/hooks/data";
 import { TrackedEntity } from "../../types";
+import { useSearchParams } from "react-router-dom";
 
 export function useAssignDevice() {
 	const [programMapping] = useSetting("programMapping", { global: true });
 	const { patientTei } = usePatient();
-	const TEA_ID = programMapping.attributes.deviceIMEInumber;
-	const MediatorUrl = programMapping.mediatorUrl;
-	const ApiKey = programMapping.apiKey;
+
+	const [params] = useSearchParams();
+	const currentProgram = params.get("program");
+
+	const selectedProgram = programMapping.filter(
+		(mapping: any) => mapping.program === currentProgram,
+	);
+	const program = selectedProgram[0];
+	const TEA_ID = program?.attributes.deviceIMEInumber;
+	const MediatorUrl = program?.mediatorUrl;
+	const ApiKey = program?.apiKey;
 
 	const attributeIndex = patientTei?.attributes.findIndex(
 		(attribute) => attribute.attribute === TEA_ID,

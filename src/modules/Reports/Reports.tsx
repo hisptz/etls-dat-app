@@ -13,6 +13,8 @@ import { PeriodUtility } from "@hisptz/dhis2-utils";
 import { DateTime } from "luxon";
 import { SelectedReport } from "./components/Table/FilterArea/components/FilterField";
 import { useRecoilState } from "recoil";
+import { ProgramsTab } from "../TBAdherence/components/ProgramsTab";
+import { useSetting } from "@dhis2/app-service-datastore";
 
 export function ReportsOutlet() {
 	return <Outlet />;
@@ -20,6 +22,7 @@ export function ReportsOutlet() {
 
 export function Reports() {
 	const [params] = useSearchParams();
+	const [programMapping] = useSetting("programMapping", { global: true });
 	const reportType = params.get("reportType");
 	const period = params.get("periods");
 	const orgUnit = params.get("ou");
@@ -61,6 +64,7 @@ export function Reports() {
 			<h1 className="m-0" style={{ marginBottom: "16px" }}>
 				{i18n.t("Reports")}
 			</h1>
+			{!isEmpty(programMapping) ? <ProgramsTab /> : null}
 			<FilterArea />
 			<div>
 				{enabled ? (

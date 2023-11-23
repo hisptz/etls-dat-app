@@ -21,6 +21,7 @@ export function FilterArea({ loading, onFetch }: FilterAreaProps) {
 	const { filters, startDate } = useFilters();
 	const [programMapping] = useSetting("programMapping", { global: true });
 	const [, setOrganizationUnitState] = useRecoilState(OrganizationUnitState);
+	const currentProgram = params.get("program");
 
 	const orgUnit = params.get("ou") ?? null;
 	const onFilterClick = () => {
@@ -40,7 +41,7 @@ export function FilterArea({ loading, onFetch }: FilterAreaProps) {
 	};
 
 	const onResetClick = () => {
-		const defaultValue = getDefaultFilters();
+		const defaultValue = getDefaultFilters(currentProgram ?? "");
 		setParams(defaultValue);
 		setOrganizationUnitState([defaultOrg]);
 	};
@@ -56,7 +57,7 @@ export function FilterArea({ loading, onFetch }: FilterAreaProps) {
 							{i18n.t("Reset")}
 						</Button>
 						<Button
-							disabled={isEmpty(programMapping.program)}
+							disabled={isEmpty(programMapping)}
 							loading={loading}
 							onClick={onFilterClick}
 							primary

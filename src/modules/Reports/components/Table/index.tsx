@@ -16,6 +16,7 @@ import Download from "../../Download";
 import { ReportConfig } from "../../../shared/constants";
 import { useRecoilState } from "recoil";
 import { SelectedReport } from "./FilterArea/components/FilterField";
+import { useSetting } from "@dhis2/app-service-datastore";
 
 export interface ReportTableProps {
 	loading: boolean;
@@ -32,6 +33,7 @@ export default function ReportTable({
 	data,
 	loadingDevices,
 }: ReportTableProps) {
+	const [programMapping] = useSetting("programMapping", { global: true });
 	const [report] = useRecoilState<ReportConfig>(SelectedReport);
 
 	return (
@@ -51,9 +53,15 @@ export default function ReportTable({
 							/>
 						</div>
 						<CustomDataTable
-							emptyLabel={i18n.t(
-								"There is no report data for the selected filters",
-							)}
+							emptyLabel={
+								!isEmpty(programMapping)
+									? i18n.t(
+											"There is no report data for the selected filters",
+									  )
+									: i18n.t(
+											"There are no program mappings set, please go to configurations",
+									  )
+							}
 							loading={loading || loadingDevices}
 							columns={report.columns as CustomDataTableColumn[]}
 							pagination={
@@ -63,7 +71,7 @@ export default function ReportTable({
 							}
 							rows={(report?.id !== "dat-device-summary-report"
 								? reports
-								: data.devices
+								: data?.devices ?? []
 							).map((report: any) => {
 								return {
 									...(report.tableData as CustomDataTableRow),

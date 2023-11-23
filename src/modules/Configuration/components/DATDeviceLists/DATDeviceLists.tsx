@@ -4,7 +4,7 @@ import i18n from "@dhis2/d2-i18n";
 import { DATA_TEST_PREFIX } from "../../../shared/constants";
 import { useRecoilState } from "recoil";
 import DeviceListTable from "./components/DeviceListTable";
-import { add, editDevice } from "./state";
+import { add } from "./state";
 import EditDevice from "./components/EditDevice";
 import { useSetting } from "@dhis2/app-service-datastore";
 

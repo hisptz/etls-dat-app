@@ -130,11 +130,19 @@ export function useReportTableData() {
 	const e = DateTime.fromISO(periods.end);
 	const endDate = e.toFormat("yyyy-MM-dd");
 
+	const currentProgram = params.get("program");
+
+	const selectedProgram = programMapping.filter(
+		(mapping: programMapping) => mapping.program === currentProgram,
+	);
+
+	const mapping = selectedProgram[0];
+
 	const { data, loading, error, refetch } = useDataQuery<Data>(query, {
 		variables: {
 			page: 1,
 			pageSize: 20,
-			program: DAT_PROGRAM(),
+			program: mapping?.program,
 			startDate,
 			endDate,
 			filters,
@@ -163,11 +171,7 @@ export function useReportTableData() {
 		if (data) {
 			setreports(
 				data?.reports.instances.map((tei) => {
-					return new PatientProfile(
-						tei,
-						programMapping,
-						regimenSetting,
-					);
+					return new PatientProfile(tei, mapping, regimenSetting);
 				}) ?? [],
 			);
 			setPagination({
@@ -209,8 +213,6 @@ export function useReportTableData() {
 		},
 	});
 
-	const programId = DAT_PROGRAM();
-
 	const onDownload = (type: "xlsx" | "csv" | "json") => {
 		if (!isEmpty(orgUnit) && !isEmpty(startDate)) {
 			download(type, {
@@ -218,7 +220,7 @@ export function useReportTableData() {
 				pageSize: 700,
 				startDate,
 				endDate,
-				program: programId,
+				program: mapping?.program,
 			});
 		}
 	};
@@ -244,8 +246,15 @@ export const useDATDevices = () => {
 	const [data, setData] = useState<any>();
 	const [errorDevice, setError] = useState<any>();
 	const [loadingDevice, setLoading] = useState(true);
-	const MediatorUrl = programMapping.mediatorUrl;
-	const ApiKey = programMapping.apiKey;
+	const [params] = useSearchParams();
+	const currentProgram = params.get("program");
+
+	const selectedProgram = programMapping.filter(
+		(mapping: programMapping) => mapping.program === currentProgram,
+	);
+	const mapping = selectedProgram[0];
+	const MediatorUrl = mapping?.mediatorUrl;
+	const ApiKey = mapping?.apiKey;
 	const [downloadingDAT, setDownloading] = useState(false);
 
 	const { show, hide } = useAlert(
