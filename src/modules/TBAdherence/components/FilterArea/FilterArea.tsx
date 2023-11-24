@@ -8,8 +8,9 @@ import { useFilters } from "../Table/hooks/data";
 import { useSetting } from "@dhis2/app-service-datastore";
 import { isEmpty } from "lodash";
 import { OrganizationUnitState } from "../../state/filters";
-import { useRecoilState } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 import { getDefaultTBAdherenceFilters } from "../../constants/filters";
+import { CurrentUserOrganizationUnit } from "../../../shared/state/currentUser";
 
 export interface FilterAreaProps {
 	loading: boolean;
@@ -21,7 +22,7 @@ export function FilterArea({ loading, onFetch }: FilterAreaProps) {
 	const { filters, startDate } = useFilters();
 	const [programMapping] = useSetting("programMapping", { global: true });
 	const [, setOrganizationUnitState] = useRecoilState(OrganizationUnitState);
-
+	const defaultOrganizationUnit = useRecoilValue(CurrentUserOrganizationUnit);
 	const orgUnit = params.get("ou") ?? null;
 	const onFilterClick = () => {
 		onFetch({
@@ -32,17 +33,10 @@ export function FilterArea({ loading, onFetch }: FilterAreaProps) {
 		});
 	};
 
-	const defaultOrg = {
-		id: "CAWjYmd5Dea",
-		displayName: "United Republic of Tanzania",
-		path: "/CAWjYmd5Dea",
-		children: [],
-	};
-
 	const onResetClick = () => {
 		const defaultValue = getDefaultTBAdherenceFilters();
 		setParams(defaultValue);
-		setOrganizationUnitState([defaultOrg]);
+		setOrganizationUnitState(defaultOrganizationUnit);
 	};
 
 	return (

@@ -12,6 +12,8 @@ import {
 } from "../../../../shared/constants";
 import { TrackedEntity } from "../../../../shared/types";
 import { useSetting } from "@dhis2/app-service-datastore";
+import { useRecoilValue } from "recoil";
+import { CurrentUserOrganizationUnit } from "../../../../shared/state/currentUser";
 
 const query: any = {
 	patients: {
@@ -107,6 +109,7 @@ export function useFilters() {
 }
 
 export function useTBAdherenceTableData() {
+	const defaultOrganizationUnit = useRecoilValue(CurrentUserOrganizationUnit);
 	const { filters, startDate } = useFilters();
 	const [patients, setPatients] = useState<PatientProfile[]>([]);
 	const [programMapping] = useSetting("programMapping", {
@@ -117,7 +120,7 @@ export function useTBAdherenceTableData() {
 	});
 	const [pagination, setPagination] = useState<Pagination>();
 	const [params] = useSearchParams();
-	const orgUnit = params.get("ou");
+	const orgUnit = params.get("ou") ?? defaultOrganizationUnit.map(({id}) => id).join(";");
 
 	const { data, loading, error, refetch } = useDataQuery<Data>(query, {
 		variables: {
