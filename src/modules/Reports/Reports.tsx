@@ -1,4 +1,8 @@
-import { DATA_TEST_PREFIX, ReportConfig } from "../shared/constants";
+import {
+	DATA_ELEMENTS,
+	DATA_TEST_PREFIX,
+	ReportConfig,
+} from "../shared/constants";
 import React, { useEffect, useState } from "react";
 import i18n from "@dhis2/d2-i18n";
 import { Outlet, useSearchParams } from "react-router-dom";
@@ -9,10 +13,10 @@ import {
 } from "./components/Table/hooks/data";
 import ReportTable from "./components/Table";
 import FilterArea from "./components/Table/FilterArea";
-import { PeriodUtility } from "@hisptz/dhis2-utils";
-import { DateTime } from "luxon";
+
 import { SelectedReport } from "./components/Table/FilterArea/components/FilterField";
 import { useRecoilState } from "recoil";
+import { useSetting } from "@dhis2/app-service-datastore";
 
 export function ReportsOutlet() {
 	return <Outlet />;
@@ -20,6 +24,9 @@ export function ReportsOutlet() {
 
 export function Reports() {
 	const [params] = useSearchParams();
+	const [programMapping] = useSetting("programMapping", {
+		global: true,
+	});
 	const reportType = params.get("reportType");
 	const period = params.get("periods");
 	const orgUnit = params.get("ou");
@@ -27,22 +34,31 @@ export function Reports() {
 	const { data, loadingDevice } = useDATDevices();
 	const [enabled, setenabled] = useState<boolean>(false);
 	const [report] = useRecoilState<ReportConfig>(SelectedReport);
-	const periods = PeriodUtility.getPeriodById(
-		!isEmpty(period) ? period : "TODAY",
-	);
-	const s = DateTime.fromISO(periods.start);
-	const startDate = s.toFormat("yyyy-MM-dd");
-	const e = DateTime.fromISO(periods.end);
-	const endDate = e.toFormat("yyyy-MM-dd");
+	const stage = programMapping.programStage;
+	const dimensions = [
+		stage + "." + programMapping.attributes.patientNumber,
+		stage + "." + programMapping.attributes.firstName,
+		stage + "." + programMapping.attributes.surname,
+		stage + "." + programMapping.attributes.phoneNumber,
+		stage + "." + programMapping.attributes.regimen,
+		stage +
+			"." +
+			DATA_ELEMENTS.DEVICE_SIGNAL +
+			(reportType === "tb-adherence-report"
+				? ":IN:Once;Multiple"
+				: reportType === "patients-who-missed-doses"
+				? ":IN:Heartbeat;None"
+				: ""),
+	];
 
 	useEffect(() => {
 		if (reportType != "dat-device-summary-report") {
 			if (!isEmpty(reportType && period && orgUnit)) {
 				refetch({
 					page: 1,
-					orgUnit,
-					startDate,
-					endDate,
+					pe: [period],
+					ou: [orgUnit],
+					dx: dimensions,
 				});
 				setenabled(true);
 			} else {

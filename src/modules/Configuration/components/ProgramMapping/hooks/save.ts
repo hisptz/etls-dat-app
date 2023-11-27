@@ -17,7 +17,7 @@ export function useProgramMapping() {
 	const apiKey = params.get("apiKey");
 	const firstName = params.get("firstName");
 	const surname = params.get("surname");
-	const tbDistrictNumber = params.get("tbDistrictNumber");
+	const patientNumber = params.get("patientNumber");
 	const age = params.get("age");
 	const sex = params.get("sex");
 	const regimen = params.get("regimen");
@@ -32,7 +32,7 @@ export function useProgramMapping() {
 		attributes: {
 			firstName: firstName ?? "",
 			surname: surname ?? "",
-			tbDistrictNumber: tbDistrictNumber ?? "",
+			patientNumber: patientNumber ?? "",
 			age: age ?? "",
 			sex: sex ?? "",
 			regimen: regimen ?? "",
@@ -52,7 +52,7 @@ export function getDefaultFilters() {
 		apiKey: programMapping.apiKey ?? "",
 		firstName: programMapping.attributes?.firstName ?? "",
 		surname: programMapping.attributes?.surname ?? "",
-		tbDistrictNumber: programMapping.attributes?.tbDistrictNumber ?? "",
+		patientNumber: programMapping.attributes?.patientNumber ?? "",
 		age: programMapping.attributes?.age ?? "",
 		sex: programMapping.attributes?.sex ?? "",
 		regimen: programMapping.attributes?.regimen ?? "",

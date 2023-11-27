@@ -7,6 +7,7 @@ import { compact, isEmpty } from "lodash";
 import { useDownloadData } from "../../../utils/download";
 import { PatientProfile } from "../../../../shared/models";
 import {
+	DATA_ELEMENTS,
 	DAT_PROGRAM,
 	ReportConfig,
 	TEI_FIELDS,
@@ -20,55 +21,110 @@ import axios from "axios";
 import { saveAs } from "file-saver";
 import { useRecoilState } from "recoil";
 import { SelectedReport } from "../FilterArea/components/FilterField";
+import _ from "lodash";
+
+// const query: any = {
+// 	reports: {
+// 		resource: "tracker/trackedEntities",
+// 		params: ({
+// 			page,
+// 			pageSize,
+// 			periods,
+// 			startDate,
+// 			endDate,
+// 			program,
+// 			orgUnit,
+// 		}: {
+// 			page: number;
+// 			pageSize: number;
+// 			filters?: string[];
+// 			periods: string;
+// 			startDate?: string;
+// 			endDate?: string;
+// 			program: string;
+// 			orgUnit?: string;
+// 		}) => ({
+// 			pageSize,
+// 			page,
+// 			enrollmentEnrolledAfter: startDate,
+// 			enrollmentEnrolledBefore: endDate,
+// 			program,
+// 			orgUnit,
+// 			rootJunction: "OR",
+// 			enrolledAt: periods,
+// 			totalPages: true,
+// 			ouMode: "DESCENDANTS",
+// 			fields: TEI_FIELDS,
+// 		}),
+// 	},
+// };
+
+// function generateDimensions(dimensions: any) {
+// 	const dimensionObj = {};
+// 	dimensions.forEach((dimension: any) => {
+// 		dimensionObj[`dimension ${dimension}`] = dimension;
+// 	});
+// 	return dimensionObj;
+// }
 
 const query: any = {
 	reports: {
-		resource: "tracker/trackedEntities",
+		resource: "analytics/events",
+		id: ({ program }: any) => `query/${program}`,
 		params: ({
 			page,
 			pageSize,
-			periods,
-			startDate,
-			endDate,
-			program,
-			orgUnit,
+			pe,
+			stage,
+			dx,
+			ou,
 		}: {
 			page: number;
 			pageSize: number;
 			filters?: string[];
-			periods: string;
+			pe: string[];
 			startDate?: string;
 			endDate?: string;
-			program: string;
-			orgUnit?: string;
+			dx: [];
+			stage: string;
+			ou: string[];
 		}) => ({
+			dimension: [
+				`ou:${ou.join(";")}`,
+				`pe:${pe.join(";")}`,
+				...(dx?.map((dx: string) => `${dx}`) ?? []),
+			],
+			stage,
+			displayProperty: "NAME",
+			outputType: "EVENT",
+			desc: "eventdate",
 			pageSize,
 			page,
-			enrollmentEnrolledAfter: startDate,
-			enrollmentEnrolledBefore: endDate,
-			program,
-			orgUnit,
-			rootJunction: "OR",
-			enrolledAt: periods,
 			totalPages: true,
-			ouMode: "DESCENDANTS",
-			fields: TEI_FIELDS,
 		}),
 	},
 };
-
 type Data = {
 	reports: {
-		instances: TrackedEntity[];
-		page: number;
-		pageSize: number;
-		total: number;
+		headers: [];
+		metaData: {
+			dimensions: object;
+
+			items: object;
+			pager: {
+				page: number;
+				pageCount: number;
+				pageSize: number;
+				total: number;
+			};
+		};
+		rows: [];
 	};
 };
 export function filterObject(programMapping: programMapping) {
 	const filtersConfig: any = {
-		tbDistrictNumber: {
-			attribute: programMapping.attributes?.tbDistrictNumber,
+		patientNumber: {
+			attribute: programMapping.attributes?.patientNumber,
 			operator: "eq",
 		},
 		deviceIMEInumber: {
@@ -108,7 +164,7 @@ export function useFilters() {
 
 export function useReportTableData() {
 	const { filters } = useFilters();
-	const [reports, setreports] = useState<PatientProfile[] | []>([]);
+	const [reports, setreports] = useState<[] | any>([]);
 	const [programMapping] = useSetting("programMapping", {
 		global: true,
 	});
@@ -116,29 +172,40 @@ export function useReportTableData() {
 		global: true,
 	});
 	const [pagination, setPagination] = useState<Pagination>();
+	const [counter, setCounter] = useState<number>(1);
 	const [params] = useSearchParams();
 	const orgUnit = params.get("ou");
 	const period = params.get("periods");
 	const reportType = params.get("reportType");
 	const [reportConfigs] = useSetting("reports", { global: true });
 
-	const periods = PeriodUtility.getPeriodById(
-		!isEmpty(period) ? period : "TODAY",
-	);
-	const s = DateTime.fromISO(periods.start);
-	const startDate = s.toFormat("yyyy-MM-dd");
-	const e = DateTime.fromISO(periods.end);
-	const endDate = e.toFormat("yyyy-MM-dd");
+	const stage = programMapping.programStage;
+
+	const dimensions = [
+		stage + "." + programMapping.attributes.patientNumber,
+		stage + "." + programMapping.attributes.firstName,
+		stage + "." + programMapping.attributes.surname,
+		stage + "." + programMapping.attributes.phoneNumber,
+		stage + "." + programMapping.attributes.regimen,
+		stage +
+			"." +
+			DATA_ELEMENTS.DEVICE_SIGNAL +
+			(reportType === "tb-adherence-report"
+				? ":IN:Once;Multiple"
+				: reportType === "patients-who-missed-doses"
+				? ":IN:Heartbeat;None"
+				: ""),
+	];
 
 	const { data, loading, error, refetch } = useDataQuery<Data>(query, {
 		variables: {
 			page: 1,
-			pageSize: 20,
+			pageSize: 50,
 			program: DAT_PROGRAM(),
-			startDate,
-			endDate,
-			filters,
-			orgUnit,
+			stage,
+			pe: [period],
+			ou: [orgUnit],
+			dx: dimensions,
 		},
 		lazy: true,
 	});
@@ -146,43 +213,103 @@ export function useReportTableData() {
 	const onPageChange = (page: number) => {
 		refetch({
 			page,
-			filters,
-			orgUnit,
+			pe: [period],
+			ou: [orgUnit],
 		});
 	};
 	const onPageSizeChange = (pageSize: number) => {
 		refetch({
 			page: 1,
 			pageSize,
-			filters,
-			orgUnit,
+			pe: [period],
+			ou: [orgUnit],
 		});
 	};
+
+	function transformRowsData(headers: any, rows: any) {
+		if (!headers || !rows || rows.length === 0) {
+			return [];
+		}
+		const transformedData = [];
+
+		for (const row of rows) {
+			const rowData = {};
+
+			headers.forEach((header: any, index: number) => {
+				const columnId = header.name;
+				const cellValue = row[index];
+
+				rowData[columnId] = cellValue;
+			});
+
+			transformedData.push(rowData);
+		}
+
+		return transformedData;
+	}
+
+	const rowData = transformRowsData(
+		data?.reports.headers,
+		data?.reports.rows,
+	);
+
+	const groupedData = _.groupBy(rowData, "tei");
+
+	const mergedData = Object.keys(groupedData).map((tei) => {
+		const dataArray = groupedData[tei];
+
+		const regimen = dataArray[0][programMapping.attributes.regimen];
+
+		let adherenceFrequency;
+		regimenSetting?.map((setting: any) => {
+			if (setting.regimen === regimen) {
+				adherenceFrequency = setting.administration as string;
+			}
+		});
+
+		return {
+			...dataArray[0],
+			noOfSignal: dataArray.length,
+			adherenceFrequency: adherenceFrequency ?? "Daily",
+		};
+	});
+
+	// let allData: any = [];
+
+	// useEffect(() => {
+	// 	if (data?.reports?.metaData?.pager?.page ?? 1 <= counter) {
+	// 		refetch({
+	// 			page: counter,
+	// 			pe: [period],
+	// 			ou: [orgUnit],
+	// 		});
+	// 		setCounter((prevState) => {
+	// 			return prevState++;
+	// 		});
+	// 		allData.push(data?.reports);
+	// 	}
+	// }, [counter]);
+
+	// console.log(allData);
 
 	useEffect(() => {
 		if (data) {
 			setreports(
-				data?.reports.instances.map((tei) => {
-					return new PatientProfile(
-						tei,
-						programMapping,
-						regimenSetting,
-					);
+				mergedData.map((data) => {
+					return data;
 				}) ?? [],
 			);
 			setPagination({
-				page: data?.reports.page,
-				pageSize: data?.reports.pageSize,
-				total: data?.reports.total,
-				pageCount: Math.ceil(
-					data?.reports.total / data?.reports.pageSize,
-				),
+				page: data?.reports.metaData.pager.page,
+				pageSize: data?.reports.metaData.pager.pageSize,
+				total: data?.reports.metaData.pager.total,
+				pageCount: data?.reports.metaData.pager.pageCount,
 			});
 		}
 	}, [data]);
 
 	const { download, downloading } = useDownloadData({
-		resource: "tracker/trackedEntities",
+		resource: "analytics/events",
 		query: query,
 		queryKey: "reports",
 		mapping: (data: TrackedEntity) => {
@@ -212,12 +339,12 @@ export function useReportTableData() {
 	const programId = DAT_PROGRAM();
 
 	const onDownload = (type: "xlsx" | "csv" | "json") => {
-		if (!isEmpty(orgUnit) && !isEmpty(startDate)) {
+		if (!isEmpty(orgUnit) && !isEmpty(period)) {
 			download(type, {
-				orgUnit,
-				pageSize: 700,
-				startDate,
-				endDate,
+				pe: [period],
+				ou: [orgUnit],
+				dx: dimensions,
+				pageSize: 500,
 				program: programId,
 			});
 		}

@@ -78,6 +78,12 @@ export function FilterField({
 								return ou.id;
 							})
 							.join(";")
+					: type == "periods"
+					? value
+							.map((pe: any) => {
+								return pe;
+							})
+							.join(";")
 					: value,
 			);
 
@@ -110,9 +116,12 @@ export function FilterField({
 				  });
 		}
 		if (type === "periods") {
-			const period = PeriodUtility.getPeriodById(value ?? []);
+			let periods: any = [];
+			value?.split(";").map((pe) => {
+				periods.push(PeriodUtility.getPeriodById(pe ?? []));
+			});
 
-			return period.name;
+			return periods.map((pe: any) => pe.name);
 		}
 		if (type === "report") {
 			return reportConfig?.map((report: ReportConfig) => {
@@ -232,11 +241,10 @@ export function FilterField({
 			{!periods && (
 				<PeriodSelectorModal
 					enablePeriodSelector
-					singleSelection
 					hide={periods}
 					selectedPeriods={
 						type == "periods" && !isEmpty(value)
-							? value?.split(",")
+							? value?.split(";")
 							: []
 					}
 					onClose={() => {

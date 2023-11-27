@@ -13,7 +13,7 @@ Feature: Configuration features
     And inputs the "select" field "mappedTbProgram" as "tj4u1ip0tTF"
     And inputs the "select" field "firstName" as "iAaQt0MfyFj"
     And inputs the "select" field "surname" as "yaNdF4auOw6"
-    And inputs the "select" field "tbDistrictNumber" as "aihxG1tTqba"
+    And inputs the "select" field "patientNumber" as "aihxG1tTqba"
     And inputs the "select" field "age" as "ycm08j1RuKr"
     And inputs the "select" field "sex" as "lYMzXiSb00n"
     And inputs the "select" field "regimen" as "JjySGEpaVza"

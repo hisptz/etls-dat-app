@@ -30,7 +30,7 @@ export interface programMapping {
 	attributes?: {
 		firstName?: string;
 		surname?: string;
-		tbDistrictNumber?: string;
+		patientNumber?: string;
 		age?: string;
 		sex?: string;
 		regimen?: string;
@@ -150,9 +150,9 @@ export const reports: ReportConfig[] = [
 
 export const TBAdherence: TBAdherenceConfig[] = [
 	{
-		key: "tbDistrictNumber",
+		key: "patientNumber",
 		label: "Patient Number",
-		path: "tbDistrictNumber",
+		path: "patientNumber",
 	},
 	{
 		key: "name",
