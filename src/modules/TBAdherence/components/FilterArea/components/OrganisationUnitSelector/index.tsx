@@ -9,6 +9,7 @@ import { OrganisationUnit } from "@hisptz/dhis2-utils";
 import { useOrgUnit } from "../../../../utils/orgUnits";
 import { compact } from "lodash";
 import { DATA_TEST_PREFIX } from "../../../../../shared/constants";
+import { OrganisationUnitSelection } from "../../../../../shared/types/user";
 
 export default function OrganisationUnitSelector() {
 	const [hide, setHide] = useState(true);
@@ -21,7 +22,7 @@ export default function OrganisationUnitSelector() {
 		setParams((params) => {
 			const updatedParams = new URLSearchParams(params);
 
-			const joinedValue = value.map((ou) => ou.id).join(";");
+			const joinedValue = (value ?? []).map((ou) => ou.id).join(";");
 			updatedParams.set("ou", joinedValue);
 
 			return updatedParams;
@@ -46,14 +47,14 @@ export default function OrganisationUnitSelector() {
 			>
 				{organizationUnits.length == 0
 					? i18n.t("Select Organisation unit")
-					: organizationUnits.map(
-							(ou: OrganisationUnit, index: number) => (
-								<div key={ou.id}>
-									{ou.displayName}
-									{index < organizationUnits!.length - 1 &&
+					: (organizationUnits ?? []).map(
+						(ou: OrganisationUnitSelection, index: number) => (
+							<div key={ou.id}>
+								{ou.displayName}
+								{index < organizationUnits!.length - 1 &&
 										",\u00A0"}
-								</div>
-							),
+							</div>
+						),
 					  )}
 			</Button>
 			{loading ? null : (
