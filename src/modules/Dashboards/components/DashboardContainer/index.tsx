@@ -98,12 +98,12 @@ export default function DashboardContainer(): React.ReactElement {
 									/>
 								) : dashboardConfiguration.type ==
 								  "visualization" ? (
-									<D2VisualizationContainer
-										{...dashboardConfiguration}
-									/>
-								) : (
-									<p>Not found</p>
-								)}
+										<D2VisualizationContainer
+											{...dashboardConfiguration}
+										/>
+									) : (
+										<p>Not found</p>
+									)}
 							</Card>
 						</Box>
 					</div>
