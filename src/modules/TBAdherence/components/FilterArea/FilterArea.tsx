@@ -23,7 +23,7 @@ export function FilterArea({ loading, onFetch }: FilterAreaProps) {
 	const [programMapping] = useSetting("programMapping", { global: true });
 	const [, setOrganizationUnitState] = useRecoilState(OrganizationUnitState);
 	const defaultOrganizationUnit = useRecoilValue(CurrentUserOrganizationUnit);
-	const orgUnit = params.get("ou") ?? null;
+	const orgUnit = params.get("ou") ?? defaultOrganizationUnit.map(({id}) => id).join(";");
 	const onFilterClick = () => {
 		onFetch({
 			page: 1,

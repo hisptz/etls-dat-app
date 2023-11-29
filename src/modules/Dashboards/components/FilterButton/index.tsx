@@ -26,18 +26,11 @@ export default function FilterButton({
 	orgUnitProps?: Record<string, any>;
 	periodProps?: Record<string, any>;
 }): React.ReactElement {
-	const [searchParams, setSearchParams] = useSearchParams();
+	const [, setSearchParams] = useSearchParams();
 	const [filterOpen, setFilterOpen] = useState<string | undefined>();
 	const [menuOpen, setMenuOpen] = useState(false);
 	const { orgUnit: orgUnitSelection, periods: periodSelection } =
 		filter ?? {};
-
-	// setting defaultParams
-	if(searchParams.size) {
-		console.log({ou: searchParams.get("ou"), pe: searchParams.get("pe")});
-	} else {
-		console.log("Empty Params");
-	}
 
 	// Setting search params
 	const updateSearchParams = (key: string, value: string) => {

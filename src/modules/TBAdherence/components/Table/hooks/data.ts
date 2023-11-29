@@ -15,6 +15,7 @@ import { useSetting } from "@dhis2/app-service-datastore";
 import { useRecoilValue } from "recoil";
 import { CurrentUserOrganizationUnit } from "../../../../shared/state/currentUser";
 
+// TODO check why ou is not passed
 const query: any = {
 	patients: {
 		resource: "tracker/trackedEntities",
