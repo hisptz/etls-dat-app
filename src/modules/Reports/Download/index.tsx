@@ -24,7 +24,7 @@ export default function Download({ enabled }: { enabled: boolean }) {
 	return (
 		<DropdownButton
 			dataTest={`${DATA_TEST_PREFIX}-${"download"}`}
-			disabled={!enabled}
+			disabled={!enabled || downloading || downloadingDAT}
 			loading={downloading || downloadingDAT}
 			onClick={() => setDownloadStateRef((prevState) => !prevState)}
 			open={downloadStateRef}
@@ -50,7 +50,9 @@ export default function Download({ enabled }: { enabled: boolean }) {
 				</div>
 			}
 		>
-			{i18n.t("Download")}
+			{i18n.t(
+				downloading || downloadingDAT ? "Downloading..." : "Download",
+			)}
 		</DropdownButton>
 	);
 }

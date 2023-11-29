@@ -12,6 +12,7 @@ import {
 	ReportConfig,
 	TEI_FIELDS,
 	programMapping,
+	regimenSetting,
 } from "../../../../shared/constants";
 import { TrackedEntity } from "../../../../shared/types";
 import { useSetting } from "@dhis2/app-service-datastore";
@@ -19,53 +20,10 @@ import { DateTime } from "luxon";
 import { PeriodUtility } from "@hisptz/dhis2-utils";
 import axios from "axios";
 import { saveAs } from "file-saver";
-import { useRecoilState } from "recoil";
+import { atom, useRecoilState } from "recoil";
 import { SelectedReport } from "../FilterArea/components/FilterField";
 import _ from "lodash";
-
-// const query: any = {
-// 	reports: {
-// 		resource: "tracker/trackedEntities",
-// 		params: ({
-// 			page,
-// 			pageSize,
-// 			periods,
-// 			startDate,
-// 			endDate,
-// 			program,
-// 			orgUnit,
-// 		}: {
-// 			page: number;
-// 			pageSize: number;
-// 			filters?: string[];
-// 			periods: string;
-// 			startDate?: string;
-// 			endDate?: string;
-// 			program: string;
-// 			orgUnit?: string;
-// 		}) => ({
-// 			pageSize,
-// 			page,
-// 			enrollmentEnrolledAfter: startDate,
-// 			enrollmentEnrolledBefore: endDate,
-// 			program,
-// 			orgUnit,
-// 			rootJunction: "OR",
-// 			enrolledAt: periods,
-// 			totalPages: true,
-// 			ouMode: "DESCENDANTS",
-// 			fields: TEI_FIELDS,
-// 		}),
-// 	},
-// };
-
-// function generateDimensions(dimensions: any) {
-// 	const dimensionObj = {};
-// 	dimensions.forEach((dimension: any) => {
-// 		dimensionObj[`dimension ${dimension}`] = dimension;
-// 	});
-// 	return dimensionObj;
-// }
+import { CustomDataTableRow } from "@hisptz/dhis2-ui";
 
 const query: any = {
 	reports: {
@@ -109,7 +67,6 @@ type Data = {
 		headers: [];
 		metaData: {
 			dimensions: object;
-
 			items: object;
 			pager: {
 				page: number;
@@ -121,6 +78,12 @@ type Data = {
 		rows: [];
 	};
 };
+
+export const allRowData = atom<[]>({
+	key: "all-row-data-state",
+	default: [],
+});
+
 export function filterObject(programMapping: programMapping) {
 	const filtersConfig: any = {
 		patientNumber: {
@@ -162,8 +125,29 @@ export function useFilters() {
 	};
 }
 
+export function transformRowsData(headers: any, rows: any) {
+	if (!headers || !rows || rows.length === 0) {
+		return [];
+	}
+	const transformedData = [];
+
+	for (const row of rows) {
+		const rowData = {};
+
+		headers.forEach((header: any, index: number) => {
+			const columnId = header.name;
+			const cellValue = row[index];
+
+			rowData[columnId] = cellValue;
+		});
+
+		transformedData.push(rowData);
+	}
+
+	return transformedData;
+}
+
 export function useReportTableData() {
-	const { filters } = useFilters();
 	const [reports, setreports] = useState<[] | any>([]);
 	const [programMapping] = useSetting("programMapping", {
 		global: true,
@@ -172,7 +156,19 @@ export function useReportTableData() {
 		global: true,
 	});
 	const [pagination, setPagination] = useState<Pagination>();
-	const [counter, setCounter] = useState<number>(1);
+
+	const [allData, setAllData] = useState<[] | any>();
+	const [paginatedEvents, setPaginatedEvents] = useState<{
+		page: any;
+		pageSize: any;
+		total: any;
+		pageCount: number;
+		data: any;
+	}>();
+
+	const [currentPage, setCurrentPage] = useState<number>(1);
+	const [currentPageSize, setPageSize] = useState<number>(50);
+
 	const [params] = useSearchParams();
 	const orgUnit = params.get("ou");
 	const period = params.get("periods");
@@ -197,7 +193,28 @@ export function useReportTableData() {
 				: ""),
 	];
 
-	const { data, loading, error, refetch } = useDataQuery<Data>(query, {
+	function paginateEvent(
+		eventArray: any,
+		currentPage: number,
+		pageSize: number,
+	) {
+		const startIndex = (currentPage - 1) * pageSize;
+		const endIndex = startIndex + pageSize;
+
+		const pageData = eventArray.slice(startIndex, endIndex);
+
+		const pagination = {
+			page: currentPage,
+			pageSize: pageSize,
+			total: eventArray.length,
+			pageCount: Math.ceil(eventArray.length / pageSize),
+			data: pageData,
+		};
+
+		return pagination;
+	}
+
+	const { data, error, refetch, loading } = useDataQuery<Data>(query, {
 		variables: {
 			page: 1,
 			pageSize: 50,
@@ -211,52 +228,73 @@ export function useReportTableData() {
 	});
 
 	const onPageChange = (page: number) => {
-		refetch({
-			page,
-			pe: [period],
-			ou: [orgUnit],
-		});
+		setCurrentPage(page);
+		const result = paginateEvent(mergedData, page, currentPageSize);
+		setPaginatedEvents(result);
 	};
 	const onPageSizeChange = (pageSize: number) => {
-		refetch({
-			page: 1,
-			pageSize,
-			pe: [period],
-			ou: [orgUnit],
-		});
+		setPageSize(pageSize);
+		const result = paginateEvent(mergedData, 1, pageSize);
+		setPaginatedEvents(result);
 	};
 
-	function transformRowsData(headers: any, rows: any) {
-		if (!headers || !rows || rows.length === 0) {
-			return [];
-		}
-		const transformedData = [];
-
-		for (const row of rows) {
-			const rowData = {};
-
-			headers.forEach((header: any, index: number) => {
-				const columnId = header.name;
-				const cellValue = row[index];
-
-				rowData[columnId] = cellValue;
+	const getAllEvents = async () => {
+		try {
+			const result = await refetch({
+				page: 1,
+				pe: [period],
+				ou: [orgUnit],
+				dx: dimensions,
 			});
 
-			transformedData.push(rowData);
+			const count = result.reports?.metaData.pager.pageCount;
+
+			if (count) {
+				const promises = [];
+
+				for (let i = 0; i < count; i++) {
+					try {
+						const data = await refetch({
+							page: i + 1,
+							pe: [period],
+							ou: [orgUnit],
+							dx: dimensions,
+						});
+
+						if (data) {
+							promises.push(
+								transformRowsData(
+									data.reports?.headers,
+									data.reports?.rows,
+								),
+							);
+						} else {
+							promises.push(null);
+						}
+					} catch (error) {
+						console.error(
+							`Error fetching data for page ${i + 1}:`,
+							error,
+						);
+						promises.push(null);
+					}
+				}
+
+				const RowsData = await Promise.all(promises);
+
+				const flattenedData = _.flatten(RowsData);
+
+				setAllData(flattenedData);
+			}
+		} catch (error) {
+			console.error("Error fetching data:", error);
 		}
+	};
 
-		return transformedData;
-	}
-
-	const rowData = transformRowsData(
-		data?.reports.headers,
-		data?.reports.rows,
-	);
-
-	const groupedData = _.groupBy(rowData, "tei");
+	const groupedData = _.groupBy(allData, "tei");
 
 	const mergedData = Object.keys(groupedData).map((tei) => {
-		const dataArray = groupedData[tei];
+		const dataArray: any = groupedData[tei];
 
 		const regimen = dataArray[0][programMapping.attributes.regimen];
 
@@ -273,51 +311,36 @@ export function useReportTableData() {
 			adherenceFrequency: adherenceFrequency ?? "Daily",
 		};
 	});
-
-	// let allData: any = [];
-
-	// useEffect(() => {
-	// 	if (data?.reports?.metaData?.pager?.page ?? 1 <= counter) {
-	// 		refetch({
-	// 			page: counter,
-	// 			pe: [period],
-	// 			ou: [orgUnit],
-	// 		});
-	// 		setCounter((prevState) => {
-	// 			return prevState++;
-	// 		});
-	// 		allData.push(data?.reports);
-	// 	}
-	// }, [counter]);
-
-	// console.log(allData);
+	useEffect(() => {
+		if (mergedData) {
+			const results = paginateEvent(mergedData, 1, 50);
+			setPaginatedEvents(results);
+		}
+	}, [allData]);
 
 	useEffect(() => {
-		if (data) {
+		if (paginatedEvents) {
 			setreports(
-				mergedData.map((data) => {
+				paginatedEvents.data.map((data: any) => {
 					return data;
-				}) ?? [],
+				}),
 			);
+
 			setPagination({
-				page: data?.reports.metaData.pager.page,
-				pageSize: data?.reports.metaData.pager.pageSize,
-				total: data?.reports.metaData.pager.total,
-				pageCount: data?.reports.metaData.pager.pageCount,
+				page: paginatedEvents.page,
+				pageSize: paginatedEvents.pageSize,
+				total: paginatedEvents.total,
+				pageCount: paginatedEvents.pageCount,
 			});
 		}
-	}, [data]);
+	}, [paginatedEvents]);
 
 	const { download, downloading } = useDownloadData({
 		resource: "analytics/events",
 		query: query,
 		queryKey: "reports",
-		mapping: (data: TrackedEntity) => {
-			const downloadData = new PatientProfile(
-				data,
-				programMapping,
-				regimenSetting,
-			).tableData;
+		mapping: (data: any) => {
+			const downloadData = data;
 
 			let i;
 			reportConfigs.map((report: ReportConfig, index: number) => {
@@ -362,6 +385,7 @@ export function useReportTableData() {
 		loading,
 		error,
 		refetch,
+		getAllEvents,
 	};
 }
 
@@ -369,64 +393,142 @@ export const useDATDevices = () => {
 	const [programMapping] = useSetting("programMapping", { global: true });
 	const [report] = useRecoilState<ReportConfig>(SelectedReport);
 	const [data, setData] = useState<any>();
+	const [allDevices, setAllDevices] = useState<any>();
+	const [currentPage, setCurrentPage] = useState<number>(1);
+	const [currentPageSize, setPageSize] = useState<number>(20);
 	const [errorDevice, setError] = useState<any>();
 	const [loadingDevice, setLoading] = useState(true);
+	const [pagination, setPagination] = useState<Pagination>();
 	const MediatorUrl = programMapping.mediatorUrl;
 	const ApiKey = programMapping.apiKey;
 	const [downloadingDAT, setDownloading] = useState(false);
 
 	const { show, hide } = useAlert(
 		({ message }) => message,
-		({ type }) => ({ ...type, duration: 1500 }),
+		({ type }) => ({ ...type, duration: 5000 }),
 	);
 
-	useEffect(() => {
-		const fetchData = async () => {
-			try {
-				const response = await axios.get(
-					`${MediatorUrl}/api/devices/`,
-					{
-						headers: {
-							"x-api-key": ApiKey,
-						},
-					},
-				);
-				setData(response.data);
+	async function paginateArray(
+		eventArray: any,
+		currentPage: number,
+		pageSize: number,
+	) {
+		const startIndex = (currentPage - 1) * pageSize;
+		const endIndex = startIndex + pageSize;
 
-				setLoading(false);
-			} catch (error) {
-				setError(error);
+		const pageData = eventArray.slice(startIndex, endIndex);
 
-				setLoading(false);
-			}
+		const pagination = {
+			page: currentPage,
+			pageSize: pageSize,
+			total: eventArray.length,
+			pageCount: Math.ceil(eventArray.length / pageSize),
+			data: pageData,
 		};
 
+		return pagination;
+	}
+
+	const fetchData = async () => {
+		try {
+			const response = await axios.get(`${MediatorUrl}/api/devices/`, {
+				headers: {
+					"x-api-key": ApiKey,
+				},
+			});
+
+			setAllDevices(response.data?.devices ?? []);
+
+			setLoading(false);
+		} catch (error) {
+			setError(error);
+			setLoading(false);
+		}
+	};
+
+	const paginateData = async ({
+		page,
+		pageSize,
+	}: {
+		page?: number;
+		pageSize?: number;
+	}) => {
+		try {
+			const paginatedData = await paginateArray(
+				allDevices ?? [],
+				page ?? currentPage,
+				pageSize ?? currentPageSize,
+			);
+
+			const defaultData = await paginateArray(
+				allDevices ?? [],
+				1,
+				pageSize ?? currentPageSize,
+			);
+
+			setData(
+				!isEmpty(paginatedData.data)
+					? paginatedData.data
+					: defaultData.data,
+			);
+			setPagination({
+				page: !isEmpty(paginatedData.data)
+					? paginatedData.page
+					: defaultData.page,
+				pageSize: !isEmpty(paginatedData.data)
+					? paginatedData.pageSize
+					: defaultData.pageSize,
+				total: !isEmpty(paginatedData.data)
+					? paginatedData.total
+					: defaultData.total,
+				pageCount: !isEmpty(paginatedData.data)
+					? paginatedData.pageCount
+					: defaultData.pageCount,
+			});
+
+			setLoading(false);
+		} catch (error) {
+			setError(error);
+			setLoading(false);
+		}
+	};
+
+	useEffect(() => {
+		paginateData({});
+	}, [allDevices]);
+
+	useEffect(() => {
 		fetchData();
 	}, []);
+
+	const onPageChange = async (page: number) => {
+		setCurrentPage(page);
+		await paginateData({ page: page });
+	};
+	const onPageSizeChange = async (pageSize: number) => {
+		setPageSize(pageSize);
+		await paginateData({ pageSize: pageSize });
+	};
 
 	const downloadFile = async (type: "xlsx" | "json" | "csv") => {
 		setDownloading(true);
 		try {
 			if (type === "json") {
 				saveAs(
-					new File(
-						[JSON.stringify(data.devices)] as any,
-						"data.json",
-						{
-							type: "json",
-						},
-					),
+					new File([JSON.stringify(allDevices)] as any, "data.json", {
+						type: "json",
+					}),
 					`${report.name}.json`,
 				);
 			} else if (type === "xlsx") {
 				const excel = await import("xlsx");
 				const workbook = excel.utils.book_new();
-				const worksheet = excel.utils.json_to_sheet(data.devices);
+				const worksheet = excel.utils.json_to_sheet(allDevices);
 				excel.utils.book_append_sheet(workbook, worksheet, "data");
 				excel.writeFile(workbook, `${report.name}.xlsx`);
 			} else if (type === "csv") {
 				const excel = await import("xlsx");
-				const worksheet = excel.utils.json_to_sheet(data.devices);
+				const worksheet = excel.utils.json_to_sheet(allDevices);
 				const csvData = excel.utils.sheet_to_csv(worksheet);
 				saveAs(
 					new File([csvData], "data.csv", {
@@ -451,6 +553,11 @@ export const useDATDevices = () => {
 	};
 
 	return {
+		paginationDAT: {
+			...pagination,
+			onPageSizeChange,
+			onPageChange,
+		},
 		data,
 		errorDevice,
 		loadingDevice,
@@ -458,3 +565,47 @@ export const useDATDevices = () => {
 		downloadingDAT,
 	};
 };
+
+export function sanitizeReportData(
+	data: any[],
+	regimenSettings: regimenSetting[],
+	programMapping: programMapping,
+) {
+	return data.map((report: any) => {
+		const percentage = !isEmpty(regimenSettings)
+			? regimenSettings.map((option: regimenSetting) => {
+					if (option.administration === report.adherenceFrequency) {
+						return (
+							(
+								(report.noOfSignal /
+									parseInt(option.idealDoses)) *
+								100
+							).toFixed(2) + "%"
+						);
+					} else {
+						return "N/A";
+					}
+			  })
+			: "N/A";
+
+		const adherencePercentage = percentage != "N/A" ? percentage[0] : "N/A";
+		return {
+			...([] as unknown as CustomDataTableRow),
+			tbIdentificationNumber:
+				report[programMapping.attributes?.patientNumber ?? ""],
+			name:
+				report[programMapping.attributes?.firstName ?? ""] +
+				" " +
+				report[programMapping.attributes?.surname ?? ""],
+			phoneNumber: report[programMapping.attributes?.phoneNumber ?? ""],
+			adherenceFrequency: report.adherenceFrequency,
+			adherencePercentage: adherencePercentage,
+			numberOfMissedDoses: report.noOfSignal,
+			deviceIMEINumber: report.imei,
+			daysInUse: report.daysDeviceInUse,
+			lastHeartbeat: report.lastHeartBeat,
+			lastOpened: report.lastOpened,
+			lastBatteryLevel: report.batteryLevel,
+		};
+	});
+}

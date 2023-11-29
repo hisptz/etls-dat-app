@@ -1,5 +1,5 @@
 export interface FilterParams {
-	tbDistrcitNumber?: string;
+	patientNumber?: string;
 	deviceEmiNumber?: string;
 	orgUnit?: string;
 }

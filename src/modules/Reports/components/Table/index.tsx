@@ -21,11 +21,13 @@ import {
 import { useRecoilState } from "recoil";
 import { SelectedReport } from "./FilterArea/components/FilterField";
 import { useSetting } from "@dhis2/app-service-datastore";
+import { sanitizeReportData } from "./hooks/data";
 
 export interface ReportTableProps {
 	loading: boolean;
 	reports: [];
 	pagination: Pagination;
+	paginationDAT: Pagination;
 	data: any;
 	loadingDevices: boolean;
 }
@@ -34,6 +36,7 @@ export default function ReportTable({
 	loading,
 	reports,
 	pagination,
+	paginationDAT,
 	data,
 	loadingDevices,
 }: ReportTableProps) {
@@ -70,69 +73,15 @@ export default function ReportTable({
 							pagination={
 								report.id !== "dat-device-summary-report"
 									? pagination
-									: null
+									: paginationDAT
 							}
-							rows={(report?.id !== "dat-device-summary-report"
-								? reports
-								: data.devices
-							).map((report: any) => {
-								const percentage = !isEmpty(regimenSettings)
-									? regimenSettings.map(
-											(option: regimenSetting) => {
-												if (
-													option.administration ===
-													report.adherenceFrequency
-												) {
-													return (
-														(
-															(report.noOfSignal /
-																parseInt(
-																	option.idealDoses,
-																)) *
-															100
-														).toFixed(2) + "%"
-													);
-												} else {
-													return "N/A";
-												}
-											},
-									  )
-									: "N/A";
-
-								const adherencePercentage =
-									percentage != "N/A" ? percentage[0] : "N/A";
-								return {
-									...(report as CustomDataTableRow),
-									tbIdentificationNumber:
-										report[
-											programMapping.attributes
-												.patientNumber
-										],
-									name:
-										report[
-											programMapping.attributes.firstName
-										] +
-										" " +
-										report[
-											programMapping.attributes.surname
-										],
-									phoneNumber:
-										report[
-											programMapping.attributes
-												.phoneNumber
-										],
-									adherenceFrequency:
-										report.adherenceFrequency,
-									adherencePercentage: adherencePercentage,
-
-									numberOfMissedDoses: report.noOfSignal,
-									deviceIMEINumber: report.imei,
-									daysInUse: report.daysDeviceInUse,
-									lastHeartbeat: report.lastHeartBeat,
-									lastOpened: report.lastOpened,
-									lastBatteryLevel: report.batteryLevel,
-								};
-							})}
+							rows={sanitizeReportData(
+								report?.id !== "dat-device-summary-report"
+									? reports
+									: data,
+								regimenSettings,
+								programMapping,
+							)}
 						/>
 					</>
 				)}

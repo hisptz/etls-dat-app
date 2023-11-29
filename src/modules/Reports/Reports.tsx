@@ -8,6 +8,7 @@ import i18n from "@dhis2/d2-i18n";
 import { Outlet, useSearchParams } from "react-router-dom";
 import { isEmpty } from "lodash";
 import {
+	allRowData,
 	useDATDevices,
 	useReportTableData,
 } from "./components/Table/hooks/data";
@@ -16,7 +17,6 @@ import FilterArea from "./components/Table/FilterArea";
 
 import { SelectedReport } from "./components/Table/FilterArea/components/FilterField";
 import { useRecoilState } from "recoil";
-import { useSetting } from "@dhis2/app-service-datastore";
 
 export function ReportsOutlet() {
 	return <Outlet />;
@@ -24,42 +24,18 @@ export function ReportsOutlet() {
 
 export function Reports() {
 	const [params] = useSearchParams();
-	const [programMapping] = useSetting("programMapping", {
-		global: true,
-	});
 	const reportType = params.get("reportType");
 	const period = params.get("periods");
 	const orgUnit = params.get("ou");
-	const { reports, pagination, loading, refetch } = useReportTableData();
-	const { data, loadingDevice } = useDATDevices();
+	const { reports, pagination, loading, getAllEvents } = useReportTableData();
+	const { data, loadingDevice, paginationDAT } = useDATDevices();
 	const [enabled, setenabled] = useState<boolean>(false);
 	const [report] = useRecoilState<ReportConfig>(SelectedReport);
-	const stage = programMapping.programStage;
-	const dimensions = [
-		stage + "." + programMapping.attributes.patientNumber,
-		stage + "." + programMapping.attributes.firstName,
-		stage + "." + programMapping.attributes.surname,
-		stage + "." + programMapping.attributes.phoneNumber,
-		stage + "." + programMapping.attributes.regimen,
-		stage +
-			"." +
-			DATA_ELEMENTS.DEVICE_SIGNAL +
-			(reportType === "tb-adherence-report"
-				? ":IN:Once;Multiple"
-				: reportType === "patients-who-missed-doses"
-				? ":IN:Heartbeat;None"
-				: ""),
-	];
 
 	useEffect(() => {
 		if (reportType != "dat-device-summary-report") {
 			if (!isEmpty(reportType && period && orgUnit)) {
-				refetch({
-					page: 1,
-					pe: [period],
-					ou: [orgUnit],
-					dx: dimensions,
-				});
+				getAllEvents();
 				setenabled(true);
 			} else {
 				setenabled(false);
@@ -84,6 +60,7 @@ export function Reports() {
 						<ReportTable
 							reports={reports}
 							pagination={pagination}
+							paginationDAT={paginationDAT}
 							loading={loading}
 							data={data}
 							loadingDevices={loadingDevice}

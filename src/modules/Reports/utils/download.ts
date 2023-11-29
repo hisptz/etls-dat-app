@@ -7,8 +7,18 @@ import { Pagination } from "@hisptz/dhis2-utils";
 import { flattenDeep, get, isEmpty, range } from "lodash";
 import { saveAs } from "file-saver";
 import { useRecoilState } from "recoil";
-import { ReportConfig } from "../../shared/constants";
+import {
+	ReportConfig,
+	programMapping,
+	regimenSetting,
+} from "../../shared/constants";
 import { SelectedReport } from "../components/Table/FilterArea/components/FilterField";
+import {
+	sanitizeReportData,
+	transformRowsData,
+} from "../components/Table/hooks/data";
+import { useSetting } from "@dhis2/app-service-datastore";
+import { useSearchParams } from "react-router-dom";
 
 export async function downloadFile(
 	type: "xlsx" | "json" | "csv",
@@ -53,10 +63,11 @@ async function getPagination(
 		totalPages: true,
 		skipData: true,
 	});
+
 	return {
-		page: get(data, [queryKey, "page"]),
-		total: get(data, [queryKey, "total"]),
-		pageSize: get(data, [queryKey, "pageSize"]),
+		page: get(data, [queryKey, "metaData"]).pager.page,
+		total: get(data, [queryKey, "metaData"]).pager.total,
+		pageSize: get(data, [queryKey, "metaData"]).pager.pageSize,
 	} as Pagination;
 }
 
@@ -68,18 +79,32 @@ async function getData(
 		resource,
 		mapping,
 		page,
+		programMapping,
+		regimenSetting,
 	}: {
 		options: any;
 		queryKey: string;
 		resource: string;
 		mapping: any;
 		page: number;
+		programMapping: programMapping;
+		regimenSetting: regimenSetting[];
 	},
 ): Promise<Array<Record<string, any>>> {
 	const data = await refetch({ ...options, page });
-	const rawData = get(data, [queryKey, "instances"]);
-	if (!isEmpty(rawData)) {
-		return rawData.map(mapping);
+
+	const rawData = data[queryKey];
+
+	const rows = transformRowsData(rawData.headers, rawData.rows);
+
+	const finalEventData = sanitizeReportData(
+		rows,
+		regimenSetting,
+		programMapping,
+	);
+
+	if (!isEmpty(finalEventData)) {
+		return finalEventData.map(mapping);
 	}
 	return [];
 }
@@ -102,8 +127,17 @@ export function useDownloadData({
 
 	const [downloading, setDownloading] = useState(false);
 	const [pageCount, setPageCount] = useState(0);
+	const [params] = useSearchParams();
 	const [progress, setProgress] = useState(0);
 	const [report] = useRecoilState<ReportConfig>(SelectedReport);
+	const [programMapping] = useSetting("programMapping", {
+		global: true,
+	});
+	const [regimenSetting] = useSetting("regimenSetting", {
+		global: true,
+	});
+	const [reportConfigs] = useSetting("reports", { global: true });
+	const reportType = params.get("reportType");
 
 	const { refetch } = useDataQuery(query, { lazy: true });
 
@@ -144,8 +178,11 @@ export function useDownloadData({
 							resource,
 							mapping,
 							page,
+							programMapping,
+							regimenSetting,
 						}).then((data) => {
 							setProgress(page);
+
 							show({
 								type: {
 									info: true,
@@ -164,7 +201,91 @@ export function useDownloadData({
 								asyncify(dataFetch),
 							),
 						);
-						await downloadFile(type, data, report.name);
+
+						const groupedData = _.groupBy(data, "name");
+						const mergedData = Object.keys(groupedData).map(
+							(name) => {
+								const dataArray: any = groupedData[name];
+
+								const regimen =
+									dataArray[0][
+										programMapping.attributes?.regimen ?? ""
+									];
+
+								let adherenceFrequency;
+								regimenSetting?.map((setting: any) => {
+									if (setting.regimen === regimen) {
+										adherenceFrequency =
+											setting.administration as string;
+									}
+								});
+
+								return {
+									...dataArray[0],
+									noOfSignal: dataArray.length,
+									numberOfMissedDoses: dataArray.length,
+									adherenceFrequency:
+										adherenceFrequency ?? "Daily",
+								};
+							},
+						);
+						const finalData = mergedData.map((data) => {
+							const percentage = !isEmpty(regimenSetting)
+								? regimenSetting.map(
+										(option: regimenSetting) => {
+											if (
+												option.administration ===
+												data.adherenceFrequency
+											) {
+												return (
+													(
+														(data.noOfSignal /
+															parseInt(
+																option.idealDoses,
+															)) *
+														100
+													).toFixed(2) + "%"
+												);
+											} else {
+												return "N/A";
+											}
+										},
+								  )
+								: "N/A";
+
+							const adherencePercentage =
+								percentage != "N/A" ? percentage[0] : "N/A";
+							return {
+								...data,
+								adherencePercentage: adherencePercentage,
+							};
+						});
+
+						let i;
+						reportConfigs.map(
+							(report: ReportConfig, index: number) => {
+								if (report.id === reportType) {
+									i = index;
+								}
+							},
+						);
+
+						const { columns } =
+							reportConfigs[parseInt(`${i ?? 0}`)];
+
+						const keysToFilter = columns.map(
+							(item: any) => item.key,
+						);
+
+						const sanitizedData = finalData.map((obj) =>
+							Object.fromEntries(
+								Object.entries(obj).filter(([key]) =>
+									keysToFilter.includes(key),
+								),
+							),
+						);
+
+						await downloadFile(type, sanitizedData, report.name);
 					}
 				}
 			} catch (e: any) {
