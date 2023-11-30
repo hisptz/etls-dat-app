@@ -74,11 +74,17 @@ export function FilterField({
 				name,
 				type == "organisation units"
 					? value
-							.map((ou: any) => {
-								return ou.id;
+						.map((ou: any) => {
+							return ou.id;
+						})
+						.join(";")
+					: type == "periods"
+						? value
+							.map((pe: any) => {
+								return pe;
 							})
 							.join(";")
-					: value,
+						: value,
 			);
 
 			return updatedParams;
@@ -102,17 +108,20 @@ export function FilterField({
 			return loading
 				? i18n.t("Loading...")
 				: (selectedOrgUnits ?? orgUnit)?.map((orgUnit: any) => {
-						return value?.split(";").map((ou: string) => {
-							if (orgUnit.id == ou) {
-								return orgUnit.displayName;
-							}
-						});
+					return value?.split(";").map((ou: string) => {
+						if (orgUnit.id == ou) {
+							return orgUnit.displayName;
+						}
+					}).join(", ");
 				  });
 		}
 		if (type === "periods") {
-			const period = PeriodUtility.getPeriodById(value ?? []);
+			const periods: any = [];
+			value?.split(";").map((pe) => {
+				periods.push(PeriodUtility.getPeriodById(pe ?? []));
+			});
 
-			return period.name;
+			return periods.map((pe: any) => pe.name).join(", ");
 		}
 		if (type === "report") {
 			return reportConfig?.map((report: ReportConfig) => {
@@ -232,11 +241,10 @@ export function FilterField({
 			{!periods && (
 				<PeriodSelectorModal
 					enablePeriodSelector
-					singleSelection
 					hide={periods}
 					selectedPeriods={
 						type == "periods" && !isEmpty(value)
-							? value?.split(",")
+							? value?.split(";")
 							: []
 					}
 					onClose={() => {

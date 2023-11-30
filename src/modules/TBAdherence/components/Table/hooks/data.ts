@@ -63,7 +63,7 @@ type Data = {
 export function filterObject(programMapping: programMapping) {
 	const filtersConfig: any = {
 		patientNumber: {
-			attribute: programMapping.attributes?.tbDistrictNumber,
+			attribute: programMapping.attributes?.patientNumber,
 			operator: "eq",
 		},
 		deviceIMEInumber: {

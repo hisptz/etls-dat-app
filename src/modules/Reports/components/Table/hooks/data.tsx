@@ -1,114 +1,104 @@
-import { useAlert, useDataQuery } from "@dhis2/app-runtime";
+import { useDataQuery } from "@dhis2/app-runtime";
 import { useEffect, useState } from "react";
 import { Pagination } from "@hisptz/dhis2-utils";
 import { useSearchParams } from "react-router-dom";
-import i18n from "@dhis2/d2-i18n";
-import { compact, isEmpty } from "lodash";
-import { useDownloadData } from "../../../utils/download";
-import { PatientProfile } from "../../../../shared/models";
+import {  isEmpty } from "lodash";
 import {
+	DATA_ELEMENTS,
 	DAT_PROGRAM,
-	ReportConfig,
-	TEI_FIELDS,
 	programMapping,
+	regimenSetting,
 } from "../../../../shared/constants";
-import { TrackedEntity } from "../../../../shared/types";
 import { useSetting } from "@dhis2/app-service-datastore";
-import { DateTime } from "luxon";
-import { PeriodUtility } from "@hisptz/dhis2-utils";
 import axios from "axios";
-import { saveAs } from "file-saver";
-import { useRecoilState } from "recoil";
-import { SelectedReport } from "../FilterArea/components/FilterField";
+import { atom, useRecoilState } from "recoil";
+import _ from "lodash";
+import { CustomDataTableRow } from "@hisptz/dhis2-ui";
+import { DATDevicesReportState, DHID2ReportState } from "../../../state/report";
+
+type Data = {
+	reports: {
+		headers: [];
+		metaData: {
+			dimensions: object;
+			items: object;
+			pager: {
+				page: number;
+				pageCount: number;
+				pageSize: number;
+				total: number;
+			};
+		};
+		rows: [];
+	};
+};
 
 const query: any = {
 	reports: {
-		resource: "tracker/trackedEntities",
+		resource: "analytics/events",
+		id: ({ program }: any) => `query/${program}`,
 		params: ({
 			page,
 			pageSize,
-			periods,
-			startDate,
-			endDate,
-			program,
-			orgUnit,
+			pe,
+			stage,
+			dx,
+			ou,
 		}: {
 			page: number;
 			pageSize: number;
 			filters?: string[];
-			periods: string;
+			pe: string[];
 			startDate?: string;
 			endDate?: string;
-			program: string;
-			orgUnit?: string;
+			dx: [];
+			stage: string;
+			ou: string[];
 		}) => ({
+			dimension: [
+				`ou:${ou.join(";")}`,
+				`pe:${pe.join(";")}`,
+				...(dx?.map((dx: string) => `${dx}`) ?? []),
+			],
+			stage,
+			displayProperty: "NAME",
+			outputType: "EVENT",
+			desc: "eventdate",
 			pageSize,
 			page,
-			enrollmentEnrolledAfter: startDate,
-			enrollmentEnrolledBefore: endDate,
-			program,
-			orgUnit,
-			rootJunction: "OR",
-			enrolledAt: periods,
 			totalPages: true,
-			ouMode: "DESCENDANTS",
-			fields: TEI_FIELDS,
 		}),
 	},
 };
 
-type Data = {
-	reports: {
-		instances: TrackedEntity[];
-		page: number;
-		pageSize: number;
-		total: number;
-	};
-};
-export function filterObject(programMapping: programMapping) {
-	const filtersConfig: any = {
-		tbDistrictNumber: {
-			attribute: programMapping.attributes?.tbDistrictNumber,
-			operator: "eq",
-		},
-		deviceIMEInumber: {
-			attribute: programMapping.attributes?.deviceIMEInumber,
-			operator: "eq",
-		},
-	};
+export const allRowData = atom<[]>({
+	key: "all-row-data-state",
+	default: [],
+});
 
-	return { filtersConfig: filtersConfig };
-}
+export function transformRowsData(headers: any, rows: any) {
+	if (!headers || !rows || rows.length === 0) {
+		return [];
+	}
+	const transformedData = [];
 
-export function useFilters() {
-	const [params] = useSearchParams();
-	const [programMapping] = useSetting("programMapping", {
-		global: true,
-	});
+	for (const row of rows) {
+		const rowData: any = {};
 
-	const filters = compact(
-		Array.from(params.keys()).map((filter) => {
-			const filterConfig =
-				filterObject(programMapping).filtersConfig[filter];
-			if (filterConfig) {
-				const value = params.get(filter);
-				if (value) {
-					return `${filterConfig.attribute}:${filterConfig.operator}:${value}`;
-				}
-			}
-		}),
-	);
+		headers.forEach((header: any, index: number) => {
+			const columnId = header.name;
+			const cellValue = row[index];
+			rowData[columnId] = cellValue;
+		});
 
-	return {
-		filters,
-		startDate: params.get("startDate"),
-		endDate: params.get("endDate"),
-	};
+		transformedData.push(rowData);
+	}
+
+	return transformedData;
 }
 
 export function useReportTableData() {
-	const { filters } = useFilters();
-	const [reports, setreports] = useState<PatientProfile[] | []>([]);
+	const [reports, setreports] = useState<[] | any>([]);
 	const [programMapping] = useSetting("programMapping", {
 		global: true,
 	});
@@ -116,112 +106,184 @@ export function useReportTableData() {
 		global: true,
 	});
 	const [pagination, setPagination] = useState<Pagination>();
+
+	const [allData, setAllData] = useState<any[]>();
+	const [dhis2ReportData, setDHIS2ReportData] = useRecoilState<any[]>(DHID2ReportState);
+	const [paginatedEvents, setPaginatedEvents] = useState<{
+		page: any;
+		pageSize: any;
+		total: any;
+		pageCount: number;
+		data: any;
+	}>();
+
+	const [currentPage, setCurrentPage] = useState<number>(1);
+	const [currentPageSize, setPageSize] = useState<number>(50);
 	const [params] = useSearchParams();
 	const orgUnit = params.get("ou");
 	const period = params.get("periods");
 	const reportType = params.get("reportType");
-	const [reportConfigs] = useSetting("reports", { global: true });
 
-	const periods = PeriodUtility.getPeriodById(
-		!isEmpty(period) ? period : "TODAY",
-	);
-	const s = DateTime.fromISO(periods.start);
-	const startDate = s.toFormat("yyyy-MM-dd");
-	const e = DateTime.fromISO(periods.end);
-	const endDate = e.toFormat("yyyy-MM-dd");
+	const stage = programMapping.programStage;
 
-	const { data, loading, error, refetch } = useDataQuery<Data>(query, {
+	const dimensions = [
+		stage + "." + programMapping.attributes.patientNumber,
+		stage + "." + programMapping.attributes.firstName,
+		stage + "." + programMapping.attributes.surname,
+		stage + "." + programMapping.attributes.phoneNumber,
+		stage + "." + programMapping.attributes.regimen,
+		stage +
+			"." +
+			DATA_ELEMENTS.DEVICE_SIGNAL +
+			(reportType === "tb-adherence-report"
+				? ":IN:Once;Multiple"
+				: reportType === "patients-who-missed-doses"
+					? ":IN:Heartbeat;None"
+					: ""),
+	];
+
+	function paginateEvent(
+		eventArray: any,
+		currentPage: number,
+		pageSize: number,
+	) {
+		const startIndex = (currentPage - 1) * pageSize;
+		const endIndex = startIndex + pageSize;
+
+		const pageData = eventArray.slice(startIndex, endIndex);
+
+		return {
+			page: currentPage,
+			pageSize: pageSize,
+			total: eventArray.length,
+			pageCount: Math.ceil(eventArray.length / pageSize),
+			data: pageData,
+		};
+	}
+
+	const { data, error, refetch, loading } = useDataQuery<Data>(query, {
 		variables: {
 			page: 1,
-			pageSize: 20,
+			pageSize: 50,
 			program: DAT_PROGRAM(),
-			startDate,
-			endDate,
-			filters,
-			orgUnit,
+			stage,
+			pe: [period],
+			ou: [orgUnit],
+			dx: dimensions,
 		},
 		lazy: true,
 	});
 
 	const onPageChange = (page: number) => {
-		refetch({
-			page,
-			filters,
-			orgUnit,
-		});
+		setCurrentPage(page);
+		const result = paginateEvent(mergedData, page, currentPageSize);
+		setPaginatedEvents(result);
 	};
 	const onPageSizeChange = (pageSize: number) => {
-		refetch({
-			page: 1,
-			pageSize,
-			filters,
-			orgUnit,
-		});
+		setPageSize(pageSize);
+		const result = paginateEvent(mergedData, 1, pageSize);
+		setPaginatedEvents(result);
 	};
 
-	useEffect(() => {
-		if (data) {
-			setreports(
-				data?.reports.instances.map((tei) => {
-					return new PatientProfile(
-						tei,
-						programMapping,
-						regimenSetting,
-					);
-				}) ?? [],
-			);
-			setPagination({
-				page: data?.reports.page,
-				pageSize: data?.reports.pageSize,
-				total: data?.reports.total,
-				pageCount: Math.ceil(
-					data?.reports.total / data?.reports.pageSize,
-				),
+	const getAllEvents = async () => {
+		try {
+			const result = await refetch({
+				page: 1,
+				pe: [period],
+				ou: [orgUnit],
+				dx: dimensions,
 			});
-		}
-	}, [data]);
 
-	const { download, downloading } = useDownloadData({
-		resource: "tracker/trackedEntities",
-		query: query,
-		queryKey: "reports",
-		mapping: (data: TrackedEntity) => {
-			const downloadData = new PatientProfile(
-				data,
-				programMapping,
-				regimenSetting,
-			).tableData;
+			const count = result.reports?.metaData.pager.pageCount;
 
-			let i;
-			reportConfigs.map((report: ReportConfig, index: number) => {
-				if (report.id === reportType) {
-					i = index;
+			if (count) {
+				const promises = [];
+
+				for (let i = 0; i < count; i++) {
+					try {
+						const data = await refetch({
+							page: i + 1,
+							pe: [period],
+							ou: [orgUnit],
+							dx: dimensions,
+						});
+
+						if (data) {
+							promises.push(
+								transformRowsData(
+									data.reports?.headers,
+									data.reports?.rows,
+								),
+							);
+						} else {
+							promises.push(null);
+						}
+					} catch (error) {
+						console.error(
+							`Error fetching data for page ${i + 1}:`,
+							error,
+						);
+						promises.push(null);
+					}
 				}
-			});
 
-			const { columns } = reportConfigs[parseInt(`${i ?? 0}`)];
+				const RowsData = await Promise.all(promises);
 
-			return Object.fromEntries(
-				Object.entries(downloadData).filter(([key]) =>
-					columns.map(({ key }: any) => key).includes(key),
-				),
-			);
-		},
+				const flattenedData = _.flatten(RowsData);
+
+				setAllData(flattenedData);
+			}
+		} catch (error) {
+			console.error("Error fetching data:", error);
+		}
+	};
+
+	const groupedData = _.groupBy(allData, "tei");
+
+	const mergedData = Object.keys(groupedData).map((tei) => {
+		const dataArray: any = groupedData[tei];
+
+		const regimen = dataArray[0][programMapping.attributes.regimen];
+
+		let adherenceFrequency;
+		regimenSetting?.map((setting: any) => {
+			if (setting.regimen === regimen) {
+				adherenceFrequency = setting.administration as string;
+			}
+		});
+
+		return {
+			...dataArray[0],
+			noOfSignal: dataArray.length,
+			adherenceFrequency: adherenceFrequency ?? "Daily",
+		};
 	});
 
-	const programId = DAT_PROGRAM();
+	useEffect(() => {
+		if (mergedData) {
+			const results = paginateEvent(mergedData, 1, 50);
+			setPaginatedEvents(results);
+			setDHIS2ReportData(mergedData);
+		}
+	}, [allData]);
 
-	const onDownload = (type: "xlsx" | "csv" | "json") => {
-		if (!isEmpty(orgUnit) && !isEmpty(startDate)) {
-			download(type, {
-				orgUnit,
-				pageSize: 700,
-				startDate,
-				endDate,
-				program: programId,
+	useEffect(() => {
+		if (paginatedEvents) {
+			setreports(
+				paginatedEvents.data.map((data: any) => {
+					return data;
+				}),
+			);
+
+			setPagination({
+				page: paginatedEvents.page,
+				pageSize: paginatedEvents.pageSize,
+				total: paginatedEvents.total,
+				pageCount: paginatedEvents.pageCount,
 			});
 		}
-	};
+	}, [paginatedEvents]);
+	const programId = DAT_PROGRAM();
 
 	return {
 		pagination: {
@@ -230,104 +292,178 @@ export function useReportTableData() {
 			onPageChange,
 		},
 		reports,
-		downloading,
-		download: onDownload,
 		loading,
 		error,
 		refetch,
+		getAllEvents,
 	};
 }
 
 export const useDATDevices = () => {
 	const [programMapping] = useSetting("programMapping", { global: true });
-	const [report] = useRecoilState<ReportConfig>(SelectedReport);
 	const [data, setData] = useState<any>();
+	const [allDevices, setAllDevices] = useRecoilState<any[]>(DATDevicesReportState);
+	const [currentPage, setCurrentPage] = useState<number>(1);
+	const [currentPageSize, setPageSize] = useState<number>(20);
 	const [errorDevice, setError] = useState<any>();
 	const [loadingDevice, setLoading] = useState(true);
+	const [pagination, setPagination] = useState<Pagination>();
 	const MediatorUrl = programMapping.mediatorUrl;
 	const ApiKey = programMapping.apiKey;
-	const [downloadingDAT, setDownloading] = useState(false);
+	async function paginateArray(
+		eventArray: any,
+		currentPage: number,
+		pageSize: number,
+	) {
+		const startIndex = (currentPage - 1) * pageSize;
+		const endIndex = startIndex + pageSize;
 
-	const { show, hide } = useAlert(
-		({ message }) => message,
-		({ type }) => ({ ...type, duration: 1500 }),
-	);
+		const pageData = eventArray.slice(startIndex, endIndex);
 
-	useEffect(() => {
-		const fetchData = async () => {
-			try {
-				const response = await axios.get(
-					`${MediatorUrl}/api/devices/`,
-					{
-						headers: {
-							"x-api-key": ApiKey,
-						},
-					},
-				);
-				setData(response.data);
-
-				setLoading(false);
-			} catch (error) {
-				setError(error);
-
-				setLoading(false);
-			}
+		const pagination = {
+			page: currentPage,
+			pageSize: pageSize,
+			total: eventArray.length,
+			pageCount: Math.ceil(eventArray.length / pageSize),
+			data: pageData,
 		};
 
-		fetchData();
-	}, []);
+		return pagination;
+	}
 
-	const downloadFile = async (type: "xlsx" | "json" | "csv") => {
-		setDownloading(true);
+	const fetchData = async () => {
 		try {
-			if (type === "json") {
-				saveAs(
-					new File(
-						[JSON.stringify(data.devices)] as any,
-						"data.json",
-						{
-							type: "json",
-						},
-					),
-					`${report.name}.json`,
-				);
-			} else if (type === "xlsx") {
-				const excel = await import("xlsx");
-				const workbook = excel.utils.book_new();
-				const worksheet = excel.utils.json_to_sheet(data.devices);
-				excel.utils.book_append_sheet(workbook, worksheet, "data");
-				excel.writeFile(workbook, `${report.name}.xlsx`);
-			} else if (type === "csv") {
-				const excel = await import("xlsx");
-				const worksheet = excel.utils.json_to_sheet(data.devices);
-				const csvData = excel.utils.sheet_to_csv(worksheet);
-				saveAs(
-					new File([csvData], "data.csv", {
-						type: "csv",
-					}),
-					`${report.name}.csv`,
-				);
-			}
-			show({
-				type: {
-					info: true,
+			const response = await axios.get(`${MediatorUrl}/api/devices/`, {
+				headers: {
+					"x-api-key": ApiKey,
 				},
-				message: `${i18n.t("Downloading...")}`,
 			});
-		} catch (e: any) {
-			show({ message: e.message, type: { critical: true } });
-			setTimeout(() => hide(), 5000);
-		} finally {
-			setDownloading(false);
-			hide();
+
+			setAllDevices(response.data?.devices ?? []);
+
+			setLoading(false);
+		} catch (error) {
+			setError(error);
+			setLoading(false);
 		}
 	};
 
+	const paginateData = async ({
+		page,
+		pageSize,
+	}: {
+		page?: number;
+		pageSize?: number;
+	}) => {
+		try {
+			const paginatedData = await paginateArray(
+				allDevices ?? [],
+				page ?? currentPage,
+				pageSize ?? currentPageSize,
+			);
+
+			const defaultData = await paginateArray(
+				allDevices ?? [],
+				1,
+				pageSize ?? currentPageSize,
+			);
+
+			setData(
+				!isEmpty(paginatedData.data)
+					? paginatedData.data
+					: defaultData.data,
+			);
+			setPagination({
+				page: !isEmpty(paginatedData.data)
+					? paginatedData.page
+					: defaultData.page,
+				pageSize: !isEmpty(paginatedData.data)
+					? paginatedData.pageSize
+					: defaultData.pageSize,
+				total: !isEmpty(paginatedData.data)
+					? paginatedData.total
+					: defaultData.total,
+				pageCount: !isEmpty(paginatedData.data)
+					? paginatedData.pageCount
+					: defaultData.pageCount,
+			});
+
+			setLoading(false);
+		} catch (error) {
+			setError(error);
+			setLoading(false);
+		}
+	};
+
+	useEffect(() => {
+		paginateData({});
+	}, [allDevices]);
+
+	useEffect(() => {
+		fetchData();
+	}, []);
+
+	const onPageChange = async (page: number) => {
+		setCurrentPage(page);
+		await paginateData({ page: page });
+	};
+	const onPageSizeChange = async (pageSize: number) => {
+		setPageSize(pageSize);
+		await paginateData({ pageSize: pageSize });
+	};
+
 	return {
+		paginationDAT: {
+			...pagination,
+			onPageSizeChange,
+			onPageChange,
+		},
 		data,
 		errorDevice,
 		loadingDevice,
-		downloadFile,
-		downloadingDAT,
 	};
 };
+
+export function sanitizeReportData(
+	data: any[],
+	regimenSettings: regimenSetting[],
+	programMapping: programMapping,
+) {
+	return data.map((report: any) => {
+		const percentage = !isEmpty(regimenSettings)
+			? regimenSettings.map((option: regimenSetting) => {
+				if (option.administration === report.adherenceFrequency) {
+					return (
+						(
+							(report.noOfSignal /
+									parseInt(option.idealDoses)) *
+								100
+						).toFixed(2) + "%"
+					);
+				} else {
+					return "N/A";
+				}
+			  })
+			: "N/A";
+
+		const adherencePercentage = percentage != "N/A" ? percentage[0] : "N/A";
+		return {
+			...([] as unknown as CustomDataTableRow),
+			tbIdentificationNumber:
+				report[programMapping.attributes?.patientNumber ?? ""],
+			name:
+				report[programMapping.attributes?.firstName ?? ""] +
+				" " +
+				report[programMapping.attributes?.surname ?? ""],
+			phoneNumber: report[programMapping.attributes?.phoneNumber ?? ""],
+			adherenceFrequency: report.adherenceFrequency,
+			adherencePercentage: adherencePercentage,
+			numberOfMissedDoses: report.noOfSignal,
+			deviceIMEINumber: report.imei,
+			daysInUse: report.daysDeviceInUse,
+			lastHeartbeat: report.lastHeartBeat,
+			lastOpened: report.lastOpened,
+			lastBatteryLevel: report.batteryLevel,
+		};
+	});
+}

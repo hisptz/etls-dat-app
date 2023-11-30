@@ -40,9 +40,9 @@ export class PatientProfile extends TrackedEntityModel {
 		}`;
 	}
 
-	get tbDistrictNumber(): string {
+	get patientNumber(): string {
 		return this.getAttributeValue(
-			this.programMapping?.attributes?.tbDistrictNumber ?? "",
+			this.programMapping?.attributes?.patientNumber ?? "",
 		) as string;
 	}
 
@@ -117,8 +117,8 @@ export class PatientProfile extends TrackedEntityModel {
 
 	get tableData(): Record<string, any> {
 		const name = this.name;
-		const tbDistrictNumber = this.tbDistrictNumber;
-		const tbIdentificationNumber = this.tbDistrictNumber;
+		const patientNumber = this.patientNumber;
+		const tbIdentificationNumber = this.patientNumber;
 		const age = this.age;
 		const sex = this.sex;
 		const phoneNumber = this.phoneNumber;
@@ -135,42 +135,9 @@ export class PatientProfile extends TrackedEntityModel {
 			this.programStageID ?? "",
 		);
 
-		const MissedDoses = filteredEvents.filter((item: any) => {
-			return item.dataValues.some(
-				(dataValue: any) => dataValue.value === "Heartbeat",
-			);
-		});
-
-		const numberOfMissedDoses = MissedDoses.length;
-
-		const takenDoses = filteredEvents.filter((item: any) => {
-			return item.dataValues.some((dataValue: any) => {
-				const value = dataValue.value;
-				return value === "Once" || value === "Multiple";
-			});
-		});
-
-		const percentage = !isEmpty(this.regimenSettings)
-			? this.regimenSettings.map((option: regimenSetting) => {
-					if (option.administration == this.adherenceFrequency) {
-						return (
-							(
-								(takenDoses.length /
-									parseInt(option.idealDoses)) *
-								100
-							).toFixed(2) + "%"
-						);
-					} else {
-						return "N/A";
-					}
-			  })
-			: "N/A";
-
-		const adherencePercentage = percentage != "N/A" ? percentage[0] : "N/A";
-
 		return {
 			id: this.id as string,
-			tbDistrictNumber,
+			patientNumber,
 			tbIdentificationNumber,
 			name,
 			age,
@@ -183,8 +150,6 @@ export class PatientProfile extends TrackedEntityModel {
 			dosageTime,
 			enrollmentDate,
 			deviceSignal,
-			adherencePercentage,
-			numberOfMissedDoses,
 		};
 	}
 

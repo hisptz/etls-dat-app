@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import styles from "./adherenceStreak.module.css";
 import { Tooltip } from "react-tooltip";
 import i18n from "@dhis2/d2-i18n";
+import { isEmpty } from "lodash";
 
 export interface DateEvent {
 	date: string;
@@ -55,7 +56,7 @@ function AdherenceStreak({ events, frequency }: CalendarProps) {
 				}
 			}
 
-			const tooltipId = `daily-tooltip-${i}`;
+			const tooltipId = `daily-tooltip-${cellColor + i}`;
 			const tooltipContent = i18n.t(
 				`Date: ${formatDate(cellDate)} Status: ${
 					cellColor
@@ -74,17 +75,16 @@ function AdherenceStreak({ events, frequency }: CalendarProps) {
 						key={i}
 						className={`${styles["calendar-cell"]} ${styles[cellColor]}`}
 						style={{ fontSize: "18px" }}
-						data-tooltip-id={!cellColor ? undefined : tooltipId}
+						data-tooltip-id={tooltipId}
 					></div>
-					{cellColor !== "" && (
-						<Tooltip
-							id={tooltipId}
-							content={tooltipContent}
-							delayShow={500}
-							closeOnResize
-							place="bottom"
-						/>
-					)}
+
+					<Tooltip
+						id={tooltipId}
+						content={tooltipContent}
+						delayShow={500}
+						closeOnResize
+						place="bottom"
+					/>
 				</>,
 			);
 		}
@@ -119,12 +119,12 @@ function AdherenceStreak({ events, frequency }: CalendarProps) {
 					? cellColors[monthEvents[0].event]
 					: "N/A";
 
-			const tooltipId = `monthly-tooltip-${i}`;
+			const tooltipId = `monthly-tooltip-${monthStreakColor + i}`;
 			const tooltipContent = i18n.t(
 				`Month: ${targetMonth.toLocaleString("default", {
 					month: "long",
 				})} \n Status: ${
-					monthStreakColor
+					!isEmpty(monthStreakColor)
 						? monthStreakColor == "green"
 							? "Dose Taken"
 							: monthStreakColor == "blue"
@@ -142,19 +142,16 @@ function AdherenceStreak({ events, frequency }: CalendarProps) {
 						key={i}
 						className={`${styles["calendar-cell"]} ${styles[monthStreakColor]}`}
 						style={{ fontSize: "18px" }}
-						data-tooltip-id={
-							!monthStreakColor ? undefined : tooltipId
-						}
+						data-tooltip-id={tooltipId}
 					></div>
-					{monthStreakColor !== "" && (
-						<Tooltip
-							id={tooltipId}
-							content={tooltipContent}
-							delayShow={500}
-							closeOnResize
-							place="bottom"
-						/>
-					)}
+
+					<Tooltip
+						id={tooltipId}
+						content={tooltipContent}
+						delayShow={500}
+						closeOnResize
+						place="bottom"
+					/>
 				</>,
 			);
 		}
@@ -186,7 +183,7 @@ function AdherenceStreak({ events, frequency }: CalendarProps) {
 					break;
 				}
 			}
-			const tooltipId = `weekly-tooltip-${week}`;
+			const tooltipId = `weekly-tooltip-${weekColor + week}`;
 			const tooltipContent = i18n.t(
 				`Week: ${week}\nStatus: ${
 					weekColor
@@ -204,17 +201,16 @@ function AdherenceStreak({ events, frequency }: CalendarProps) {
 						key={`before-${week}`}
 						className={`${styles["calendar-week-cell"]} ${styles[weekColor]}`}
 						style={{ fontSize: "18px" }}
-						data-tooltip-id={!weekColor ? undefined : tooltipId}
+						data-tooltip-id={tooltipId}
 					></div>
-					{weekColor !== "" && (
-						<Tooltip
-							id={tooltipId}
-							content={tooltipContent}
-							delayShow={500}
-							closeOnResize
-							place="bottom"
-						/>
-					)}
+
+					<Tooltip
+						id={tooltipId}
+						content={tooltipContent}
+						delayShow={500}
+						closeOnResize
+						place="bottom"
+					/>
 				</>,
 			);
 		}

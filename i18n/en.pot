@@ -5,11 +5,14 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2023-11-21T16:56:39.757Z\n"
-"PO-Revision-Date: 2023-11-21T16:56:39.757Z\n"
+"POT-Creation-Date: 2023-11-30T15:24:57.870Z\n"
+"PO-Revision-Date: 2023-11-30T15:24:57.870Z\n"
 
 msgid "Configurations"
 msgstr "Configurations"
+
+msgid "Search"
+msgstr "Search"
 
 msgid "Add Device"
 msgstr "Add Device"
@@ -20,8 +23,8 @@ msgstr "Delete DAT Device"
 msgid "Are you sure you want to delete the device with IMEI "
 msgstr "Are you sure you want to delete the device with IMEI "
 
-msgid "Hide"
-msgstr "Hide"
+msgid "Cancel"
+msgstr "Cancel"
 
 msgid "Delete"
 msgstr "Delete"
@@ -49,6 +52,9 @@ msgstr "Add the IMEI number as seen on the device"
 
 msgid "Save"
 msgstr "Save"
+
+msgid "No matching devices found"
+msgstr "No matching devices found"
 
 msgid "Program Mapping"
 msgstr "Program Mapping"
@@ -152,9 +158,6 @@ msgstr "CSV"
 msgid "JSON"
 msgstr "JSON"
 
-msgid "Download"
-msgstr "Download"
-
 msgid "Reports"
 msgstr "Reports"
 
@@ -172,9 +175,6 @@ msgstr "Organisation units"
 
 msgid "Periods"
 msgstr "Periods"
-
-msgid "Downloading..."
-msgstr "Downloading..."
 
 msgid "There is no report data for the selected filters"
 msgstr "There is no report data for the selected filters"
@@ -252,9 +252,6 @@ msgstr "Reset"
 msgid "Searching..."
 msgstr "Searching..."
 
-msgid "Search"
-msgstr "Search"
-
 msgid "Select Organisation unit"
 msgstr "Select Organisation unit"
 
@@ -263,6 +260,9 @@ msgstr "Search Criteria"
 
 msgid "There is no data for the selected filters"
 msgstr "There is no data for the selected filters"
+
+msgid "Downloading..."
+msgstr "Downloading..."
 
 msgid "View"
 msgstr "View"

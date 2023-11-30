@@ -46,7 +46,7 @@ const schema = z.object({
 		surname: z
 			.string({ required_error: "Surname attribute is required" })
 			.nonempty("Surname attribute is required"),
-		tbDistrictNumber: z
+		patientNumber: z
 			.string({ required_error: "Patient Number is required" })
 			.nonempty("Patient Number is required"),
 		age: z
@@ -167,7 +167,7 @@ function Edit({
 								<FilterField
 									options={attributeOptions}
 									required={true}
-									name="attributes.tbDistrictNumber"
+									name="attributes.patientNumber"
 									label={i18n.t("Patient Number")}
 									type="select"
 								/>
@@ -239,7 +239,7 @@ function Edit({
 				<ModalActions>
 					<ButtonStrip end>
 						<Button onClick={onClose} secondary>
-							{i18n.t("Hide")}
+							{i18n.t("Cancel")}
 						</Button>
 						<Button
 							loading={form.formState.isSubmitting}

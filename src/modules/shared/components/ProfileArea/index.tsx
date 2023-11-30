@@ -116,7 +116,7 @@ export function ProfileArea({
 										className={styles["label-value"]}
 										htmlFor="value"
 									>
-										{profile.tbDistrictNumber}
+										{profile.patientNumber}
 									</label>
 								</div>
 								<div
@@ -372,7 +372,7 @@ export function ProfileArea({
 							: profile.deviceIMEINumber
 					}
 					name={profile.name}
-					patientId={profile.tbDistrictNumber}
+					patientId={profile.patientNumber}
 					refetch={refetch}
 					hide={hide}
 					onHide={onHide}

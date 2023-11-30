@@ -5,7 +5,7 @@ import { FilterField } from "./FilterField";
 export function PropertiesFilter() {
 	return (
 		<div className="column gap-16">
-			<h3 className="m-0" style={{ marginBottom: "25px" }}>
+			<h3 className="m-0" style={{ marginBottom: "16px" }}>
 				{i18n.t("Search Criteria")}
 			</h3>
 			<div
