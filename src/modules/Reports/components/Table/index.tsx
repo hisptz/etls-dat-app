@@ -10,14 +10,9 @@ import { Pagination } from "@hisptz/dhis2-utils";
 
 import { FullPageLoader } from "../../../shared/components/Loaders";
 import { isEmpty } from "lodash";
-import { PatientProfile } from "../../../shared/models/profile";
 import Download from "../../Download";
 
-import {
-	DATA_ELEMENTS,
-	ReportConfig,
-	regimenSetting,
-} from "../../../shared/constants";
+import { ReportConfig } from "../../../shared/constants";
 import { useRecoilState } from "recoil";
 import { SelectedReport } from "./FilterArea/components/FilterField";
 import { useSetting } from "@dhis2/app-service-datastore";

@@ -43,6 +43,12 @@ export function FilterArea({ loading, onFetch }: FilterAreaProps) {
 		const defaultValue = getDefaultFilters();
 		setParams(defaultValue);
 		setOrganizationUnitState([defaultOrg]);
+		onFetch({
+			page: 1,
+			filters: [],
+			startDate,
+			orgUnit: defaultOrg.id,
+		});
 	};
 
 	return (
@@ -50,7 +56,7 @@ export function FilterArea({ loading, onFetch }: FilterAreaProps) {
 			<Card>
 				<div className="column gap-16 p-16">
 					<PropertiesFilter />
-					<br />
+
 					<ButtonStrip>
 						<Button onClick={onResetClick}>
 							{i18n.t("Reset")}
