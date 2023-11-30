@@ -1,14 +1,14 @@
 import { atom } from "recoil";
-import { OrganisationUnit } from "@hisptz/dhis2-utils";
+import { OrganisationUnitSelection } from "../../shared/types/user";
 
-export const OrganizationUnitState = atom<OrganisationUnit[]>({
+
+export const OrganizationUnitState = atom<OrganisationUnitSelection[]>({
 	key: "organization-unit-state",
 	default: [
 		{
 			id: " ",
 			displayName: " ",
 			path: "/ ",
-			children: [],
 		},
 	],
 });

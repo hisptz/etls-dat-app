@@ -7,7 +7,6 @@ import {
 	IconTable24,
 	IconSettings24,
 	IconVisualizationLinelist24,
-	IconVisualizationColumn24,
 } from "@dhis2/ui";
 import i18n from "@dhis2/d2-i18n";
 
@@ -20,7 +19,6 @@ import { Dashboards } from "../../Dashboards";
 import { ProgramMapping } from "../../Configuration/components/ProgramMapping";
 import { DATDevicelists } from "../../Configuration/components/DATDeviceLists";
 import { RegimenSetUp } from "../../Configuration/components/RegimeSetUp";
-import { getDefaultReportFilters } from "../../Reports/constants/filters";
 import { getDefaultTBAdherenceFilters } from "../../TBAdherence/constants/filters";
 
 export interface NavItem {

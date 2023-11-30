@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { isEmpty } from "lodash";
+import { isEmpty, map } from "lodash";
 import {
 	PeriodSelectorModal,
 	CustomOrgUnitProvider,
@@ -11,6 +11,7 @@ import { DropdownButton, IconFilter24 } from "@dhis2/ui";
 
 import { DimensionFilter } from "../../../shared/interfaces";
 import { FilterMenu } from "../FilterMenu";
+import { useSearchParams } from "react-router-dom";
 
 export default function FilterButton({
 	filter,
@@ -25,20 +26,33 @@ export default function FilterButton({
 	orgUnitProps?: Record<string, any>;
 	periodProps?: Record<string, any>;
 }): React.ReactElement {
+	const [, setSearchParams] = useSearchParams();
 	const [filterOpen, setFilterOpen] = useState<string | undefined>();
 	const [menuOpen, setMenuOpen] = useState(false);
 	const { orgUnit: orgUnitSelection, periods: periodSelection } =
 		filter ?? {};
 
+	// Setting search params
+	const updateSearchParams = (key: string, value: string) => {
+		setSearchParams((params) => {
+			const updatedParams = new URLSearchParams(params);
+			updatedParams.set(key, value);
+			return updatedParams;
+		});
+	};
+
 	// Filter methods
 	const onPeriodChange = (period: any) => {
 		if (!isEmpty(period)) {
+			updateSearchParams("pe", period.join(";"));
 			onFilterChange({ ...filter, periods: period });
 		}
 	};
 
 	const onOrgUnitChange = (orgUnit: OrgUnitSelection) => {
 		if (!isEmpty(orgUnit.orgUnits)) {
+			const ouIds = map(orgUnit.orgUnits, ({ id }) => id);
+			updateSearchParams("ou", ouIds.join(";"));
 			onFilterChange({ ...filter, orgUnit });
 		}
 	};
