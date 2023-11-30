@@ -44,7 +44,7 @@ export function FilterArea({ loading, onFetch }: FilterAreaProps) {
 			<Card>
 				<div className="column gap-16 p-16">
 					<PropertiesFilter />
-					<br />
+
 					<ButtonStrip>
 						<Button onClick={onResetClick}>
 							{i18n.t("Reset")}

@@ -1,17 +1,24 @@
 import React, { useState } from "react";
-import { Card, Button } from "@dhis2/ui";
+import { Card, Button, ButtonStrip } from "@dhis2/ui";
 import i18n from "@dhis2/d2-i18n";
 import { DATA_TEST_PREFIX } from "../../../shared/constants";
 import { useRecoilState } from "recoil";
 import DeviceListTable from "./components/DeviceListTable";
-import { add, editDevice } from "./state";
+import { add } from "./state";
 import EditDevice from "./components/EditDevice";
-import { useSetting } from "@dhis2/app-service-datastore";
+
+import { useDevicesFromDataStore } from "./hooks/data";
+import { FilterField } from "../../../TBAdherence/components/FilterArea/components/FilterField";
+import { useSearchParams } from "react-router-dom";
 
 export function DATDevicelists() {
 	const [, setAdd] = useRecoilState<boolean>(add);
 	const [hide, setHide] = useState<boolean>(true);
-	const [deviceIMEIList] = useSetting("deviceIMEIList", { global: true });
+	const { data, loadingDevice, pagination, refetch, search } =
+		useDevicesFromDataStore();
+	const [param] = useSearchParams();
+
+	const searchDevice = param.get("deviceIMEINumber");
 
 	const onHide = () => {
 		setHide(true);
@@ -25,22 +32,48 @@ export function DATDevicelists() {
 						style={{
 							display: "flex",
 							flexDirection: "row",
-							justifyContent: "space-between",
+							justifyContent: "start",
 							marginBottom: "32px",
 						}}
 					>
-						<Button
-							onClick={() => {
-								setAdd(true);
-								setHide(false);
-							}}
-							secondary
-						>
-							{i18n.t("Add Device")}
-						</Button>
+						<ButtonStrip>
+							<FilterField
+								name="deviceIMEINumber"
+								type="text"
+								label={""}
+							/>
+							<Button
+								primary
+								onClick={() => {
+									search(searchDevice);
+								}}
+							>
+								{i18n.t("Search")}
+							</Button>
+							<Button
+								onClick={() => {
+									setAdd(true);
+									setHide(false);
+								}}
+								secondary
+							>
+								{i18n.t("Add Device")}
+							</Button>
+						</ButtonStrip>
 					</div>
-					{!hide && <EditDevice hide={hide} onHide={onHide} />}
-					<DeviceListTable devices={deviceIMEIList} loading={false} />
+					{!hide && (
+						<EditDevice
+							refresh={refetch}
+							hide={hide}
+							onHide={onHide}
+						/>
+					)}
+					<DeviceListTable
+						devices={data}
+						loading={loadingDevice}
+						pagination={pagination}
+						refresh={refetch}
+					/>
 				</div>
 			</Card>
 		</div>

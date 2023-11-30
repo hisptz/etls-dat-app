@@ -1,14 +1,9 @@
-import {
-	DATA_ELEMENTS,
-	DATA_TEST_PREFIX,
-	ReportConfig,
-} from "../shared/constants";
+import { DATA_TEST_PREFIX, ReportConfig } from "../shared/constants";
 import React, { useEffect, useState } from "react";
 import i18n from "@dhis2/d2-i18n";
 import { Outlet, useSearchParams } from "react-router-dom";
 import { isEmpty } from "lodash";
 import {
-	allRowData,
 	useDATDevices,
 	useReportTableData,
 } from "./components/Table/hooks/data";

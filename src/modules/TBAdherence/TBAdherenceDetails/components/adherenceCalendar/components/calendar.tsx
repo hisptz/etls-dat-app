@@ -6,6 +6,7 @@ import i18n from "@dhis2/d2-i18n";
 import { IconChevronRight24, IconChevronLeft24 } from "@dhis2/ui";
 import { DateTime } from "luxon";
 import { isSameDay } from "date-fns";
+import { isEmpty } from "lodash";
 
 export interface DateEvent {
 	date: string;
@@ -198,6 +199,17 @@ function Calendar({ events, frequency, onClick }: CalendarProps) {
 						display: "flex",
 						flexDirection: "row",
 						position: "relative",
+						cursor:
+							isEmpty(cellColor) || cellColor[0] == undefined
+								? "pointer"
+								: undefined,
+					}}
+					onClick={() => {
+						if (isEmpty(cellColor) || cellColor[0] == undefined) {
+							const currentDate =
+								DateTime.fromJSDate(date).toISODate();
+							showDetails(currentDate ?? "", "", "");
+						}
 					}}
 				>
 					<span
@@ -290,6 +302,7 @@ function Calendar({ events, frequency, onClick }: CalendarProps) {
 
 			const uniqueEvents: any = [];
 			const weekEvents: any[] = [];
+			let weekColor: any;
 
 			for (const event of events) {
 				const eventDate = new Date(event.date);
@@ -345,27 +358,34 @@ function Calendar({ events, frequency, onClick }: CalendarProps) {
 
 			const uniqueWeekEvents = filterUnique();
 
-			const cellContent = uniqueWeekEvents.map((event, index) => (
-				<div
-					key={`color-${index}`}
-					className={`${styles["calendar-week-cell-dot"]}  ${
-						styles[
-							weekEvents.length !== 1
-								? index === 0
-									? "diagnaol-box-1"
-									: "diagnaol-box-2"
-								: ""
-						]
-					}  ${styles[cellColors[event.event]]}`}
-					onClick={() => {
-						showDetails(
-							event.date,
-							cellColors[event.event],
-							event.batteryLevel,
-						);
-					}}
-				></div>
-			));
+			const cellContent = uniqueWeekEvents.map(
+				(event, index) => (
+					(weekColor = cellColors[event.event]),
+					(
+						<div
+							key={`color-${index}`}
+							className={`${styles["calendar-week-cell-dot"]}  ${
+								styles[
+									weekEvents.length !== 1
+										? index === 0
+											? "diagnaol-box-1"
+											: "diagnaol-box-2"
+										: ""
+								]
+							}  ${styles[cellColors[event.event]]}`}
+							onClick={() => {
+								if (weekColor) {
+									showDetails(
+										event.date,
+										cellColors[event.event],
+										event.batteryLevel,
+									);
+								}
+							}}
+						></div>
+					)
+				),
+			);
 
 			const isDatePresent = uniqueWeekEvents.some((event: any) => {
 				const eventDate = DateTime.fromISO(event.date).toISODate();
@@ -394,7 +414,17 @@ function Calendar({ events, frequency, onClick }: CalendarProps) {
 				<div
 					key={`before-${week}`}
 					className={`${styles["calendar-week-cell"]}`}
-					style={{ fontSize: "18px" }}
+					style={{
+						fontSize: "18px",
+						cursor: !weekColor ? "pointer" : undefined,
+					}}
+					onClick={() => {
+						if (!weekColor) {
+							const currentDate =
+								DateTime.fromJSDate(startDate).toISODate();
+							showDetails(currentDate ?? "", "", "");
+						}
+					}}
 				>
 					{cellContent}
 					{weekno}
@@ -423,6 +453,7 @@ function Calendar({ events, frequency, onClick }: CalendarProps) {
 		for (let month = 0; month < monthsInYear; month++) {
 			const startDate = new Date(currentYear, month, 1);
 			const endDate = new Date(currentYear, month + 1, 0);
+			let monthColor: any;
 
 			const monthEvents = getEventsForMonth(startDate, endDate);
 
@@ -457,27 +488,32 @@ function Calendar({ events, frequency, onClick }: CalendarProps) {
 
 			const uniqueMonthlyEvents = filterUnique();
 
-			const cellContent = uniqueMonthlyEvents.map((event, index) => (
-				<div
-					key={`color-${index}`}
-					className={`${styles["calendar-monthly-cell-dot"]} 	${
-						styles[
-							uniqueMonthlyEvents.length !== 1
-								? index === 0
-									? "diagnaol-box-1"
-									: "diagnaol-box-2"
-								: ""
-						]
-					}  ${styles[cellColors[event.event]]}`}
-					onClick={() => {
-						showDetails(
-							event.date,
-							cellColors[event.event],
-							event.batteryLevel,
-						);
-					}}
-				></div>
-			));
+			const cellContent = uniqueMonthlyEvents.map((event, index) => {
+				monthColor = cellColors[event.event];
+				return (
+					<div
+						key={`color-${index}`}
+						className={`${styles["calendar-monthly-cell-dot"]} 	${
+							styles[
+								uniqueMonthlyEvents.length !== 1
+									? index === 0
+										? "diagnaol-box-1"
+										: "diagnaol-box-2"
+									: ""
+							]
+						}  ${styles[cellColors[event.event]]}`}
+						onClick={() => {
+							if (monthColor) {
+								showDetails(
+									event.date,
+									cellColors[event.event],
+									event.batteryLevel,
+								);
+							}
+						}}
+					></div>
+				);
+			});
 
 			const monthname = (
 				<span
@@ -503,7 +539,17 @@ function Calendar({ events, frequency, onClick }: CalendarProps) {
 				<div
 					key={`month-${month}`}
 					className={`${styles["calendar-cell-monthly"]}`}
-					style={{ fontSize: "18px" }}
+					style={{
+						fontSize: "18px",
+						cursor: !monthColor ? "pointer" : undefined,
+					}}
+					onClick={() => {
+						if (!monthColor) {
+							const currentDate =
+								DateTime.fromJSDate(startDate).toISODate();
+							showDetails(currentDate ?? "", "", "");
+						}
+					}}
 				>
 					{cellContent}
 					{monthname}

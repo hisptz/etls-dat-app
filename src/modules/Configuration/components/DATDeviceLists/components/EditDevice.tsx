@@ -38,10 +38,12 @@ const EditDevice = ({
 	data,
 	hide,
 	onHide,
+	refresh,
 }: {
 	data?: DeviceFormData;
 	hide: boolean;
 	onHide: () => void;
+	refresh: (newDevices?: any) => void;
 }) => {
 	const [addNew, setAdd] = useRecoilState<boolean>(add);
 	const [bulkUpload, setBulkUpload] = useState<boolean>(false);
@@ -66,6 +68,7 @@ const EditDevice = ({
 		addDevice(updatedDevices);
 		onHide();
 		setAdd(false);
+		refresh([...updatedDevices]);
 		show({
 			message: "Devices Updated Successfully",
 			type: { success: true },

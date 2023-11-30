@@ -5,11 +5,14 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2023-11-30T12:19:56.595Z\n"
-"PO-Revision-Date: 2023-11-30T12:19:56.595Z\n"
+"POT-Creation-Date: 2023-11-30T15:24:57.870Z\n"
+"PO-Revision-Date: 2023-11-30T15:24:57.870Z\n"
 
 msgid "Configurations"
 msgstr "Configurations"
+
+msgid "Search"
+msgstr "Search"
 
 msgid "Add Device"
 msgstr "Add Device"
@@ -49,6 +52,9 @@ msgstr "Add the IMEI number as seen on the device"
 
 msgid "Save"
 msgstr "Save"
+
+msgid "No matching devices found"
+msgstr "No matching devices found"
 
 msgid "Program Mapping"
 msgstr "Program Mapping"
@@ -245,9 +251,6 @@ msgstr "Reset"
 
 msgid "Searching..."
 msgstr "Searching..."
-
-msgid "Search"
-msgstr "Search"
 
 msgid "Select Organisation unit"
 msgstr "Select Organisation unit"
