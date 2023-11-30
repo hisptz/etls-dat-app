@@ -9,7 +9,6 @@ import { Pagination } from "@hisptz/dhis2-utils";
 
 import { FullPageLoader } from "../../../shared/components/Loaders";
 import { isEmpty } from "lodash";
-import Download from "../../Download";
 
 import { ReportColumn, ReportConfig } from "../../../shared/constants";
 import { useRecoilState, useRecoilValue } from "recoil";
@@ -17,6 +16,7 @@ import { SelectedReport } from "./FilterArea/components/FilterField";
 import { useSetting } from "@dhis2/app-service-datastore";
 import { sanitizeReportData } from "./hooks/data";
 import { DATDevicesReportState, DHID2ReportState } from "../../state/report";
+import Download from "../Download";
 
 export interface ReportTableProps {
 	loading: boolean;

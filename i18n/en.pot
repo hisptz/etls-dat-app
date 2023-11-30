@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2023-11-30T15:24:57.870Z\n"
-"PO-Revision-Date: 2023-11-30T15:24:57.870Z\n"
+"POT-Creation-Date: 2023-11-30T16:08:56.481Z\n"
+"PO-Revision-Date: 2023-11-30T16:08:56.481Z\n"
 
 msgid "Configurations"
 msgstr "Configurations"
@@ -149,6 +149,9 @@ msgstr "Period"
 msgid "Organisation Unit"
 msgstr "Organisation Unit"
 
+msgid "Reports"
+msgstr "Reports"
+
 msgid "Excel"
 msgstr "Excel"
 
@@ -157,9 +160,6 @@ msgstr "CSV"
 
 msgid "JSON"
 msgstr "JSON"
-
-msgid "Reports"
-msgstr "Reports"
 
 msgid "Loading..."
 msgstr "Loading..."
