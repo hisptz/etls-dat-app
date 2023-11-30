@@ -17,9 +17,10 @@ interface DeleteDevice {
 	inUse?: boolean;
 	hide: boolean;
 	onHide: () => void;
+	refresh: (newDevices: any) => void;
 }
 
-function DeleteDevice({ IMEI, inUse, hide, onHide }: DeleteDevice) {
+function DeleteDevice({ IMEI, inUse, hide, onHide, refresh }: DeleteDevice) {
 	const [devices, { set: deleteDevice }] = useSetting("deviceIMEIList", {
 		global: true,
 	});
@@ -36,6 +37,7 @@ function DeleteDevice({ IMEI, inUse, hide, onHide }: DeleteDevice) {
 					(item: deviceIMEIList) => item["IMEI"] !== IMEI,
 				);
 				deleteDevice(updatedDevices);
+				refresh([...updatedDevices]);
 				show({
 					message: "Device Deleted Successfully",
 					type: { success: true },

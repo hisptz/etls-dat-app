@@ -4,7 +4,6 @@ import {
 	CustomDataTableColumn,
 	CustomDataTableRow,
 } from "@hisptz/dhis2-ui";
-import { Card } from "@dhis2/ui";
 import i18n from "@dhis2/d2-i18n";
 import { Pagination } from "@hisptz/dhis2-utils";
 
@@ -19,22 +18,21 @@ import { deviceIMEIList } from "../../../../shared/constants";
 export interface DevicesTableProps {
 	loading: boolean;
 	devices: deviceIMEIList[];
+	pagination: Pagination;
+	refresh: (newDevices: any) => void;
 }
 
 export default function DeviceListTable({
 	loading,
 	devices,
+	pagination,
+	refresh,
 }: DevicesTableProps) {
 	const [hideDel, setDelete] = useState<boolean>(true);
 	const [hide, setEdit] = useState<boolean>(true);
 	const [selectedDevice, setSelectedDevice] = useState<DeviceFormData>();
 
 	const devicesColumns = [
-		{
-			key: "sn",
-			label: "S/N",
-			path: "sn",
-		},
 		{
 			key: "IMEI",
 			label: "IMEI Number",
@@ -73,11 +71,8 @@ export default function DeviceListTable({
 	}
 
 	return (
-		<div className="w-100 h-100" style={{ height: "62vh" }}>
-			<div
-				className=" w-100 h-100 gap-16 column"
-				style={{ overflowY: "scroll" }}
-			>
+		<div className="w-100 h-100">
+			<div className=" w-100 h-100 gap-16 column">
 				{loading && isEmpty(devices) ? (
 					<FullPageLoader />
 				) : (
@@ -85,11 +80,11 @@ export default function DeviceListTable({
 						<CustomDataTable
 							emptyLabel={i18n.t("There are no devices")}
 							loading={loading}
+							pagination={pagination}
 							columns={devicesColumns as CustomDataTableColumn[]}
 							rows={devices.map((device, index) => {
 								return {
 									...(device as CustomDataTableRow),
-									sn: index + 1,
 									action: getActions(device),
 								};
 							})}
@@ -99,6 +94,7 @@ export default function DeviceListTable({
 								data={selectedDevice}
 								hide={hide}
 								onHide={onHide}
+								refresh={refresh}
 							/>
 						)}
 						{!hideDel && (
@@ -107,6 +103,7 @@ export default function DeviceListTable({
 								inUse={selectedDevice?.inUse}
 								hide={hideDel}
 								onHide={onHideDel}
+								refresh={refresh}
 							/>
 						)}
 					</>
