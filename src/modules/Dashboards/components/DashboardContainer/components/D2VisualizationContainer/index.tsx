@@ -1,6 +1,6 @@
-import React, {useMemo} from "react";
+import React, { useMemo } from "react";
 import { DashboardItem } from "../../../../../shared/interfaces";
-import {useDataQuery} from "@dhis2/app-runtime";
+import { useDataQuery } from "@dhis2/app-runtime";
 import {
 	getCategoryOptionGroupSets,
 	getCategoryOptions,
@@ -10,34 +10,53 @@ import {
 	getLayout,
 	getOrganisationUnitGroupSetDimensions,
 	getOrgUnits,
-	getPeriods
+	getPeriods,
 } from "./utils/visualization";
 import { FullPageLoader } from "../../../../../shared/components/Loaders";
+import { useSearchParams } from "react-router-dom";
+import { DashboardFilterState } from "../../../../states/dashboardsHeader";
+import { useRecoilValue } from "recoil";
+import { OrgUnitSelection } from "@hisptz/dhis2-utils";
 
-const Visualization = React.lazy(() => import("@hisptz/dhis2-analytics").then(({Visualization}) => ({default: Visualization})));
+const Visualization = React.lazy(() =>
+	import("@hisptz/dhis2-analytics").then(({ Visualization }) => ({
+		default: Visualization,
+	})),
+);
 
 const visualizationQuery = {
 	visualization: {
 		resource: "visualizations",
-		id: ({id}: any) => id,
-	}
+		id: ({ id }: any) => id,
+	},
 };
 export default function D2VisualizationContainer(
 	config: DashboardItem,
 ): React.ReactElement {
-	const {data, loading} = useDataQuery<{ visualization: any }>(visualizationQuery, {
-		variables: {
-			id: config.id
-		}
-	});
+	const [searchParams] = useSearchParams();
+	const { orgUnit: selectedOrgUnits, periods: selectedPeriods } =
+		useRecoilValue(DashboardFilterState);
+	const { data, loading } = useDataQuery<{ visualization: any }>(
+		visualizationQuery,
+		{
+			variables: {
+				id: config.id,
+			},
+		},
+	);
 	const visualization = useMemo(() => data?.visualization, [data]);
 
-
 	if (loading) {
-		return (
-			<FullPageLoader minHeight={400}/>
-		);
+		return <FullPageLoader minHeight={400} message={"Loading"} />;
 	}
+
+	const ouParams = searchParams.get("ou");
+	const peParams = searchParams.get("pe");
+
+	const pe: string[] = peParams ? peParams.split(";") : selectedPeriods ?? [];
+	const ou: string[] = ouParams
+		? ouParams.split(";")
+		: (selectedOrgUnits?.orgUnits ?? []).map(({ id }) => id);
 
 	return (
 		<div style={{ padding: 16 }}>
@@ -51,22 +70,29 @@ export default function D2VisualizationContainer(
 						display: "flex",
 					}}
 				>
-					{config.options?.title ?? data?.visualization?.displayFormName ?? data?.visualization?.displayName}
+					{config.options?.title ??
+						data?.visualization?.displayFormName ??
+						data?.visualization?.displayName}
 				</div>
 			)}
-			<div style={{ minHeight: 400 }} className="w-100 h-100 column gap-16">
+			<div
+				style={{ minHeight: 400 }}
+				className="w-100 h-100 column gap-16"
+			>
 				<div className="flex-1">
 					<Visualization
 						showToolbar
-						showPeriodSelector = {false}
+						showPeriodSelector={false}
 						layout={getLayout(visualization)}
 						defaultVisualizationType={getDefaultType(visualization)}
 						dimensions={{
-							dx: getDataItems(visualization),
-							pe: getPeriods(visualization), // TODO: add ability to fetch periods from selections
-							ou: getOrgUnits(visualization), // TODO: ability to fetch periods from selections
+							pe,
+							ou,
+							dx: getDataItems(visualization), // TODO: ability to fetch periods from selections
 							...getCategoryOptions(visualization),
-							...getOrganisationUnitGroupSetDimensions(visualization),
+							...getOrganisationUnitGroupSetDimensions(
+								visualization,
+							),
 							...getCategoryOptionGroupSets(visualization),
 						}}
 						config={getConfig(visualization, {}) as any}

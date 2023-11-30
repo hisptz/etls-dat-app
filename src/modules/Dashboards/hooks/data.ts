@@ -12,7 +12,7 @@ import {
 } from "lodash";
 import { mapLimit, parallel } from "async-es";
 import { useDataEngine } from "@dhis2/app-runtime";
-
+import { useSearchParams } from "react-router-dom";
 import {
 	DEFAULT_PAGE_SIZE,
 	EVENTS_PAGINATION_QUERY,
@@ -29,7 +29,7 @@ import { DateTime } from "luxon";
 import { DATA_ELEMENTS } from "../../shared/constants";
 
 const CONCURRENT_REQUESTS = 5;
-interface EnrollmentSummary {
+type EnrollmentSummary = {
 	numberOfClients: number;
 	numberOfDevices: number;
 	clientsRegisteredIntoDAT: number;
@@ -38,7 +38,7 @@ interface EnrollmentSummary {
 	};
 }
 
-interface AdherenceSummary {
+type AdherenceSummary = {
 	totalDeviceSignalEvents: number;
 	deviceSignalsForDoseTake: number;
 }
@@ -138,6 +138,7 @@ export function useDefaultDashboardData() {
 	const [adherenceSummary, setAdherenceSummary] =
 		useState<AdherenceSummary | null>(null);
 
+	const [ searchParams] = useSearchParams();
 	const engine = useDataEngine();
 	const controller = new AbortController();
 	const { orgUnit: selectedOrgUnits, periods: selectedPeriods } =
@@ -145,10 +146,14 @@ export function useDefaultDashboardData() {
 	const [programMapping] = useSetting("programMapping", { global: true });
 	const [devices] = useSetting("deviceIMEIList", { global: true });
 
+	const ouParams = searchParams.get("ou");
+	const peParams = searchParams.get("pe");
+
+	const ou = ouParams ? head(ouParams.split(";")) : head(selectedOrgUnits?.orgUnits)?.id ?? "";
 	const { start: startDate, end: endDate } = PeriodUtility.getPeriodById(
-		head(selectedPeriods),
+		head(peParams ? peParams.split(";") :selectedPeriods),
 	);
-	const ou = head(selectedOrgUnits?.orgUnits)?.id ?? "";
+
 	const today = DateTime.now().minus({ days: 1 }).toFormat("yyyy-MM-dd");
 	const trackedEntityInstanceQueryParams = {
 		program: programMapping?.program ?? "",
@@ -325,8 +330,8 @@ export function useDefaultDashboardData() {
 				fetchAdherenceSummary(),
 			);
 		}
-		setTimeout(() => {
-			getDefaultDashboardData();
+		setTimeout(async() => {
+			await getDefaultDashboardData();
 		}, 300);
 
 		return () => {

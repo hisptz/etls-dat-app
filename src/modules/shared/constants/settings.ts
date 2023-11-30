@@ -38,15 +38,19 @@ export interface programMapping {
 		deviceIMEInumber?: string;
 	};
 }
+
+export interface ReportColumn {
+	key: string;
+	label: string;
+	path: string | Array<string | number>;
+}
+
+
 export interface ReportConfig {
 	name: string;
 	id: string;
 	filters: string[];
-	columns: Array<{
-		key: string;
-		label: string;
-		path: string | Array<string | number>;
-	}>;
+	columns: Array<ReportColumn>;
 }
 
 export const reports: ReportConfig[] = [

@@ -112,14 +112,13 @@ function getAdherencePercentageSummary({
 	if (config.options?.renderAs !== "progress") {
 		return getDefaultMessageForNonExistingVisualization();
 	}
+
 	return (
 		<div>
 			<div className="pv-8 center align-center flex">
 				<CircularProgressDashboard
-					denominator={
-						deviceSignalsForDoseTake / totalDeviceSignalEvents
-					}
-					numerator={1}
+					denominator={totalDeviceSignalEvents}
+					numerator={deviceSignalsForDoseTake}
 					size={100}
 				/>
 			</div>

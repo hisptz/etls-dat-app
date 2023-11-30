@@ -23,8 +23,8 @@ msgstr "Delete DAT Device"
 msgid "Are you sure you want to delete the device with IMEI "
 msgstr "Are you sure you want to delete the device with IMEI "
 
-msgid "Hide"
-msgstr "Hide"
+msgid "Cancel"
+msgstr "Cancel"
 
 msgid "Delete"
 msgstr "Delete"
@@ -176,9 +176,6 @@ msgstr "Organisation units"
 msgid "Periods"
 msgstr "Periods"
 
-msgid "Downloading..."
-msgstr "Downloading..."
-
 msgid "There is no report data for the selected filters"
 msgstr "There is no report data for the selected filters"
 
@@ -263,6 +260,9 @@ msgstr "Search Criteria"
 
 msgid "There is no data for the selected filters"
 msgstr "There is no data for the selected filters"
+
+msgid "Downloading..."
+msgstr "Downloading..."
 
 msgid "View"
 msgstr "View"

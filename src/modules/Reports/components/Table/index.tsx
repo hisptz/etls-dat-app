@@ -3,7 +3,6 @@ import React from "react";
 import {
 	CustomDataTable,
 	CustomDataTableColumn,
-	CustomDataTableRow,
 } from "@hisptz/dhis2-ui";
 import i18n from "@dhis2/d2-i18n";
 import { Pagination } from "@hisptz/dhis2-utils";
@@ -12,11 +11,12 @@ import { FullPageLoader } from "../../../shared/components/Loaders";
 import { isEmpty } from "lodash";
 import Download from "../../Download";
 
-import { ReportConfig } from "../../../shared/constants";
-import { useRecoilState } from "recoil";
+import { ReportColumn, ReportConfig } from "../../../shared/constants";
+import { useRecoilState, useRecoilValue } from "recoil";
 import { SelectedReport } from "./FilterArea/components/FilterField";
 import { useSetting } from "@dhis2/app-service-datastore";
 import { sanitizeReportData } from "./hooks/data";
+import { DATDevicesReportState, DHID2ReportState } from "../../state/report";
 
 export interface ReportTableProps {
 	loading: boolean;
@@ -36,6 +36,8 @@ export default function ReportTable({
 	loadingDevices,
 }: ReportTableProps) {
 	const [report] = useRecoilState<ReportConfig>(SelectedReport);
+	const deviceList = useRecoilValue(DATDevicesReportState);
+	const d2ReportData = useRecoilValue(DHID2ReportState);
 	const [programMapping] = useSetting("programMapping", {
 		global: true,
 	});
@@ -57,6 +59,14 @@ export default function ReportTable({
 									(!loading && !isEmpty(reports)) ||
 									(!loadingDevices && !isEmpty(data))
 								}
+								data={sanitizeReportData(
+									report?.id !== "dat-device-summary-report"
+									? d2ReportData
+									: deviceList,
+									regimenSettings,
+									programMapping,
+									)}
+								columns={report.columns as ReportColumn[]}
 							/>
 						</div>
 						<CustomDataTable

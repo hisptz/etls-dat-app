@@ -100,7 +100,7 @@ function DeleteDevice({ IMEI, inUse, hide, onHide, refresh }: DeleteDevice) {
 							}}
 							secondary
 						>
-							{i18n.t("Hide")}
+							{i18n.t("Cancel")}
 						</Button>
 						<Button
 							onClick={() => {
