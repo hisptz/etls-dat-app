@@ -79,147 +79,10 @@ export function generateUid() {
 }
 
 export function useProgramStage() {
-	const [params] = useSearchParams();
-	const programId = params.get("mappedTbProgram");
-	const [programMapping] = useSetting("programMapping", { global: true });
-
-	const programStage = {
-		programStages: [
-			{
-				id: programMapping.programStage,
-				name: "DAT-Adherence Records",
-				repeatable: true,
-				program: { id: programId ?? programMapping.program ?? null },
-				programStageDataElements: [
-					{
-						dataElement: {
-							id: DATA_ELEMENTS.DEVICE_HEALTH,
-						},
-					},
-					{
-						dataElement: {
-							id: DATA_ELEMENTS.BATTERY_HEALTH,
-						},
-					},
-					{
-						dataElement: {
-							id: DATA_ELEMENTS.DOSAGE_TIME,
-						},
-					},
-					{
-						dataElement: {
-							id: DATA_ELEMENTS.DEVICE_SIGNAL,
-						},
-					},
-				],
-			},
-		],
-		dataElements: [
-			{
-				code: "WISE_PILL_001",
-				id: DATA_ELEMENTS.DEVICE_HEALTH,
-				name: "Device health",
-				shortName: "Device health",
-				aggregationType: "NONE",
-				domainType: "TRACKER",
-				valueType: "TEXT",
-			},
-			{
-				code: "WISE_PILL_002",
-				id: DATA_ELEMENTS.BATTERY_HEALTH,
-				name: "Battery health",
-				shortName: "Battery health",
-				aggregationType: "NONE",
-				domainType: "TRACKER",
-				valueType: "NUMBER",
-			},
-			{
-				code: "WISE_PILL_003",
-				id: DATA_ELEMENTS.DOSAGE_TIME,
-				name: "Dosage time",
-				shortName: "Dosage time",
-				aggregationType: "NONE",
-				domainType: "TRACKER",
-				valueType: "DATETIME",
-			},
-			{
-				code: "WISE_PILL_004",
-				id: DATA_ELEMENTS.DEVICE_SIGNAL,
-				name: "Device signal",
-				shortName: "Device signal",
-				aggregationType: "NONE",
-				domainType: "TRACKER",
-				valueType: "TEXT",
-				optionSet: {
-					id: "lpMwLxkJor6",
-				},
-			},
-		],
-		optionSets: [
-			{
-				id: "lpMwLxkJor6",
-				name: "Device signal",
-				valueType: "TEXT",
-				options: [
-					{
-						id: "rzRYYkh8jaq",
-					},
-					{
-						id: "bXCWzsKQiIe",
-					},
-					{
-						id: "J4u3MgT8ll3",
-					},
-					{
-						id: "rqvQqekCxF3",
-					},
-				],
-			},
-		],
-		options: [
-			{
-				id: "rzRYYkh8jaq",
-				code: "Once",
-				name: "Opened Once",
-				sortOrder: 1,
-				optionSet: {
-					id: "lpMwLxkJor6",
-				},
-			},
-			{
-				id: "bXCWzsKQiIe",
-				code: "Multiple",
-				name: "Opened Multiple",
-				sortOrder: 2,
-				optionSet: {
-					id: "lpMwLxkJor6",
-				},
-			},
-			{
-				id: "J4u3MgT8ll3",
-				code: "None",
-				name: "None",
-				sortOrder: 3,
-				optionSet: {
-					id: "lpMwLxkJor6",
-				},
-			},
-			{
-				id: "rqvQqekCxF3",
-				code: "Heartbeat",
-				name: "Heartbeat",
-				sortOrder: 4,
-				optionSet: {
-					id: "lpMwLxkJor6",
-				},
-			},
-		],
-	};
-
 	const createProgramStage: any = {
 		type: "create",
 		resource: "metadata",
-		data: programStage,
+		data: ({ data }: any) => data,
 		importMode: "COMMIT",
 		identifier: "UID",
 		importReportMode: "ERRORS",
@@ -233,14 +96,150 @@ export function useProgramStage() {
 
 	const [mutate, { loading, error }] = useDataMutation(createProgramStage);
 
-	const handleImportProgramStage = () => {
-		mutate()
-			.then((response) => {
-				null;
-			})
-			.catch((error) => {
-				null;
+	const handleImportProgramStage = async (mapping: any) => {
+		const programStage = {
+			programStages: [
+				{
+					id: mapping.programStage,
+					name: "DAT-Adherence Records",
+					repeatable: true,
+					program: {
+						id: mapping.program ?? null,
+					},
+					programStageDataElements: [
+						{
+							dataElement: {
+								id: DATA_ELEMENTS.DEVICE_HEALTH,
+							},
+						},
+						{
+							dataElement: {
+								id: DATA_ELEMENTS.BATTERY_HEALTH,
+							},
+						},
+						{
+							dataElement: {
+								id: DATA_ELEMENTS.DOSAGE_TIME,
+							},
+						},
+						{
+							dataElement: {
+								id: DATA_ELEMENTS.DEVICE_SIGNAL,
+							},
+						},
+					],
+				},
+			],
+			dataElements: [
+				{
+					code: "WISE_PILL_001",
+					id: DATA_ELEMENTS.DEVICE_HEALTH,
+					name: "Device health",
+					shortName: "Device health",
+					aggregationType: "NONE",
+					domainType: "TRACKER",
+					valueType: "TEXT",
+				},
+				{
+					code: "WISE_PILL_002",
+					id: DATA_ELEMENTS.BATTERY_HEALTH,
+					name: "Battery health",
+					shortName: "Battery health",
+					aggregationType: "NONE",
+					domainType: "TRACKER",
+					valueType: "NUMBER",
+				},
+				{
+					code: "WISE_PILL_003",
+					id: DATA_ELEMENTS.DOSAGE_TIME,
+					name: "Dosage time",
+					shortName: "Dosage time",
+					aggregationType: "NONE",
+					domainType: "TRACKER",
+					valueType: "DATETIME",
+				},
+				{
+					code: "WISE_PILL_004",
+					id: DATA_ELEMENTS.DEVICE_SIGNAL,
+					name: "Device signal",
+					shortName: "Device signal",
+					aggregationType: "NONE",
+					domainType: "TRACKER",
+					valueType: "TEXT",
+					optionSet: {
+						id: "lpMwLxkJor6",
+					},
+				},
+			],
+			optionSets: [
+				{
+					id: "lpMwLxkJor6",
+					name: "Device signal",
+					valueType: "TEXT",
+					options: [
+						{
+							id: "rzRYYkh8jaq",
+						},
+						{
+							id: "bXCWzsKQiIe",
+						},
+						{
+							id: "J4u3MgT8ll3",
+						},
+						{
+							id: "rqvQqekCxF3",
+						},
+					],
+				},
+			],
+			options: [
+				{
+					id: "rzRYYkh8jaq",
+					code: "Once",
+					name: "Opened Once",
+					sortOrder: 1,
+					optionSet: {
+						id: "lpMwLxkJor6",
+					},
+				},
+				{
+					id: "bXCWzsKQiIe",
+					code: "Multiple",
+					name: "Opened Multiple",
+					sortOrder: 2,
+					optionSet: {
+						id: "lpMwLxkJor6",
+					},
+				},
+				{
+					id: "J4u3MgT8ll3",
+					code: "None",
+					name: "None",
+					sortOrder: 3,
+					optionSet: {
+						id: "lpMwLxkJor6",
+					},
+				},
+				{
+					id: "rqvQqekCxF3",
+					code: "Heartbeat",
+					name: "Heartbeat",
+					sortOrder: 4,
+					optionSet: {
+						id: "lpMwLxkJor6",
+					},
+				},
+			],
+		};
+		if (mapping) {
+			const res = await mutate({
+				data: programStage,
 			});
+
+			return {
+				response: res,
+			};
+		}
 	};
 
 	return {
