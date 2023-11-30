@@ -80,8 +80,8 @@ const EditDevice = ({
 			);
 			isDeviceAlreadyPresent
 				? show({
-						message: "Device Already Exists!",
-						type: { error: true },
+					message: "Device Already Exists!",
+					type: { error: true },
 				  })
 				: updateDeviceListAndShowSuccess(updatedDevices);
 		} else if (excelFile) {
@@ -114,10 +114,10 @@ const EditDevice = ({
 			const updatedDevices = devices.map((device: deviceIMEIList) =>
 				device.IMEI === data.IMEI
 					? {
-							...device,
-							IMEI: deviceData.IMEI,
-							code: deviceData.code,
-							name: deviceData.name,
+						...device,
+						IMEI: deviceData.IMEI,
+						code: deviceData.code,
+						name: deviceData.name,
 					  }
 					: device,
 			);
@@ -221,7 +221,7 @@ const EditDevice = ({
 				<ModalActions>
 					<ButtonStrip end>
 						<Button onClick={onClose} secondary>
-							{i18n.t("Hide")}
+							{i18n.t("Cancel")}
 						</Button>
 						<Button
 							loading={form.formState.isSubmitting}

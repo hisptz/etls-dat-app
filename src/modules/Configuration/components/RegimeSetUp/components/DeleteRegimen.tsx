@@ -89,7 +89,7 @@ function DeleteSetting({ regimen, hide, onHide }: DeleteSetting) {
 							}}
 							secondary
 						>
-							{i18n.t("Hide")}
+							{i18n.t("Cancel")}
 						</Button>
 						<Button
 							onClick={() => {

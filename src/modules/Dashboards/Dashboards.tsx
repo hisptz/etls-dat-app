@@ -17,7 +17,7 @@ export function Dashboards() {
 
 			<DashboardHeader />
 
-			{/* <DashboardContainer /> */}
+			<DashboardContainer />
 		</div>
 	);
 }

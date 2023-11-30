@@ -94,10 +94,10 @@ const AddSetting = ({
 			const updatedSetting = settings.map((setting: regimenSetting) =>
 				setting.regimen === regimenData.regimen
 					? {
-							...setting,
-							regimen: regimenData.regimen,
-							administration: regimenData.administration,
-							idealDoses: regimenData.idealDoses,
+						...setting,
+						regimen: regimenData.regimen,
+						administration: regimenData.administration,
+						idealDoses: regimenData.idealDoses,
 					  }
 					: setting,
 			);
@@ -155,7 +155,7 @@ const AddSetting = ({
 				<ModalActions>
 					<ButtonStrip end>
 						<Button onClick={onClose} secondary>
-							{i18n.t("Hide")}
+							{i18n.t("Cancel")}
 						</Button>
 						<Button
 							loading={form.formState.isSubmitting}

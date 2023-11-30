@@ -54,19 +54,19 @@ function EditAlarm({
 		dayInWeek:
 			frequency == "Weekly"
 				? z
-						.string({
-							required_error: "Day of the Dose is required",
-						})
-						.nonempty("Day of the Dose is required")
+					.string({
+						required_error: "Day of the Dose is required",
+					})
+					.nonempty("Day of the Dose is required")
 				: z.string(),
 		nextDoseTime:
 			frequency == "Monthly"
 				? z.string()
 				: z
-						.string({
-							required_error: "Next Dose Time is required",
-						})
-						.nonempty("Next Dose Time is required"),
+					.string({
+						required_error: "Next Dose Time is required",
+					})
+					.nonempty("Next Dose Time is required"),
 		nextRefillDate: z
 			.string({ required_error: "Next Refill Date is required" })
 			.nonempty("Next Refill Date is required"),
@@ -108,8 +108,8 @@ function EditAlarm({
 				frequency == "Daily"
 					? "1111111"
 					: frequency == "Weekly"
-					? generateDays(data.dayInWeek)
-					: null,
+						? generateDays(data.dayInWeek)
+						: null,
 		};
 
 		await setAlarm({ data: alarmData }).then(async (res) => {
@@ -239,7 +239,7 @@ function EditAlarm({
 				<ModalActions>
 					<ButtonStrip end>
 						<Button onClick={onClose} secondary>
-							{i18n.t("Hide")}
+							{i18n.t("Cancel")}
 						</Button>
 						<Button
 							loading={form.formState.isSubmitting}
