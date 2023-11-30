@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2023-11-30T07:56:35.661Z\n"
-"PO-Revision-Date: 2023-11-30T07:56:35.661Z\n"
+"POT-Creation-Date: 2023-11-30T12:19:56.595Z\n"
+"PO-Revision-Date: 2023-11-30T12:19:56.595Z\n"
 
 msgid "Configurations"
 msgstr "Configurations"
@@ -170,9 +170,6 @@ msgstr "Organisation units"
 msgid "Periods"
 msgstr "Periods"
 
-msgid "Downloading..."
-msgstr "Downloading..."
-
 msgid "There is no report data for the selected filters"
 msgstr "There is no report data for the selected filters"
 
@@ -260,6 +257,9 @@ msgstr "Search Criteria"
 
 msgid "There is no data for the selected filters"
 msgstr "There is no data for the selected filters"
+
+msgid "Downloading..."
+msgstr "Downloading..."
 
 msgid "View"
 msgstr "View"
