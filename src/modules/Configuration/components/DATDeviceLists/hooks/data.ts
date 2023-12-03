@@ -139,7 +139,7 @@ export const useDevicesFromDataStore = () => {
 		await paginateData({ pageSize: pageSize });
 	};
 
-	const search = (device: string) => {
+	const search = (device?: string | null) => {
 		const filteredData = allDevices.filter((d: any) =>
 			d.IMEI.includes(device),
 		);
