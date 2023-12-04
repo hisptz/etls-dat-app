@@ -20,8 +20,8 @@ import {
 import { Option } from "../../../../../shared/types";
 import { atom, useRecoilState } from "recoil";
 import i18n from "@dhis2/d2-i18n";
-import { OrgUnitSelectorModal } from "@hisptz/dhis2-ui";
-import { PeriodSelectorModal } from "@hisptz/dhis2-ui";
+import { OrgUnitSelectorModal, PeriodSelectorModal } from "@hisptz/dhis2-ui";
+
 import { useSetting } from "@dhis2/app-service-datastore";
 import { useOrgUnit } from "../../../../utils/orgUnits";
 import { PeriodUtility } from "@hisptz/dhis2-utils";
@@ -74,17 +74,17 @@ export function FilterField({
 				name,
 				type == "organisation units"
 					? value
-						.map((ou: any) => {
-							return ou.id;
-						})
-						.join(";")
+							.map((ou: any) => {
+								return ou.id;
+							})
+							.join(";")
 					: type == "periods"
-						? value
+					? value
 							.map((pe: any) => {
 								return pe;
 							})
 							.join(";")
-						: value,
+					: value,
 			);
 
 			return updatedParams;
@@ -108,11 +108,11 @@ export function FilterField({
 			return loading
 				? i18n.t("Loading...")
 				: (selectedOrgUnits ?? orgUnit)?.map((orgUnit: any) => {
-					return value?.split(";").map((ou: string) => {
-						if (orgUnit.id == ou) {
-							return orgUnit.displayName;
-						}
-					}).join(", ");
+						return value?.split(";").map((ou: string) => {
+							if (orgUnit.id == ou) {
+								return orgUnit.displayName + ", ";
+							}
+						});
 				  });
 		}
 		if (type === "periods") {
