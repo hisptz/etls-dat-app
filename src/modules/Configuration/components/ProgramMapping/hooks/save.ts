@@ -189,6 +189,9 @@ export function useProgramStage() {
 						{
 							id: "rqvQqekCxF3",
 						},
+						{
+							id: "l8Z3eixIrDs",
+						},
 					],
 				},
 			],
@@ -224,6 +227,15 @@ export function useProgramStage() {
 					id: "rqvQqekCxF3",
 					code: "Heartbeat",
 					name: "Heartbeat",
+					sortOrder: 4,
+					optionSet: {
+						id: "lpMwLxkJor6",
+					},
+				},
+				{
+					id: "l8Z3eixIrDs",
+					code: "Enrollment",
+					name: "Enrollment",
 					sortOrder: 4,
 					optionSet: {
 						id: "lpMwLxkJor6",
