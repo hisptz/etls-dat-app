@@ -24,6 +24,7 @@ export interface FilterFieldProps {
 	multiSelect?: boolean;
 	loading?: boolean;
 	width?: string;
+	disabled?: boolean;
 }
 
 export function FilterField({

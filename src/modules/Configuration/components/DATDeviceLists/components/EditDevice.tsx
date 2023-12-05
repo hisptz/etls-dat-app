@@ -83,8 +83,8 @@ const EditDevice = ({
 			);
 			isDeviceAlreadyPresent
 				? show({
-					message: "Device Already Exists!",
-					type: { error: true },
+						message: "Device Already Exists!",
+						type: { error: true },
 				  })
 				: updateDeviceListAndShowSuccess(updatedDevices);
 		} else if (excelFile) {
@@ -117,10 +117,10 @@ const EditDevice = ({
 			const updatedDevices = devices.map((device: deviceIMEIList) =>
 				device.IMEI === data.IMEI
 					? {
-						...device,
-						IMEI: deviceData.IMEI,
-						code: deviceData.code,
-						name: deviceData.name,
+							...device,
+							IMEI: deviceData.IMEI,
+							code: deviceData.code,
+							name: deviceData.name,
 					  }
 					: device,
 			);
@@ -209,11 +209,14 @@ const EditDevice = ({
 									<FilterField
 										label={i18n.t("Device IMEI number")}
 										name="IMEI"
+										disabled={data?.inUse ? true : false}
 										type="text"
 									/>
 									<label style={{ fontSize: "12px" }}>
 										{i18n.t(
-											"Add the IMEI number as seen on the device",
+											data?.inUse
+												? "Device is already in use"
+												: "Add the IMEI number as seen on the device",
 										)}
 									</label>
 								</div>
@@ -229,6 +232,7 @@ const EditDevice = ({
 						<Button
 							loading={form.formState.isSubmitting}
 							onClick={form.handleSubmit(onSubmit)}
+							disabled={data?.inUse ? true : false}
 							primary
 						>
 							{i18n.t("Save")}

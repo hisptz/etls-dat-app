@@ -23,12 +23,21 @@ export interface AdherenceTableProps {
 	loading: boolean;
 	patients: PatientProfile[];
 	pagination: Pagination;
+	onSort: (sort: any) => void;
+	sortState:
+		| {
+				name: string;
+				direction: "desc" | "default" | "asc";
+		  }
+		| undefined;
 }
 
 export default function TBAdherenceTable({
 	loading,
 	patients,
 	pagination,
+	onSort,
+	sortState,
 }: AdherenceTableProps) {
 	const [TBAdherence] = useSetting("TBAdherence", { global: true });
 	const navigate = useNavigate();
@@ -104,6 +113,8 @@ export default function TBAdherenceTable({
 										getAdherenceStreak(patient),
 								};
 							})}
+							onSort={onSort}
+							sortState={sortState}
 						/>
 					)}
 				</div>

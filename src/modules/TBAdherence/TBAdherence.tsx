@@ -15,7 +15,7 @@ export function TreatmentAdherenceOutlet() {
 
 export function TBAdherencePage() {
 	const [programMapping] = useSetting("programMapping", { global: true });
-	const { patients, pagination, refetch, loading } =
+	const { patients, pagination, refetch, loading, onSort, sortState } =
 		useTBAdherenceTableData();
 	const navigate = useNavigate();
 
@@ -72,6 +72,8 @@ export function TBAdherencePage() {
 							patients={patients}
 							pagination={pagination}
 							loading={loading}
+							onSort={onSort}
+							sortState={sortState}
 						/>
 					</div>
 				)}

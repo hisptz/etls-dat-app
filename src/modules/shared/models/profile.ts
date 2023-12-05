@@ -122,7 +122,7 @@ export class PatientProfile extends TrackedEntityModel {
 		const age = this.age;
 		const sex = this.sex;
 		const phoneNumber = this.phoneNumber;
-		const deviceIMEINumber = this.deviceIMEINumber;
+		const deviceIMEInumber = this.deviceIMEINumber;
 		const adherenceFrequency = this.adherenceFrequency;
 		const deviceHealth = this.deviceHealth;
 		const batteryHealth = this.batteryHealth;
@@ -143,7 +143,7 @@ export class PatientProfile extends TrackedEntityModel {
 			age,
 			sex,
 			phoneNumber,
-			deviceIMEINumber,
+			deviceIMEInumber,
 			adherenceFrequency,
 			deviceHealth,
 			batteryHealth,

@@ -93,23 +93,19 @@ function Edit({
 				: generateUid();
 		data.programStage = programStageID;
 		await setProgramMapping(data);
+		if (!isEmpty(programMapping.program)) {
+			await importProgramStage(data);
+		}
 		await onUpdate({
 			programID: data.program,
 		});
 		onHide();
-		setImport(!importMeta);
 	};
 
 	const onClose = () => {
 		onHide();
 		form.reset({});
 	};
-
-	useEffect(() => {
-		if (!isEmpty(programMapping.program)) {
-			importProgramStage();
-		}
-	}, [importMeta]);
 
 	if (error) {
 		throw error;
