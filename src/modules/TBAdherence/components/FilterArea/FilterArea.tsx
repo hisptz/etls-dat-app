@@ -23,7 +23,9 @@ export function FilterArea({ loading, onFetch }: FilterAreaProps) {
 	const [programMapping] = useSetting("programMapping", { global: true });
 	const [, setOrganizationUnitState] = useRecoilState(OrganizationUnitState);
 	const defaultOrganizationUnit = useRecoilValue(CurrentUserOrganizationUnit);
-	const orgUnit = params.get("ou") ?? defaultOrganizationUnit.map(({id}) => id).join(";");
+	const orgUnit =
+		params.get("ou") ??
+		defaultOrganizationUnit.map(({ id }) => id).join(";");
 	const onFilterClick = () => {
 		onFetch({
 			page: 1,
@@ -36,7 +38,13 @@ export function FilterArea({ loading, onFetch }: FilterAreaProps) {
 	const onResetClick = () => {
 		const defaultValue = getDefaultTBAdherenceFilters();
 		setParams(defaultValue);
-		setOrganizationUnitState(defaultOrganizationUnit);
+		setOrganizationUnitState([]);
+		onFetch({
+			page: 1,
+			filters: [],
+			startDate,
+			orgUnit: defaultOrganizationUnit.map(({ id }) => id).join(";"),
+		});
 	};
 
 	return (

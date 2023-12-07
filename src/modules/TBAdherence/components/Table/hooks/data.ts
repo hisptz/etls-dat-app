@@ -27,6 +27,7 @@ const query: any = {
 			endDate,
 			program,
 			orgUnit,
+			order,
 		}: {
 			page: number;
 			pageSize: number;
@@ -35,6 +36,7 @@ const query: any = {
 			endDate?: string;
 			program: string;
 			orgUnit?: string;
+			order?: string;
 		}) => ({
 			pageSize,
 			page,
@@ -47,6 +49,7 @@ const query: any = {
 			totalPages: true,
 			ouMode: "DESCENDANTS",
 			fields: TEI_FIELDS,
+			order: order,
 		}),
 	},
 };
@@ -119,9 +122,15 @@ export function useTBAdherenceTableData() {
 	const [regimenSetting] = useSetting("regimenSetting", {
 		global: true,
 	});
+	const [sortState, setSortState] = useState<{
+		name: string;
+		direction: "asc" | "desc" | "default";
+	}>();
 	const [pagination, setPagination] = useState<Pagination>();
 	const [params] = useSearchParams();
-	const orgUnit = params.get("ou") ?? defaultOrganizationUnit.map(({id}) => id).join(";");
+	const orgUnit =
+		params.get("ou") ??
+		defaultOrganizationUnit.map(({ id }) => id).join(";");
 
 	const { data, loading, error, refetch } = useDataQuery<Data>(query, {
 		variables: {
@@ -192,6 +201,22 @@ export function useTBAdherenceTableData() {
 		}
 	};
 
+	const onSort = (sort: any) => {
+		if (sort.direction === "default") {
+			const columnId = programMapping.attributes[sort.name];
+			refetch({ order: `${columnId}:asc` });
+		}
+
+		if (sort.direction === "asc") {
+			const columnId = programMapping.attributes[sort.name];
+			refetch({ order: `${columnId}:asc` });
+		} else {
+			const columnId = programMapping.attributes[sort.name];
+			refetch({ order: `${columnId}:desc` });
+		}
+		setSortState(sort);
+	};
+
 	return {
 		pagination: {
 			...pagination,
@@ -204,5 +229,7 @@ export function useTBAdherenceTableData() {
 		loading,
 		error,
 		refetch,
+		onSort,
+		sortState,
 	};
 }

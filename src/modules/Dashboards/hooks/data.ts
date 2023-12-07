@@ -36,12 +36,12 @@ type EnrollmentSummary = {
 	enrollmentBySex: {
 		[sex: string]: string;
 	};
-}
+};
 
 type AdherenceSummary = {
 	totalDeviceSignalEvents: number;
 	deviceSignalsForDoseTake: number;
-}
+};
 
 function getEnrollmentSummary(
 	trackedEntityInstances: TrackedEntityInstance[],
@@ -138,7 +138,7 @@ export function useDefaultDashboardData() {
 	const [adherenceSummary, setAdherenceSummary] =
 		useState<AdherenceSummary | null>(null);
 
-	const [ searchParams] = useSearchParams();
+	const [searchParams] = useSearchParams();
 	const engine = useDataEngine();
 	const controller = new AbortController();
 	const { orgUnit: selectedOrgUnits, periods: selectedPeriods } =
@@ -149,9 +149,11 @@ export function useDefaultDashboardData() {
 	const ouParams = searchParams.get("ou");
 	const peParams = searchParams.get("pe");
 
-	const ou = ouParams ? head(ouParams.split(";")) : head(selectedOrgUnits?.orgUnits)?.id ?? "";
+	const ou = ouParams
+		? head(ouParams.split(";"))
+		: head(selectedOrgUnits?.orgUnits)?.id ?? "";
 	const { start: startDate, end: endDate } = PeriodUtility.getPeriodById(
-		head(peParams ? peParams.split(";") :selectedPeriods),
+		head(peParams ? peParams.split(";") : selectedPeriods),
 	);
 
 	const today = DateTime.now().minus({ days: 1 }).toFormat("yyyy-MM-dd");
@@ -330,7 +332,7 @@ export function useDefaultDashboardData() {
 				fetchAdherenceSummary(),
 			);
 		}
-		setTimeout(async() => {
+		setTimeout(async () => {
 			await getDefaultDashboardData();
 		}, 300);
 

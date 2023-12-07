@@ -39,7 +39,7 @@ export function useRegimens() {
 		lazy: !programMapping.attributes.regimen,
 	});
 
-	const regimenOptions = data?.optionSet.optionSet.options;
+	const regimenOptions = data?.optionSet?.optionSet?.options;
 	const regimenOptionsArray = regimenOptions?.map((option) => option.code);
 	const filteredRegimenOptions = regimenOptionsArray?.filter((regimen) => {
 		return !settings.some(

@@ -139,20 +139,20 @@ export const useDevicesFromDataStore = () => {
 		await paginateData({ pageSize: pageSize });
 	};
 
-	const search = (device: string) => {
+	const search = async (device?: string | null) => {
 		const filteredData = allDevices.filter((d: any) =>
 			d.IMEI.includes(device),
 		);
 
-		paginateData({ deviceList: filteredData });
-
 		if (isEmpty(filteredData) && !isEmpty(device)) {
-			show({
+			return show({
 				type: {
 					info: true,
 				},
 				message: `${i18n.t("No matching devices found")}`,
 			});
+		} else {
+			paginateData({ deviceList: filteredData, page: 1 });
 		}
 	};
 
