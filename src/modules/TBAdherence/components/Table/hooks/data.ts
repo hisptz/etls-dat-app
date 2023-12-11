@@ -14,6 +14,7 @@ import { TrackedEntity } from "../../../../shared/types";
 import { useSetting } from "@dhis2/app-service-datastore";
 import { useRecoilValue } from "recoil";
 import { CurrentUserOrganizationUnit } from "../../../../shared/state/currentUser";
+import { getProgramMapping } from "../../../../shared/utils";
 
 const query: any = {
 	patients: {
@@ -84,16 +85,6 @@ export function filterObject(programMapping: programMapping) {
 
 	return { filtersConfig: filtersConfig };
 }
-
-const getProgramMapping = (
-	mapping: programMapping[],
-	program: string | null,
-) => {
-	if (program) {
-		return find(mapping, { program }) ?? head(mapping);
-	}
-	return head(mapping);
-};
 
 export function useFilters() {
 	const [params] = useSearchParams();
