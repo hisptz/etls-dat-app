@@ -2,7 +2,7 @@ import { useDataQuery } from "@dhis2/app-runtime";
 import { useEffect, useState } from "react";
 import { Pagination } from "@hisptz/dhis2-utils";
 import { useSearchParams } from "react-router-dom";
-import { find, isEmpty } from "lodash";
+import { isEmpty, head } from "lodash";
 import {
 	DATA_ELEMENTS,
 	DAT_PROGRAM,
@@ -14,7 +14,8 @@ import axios from "axios";
 import { atom, useRecoilState } from "recoil";
 import _ from "lodash";
 import { CustomDataTableRow } from "@hisptz/dhis2-ui";
-import { DATDevicesReportState, DHID2ReportState } from "../../../state/report";
+import { DATDevicesReportState, DHIS2ReportState } from "../../../state/report";
+import { getProgramMapping } from "../../../../shared/utils";
 
 type Data = {
 	reports: {
@@ -33,7 +34,7 @@ type Data = {
 	};
 };
 
-type EventDataPagination = {
+type CustomPagination = {
 	page: any;
 	pageSize: any;
 	total: any;
@@ -107,41 +108,39 @@ export function transformRowsData(headers: any, rows: any) {
 
 export function useReportTableData() {
 	const [reports, setReports] = useState<[] | any>([]);
-	const [programMapping] = useSetting("programMapping", {
+	const [programMappings] = useSetting("programMapping", {
 		global: true,
 	});
 	const [regimenSetting] = useSetting("regimenSetting", {
 		global: true,
 	});
 	const [pagination, setPagination] = useState<Pagination>();
+
 	const [allData, setAllData] = useState<any[]>();
-	const [, setDHIS2ReportData] = useRecoilState<any[]>(DHID2ReportState);
-	const [paginatedEvents, setPaginatedEvents] =
-		useState<EventDataPagination>();
+	const [, setDHIS2ReportData] = useRecoilState<any[]>(DHIS2ReportState);
+	const [paginatedEvents, setPaginatedEvents] = useState<CustomPagination>();
 
 	const [, setCurrentPage] = useState<number>(1);
 	const [currentPageSize, setPageSize] = useState<number>(50);
 	const [params] = useSearchParams();
 	const orgUnit = params.get("ou");
-	const period = params.get("periods");
 	const program = params.get("program");
+	const period = params.get("periods");
 	const reportType = params.get("reportType");
 
-	const stage = programMapping.programStage;
-
-	const { programStage, attributes } =
-		find(
-			programMapping,
-			({ program: programId }) => program === programId,
-		) ?? {};
+	const programMapping = getProgramMapping(
+		programMappings,
+		program,
+	) as programMapping;
+	const stage = programMapping?.programStage ?? "";
 
 	const dimensions = [
-		programStage + "." + attributes.patientNumber,
-		programStage + "." + attributes.firstName,
-		programStage + "." + attributes.surname,
-		programStage + "." + attributes.phoneNumber,
-		programStage + "." + attributes.regimen,
-		programStage +
+		stage + "." + programMapping.attributes?.patientNumber,
+		stage + "." + programMapping.attributes?.firstName,
+		stage + "." + programMapping.attributes?.surname,
+		stage + "." + programMapping.attributes?.phoneNumber,
+		stage + "." + programMapping.attributes?.regimen,
+		stage +
 			"." +
 			DATA_ELEMENTS.DEVICE_SIGNAL +
 			(reportType === "tb-adherence-report"
@@ -170,7 +169,7 @@ export function useReportTableData() {
 		};
 	}
 
-	const { data, error, refetch, loading } = useDataQuery<Data>(query, {
+	const { error, refetch, loading } = useDataQuery<Data>(query, {
 		variables: {
 			page: 1,
 			pageSize: 50,
@@ -251,12 +250,11 @@ export function useReportTableData() {
 
 	const mergedData = Object.keys(groupedData).map((tei) => {
 		const dataArray: any = groupedData[tei];
-
-		const regimen = dataArray[0][programMapping.attributes?.regimen];
+		const regimen = dataArray[0][programMapping?.attributes?.regimen ?? ""];
 
 		let adherenceFrequency;
 		regimenSetting?.map((setting: any) => {
-			if (setting?.regimen === regimen) {
+			if (setting.regimen === regimen) {
 				adherenceFrequency = setting.administration as string;
 			}
 		});

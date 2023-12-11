@@ -7,18 +7,23 @@ import { Pagination } from "@hisptz/dhis2-utils";
 import { FullPageLoader } from "../../../shared/components/Loaders";
 import { isEmpty } from "lodash";
 
-import { ReportColumn, ReportConfig } from "../../../shared/constants";
+import {
+	ReportColumn,
+	ReportConfig,
+	programMapping,
+} from "../../../shared/constants";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { SelectedReport } from "./FilterArea/components/FilterField";
 import { useSetting } from "@dhis2/app-service-datastore";
 import { sanitizeReportData } from "./hooks/data";
-import { DATDevicesReportState, DHID2ReportState } from "../../state/report";
+import { DATDevicesReportState, DHIS2ReportState } from "../../state/report";
 import Download from "../Download";
 
 export interface ReportTableProps {
 	loading: boolean;
 	reports: [];
 	pagination: Pagination;
+	programMapping: programMapping;
 	paginationDAT: Pagination;
 	data: any;
 	loadingDevices: boolean;
@@ -30,14 +35,12 @@ export default function ReportTable({
 	pagination,
 	paginationDAT,
 	data,
+	programMapping,
 	loadingDevices,
 }: ReportTableProps) {
 	const [report] = useRecoilState<ReportConfig>(SelectedReport);
 	const deviceList = useRecoilValue(DATDevicesReportState);
-	const d2ReportData = useRecoilValue(DHID2ReportState);
-	const [programMapping] = useSetting("programMapping", {
-		global: true,
-	});
+	const d2ReportData = useRecoilValue(DHIS2ReportState);
 	const [regimenSettings] = useSetting("regimenSetting", {
 		global: true,
 	});
