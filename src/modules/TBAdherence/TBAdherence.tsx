@@ -28,7 +28,7 @@ export function TBAdherencePage() {
 			<h1 className="m-0" style={{ marginBottom: "0px" }}>
 				{i18n.t("Treatment Adherence")}
 			</h1>
-			{!isEmpty(programMapping) ? <ProgramsTab /> : null}
+			{programMapping.length > 1 ? <ProgramsTab /> : null}
 			<FilterArea loading={loading} onFetch={refetch} />
 			<div className="flex-1">
 				{isEmpty(programMapping) ? (
