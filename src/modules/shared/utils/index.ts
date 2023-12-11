@@ -9,7 +9,7 @@ export function getDhis2FormattedDate(date: DateTime): string {
 export function getProgramMapping(
 	mapping: programMapping[],
 	program: string | null,
-) {
+): programMapping | undefined {
 	if (program) {
 		return find(mapping, { program }) ?? head(mapping);
 	}

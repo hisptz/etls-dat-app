@@ -2,10 +2,9 @@ import { useDataQuery } from "@dhis2/app-runtime";
 import { useEffect, useState } from "react";
 import { Pagination } from "@hisptz/dhis2-utils";
 import { useSearchParams } from "react-router-dom";
-import { isEmpty, head } from "lodash";
+import { isEmpty } from "lodash";
 import {
 	DATA_ELEMENTS,
-	DAT_PROGRAM,
 	programMapping,
 	regimenSetting,
 } from "../../../../shared/constants";
@@ -173,7 +172,7 @@ export function useReportTableData() {
 		variables: {
 			page: 1,
 			pageSize: 50,
-			program: DAT_PROGRAM(),
+			program: programMapping?.program ?? "",
 			stage,
 			pe: [period],
 			ou: [orgUnit],

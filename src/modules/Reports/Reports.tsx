@@ -45,7 +45,7 @@ export function Reports() {
 		} else {
 			setEnabled(true);
 		}
-	}, [reportType, orgUnit, period]);
+	}, [reportType, orgUnit, period, program]);
 
 	return (
 		<div
@@ -65,7 +65,7 @@ export function Reports() {
 							pagination={pagination}
 							paginationDAT={paginationDAT}
 							loading={loading}
-							programMapping={selectedProgramMapping}
+							programMapping={selectedProgramMapping ?? {}}
 							data={data}
 							loadingDevices={loadingDevice}
 						/>
