@@ -10,7 +10,7 @@ import {
 import i18n from "@dhis2/d2-i18n";
 import { FilterField } from "../../ProgramMapping/components/FilterField";
 import { useSetting } from "@dhis2/app-service-datastore";
-import { regimenSetting } from "../../../../shared/constants";
+import { RegimenSetting } from "../../../../shared/constants";
 import { Option } from "../hooks/data";
 import { FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -91,7 +91,7 @@ const AddSetting = ({
 
 	const onEdit = async (regimenData: RegimenFormData) => {
 		if (regimenData) {
-			const updatedSetting = settings.map((setting: regimenSetting) =>
+			const updatedSetting = settings.map((setting: RegimenSetting) =>
 				setting.regimen === regimenData.regimen
 					? {
 						...setting,

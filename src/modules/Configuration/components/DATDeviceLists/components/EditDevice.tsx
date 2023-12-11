@@ -15,7 +15,7 @@ import { FilterField } from "../../ProgramMapping/components/FilterField";
 import { add } from "../state";
 
 import { useSetting } from "@dhis2/app-service-datastore";
-import { deviceIMEIList } from "../../../../shared/constants";
+import { DeviceIMEIList } from "../../../../shared/constants";
 import { FormProvider, useForm } from "react-hook-form";
 import { readXLSXFile } from "../hooks/data";
 import { z } from "zod";
@@ -114,7 +114,7 @@ const EditDevice = ({
 
 	const onEdit = async (deviceData: DeviceFormData) => {
 		if (data?.IMEI && deviceData.IMEI) {
-			const updatedDevices = devices.map((device: deviceIMEIList) =>
+			const updatedDevices = devices.map((device: DeviceIMEIList) =>
 				device.IMEI === data.IMEI
 					? {
 							...device,

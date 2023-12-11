@@ -5,8 +5,8 @@ import { useSearchParams } from "react-router-dom";
 import { isEmpty } from "lodash";
 import {
 	DATA_ELEMENTS,
-	programMapping,
-	regimenSetting,
+	ProgramMapping,
+	RegimenSetting,
 } from "../../../../shared/constants";
 import { useSetting } from "@dhis2/app-service-datastore";
 import axios from "axios";
@@ -130,7 +130,7 @@ export function useReportTableData() {
 	const programMapping = getProgramMapping(
 		programMappings,
 		program,
-	) as programMapping;
+	) as ProgramMapping;
 	const stage = programMapping?.programStage ?? "";
 
 	const dimensions = [
@@ -433,12 +433,12 @@ export const useDATDevices = () => {
 
 export function sanitizeReportData(
 	data: any[],
-	regimenSettings: regimenSetting[],
-	programMapping: programMapping,
+	regimenSettings: RegimenSetting[],
+	programMapping: ProgramMapping,
 ) {
 	return data.map((report: any) => {
 		const percentage = !isEmpty(regimenSettings)
-			? regimenSettings.map((option: regimenSetting) => {
+			? regimenSettings.map((option: RegimenSetting) => {
 					if (option.administration === report.adherenceFrequency) {
 						return (
 							(

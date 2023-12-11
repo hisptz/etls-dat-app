@@ -1,20 +1,20 @@
 import { TrackedEntityModel } from "./trackedEntityModel";
-import { programMapping, regimenSetting } from "../constants";
+import { ProgramMapping, RegimenSetting } from "../constants";
 import { DatDeviceInfoEventModel } from "./datDeviceInfo";
 import { TrackedEntity } from "../types";
 import { filter, head } from "lodash";
 import { DateTime } from "luxon";
 
 export class PatientProfile extends TrackedEntityModel {
-	programMapping?: programMapping;
-	regimenSettings?: regimenSetting[];
+	programMapping?: ProgramMapping;
+	regimenSettings?: RegimenSetting[];
 	datDeviceInfoEvent?: DatDeviceInfoEventModel;
 	programStageID?: string;
 
 	constructor(
 		trackedEntity: TrackedEntity,
-		programMapping: programMapping,
-		regimenSettings: regimenSetting[],
+		programMapping: ProgramMapping,
+		regimenSettings: RegimenSetting[],
 	) {
 		super(trackedEntity);
 		this.programMapping = programMapping;

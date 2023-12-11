@@ -7,7 +7,7 @@ import { useDownloadData } from "../../../utils/download";
 import { PatientProfile } from "../../../../shared/models";
 import {
 	DAT_PROGRAM,
-	programMapping,
+	ProgramMapping,
 	TEI_FIELDS,
 } from "../../../../shared/constants";
 import { TrackedEntity } from "../../../../shared/types";
@@ -63,7 +63,7 @@ type Data = {
 	};
 };
 
-export function filterObject(programMapping: programMapping) {
+export function filterObject(programMapping: ProgramMapping) {
 	const filtersConfig: any = {
 		patientNumber: {
 			attribute: programMapping?.attributes?.patientNumber,

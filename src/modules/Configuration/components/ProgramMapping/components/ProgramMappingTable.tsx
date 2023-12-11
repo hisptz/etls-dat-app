@@ -8,14 +8,14 @@ import i18n from "@dhis2/d2-i18n";
 import { isEmpty } from "lodash";
 import { FullPageLoader } from "../../../../shared/components/Loaders";
 import { ActionButton } from "../../../../shared/components/ActionButton";
-import { programMapping } from "../../../../shared/constants";
+import { ProgramMapping } from "../../../../shared/constants";
 import Edit from "./EditProgramMapping";
 import { useProgramName, usePrograms } from "../hooks/data";
 import DeleteMapping from "./DeleteProgramMapping";
 
 export interface mappingTableProps {
 	loading: boolean;
-	programMapping: programMapping[];
+	programMapping: ProgramMapping[];
 }
 
 export default function RegimenTable({
@@ -24,7 +24,7 @@ export default function RegimenTable({
 }: mappingTableProps) {
 	const [hideDel, setDelete] = useState<boolean>(true);
 	const [hide, setEdit] = useState<boolean>(true);
-	const [selectedProgram, setSelectedProgram] = useState<programMapping>();
+	const [selectedProgram, setSelectedProgram] = useState<ProgramMapping>();
 	const { attributeOptions, programOptions, error } = usePrograms();
 	const { programName, refetch, loadingNames } = useProgramName();
 
@@ -65,7 +65,7 @@ export default function RegimenTable({
 		},
 	];
 
-	function getActions(programMapping: programMapping, index: number) {
+	function getActions(programMapping: ProgramMapping, index: number) {
 		return (
 			<>
 				<ActionButton
@@ -106,12 +106,12 @@ export default function RegimenTable({
 									mappedProgram: loadingNames
 										? "Loading..."
 										: programName?.map((program) => {
-												if (
-													program.id ===
+											if (
+												program.id ===
 													mapping.program
-												) {
-													return program.displayName;
-												}
+											) {
+												return program.displayName;
+											}
 										  }),
 								};
 							})}

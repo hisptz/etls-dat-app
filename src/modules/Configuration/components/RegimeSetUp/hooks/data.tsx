@@ -1,6 +1,6 @@
 import { useSetting } from "@dhis2/app-service-datastore";
 import { useDataQuery } from "@dhis2/app-runtime";
-import { regimenSetting } from "../../../../shared/constants";
+import { RegimenSetting } from "../../../../shared/constants";
 import { ProgramFormData } from "../../ProgramMapping/components/EditProgramMapping";
 
 const query = {
@@ -58,7 +58,7 @@ export function useRegimens() {
 	const regimenOptionsArray = regimenOptions?.map((option) => option.code);
 	const filteredRegimenOptions = regimenOptionsArray?.filter((regimen) => {
 		return !settings.some(
-			(item: regimenSetting) => item.regimen === regimen,
+			(item: RegimenSetting) => item.regimen === regimen,
 		);
 	});
 	const transformedSettings: Option[] =

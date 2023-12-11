@@ -10,7 +10,7 @@ import { isEmpty } from "lodash";
 import {
 	ReportColumn,
 	ReportConfig,
-	programMapping,
+	ProgramMapping,
 } from "../../../shared/constants";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { SelectedReport } from "./FilterArea/components/FilterField";
@@ -23,7 +23,7 @@ export interface ReportTableProps {
 	loading: boolean;
 	reports: [];
 	pagination: Pagination;
-	programMapping: programMapping;
+	programMapping: ProgramMapping;
 	paginationDAT: Pagination;
 	data: any;
 	loadingDevices: boolean;

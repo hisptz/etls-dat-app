@@ -10,7 +10,7 @@ import {
 import i18n from "@dhis2/d2-i18n";
 import { FilterField } from "../../../Configuration/components/ProgramMapping/components/FilterField";
 import { useSetting } from "@dhis2/app-service-datastore";
-import { deviceIMEIList } from "../../constants";
+import { DeviceIMEIList } from "../../constants";
 import { useAssignDevice } from "../utils/assignDevice";
 import { FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -46,13 +46,13 @@ function EditDevice({
 		global: true,
 	});
 	const [availableDevices, setAvailableDevices] =
-		useState<deviceIMEIList[]>();
+		useState<DeviceIMEIList[]>();
 	const { assignDevice, assignDeviceWisePill } = useAssignDevice();
 
 	useEffect(() => {
 		setAvailableDevices(
 			devices.filter(
-				(device: deviceIMEIList) =>
+				(device: DeviceIMEIList) =>
 					!device.inUse || device.IMEI === value,
 			),
 		);
@@ -64,7 +64,7 @@ function EditDevice({
 
 	const onSave = async (data: DeviceData) => {
 		if (data) {
-			const updatedDevices = devices.map((device: deviceIMEIList) => ({
+			const updatedDevices = devices.map((device: DeviceIMEIList) => ({
 				...device,
 				inUse:
 					device.IMEI === data.IMEI

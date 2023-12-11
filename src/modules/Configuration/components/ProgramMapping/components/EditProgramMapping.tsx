@@ -18,7 +18,7 @@ import { isEmpty } from "lodash";
 import { FormProvider, useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { programMapping } from "../../../../shared/constants";
+import { ProgramMapping } from "../../../../shared/constants";
 
 interface EditProps {
 	programOptions: Option[];
@@ -27,7 +27,7 @@ interface EditProps {
 	onUpdate?: ReturnType<typeof useDataQuery>["refetch"];
 	hide: boolean;
 	onHide: () => void;
-	data?: programMapping;
+	data?: ProgramMapping;
 }
 
 const schema = z.object({
@@ -114,7 +114,7 @@ function Edit({
 	const onEdit = async (mappingData: ProgramFormData) => {
 		if (mappingData) {
 			const updatedMapping = programMapping.map(
-				(mapping: programMapping) =>
+				(mapping: ProgramMapping) =>
 					mapping.program === mappingData.program
 						? {
 								...mapping,

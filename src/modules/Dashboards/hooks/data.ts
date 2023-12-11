@@ -143,8 +143,10 @@ export function useDefaultDashboardData() {
 	const controller = new AbortController();
 	const { orgUnit: selectedOrgUnits, periods: selectedPeriods } =
 		useRecoilValue(DashboardFilterState);
-	const [programMapping] = useSetting("programMapping", { global: true });
+	const [programMappings] = useSetting("programMapping", { global: true });
 	const [devices] = useSetting("deviceIMEIList", { global: true });
+
+	const programMapping = head(programMappings);
 
 	const ouParams = searchParams.get("ou");
 	const peParams = searchParams.get("pe");
