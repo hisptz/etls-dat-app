@@ -158,9 +158,21 @@ function Calendar({ events, frequency, onClick }: CalendarProps) {
 		}
 
 		const getEventsForDate = (date: any) => {
-			return events.filter((event) =>
+			const filteredEvents = events.filter((event) =>
 				isSameDay(DateTime.fromISO(event.date).toJSDate(), date),
 			);
+
+			const takenDosePresent = filteredEvents.some(
+				(event) => event.event === "takenDose",
+			);
+
+			if (takenDosePresent) {
+				return filteredEvents.filter(
+					(event) => event.event !== "notTakenDose",
+				);
+			} else {
+				return filteredEvents;
+			}
 		};
 
 		for (let i = 1; i <= numDays; i++) {
@@ -243,7 +255,7 @@ function Calendar({ events, frequency, onClick }: CalendarProps) {
 												styles["calendar-cell-dot"]
 											}  ${
 												styles[
-													uniqueEvents.length !== 1
+													uniqueEvents.length > 1
 														? index === 0
 															? "diagnaol-box-1"
 															: "diagnaol-box-2"
@@ -344,10 +356,23 @@ function Calendar({ events, frequency, onClick }: CalendarProps) {
 			const WeekEvents = filterUniqueEvents();
 
 			const filterUnique = () => {
-				const uniqueEventsMap: any = {};
+				const uniqueEventsMap = {};
+
+				let takenDoseExists = false;
 
 				for (const event of WeekEvents) {
-					if (!uniqueEventsMap[event.event]) {
+					if (event.event === "takenDose") {
+						takenDoseExists = true;
+						break;
+					}
+				}
+
+				for (const event of WeekEvents) {
+					if (takenDoseExists && event.event === "notTakenDose") {
+						continue;
+					}
+
+					if (!uniqueEventsMap[event.event] && event.event !== "") {
 						uniqueEventsMap[event.event] = event;
 					}
 				}
@@ -366,7 +391,7 @@ function Calendar({ events, frequency, onClick }: CalendarProps) {
 							key={`color-${index}`}
 							className={`${styles["calendar-week-cell-dot"]}  ${
 								styles[
-									weekEvents.length !== 1
+									uniqueWeekEvents.length > 1
 										? index === 0
 											? "diagnaol-box-1"
 											: "diagnaol-box-2"
@@ -476,8 +501,21 @@ function Calendar({ events, frequency, onClick }: CalendarProps) {
 			const filterUnique = () => {
 				const uniqueEventsMap = {};
 
-				for (const event of uniqueMonthEvents) {
-					if (!uniqueEventsMap[event.event]) {
+				let takenDoseExists = false;
+
+				for (const event of monthEvents) {
+					if (event.event === "takenDose") {
+						takenDoseExists = true;
+						break;
+					}
+				}
+
+				for (const event of monthEvents) {
+					if (takenDoseExists && event.event === "notTakenDose") {
+						continue;
+					}
+
+					if (!uniqueEventsMap[event.event] && event.event !== "") {
 						uniqueEventsMap[event.event] = event;
 					}
 				}
@@ -488,6 +526,8 @@ function Calendar({ events, frequency, onClick }: CalendarProps) {
 
 			const uniqueMonthlyEvents = filterUnique();
 
+			console.log(uniqueMonthEvents, uniqueMonthlyEvents);
+
 			const cellContent = uniqueMonthlyEvents.map((event, index) => {
 				monthColor = cellColors[event.event];
 				return (
@@ -495,7 +535,7 @@ function Calendar({ events, frequency, onClick }: CalendarProps) {
 						key={`color-${index}`}
 						className={`${styles["calendar-monthly-cell-dot"]} 	${
 							styles[
-								uniqueMonthlyEvents.length !== 1
+								uniqueMonthlyEvents.length > 1
 									? index === 0
 										? "diagnaol-box-1"
 										: "diagnaol-box-2"

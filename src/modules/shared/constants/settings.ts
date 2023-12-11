@@ -20,7 +20,7 @@ export interface deviceIMEIList {
 export interface regimenSetting {
 	regimen: string;
 	administration: string;
-	idealDoses: string;
+	numberOfDoses: string;
 }
 export interface programMapping {
 	program?: string;
@@ -44,7 +44,6 @@ export interface ReportColumn {
 	label: string;
 	path: string | Array<string | number>;
 }
-
 
 export interface ReportConfig {
 	name: string;

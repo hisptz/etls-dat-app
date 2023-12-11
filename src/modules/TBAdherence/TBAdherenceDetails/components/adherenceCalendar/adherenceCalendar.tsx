@@ -54,6 +54,8 @@ function AdherenceCalendar({ profile, data }: ProfileAreaProps) {
 					? "takenDose"
 					: item.dataValues[0].value == "Heartbeat"
 					? "notTakenDose"
+					: item.dataValues[0].value == "Enrollment"
+					? "enrolled"
 					: item.dataValues[0].value == "None"
 					? ""
 					: "",
@@ -61,14 +63,7 @@ function AdherenceCalendar({ profile, data }: ProfileAreaProps) {
 		};
 	});
 
-	const events: DateEvent[] = [
-		...adherenceEvents,
-
-		{
-			date: profile.enrollmentDate,
-			event: "enrolled",
-		},
-	];
+	const events: DateEvent[] = [...adherenceEvents];
 
 	const refillAlarm =
 		DateTime.fromFormat(

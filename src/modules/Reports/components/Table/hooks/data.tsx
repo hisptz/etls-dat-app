@@ -2,7 +2,7 @@ import { useDataQuery } from "@dhis2/app-runtime";
 import { useEffect, useState } from "react";
 import { Pagination } from "@hisptz/dhis2-utils";
 import { useSearchParams } from "react-router-dom";
-import {  isEmpty } from "lodash";
+import { isEmpty } from "lodash";
 import {
 	DATA_ELEMENTS,
 	DAT_PROGRAM,
@@ -108,7 +108,8 @@ export function useReportTableData() {
 	const [pagination, setPagination] = useState<Pagination>();
 
 	const [allData, setAllData] = useState<any[]>();
-	const [dhis2ReportData, setDHIS2ReportData] = useRecoilState<any[]>(DHID2ReportState);
+	const [dhis2ReportData, setDHIS2ReportData] =
+		useRecoilState<any[]>(DHID2ReportState);
 	const [paginatedEvents, setPaginatedEvents] = useState<{
 		page: any;
 		pageSize: any;
@@ -138,8 +139,8 @@ export function useReportTableData() {
 			(reportType === "tb-adherence-report"
 				? ":IN:Once;Multiple"
 				: reportType === "patients-who-missed-doses"
-					? ":IN:Heartbeat;None"
-					: ""),
+				? ":IN:Heartbeat;None"
+				: ""),
 	];
 
 	function paginateEvent(
@@ -302,7 +303,9 @@ export function useReportTableData() {
 export const useDATDevices = () => {
 	const [programMapping] = useSetting("programMapping", { global: true });
 	const [data, setData] = useState<any>();
-	const [allDevices, setAllDevices] = useRecoilState<any[]>(DATDevicesReportState);
+	const [allDevices, setAllDevices] = useRecoilState<any[]>(
+		DATDevicesReportState,
+	);
 	const [currentPage, setCurrentPage] = useState<number>(1);
 	const [currentPageSize, setPageSize] = useState<number>(20);
 	const [errorDevice, setError] = useState<any>();
@@ -432,17 +435,17 @@ export function sanitizeReportData(
 	return data.map((report: any) => {
 		const percentage = !isEmpty(regimenSettings)
 			? regimenSettings.map((option: regimenSetting) => {
-				if (option.administration === report.adherenceFrequency) {
-					return (
-						(
-							(report.noOfSignal /
-									parseInt(option.idealDoses)) *
+					if (option.administration === report.adherenceFrequency) {
+						return (
+							(
+								(report.noOfSignal /
+									parseInt(option.numberOfDoses)) *
 								100
-						).toFixed(2) + "%"
-					);
-				} else {
-					return "N/A";
-				}
+							).toFixed(2) + "%"
+						);
+					} else {
+						return "N/A";
+					}
 			  })
 			: "N/A";
 
