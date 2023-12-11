@@ -23,6 +23,7 @@ export interface regimenSetting {
 	idealDoses: string;
 }
 export interface programMapping {
+	name?: string;
 	program?: string;
 	programStage?: string;
 	mediatorUrl?: string;
@@ -44,7 +45,6 @@ export interface ReportColumn {
 	label: string;
 	path: string | Array<string | number>;
 }
-
 
 export interface ReportConfig {
 	name: string;
@@ -214,7 +214,7 @@ export const deviceIMEIList: deviceIMEIList[] = [];
 
 export const regimenSetting: regimenSetting[] = [];
 
-export const programMapping: programMapping = {};
+export const programMapping: programMapping[] = [];
 
 export const DEFAULT_SETTINGS = {
 	settings: {},

@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2023-12-01T12:22:07.255Z\n"
-"PO-Revision-Date: 2023-12-01T12:22:07.255Z\n"
+"POT-Creation-Date: 2023-12-07T12:48:21.602Z\n"
+"PO-Revision-Date: 2023-12-07T12:48:21.602Z\n"
 
 msgid "Configurations"
 msgstr "Configurations"
@@ -53,11 +53,23 @@ msgstr "Save"
 msgid "No matching devices found"
 msgstr "No matching devices found"
 
+msgid "Add Mapping"
+msgstr "Add Mapping"
+
+msgid "Delete Program Mapping"
+msgstr "Delete Program Mapping"
+
+msgid "Are you sure you want to delete this program mapping"
+msgstr "Are you sure you want to delete this program mapping"
+
+msgid "Hide"
+msgstr "Hide"
+
 msgid "Program Mapping"
 msgstr "Program Mapping"
 
-msgid "Edit"
-msgstr "Edit"
+msgid "Name"
+msgstr "Name"
 
 msgid "Mapped Program"
 msgstr "Mapped Program"
@@ -91,6 +103,9 @@ msgstr "Mediator Url"
 
 msgid "API Key"
 msgstr "API Key"
+
+msgid "Program Mappings not found"
+msgstr "Program Mappings not found"
 
 msgid "Add Setting"
 msgstr "Add Setting"
@@ -176,6 +191,9 @@ msgstr "Periods"
 msgid "There is no report data for the selected filters"
 msgstr "There is no report data for the selected filters"
 
+msgid "There are no program mappings set, please go to configurations"
+msgstr "There are no program mappings set, please go to configurations"
+
 msgid "Something went wrong"
 msgstr "Something went wrong"
 
@@ -198,10 +216,10 @@ msgid "Regimen Settings"
 msgstr "Regimen Settings"
 
 msgid ""
-"Program Mapping is not configured. Please click the link below to go to the "
+"Program Mappings are not configured. Please click the link below to go to "
 "configurations."
 msgstr ""
-"Program Mapping is not configured. Please click the link below to go to the "
+"Program Mappings are not configured. Please click the link below to go to "
 "configurations."
 
 msgid "Back"
@@ -264,6 +282,9 @@ msgstr "Downloading..."
 msgid "View"
 msgstr "View"
 
+msgid "Edit"
+msgstr "Edit"
+
 msgid "Reload"
 msgstr "Reload"
 
@@ -287,9 +308,6 @@ msgstr "Assign the device number, or click clear to clear previous device"
 
 msgid "Patient Summary"
 msgstr "Patient Summary"
-
-msgid "Name"
-msgstr "Name"
 
 msgid "Adherence Frequency"
 msgstr "Adherence Frequency"

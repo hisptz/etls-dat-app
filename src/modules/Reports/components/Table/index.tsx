@@ -1,9 +1,6 @@
 /* eslint-disable indent */
 import React from "react";
-import {
-	CustomDataTable,
-	CustomDataTableColumn,
-} from "@hisptz/dhis2-ui";
+import { CustomDataTable, CustomDataTableColumn } from "@hisptz/dhis2-ui";
 import i18n from "@dhis2/d2-i18n";
 import { Pagination } from "@hisptz/dhis2-utils";
 
@@ -61,18 +58,24 @@ export default function ReportTable({
 								}
 								data={sanitizeReportData(
 									report?.id !== "dat-device-summary-report"
-									? d2ReportData
-									: deviceList,
+										? d2ReportData
+										: deviceList,
 									regimenSettings,
 									programMapping,
-									)}
+								)}
 								columns={report.columns as ReportColumn[]}
 							/>
 						</div>
 						<CustomDataTable
-							emptyLabel={i18n.t(
-								"There is no report data for the selected filters",
-							)}
+							emptyLabel={
+								!isEmpty(programMapping)
+									? i18n.t(
+											"There is no report data for the selected filters",
+									  )
+									: i18n.t(
+											"There are no program mappings set, please go to configurations",
+									  )
+							}
 							loading={loading || loadingDevices}
 							columns={report.columns as CustomDataTableColumn[]}
 							pagination={

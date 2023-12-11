@@ -2,9 +2,8 @@ import { TrackedEntityModel } from "./trackedEntityModel";
 import { programMapping, regimenSetting } from "../constants";
 import { DatDeviceInfoEventModel } from "./datDeviceInfo";
 import { TrackedEntity } from "../types";
-import { filter, head, isEmpty } from "lodash";
+import { filter, head } from "lodash";
 import { DateTime } from "luxon";
-import { useAdherenceEvents } from "../components/ProfileArea/utils";
 
 export class PatientProfile extends TrackedEntityModel {
 	programMapping?: programMapping;
@@ -20,7 +19,6 @@ export class PatientProfile extends TrackedEntityModel {
 		super(trackedEntity);
 		this.programMapping = programMapping;
 		this.datDeviceInfoEvent = this.getDatDeviceInfoEvent();
-		this.programStageID = programMapping.programStage;
 		this.regimenSettings = regimenSettings;
 	}
 
@@ -129,11 +127,6 @@ export class PatientProfile extends TrackedEntityModel {
 		const dosageTime = this.dosageTime;
 		const enrollmentDate = this.enrollmentDate;
 		const deviceSignal = this.deviceSignal;
-
-		const { filteredEvents } = useAdherenceEvents(
-			this.events,
-			this.programStageID ?? "",
-		);
 
 		return {
 			id: this.id as string,

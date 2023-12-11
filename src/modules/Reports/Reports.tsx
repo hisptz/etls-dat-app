@@ -7,11 +7,13 @@ import {
 	useDATDevices,
 	useReportTableData,
 } from "./components/Table/hooks/data";
-import ReportTable from "./components/Table";
 import FilterArea from "./components/Table/FilterArea";
 
 import { SelectedReport } from "./components/Table/FilterArea/components/FilterField";
 import { useRecoilState } from "recoil";
+import { ProgramsTab } from "../TBAdherence/components/ProgramsTab";
+import { useSetting } from "@dhis2/app-service-datastore";
+import ReportTable from "./components/Table";
 
 export function ReportsOutlet() {
 	return <Outlet />;
@@ -19,24 +21,25 @@ export function ReportsOutlet() {
 
 export function Reports() {
 	const [params] = useSearchParams();
+	const [programMapping] = useSetting("programMapping", { global: true });
 	const reportType = params.get("reportType");
 	const period = params.get("periods");
 	const orgUnit = params.get("ou");
 	const { reports, pagination, loading, getAllEvents } = useReportTableData();
 	const { data, loadingDevice, paginationDAT } = useDATDevices();
-	const [enabled, setenabled] = useState<boolean>(false);
+	const [enabled, setEnabled] = useState<boolean>(false);
 	const [report] = useRecoilState<ReportConfig>(SelectedReport);
 
 	useEffect(() => {
 		if (reportType != "dat-device-summary-report") {
 			if (!isEmpty(reportType && period && orgUnit)) {
 				getAllEvents();
-				setenabled(true);
+				setEnabled(true);
 			} else {
-				setenabled(false);
+				setEnabled(false);
 			}
 		} else {
-			setenabled(true);
+			setEnabled(true);
 		}
 	}, [reportType, orgUnit, period]);
 
@@ -48,6 +51,7 @@ export function Reports() {
 			<h1 className="m-0" style={{ marginBottom: "16px" }}>
 				{i18n.t("Reports")}
 			</h1>
+			{!isEmpty(programMapping) ? <ProgramsTab /> : null}
 			<FilterArea />
 			<div>
 				{enabled ? (

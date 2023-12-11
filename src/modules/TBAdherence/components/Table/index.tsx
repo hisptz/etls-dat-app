@@ -10,14 +10,13 @@ import { Pagination } from "@hisptz/dhis2-utils";
 import { useSetting } from "@dhis2/app-service-datastore";
 import { FullPageLoader } from "../../../shared/components/Loaders";
 
-import { isEmpty } from "lodash";
-import { useNavigate } from "react-router-dom";
+import { head, isEmpty } from "lodash";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { PatientProfile } from "../../../shared/models/profile";
 import AdherenceStreak, {
 	DateEvent,
 } from "../../../shared/components/AdherenceStreak/AdherenceStreak";
 import { useAdherenceEvents } from "../../../shared/components/ProfileArea/utils";
-import { DateTime } from "luxon";
 
 export interface AdherenceTableProps {
 	loading: boolean;
@@ -44,19 +43,34 @@ export default function TBAdherenceTable({
 	const [programMapping] = useSetting("programMapping", {
 		global: true,
 	});
+	const [params, setParams] = useSearchParams();
+	const currentProgram =
+		params.get("program") ?? (head(programMapping) as any)?.program ?? "";
 
-	const onRowClick = (id: string) => {
+	const selectedProgram = programMapping.filter(
+		(mapping: any) => mapping.program === currentProgram,
+	);
+	const program = selectedProgram[0];
+
+	const onRowClick = async (id: string) => {
 		const row = patients.find((patient) => patient.id === id);
 
 		if (row) {
-			navigate(`/treatment-adherence/${row.id}`);
+			await navigate(`/treatment-adherence/${row.id}`);
+
+			setParams(() => {
+				const updatedParams = new URLSearchParams();
+				updatedParams.set("program", currentProgram ?? "");
+
+				return updatedParams;
+			});
 		}
 	};
 
 	function getAdherenceStreak(patient: PatientProfile) {
 		const { filteredEvents } = useAdherenceEvents(
 			patient.events,
-			programMapping.programStage,
+			program?.programStage,
 		);
 
 		const adherenceEvents = filteredEvents.map((item: any) => {

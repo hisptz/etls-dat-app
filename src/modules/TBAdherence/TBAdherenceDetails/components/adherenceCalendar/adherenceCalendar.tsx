@@ -7,6 +7,7 @@ import NoDeviceAssigned from "../../../../shared/components/ProfileArea/NoDevice
 import { useAdherenceEvents } from "../../../../shared/components/ProfileArea/utils";
 import { DateTime } from "luxon";
 import { useSetting } from "@dhis2/app-service-datastore";
+import { useSearchParams } from "react-router-dom";
 
 export interface ProfileAreaProps {
 	profile: PatientProfile;
@@ -14,12 +15,20 @@ export interface ProfileAreaProps {
 }
 
 function AdherenceCalendar({ profile, data }: ProfileAreaProps) {
+	const [params] = useSearchParams();
 	const [programMapping] = useSetting("programMapping", {
 		global: true,
 	});
+
+	const currentProgram = params.get("program");
+
+	const selectedProgram = programMapping.filter(
+		(mapping: any) => mapping.program === currentProgram,
+	);
+	const program = selectedProgram[0];
 	const { filteredEvents } = useAdherenceEvents(
 		profile.events,
-		programMapping.programStage,
+		program?.programStage,
 	);
 
 	const formatDateWithTime = (date: string) => {
@@ -69,23 +78,6 @@ function AdherenceCalendar({ profile, data }: ProfileAreaProps) {
 			event: "enrolled",
 		},
 	];
-
-	const refillAlarm =
-		DateTime.fromFormat(
-			data?.refillAlarm ?? "",
-			"yyyy-MM-dd HH:mm:ss",
-		).toFormat("MMMM dd, yyyy hh:mm a") ?? "";
-
-	const lastUpdated =
-		DateTime.fromFormat(
-			data?.lastOpened ?? "",
-			"yyyy-MM-dd HH:mm:ss",
-		).toFormat("MMMM dd, yyyy hh:mm a") ?? "";
-
-	const doseAlarm =
-		DateTime.fromFormat(data?.alarmTime ?? "", "HH:mm:ss").toFormat(
-			"hh:mm a",
-		) ?? "";
 
 	data?.batteryLevel ? data.batteryLevel + "%" : "N/A";
 

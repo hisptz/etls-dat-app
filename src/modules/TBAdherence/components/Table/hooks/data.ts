@@ -2,7 +2,7 @@ import { useDataQuery } from "@dhis2/app-runtime";
 import { useEffect, useState } from "react";
 import { Pagination } from "@hisptz/dhis2-utils";
 import { useSearchParams } from "react-router-dom";
-import { compact, isEmpty } from "lodash";
+import { compact, isEmpty, head, find } from "lodash";
 import { useDownloadData } from "../../../utils/download";
 import { PatientProfile } from "../../../../shared/models";
 import {
@@ -15,7 +15,6 @@ import { useSetting } from "@dhis2/app-service-datastore";
 import { useRecoilValue } from "recoil";
 import { CurrentUserOrganizationUnit } from "../../../../shared/state/currentUser";
 
-// TODO check why ou is not passed
 const query: any = {
 	patients: {
 		resource: "tracker/trackedEntities",
@@ -66,19 +65,19 @@ type Data = {
 export function filterObject(programMapping: programMapping) {
 	const filtersConfig: any = {
 		patientNumber: {
-			attribute: programMapping.attributes?.patientNumber,
+			attribute: programMapping?.attributes?.patientNumber,
 			operator: "eq",
 		},
 		deviceIMEInumber: {
-			attribute: programMapping.attributes?.deviceIMEInumber,
+			attribute: programMapping?.attributes?.deviceIMEInumber,
 			operator: "eq",
 		},
 		firstName: {
-			attribute: programMapping.attributes?.firstName,
+			attribute: programMapping?.attributes?.firstName,
 			operator: "like",
 		},
 		surname: {
-			attribute: programMapping.attributes?.surname,
+			attribute: programMapping?.attributes?.surname,
 			operator: "like",
 		},
 	};
@@ -86,16 +85,31 @@ export function filterObject(programMapping: programMapping) {
 	return { filtersConfig: filtersConfig };
 }
 
+const getProgramMapping = (
+	mapping: programMapping[],
+	program: string | null,
+) => {
+	if (program) {
+		return find(mapping, { program }) ?? head(mapping);
+	}
+	return head(mapping);
+};
+
 export function useFilters() {
 	const [params] = useSearchParams();
 	const [programMapping] = useSetting("programMapping", {
 		global: true,
 	});
 
+	const currentProgram = params.get("program");
+
+	const mapping = getProgramMapping(programMapping, currentProgram);
+
 	const filters = compact(
 		Array.from(params.keys()).map((filter) => {
-			const filterConfig =
-				filterObject(programMapping).filtersConfig[filter];
+			const filterConfig = mapping
+				? filterObject(mapping).filtersConfig[filter]
+				: null;
 			if (filterConfig) {
 				const value = params.get(filter);
 				if (value) {
@@ -128,19 +142,22 @@ export function useTBAdherenceTableData() {
 	}>();
 	const [pagination, setPagination] = useState<Pagination>();
 	const [params] = useSearchParams();
+	const currentProgram = params.get("program");
 	const orgUnit =
 		params.get("ou") ??
 		defaultOrganizationUnit.map(({ id }) => id).join(";");
-
+	const mapping = getProgramMapping(programMapping, currentProgram) ?? {};
 	const { data, loading, error, refetch } = useDataQuery<Data>(query, {
 		variables: {
 			page: 1,
 			pageSize: 10,
-			program: DAT_PROGRAM(),
+			program: mapping?.program,
 			startDate,
 			filters,
 			orgUnit,
 		},
+
+		lazy: !mapping,
 	});
 
 	const onPageChange = (page: number) => {
@@ -163,11 +180,7 @@ export function useTBAdherenceTableData() {
 		if (data) {
 			setPatients(
 				data?.patients.instances.map((tei) => {
-					return new PatientProfile(
-						tei,
-						programMapping,
-						regimenSetting,
-					);
+					return new PatientProfile(tei, mapping, regimenSetting);
 				}) ?? [],
 			);
 			setPagination({
@@ -179,15 +192,20 @@ export function useTBAdherenceTableData() {
 				),
 			});
 		}
-	}, [data]);
+	}, [data, currentProgram]);
+
+	useEffect(() => {
+		if (!isEmpty(programMapping)) {
+			refetch({ program: mapping?.program, page: 1, filters, orgUnit });
+		}
+	}, [currentProgram]);
 
 	const { download, downloading } = useDownloadData({
 		resource: "tracker/trackedEntities",
 		query: query,
 		queryKey: "report",
 		mapping: (data: TrackedEntity) => {
-			return new PatientProfile(data, programMapping, regimenSetting)
-				.tableData;
+			return new PatientProfile(data, mapping, regimenSetting).tableData;
 		},
 	});
 

@@ -2,7 +2,7 @@ import { useDataQuery } from "@dhis2/app-runtime";
 import { useEffect, useState } from "react";
 import { Pagination } from "@hisptz/dhis2-utils";
 import { useSearchParams } from "react-router-dom";
-import {  isEmpty } from "lodash";
+import { find, isEmpty } from "lodash";
 import {
 	DATA_ELEMENTS,
 	DAT_PROGRAM,
@@ -31,6 +31,14 @@ type Data = {
 		};
 		rows: [];
 	};
+};
+
+type EventDataPagination = {
+	page: any;
+	pageSize: any;
+	total: any;
+	pageCount: number;
+	data: any;
 };
 
 const query: any = {
@@ -98,7 +106,7 @@ export function transformRowsData(headers: any, rows: any) {
 }
 
 export function useReportTableData() {
-	const [reports, setreports] = useState<[] | any>([]);
+	const [reports, setReports] = useState<[] | any>([]);
 	const [programMapping] = useSetting("programMapping", {
 		global: true,
 	});
@@ -106,40 +114,41 @@ export function useReportTableData() {
 		global: true,
 	});
 	const [pagination, setPagination] = useState<Pagination>();
-
 	const [allData, setAllData] = useState<any[]>();
-	const [dhis2ReportData, setDHIS2ReportData] = useRecoilState<any[]>(DHID2ReportState);
-	const [paginatedEvents, setPaginatedEvents] = useState<{
-		page: any;
-		pageSize: any;
-		total: any;
-		pageCount: number;
-		data: any;
-	}>();
+	const [, setDHIS2ReportData] = useRecoilState<any[]>(DHID2ReportState);
+	const [paginatedEvents, setPaginatedEvents] =
+		useState<EventDataPagination>();
 
-	const [currentPage, setCurrentPage] = useState<number>(1);
+	const [, setCurrentPage] = useState<number>(1);
 	const [currentPageSize, setPageSize] = useState<number>(50);
 	const [params] = useSearchParams();
 	const orgUnit = params.get("ou");
 	const period = params.get("periods");
+	const program = params.get("program");
 	const reportType = params.get("reportType");
 
 	const stage = programMapping.programStage;
 
+	const { programStage, attributes } =
+		find(
+			programMapping,
+			({ program: programId }) => program === programId,
+		) ?? {};
+
 	const dimensions = [
-		stage + "." + programMapping.attributes.patientNumber,
-		stage + "." + programMapping.attributes.firstName,
-		stage + "." + programMapping.attributes.surname,
-		stage + "." + programMapping.attributes.phoneNumber,
-		stage + "." + programMapping.attributes.regimen,
-		stage +
+		programStage + "." + attributes.patientNumber,
+		programStage + "." + attributes.firstName,
+		programStage + "." + attributes.surname,
+		programStage + "." + attributes.phoneNumber,
+		programStage + "." + attributes.regimen,
+		programStage +
 			"." +
 			DATA_ELEMENTS.DEVICE_SIGNAL +
 			(reportType === "tb-adherence-report"
 				? ":IN:Once;Multiple"
 				: reportType === "patients-who-missed-doses"
-					? ":IN:Heartbeat;None"
-					: ""),
+				? ":IN:Heartbeat;None"
+				: ""),
 	];
 
 	function paginateEvent(
@@ -187,12 +196,12 @@ export function useReportTableData() {
 
 	const getAllEvents = async () => {
 		try {
-			const result = await refetch({
+			const result = (await refetch({
 				page: 1,
 				pe: [period],
 				ou: [orgUnit],
 				dx: dimensions,
-			});
+			})) as any;
 
 			const count = result.reports?.metaData.pager.pageCount;
 
@@ -201,12 +210,12 @@ export function useReportTableData() {
 
 				for (let i = 0; i < count; i++) {
 					try {
-						const data = await refetch({
+						const data = (await refetch({
 							page: i + 1,
 							pe: [period],
 							ou: [orgUnit],
 							dx: dimensions,
-						});
+						})) as any;
 
 						if (data) {
 							promises.push(
@@ -243,11 +252,11 @@ export function useReportTableData() {
 	const mergedData = Object.keys(groupedData).map((tei) => {
 		const dataArray: any = groupedData[tei];
 
-		const regimen = dataArray[0][programMapping.attributes.regimen];
+		const regimen = dataArray[0][programMapping.attributes?.regimen];
 
 		let adherenceFrequency;
 		regimenSetting?.map((setting: any) => {
-			if (setting.regimen === regimen) {
+			if (setting?.regimen === regimen) {
 				adherenceFrequency = setting.administration as string;
 			}
 		});
@@ -269,7 +278,7 @@ export function useReportTableData() {
 
 	useEffect(() => {
 		if (paginatedEvents) {
-			setreports(
+			setReports(
 				paginatedEvents.data.map((data: any) => {
 					return data;
 				}),
@@ -283,7 +292,6 @@ export function useReportTableData() {
 			});
 		}
 	}, [paginatedEvents]);
-	const programId = DAT_PROGRAM();
 
 	return {
 		pagination: {
@@ -302,7 +310,9 @@ export function useReportTableData() {
 export const useDATDevices = () => {
 	const [programMapping] = useSetting("programMapping", { global: true });
 	const [data, setData] = useState<any>();
-	const [allDevices, setAllDevices] = useRecoilState<any[]>(DATDevicesReportState);
+	const [allDevices, setAllDevices] = useRecoilState<any[]>(
+		DATDevicesReportState,
+	);
 	const [currentPage, setCurrentPage] = useState<number>(1);
 	const [currentPageSize, setPageSize] = useState<number>(20);
 	const [errorDevice, setError] = useState<any>();
@@ -432,17 +442,17 @@ export function sanitizeReportData(
 	return data.map((report: any) => {
 		const percentage = !isEmpty(regimenSettings)
 			? regimenSettings.map((option: regimenSetting) => {
-				if (option.administration === report.adherenceFrequency) {
-					return (
-						(
-							(report.noOfSignal /
+					if (option.administration === report.adherenceFrequency) {
+						return (
+							(
+								(report.noOfSignal /
 									parseInt(option.idealDoses)) *
 								100
-						).toFixed(2) + "%"
-					);
-				} else {
-					return "N/A";
-				}
+							).toFixed(2) + "%"
+						);
+					} else {
+						return "N/A";
+					}
 			  })
 			: "N/A";
 
