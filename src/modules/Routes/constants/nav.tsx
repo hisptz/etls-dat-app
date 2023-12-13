@@ -21,6 +21,7 @@ import { DATDevicelists } from "../../Configuration/components/DATDeviceLists";
 import { RegimenSetUp } from "../../Configuration/components/RegimeSetUp";
 import { getDefaultTBAdherenceFilters } from "../../TBAdherence/constants/filters";
 import { getDefaultReportFilters } from "../../Reports/constants/filters";
+import AdherenceIcon from "../components/AdherenceIcon";
 
 export interface NavItem {
 	label?: string | ((data: any) => any);
@@ -36,7 +37,7 @@ export const ROUTES: NavItem[] = [
 		id: "treatment-adherence",
 		path: "treatment-adherence",
 		element: TreatmentAdherenceOutlet,
-		icon: IconTable24,
+		icon: AdherenceIcon,
 		label: i18n.t("Treatment Adherence"),
 		subItems: [
 			{
