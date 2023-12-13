@@ -39,7 +39,7 @@ export function FilterField({
 	multiSelect,
 	...props
 }: FilterFieldProps) {
-	const [params, setParams] = useSearchParams();
+	const [, setParams] = useSearchParams();
 	const onChange = ({ value }: { value: string }) => {
 		setParams((params) => {
 			const updatedParams = new URLSearchParams(params);

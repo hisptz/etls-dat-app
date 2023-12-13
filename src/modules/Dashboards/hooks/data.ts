@@ -369,12 +369,10 @@ export function useDefaultDashboardData() {
 			...aggregatedAdherenceSummary,
 			totalDeviceSignalEvents:
 				aggregatedAdherenceSummary?.totalDeviceSignalEvents ??
-				0 + totalDeviceSignalEvents ??
-				0,
+				0 + totalDeviceSignalEvents,
 			deviceSignalsForDoseTake:
 				aggregatedAdherenceSummary?.deviceSignalsForDoseTake ??
-				0 + deviceSignalsForDoseTake ??
-				0,
+				0 + deviceSignalsForDoseTake,
 		};
 	};
 

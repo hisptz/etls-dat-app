@@ -11,9 +11,7 @@ export function Dashboards() {
 			className="column gap-32 p-16 h-100 w-100"
 			data-test={`${DATA_TEST_PREFIX}-reports-container`}
 		>
-			<h1 className="m-0" style={{ marginBottom: "16px" }}>
-				{i18n.t("Dashboards")}
-			</h1>
+			<h1 className="m-0">{i18n.t("Dashboards")}</h1>
 
 			<DashboardHeader />
 
