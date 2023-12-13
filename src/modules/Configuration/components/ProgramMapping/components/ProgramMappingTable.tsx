@@ -9,9 +9,9 @@ import { isEmpty } from "lodash";
 import { FullPageLoader } from "../../../../shared/components/Loaders";
 import { ActionButton } from "../../../../shared/components/ActionButton";
 import { ProgramMapping } from "../../../../shared/constants";
-import Edit from "./EditProgramMapping";
+import ProgramMappingForm from "./ProgramMappingForm";
 import { useProgramName, usePrograms } from "../hooks/data";
-import DeleteMapping from "./DeleteProgramMapping";
+import ProgramMappingDeleteModal from "./ProgramMappingDeleteModal";
 
 export interface mappingTableProps {
 	loading: boolean;
@@ -118,7 +118,7 @@ export default function RegimenTable({
 						/>
 
 						{!hide && (
-							<Edit
+							<ProgramMappingForm
 								attributeOptions={attributeOptions}
 								programOptions={programOptions}
 								error={error}
@@ -129,7 +129,7 @@ export default function RegimenTable({
 							/>
 						)}
 						{!hideDel && (
-							<DeleteMapping
+							<ProgramMappingDeleteModal
 								mappedProgram={selectedProgram?.name}
 								onHide={onHideDel}
 								hide={hideDel}

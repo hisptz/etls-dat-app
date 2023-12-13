@@ -1,6 +1,6 @@
 import { useSetting } from "@dhis2/app-service-datastore";
 import { useDataQuery } from "@dhis2/app-runtime";
-import { ProgramFormData } from "../components/EditProgramMapping";
+import { ProgramFormData } from "../components/ProgramMappingForm";
 
 const query = {
 	programs: {

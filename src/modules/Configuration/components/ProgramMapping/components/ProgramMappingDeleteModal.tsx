@@ -11,15 +11,15 @@ import i18n from "@dhis2/d2-i18n";
 import { useSetting } from "@dhis2/app-service-datastore";
 
 import { useAlert } from "@dhis2/app-runtime";
-import { ProgramFormData } from "./EditProgramMapping";
+import { ProgramFormData } from "./ProgramMappingForm";
 
-interface DeleteMapping {
+interface DeleteProgramMappingProps {
 	mappedProgram?: string;
 	onHide: () => void;
 	hide: boolean;
 }
 
-function DeleteMapping({ mappedProgram, hide, onHide }: DeleteMapping) {
+function ProgramMappingDeleteModal({ mappedProgram, hide, onHide }: DeleteProgramMappingProps) {
 	const [programMapping, { set: deleteProgramMapping }] = useSetting(
 		"programMapping",
 		{
@@ -109,4 +109,4 @@ function DeleteMapping({ mappedProgram, hide, onHide }: DeleteMapping) {
 	);
 }
 
-export default DeleteMapping;
+export default ProgramMappingDeleteModal;

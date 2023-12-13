@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import i18n from "@dhis2/d2-i18n";
 import { Card, CircularLoader, Button } from "@dhis2/ui";
 import { DATA_TEST_PREFIX } from "../../../shared/constants";
-import Edit from "./components/EditProgramMapping";
+import ProgramMappingForm from "./components/ProgramMappingForm";
 import { usePrograms } from "./hooks/data";
 import { useSetting } from "@dhis2/app-service-datastore";
 import ProgramMappingTable from "./components/ProgramMappingTable";
@@ -46,7 +46,7 @@ export function ProgramMapping() {
 						</Button>
 					</div>
 					{!hide && (
-						<Edit
+						<ProgramMappingForm
 							attributeOptions={attributeOptions}
 							programOptions={programOptions}
 							error={error}

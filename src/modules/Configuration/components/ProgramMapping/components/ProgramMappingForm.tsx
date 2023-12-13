@@ -74,7 +74,7 @@ const schema = z.object({
 
 export type ProgramFormData = z.infer<typeof schema>;
 
-function Edit({
+function ProgramMappingForm({
 	programOptions,
 	attributeOptions,
 	error,
@@ -336,4 +336,4 @@ function Edit({
 	);
 }
 
-export default Edit;
+export default ProgramMappingForm;
