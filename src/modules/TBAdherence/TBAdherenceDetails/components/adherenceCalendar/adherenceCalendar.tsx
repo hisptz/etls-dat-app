@@ -79,7 +79,7 @@ function AdherenceCalendar({ profile, data }: ProfileAreaProps) {
 		},
 	];
 
-	data?.batteryLevel ? data.batteryLevel + "%" : "N/A";
+	data?.batteryLevel ?? "N/A";
 
 	return (
 		<div
@@ -231,7 +231,7 @@ function AdherenceCalendar({ profile, data }: ProfileAreaProps) {
 										? batteryLevel === undefined
 											? "N/A"
 											: batteryLevel !== ""
-											? batteryLevel + "%"
+											? batteryLevel
 											: "N/A"
 										: i18n.t("N/A")}
 								</label>

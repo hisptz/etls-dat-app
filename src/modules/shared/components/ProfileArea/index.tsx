@@ -82,7 +82,7 @@ export function ProfileArea({
 			"hh:mm a",
 		) ?? "";
 
-	const batteryLevel = data?.batteryLevel ? data.batteryLevel + "%" : "N/A";
+	const batteryLevel = data?.batteryLevel ?? "N/A";
 
 	return loading ? (
 		<></>
