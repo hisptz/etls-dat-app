@@ -51,7 +51,7 @@ export default function RegimenTable({
 		},
 		{
 			key: "idealDoses",
-			label: "Ideal Doses",
+			label: "Number of Dosess",
 			path: "idealDoses",
 		},
 
