@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from "react";
+/* eslint-disable indent */
+import React from "react";
 import {
 	Button,
 	Modal,
@@ -8,27 +9,31 @@ import {
 	ButtonStrip,
 } from "@dhis2/ui";
 import i18n from "@dhis2/d2-i18n";
-
 import { FilterField } from "./FilterField";
 import { Option } from "../hooks/data";
 import { generateUid, useProgramStage } from "../hooks/save";
 import { useSetting } from "@dhis2/app-service-datastore";
-import { useDataQuery } from "@dhis2/app-runtime";
+import { useAlert, useDataQuery } from "@dhis2/app-runtime";
 import { isEmpty } from "lodash";
 import { FormProvider, useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { ProgramMapping } from "../../../../shared/constants";
 
 interface EditProps {
 	programOptions: Option[];
 	attributeOptions: Option[];
 	error: any;
-	onUpdate: ReturnType<typeof useDataQuery>["refetch"];
+	onUpdate?: ReturnType<typeof useDataQuery>["refetch"];
 	hide: boolean;
 	onHide: () => void;
+	data?: ProgramMapping;
 }
 
 const schema = z.object({
+	name: z
+		.string({ required_error: "Name is required" })
+		.nonempty("Name is required"),
 	program: z
 		.string({ required_error: "Mapped Program is required" })
 		.nonempty("Mapped Program is required"),
@@ -67,18 +72,20 @@ const schema = z.object({
 	}),
 });
 
-type ProgramFormData = z.infer<typeof schema>;
+export type ProgramFormData = z.infer<typeof schema>;
 
-function Edit({
+function ProgramMappingForm({
 	programOptions,
 	attributeOptions,
 	error,
-	onUpdate,
 	hide,
 	onHide,
+	onUpdate,
+
+	data,
 }: EditProps) {
-	const [importMeta, setImport] = useState<boolean>(false);
 	const { importProgramStage } = useProgramStage();
+
 	const [programMapping, { set: setProgramMapping }] = useSetting(
 		"programMapping",
 		{
@@ -86,20 +93,91 @@ function Edit({
 		},
 	);
 
-	const onSubmit = async (data: ProgramFormData) => {
-		const programStageID =
-			data.program === programMapping.program
-				? programMapping.programStage
-				: generateUid();
-		data.programStage = programStageID;
-		await setProgramMapping(data);
-		if (!isEmpty(programMapping.program)) {
-			await importProgramStage(data);
+	const addNew = !data;
+
+	const { show } = useAlert(
+		({ message }) => message,
+		({ type }) => ({ ...type, duration: 3000 }),
+	);
+
+	const updateProgramMappingAndShowSuccess = async (updatedMapping: any) => {
+		await setProgramMapping(updatedMapping);
+	};
+
+	const onSave = async (mappingData: ProgramFormData) => {
+		if (mappingData) {
+			const updatedMapping = [...programMapping, mappingData];
+			await updateProgramMappingAndShowSuccess(updatedMapping);
 		}
-		await onUpdate({
-			programID: data.program,
+	};
+
+	const onEdit = async (mappingData: ProgramFormData) => {
+		if (mappingData) {
+			const updatedMapping = programMapping.map(
+				(mapping: ProgramMapping) =>
+					mapping.program === mappingData.program
+						? {
+								...mapping,
+								name: mappingData.name,
+								program: mappingData.program,
+								programStage: mappingData.programStage,
+								mediatorUrl: mappingData.mediatorUrl,
+								apiKey: mappingData.apiKey,
+								attributes: {
+									firstName: mappingData.attributes.firstName,
+									surname: mappingData.attributes.surname,
+									patientNumber:
+										mappingData.attributes.patientNumber,
+									age: mappingData.attributes.age,
+									sex: mappingData.attributes.sex,
+									regimen: mappingData.attributes.regimen,
+									phoneNumber:
+										mappingData.attributes.phoneNumber,
+									deviceIMEInumber:
+										mappingData.attributes.deviceIMEInumber,
+								},
+						  }
+						: mapping,
+			);
+			await updateProgramMappingAndShowSuccess(updatedMapping);
+		}
+	};
+
+	const onSubmit = async (data: ProgramFormData) => {
+		let foundMapping = false;
+
+		programMapping.forEach((mapping: ProgramFormData) => {
+			if (mapping.program === data.program) {
+				data.programStage = mapping.programStage;
+				foundMapping = true;
+			}
 		});
-		onHide();
+
+		if (!foundMapping) {
+			data.programStage = generateUid();
+		}
+
+		addNew ? await onSave(data) : await onEdit(data);
+
+		if (!isEmpty(programMapping)) {
+			addNew
+				? await importProgramStage(data)
+				: await Promise.all(
+						programMapping.map(async (mapping: ProgramFormData) =>
+							mapping.program === data.program
+								? importProgramStage(mapping)
+								: null,
+						),
+				  );
+		}
+		onUpdate ? await onUpdate() : null;
+
+		show({
+			message: "Program Mapping Updated Successfully",
+			type: { success: true },
+		});
+
+		onClose();
 	};
 
 	const onClose = () => {
@@ -112,9 +190,7 @@ function Edit({
 	}
 
 	const form = useForm<ProgramFormData>({
-		defaultValues: async () => {
-			return new Promise((resolve) => resolve(programMapping));
-		},
+		defaultValues: { ...data },
 		resolver: zodResolver(schema),
 	});
 
@@ -135,6 +211,15 @@ function Edit({
 							<div style={{ padding: "5px" }}>
 								<FilterField
 									required={true}
+									name="name"
+									label={i18n.t("Name")}
+									type="text"
+								/>
+							</div>
+							<div style={{ padding: "5px" }}>
+								<FilterField
+									required={true}
+									disabled={addNew ? false : true}
 									options={programOptions}
 									name="program"
 									label={i18n.t("Mapped Program")}
@@ -251,4 +336,4 @@ function Edit({
 	);
 }
 
-export default Edit;
+export default ProgramMappingForm;

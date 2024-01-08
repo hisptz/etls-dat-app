@@ -1,11 +1,9 @@
-// TODO move the downloads into components
 
 import React, { useState } from "react";
 import { DropdownButton, FlyoutMenu, MenuItem } from "@dhis2/ui";
 import i18n from "@dhis2/d2-i18n";
-import { DATA_TEST_PREFIX, ReportColumn } from "../../shared/constants";
-import { downloadFile } from "../utils/download";
-
+import { DATA_TEST_PREFIX, ReportColumn } from "../../../shared/constants";
+import { downloadFile } from "../../utils/download";
 type DownloadProps = { enabled: boolean, data: any[], columns: Array<ReportColumn> }
 
 function sanitizeDownloadedData(downloadData: any[], columns: Array<ReportColumn>): any[] {

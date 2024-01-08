@@ -67,6 +67,7 @@ export default function DashboardContainer(): React.ReactElement {
 			: adherenceSummaryError.toString();
 		showAlert({ message: errorMessage, type: { critical: true } });
 	}
+
 	return (
 		<div
 			style={{
@@ -96,14 +97,14 @@ export default function DashboardContainer(): React.ReactElement {
 											dashboardConfiguration,
 										)}
 									/>
-								) : dashboardConfiguration.type ==
+								) : dashboardConfiguration.type ===
 								  "visualization" ? (
-										<D2VisualizationContainer
-											{...dashboardConfiguration}
-										/>
-									) : (
-										<p>Not found</p>
-									)}
+									<D2VisualizationContainer
+										{...dashboardConfiguration}
+									/>
+								) : (
+									<p>Not found</p>
+								)}
 							</Card>
 						</Box>
 					</div>

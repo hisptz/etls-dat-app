@@ -10,19 +10,20 @@ export interface TBAdherenceConfig {
 	label: string;
 	path: string | Array<string | number>;
 }
-export interface deviceIMEIList {
+export interface DeviceIMEIList {
 	IMEI: string;
 	inUse: boolean;
 	name: string;
 	code: string;
 }
 
-export interface regimenSetting {
+export interface RegimenSetting {
 	regimen: string;
 	administration: string;
 	idealDoses: string;
 }
-export interface programMapping {
+export interface ProgramMapping {
+	name?: string;
 	program?: string;
 	programStage?: string;
 	mediatorUrl?: string;
@@ -44,7 +45,6 @@ export interface ReportColumn {
 	label: string;
 	path: string | Array<string | number>;
 }
-
 
 export interface ReportConfig {
 	name: string;
@@ -210,11 +210,11 @@ export const dashboards: DashboardItem[] = [
 	},
 ];
 
-export const deviceIMEIList: deviceIMEIList[] = [];
+export const deviceIMEIList: DeviceIMEIList[] = [];
 
-export const regimenSetting: regimenSetting[] = [];
+export const regimenSetting: RegimenSetting[] = [];
 
-export const programMapping: programMapping = {};
+export const programMapping: ProgramMapping[] = [];
 
 export const DEFAULT_SETTINGS = {
 	settings: {},

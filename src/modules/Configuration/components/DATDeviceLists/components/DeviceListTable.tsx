@@ -13,11 +13,11 @@ import { ActionButton } from "../../../../shared/components/ActionButton";
 
 import DeleteDevice from "./DeleteDevice";
 import EditDevice, { DeviceFormData } from "./EditDevice";
-import { deviceIMEIList } from "../../../../shared/constants";
+import { DeviceIMEIList } from "../../../../shared/constants";
 
 export interface DevicesTableProps {
 	loading: boolean;
-	devices: deviceIMEIList[];
+	devices: DeviceIMEIList[];
 	pagination: Pagination;
 	refresh: (newDevices: any) => void;
 }

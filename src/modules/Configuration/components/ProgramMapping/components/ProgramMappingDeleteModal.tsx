@@ -9,47 +9,39 @@ import {
 } from "@dhis2/ui";
 import i18n from "@dhis2/d2-i18n";
 import { useSetting } from "@dhis2/app-service-datastore";
-import { DeviceIMEIList } from "../../../../shared/constants";
-import { useAlert } from "@dhis2/app-runtime";
 
-interface DeleteDevice {
-	IMEI?: string;
-	inUse?: boolean;
-	hide: boolean;
+import { useAlert } from "@dhis2/app-runtime";
+import { ProgramFormData } from "./ProgramMappingForm";
+
+interface DeleteProgramMappingProps {
+	mappedProgram?: string;
 	onHide: () => void;
-	refresh: (newDevices: any) => void;
+	hide: boolean;
 }
 
-function DeleteDevice({ IMEI, inUse, hide, onHide, refresh }: DeleteDevice) {
-	const [devices, { set: deleteDevice }] = useSetting("deviceIMEIList", {
-		global: true,
-	});
-
+function ProgramMappingDeleteModal({ mappedProgram, hide, onHide }: DeleteProgramMappingProps) {
+	const [programMapping, { set: deleteProgramMapping }] = useSetting(
+		"programMapping",
+		{
+			global: true,
+		},
+	);
 	const { show } = useAlert(
 		({ message }) => message,
 		({ type }) => ({ ...type, duration: 3000 }),
 	);
 
 	const onDelete = () => {
-		if (IMEI) {
-			if (!inUse) {
-				const updatedDevices = devices.filter(
-					(item: DeviceIMEIList) => item["IMEI"] !== IMEI,
-				);
-				deleteDevice(updatedDevices);
-				refresh([...updatedDevices]);
-				show({
-					message: "Device Deleted Successfully",
-					type: { success: true },
-				});
-				onHide();
-			} else {
-				onHide();
-				show({
-					message: `Device with IMEI ${IMEI} can not be deleted since it has dependencies with a client`,
-					type: { info: true },
-				});
-			}
+		if (mappedProgram) {
+			const updatedRegimens = programMapping.filter(
+				(item: ProgramFormData) => item["name"] !== mappedProgram,
+			);
+			deleteProgramMapping(updatedRegimens);
+			show({
+				message: "Program Mapping Deleted Successfully",
+				type: { success: true },
+			});
+			onHide();
 		}
 	};
 
@@ -70,7 +62,7 @@ function DeleteDevice({ IMEI, inUse, hide, onHide, refresh }: DeleteDevice) {
 							fontWeight: "500",
 						}}
 					>
-						{i18n.t("Delete DAT Device")}
+						{i18n.t("Delete Program Mapping")}
 					</h3>
 				</ModalTitle>
 				<ModalContent>
@@ -84,11 +76,11 @@ function DeleteDevice({ IMEI, inUse, hide, onHide, refresh }: DeleteDevice) {
 					>
 						<label style={{ fontSize: "16px" }}>
 							{i18n.t(
-								"Are you sure you want to delete the device with IMEI ",
+								"Are you sure you want to delete this program mapping",
 							)}
 						</label>
 						<span style={{ fontWeight: "bold" }}>
-							{i18n.t(`${IMEI}`)}
+							{i18n.t(`${mappedProgram}`)}
 						</span>
 					</div>
 				</ModalContent>
@@ -100,7 +92,7 @@ function DeleteDevice({ IMEI, inUse, hide, onHide, refresh }: DeleteDevice) {
 							}}
 							secondary
 						>
-							{i18n.t("Cancel")}
+							{i18n.t("Hide")}
 						</Button>
 						<Button
 							onClick={() => {
@@ -117,4 +109,4 @@ function DeleteDevice({ IMEI, inUse, hide, onHide, refresh }: DeleteDevice) {
 	);
 }
 
-export default DeleteDevice;
+export default ProgramMappingDeleteModal;

@@ -10,7 +10,7 @@ import {
 import i18n from "@dhis2/d2-i18n";
 import { FilterField } from "../../ProgramMapping/components/FilterField";
 import { useSetting } from "@dhis2/app-service-datastore";
-import { regimenSetting } from "../../../../shared/constants";
+import { RegimenSetting } from "../../../../shared/constants";
 import { Option } from "../hooks/data";
 import { FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -26,8 +26,8 @@ const schema = z.object({
 		.string({ required_error: "Administration is required" })
 		.nonempty("Administration is required"),
 	idealDoses: z
-		.string({ required_error: "Ideal Doses is required" })
-		.nonempty("Ideal Doses is required"),
+		.string({ required_error: "Number of Dosess is required" })
+		.nonempty("Number of Dosess is required"),
 });
 
 export type RegimenFormData = z.infer<typeof schema>;
@@ -91,13 +91,13 @@ const AddSetting = ({
 
 	const onEdit = async (regimenData: RegimenFormData) => {
 		if (regimenData) {
-			const updatedSetting = settings.map((setting: regimenSetting) =>
+			const updatedSetting = settings.map((setting: RegimenSetting) =>
 				setting.regimen === regimenData.regimen
 					? {
-						...setting,
-						regimen: regimenData.regimen,
-						administration: regimenData.administration,
-						idealDoses: regimenData.idealDoses,
+							...setting,
+							regimen: regimenData.regimen,
+							administration: regimenData.administration,
+							idealDoses: regimenData.idealDoses,
 					  }
 					: setting,
 			);
@@ -143,7 +143,7 @@ const AddSetting = ({
 							</div>
 							<div style={{ padding: "5px" }}>
 								<FilterField
-									label={i18n.t("Ideal Doses")}
+									label={i18n.t("Number of Dosess")}
 									name="idealDoses"
 									type="text"
 									required

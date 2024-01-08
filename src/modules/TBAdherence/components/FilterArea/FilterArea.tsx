@@ -58,7 +58,7 @@ export function FilterArea({ loading, onFetch }: FilterAreaProps) {
 							{i18n.t("Reset")}
 						</Button>
 						<Button
-							disabled={isEmpty(programMapping.program)}
+							disabled={isEmpty(programMapping)}
 							loading={loading}
 							onClick={onFilterClick}
 							primary

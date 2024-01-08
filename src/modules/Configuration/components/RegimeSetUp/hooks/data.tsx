@@ -1,14 +1,15 @@
 import { useSetting } from "@dhis2/app-service-datastore";
 import { useDataQuery } from "@dhis2/app-runtime";
-import { regimenSetting } from "../../../../shared/constants";
+import { RegimenSetting } from "../../../../shared/constants";
+import { ProgramFormData } from "../../ProgramMapping/components/ProgramMappingForm";
 
 const query = {
 	optionSet: {
 		resource: "trackedEntityAttributes",
-		id: ({ optionsID }: any) => optionsID,
-		params: {
+		params: ({ filters }: { filters?: string }) => ({
+			filter: filters,
 			fields: ["optionSet[options[code,id,name,displayName]]"],
-		},
+		}),
 	},
 };
 
@@ -21,29 +22,43 @@ export interface Option {
 
 interface QueryType {
 	optionSet: {
-		optionSet: {
-			options: Option[];
-		};
+		trackedEntityAttributes: [{ optionSet: { options: Option[] } }];
 	};
 }
 
 export function useRegimens() {
-	const [programMapping] = useSetting("programMapping", { global: true });
 	const [settings] = useSetting("regimenSetting", {
 		global: true,
 	});
-	const { data, loading, refetch, error } = useDataQuery<QueryType>(query, {
-		variables: {
-			optionsID: programMapping.attributes.regimen ?? "",
-		},
-		lazy: !programMapping.attributes.regimen,
+	const [programMapping] = useSetting("programMapping", { global: true });
+
+	const regimens = programMapping.map((mapping: ProgramFormData) => {
+		return mapping.attributes.regimen;
 	});
 
-	const regimenOptions = data?.optionSet?.optionSet?.options;
+	const { data, loading, refetch, error } = useDataQuery<QueryType>(query, {
+		variables: {
+			filters: `id:in:[${regimens}]`,
+		},
+		lazy: !regimens,
+	});
+
+	const options = data?.optionSet.trackedEntityAttributes.map((item: any) => {
+		return item.optionSet.options;
+	});
+
+	const result = () => {
+		return options?.reduce(
+			(result, currentArray) => result.concat(currentArray),
+			[],
+		);
+	};
+
+	const regimenOptions = result();
 	const regimenOptionsArray = regimenOptions?.map((option) => option.code);
 	const filteredRegimenOptions = regimenOptionsArray?.filter((regimen) => {
 		return !settings.some(
-			(item: regimenSetting) => item.regimen === regimen,
+			(item: RegimenSetting) => item.regimen === regimen,
 		);
 	});
 	const transformedSettings: Option[] =

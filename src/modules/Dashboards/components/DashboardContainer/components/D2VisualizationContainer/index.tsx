@@ -9,14 +9,11 @@ import {
 	getDefaultType,
 	getLayout,
 	getOrganisationUnitGroupSetDimensions,
-	getOrgUnits,
-	getPeriods,
 } from "./utils/visualization";
 import { FullPageLoader } from "../../../../../shared/components/Loaders";
 import { useSearchParams } from "react-router-dom";
 import { DashboardFilterState } from "../../../../states/dashboardsHeader";
 import { useRecoilValue } from "recoil";
-import { OrgUnitSelection } from "@hisptz/dhis2-utils";
 
 const Visualization = React.lazy(() =>
 	import("@hisptz/dhis2-analytics").then(({ Visualization }) => ({
@@ -68,6 +65,7 @@ export default function D2VisualizationContainer(
 						fontWeight: "bold",
 						fontSize: 16,
 						display: "flex",
+						minHeight: 30,
 					}}
 				>
 					{config.options?.title ??

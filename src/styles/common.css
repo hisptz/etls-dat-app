@@ -190,6 +190,10 @@ label > span:nth-child(2) {
 	height: 48px;
 }
 
+.bold {
+	font-weight: bold;
+}
+
 @media print {
 	.portrait-print {
 		@page {

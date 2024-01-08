@@ -1,27 +1,29 @@
 /* eslint-disable indent */
 import React from "react";
-import {
-	CustomDataTable,
-	CustomDataTableColumn,
-} from "@hisptz/dhis2-ui";
+import { CustomDataTable, CustomDataTableColumn } from "@hisptz/dhis2-ui";
 import i18n from "@dhis2/d2-i18n";
 import { Pagination } from "@hisptz/dhis2-utils";
 
 import { FullPageLoader } from "../../../shared/components/Loaders";
 import { isEmpty } from "lodash";
-import Download from "../../Download";
 
-import { ReportColumn, ReportConfig } from "../../../shared/constants";
+import {
+	ReportColumn,
+	ReportConfig,
+	ProgramMapping,
+} from "../../../shared/constants";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { SelectedReport } from "./FilterArea/components/FilterField";
 import { useSetting } from "@dhis2/app-service-datastore";
 import { sanitizeReportData } from "./hooks/data";
-import { DATDevicesReportState, DHID2ReportState } from "../../state/report";
+import { DATDevicesReportState, DHIS2ReportState } from "../../state/report";
+import Download from "../Download";
 
 export interface ReportTableProps {
 	loading: boolean;
 	reports: [];
 	pagination: Pagination;
+	programMapping: ProgramMapping;
 	paginationDAT: Pagination;
 	data: any;
 	loadingDevices: boolean;
@@ -33,14 +35,12 @@ export default function ReportTable({
 	pagination,
 	paginationDAT,
 	data,
+	programMapping,
 	loadingDevices,
 }: ReportTableProps) {
 	const [report] = useRecoilState<ReportConfig>(SelectedReport);
 	const deviceList = useRecoilValue(DATDevicesReportState);
-	const d2ReportData = useRecoilValue(DHID2ReportState);
-	const [programMapping] = useSetting("programMapping", {
-		global: true,
-	});
+	const d2ReportData = useRecoilValue(DHIS2ReportState);
 	const [regimenSettings] = useSetting("regimenSetting", {
 		global: true,
 	});
@@ -61,18 +61,24 @@ export default function ReportTable({
 								}
 								data={sanitizeReportData(
 									report?.id !== "dat-device-summary-report"
-									? d2ReportData
-									: deviceList,
+										? d2ReportData
+										: deviceList,
 									regimenSettings,
 									programMapping,
-									)}
+								)}
 								columns={report.columns as ReportColumn[]}
 							/>
 						</div>
 						<CustomDataTable
-							emptyLabel={i18n.t(
-								"There is no report data for the selected filters",
-							)}
+							emptyLabel={
+								!isEmpty(programMapping)
+									? i18n.t(
+											"There is no report data for the selected filters",
+									  )
+									: i18n.t(
+											"There are no program mappings set, please go to configurations",
+									  )
+							}
 							loading={loading || loadingDevices}
 							columns={report.columns as CustomDataTableColumn[]}
 							pagination={

@@ -1,6 +1,6 @@
 import React from "react";
 import { TBAdherencePage, TreatmentAdherenceOutlet } from "../../TBAdherence";
-import { Reports } from "../../Reports";
+import { Reports, ReportsOutlet } from "../../Reports";
 
 import {
 	IconDashboardWindow24,
@@ -20,6 +20,8 @@ import { ProgramMapping } from "../../Configuration/components/ProgramMapping";
 import { DATDevicelists } from "../../Configuration/components/DATDeviceLists";
 import { RegimenSetUp } from "../../Configuration/components/RegimeSetUp";
 import { getDefaultTBAdherenceFilters } from "../../TBAdherence/constants/filters";
+import { getDefaultReportFilters } from "../../Reports/constants/filters";
+import AdherenceIcon from "../components/AdherenceIcon";
 
 export interface NavItem {
 	label?: string | ((data: any) => any);
@@ -35,7 +37,7 @@ export const ROUTES: NavItem[] = [
 		id: "treatment-adherence",
 		path: "treatment-adherence",
 		element: TreatmentAdherenceOutlet,
-		icon: IconTable24,
+		icon: AdherenceIcon,
 		label: i18n.t("Treatment Adherence"),
 		subItems: [
 			{
@@ -68,9 +70,24 @@ export const ROUTES: NavItem[] = [
 	{
 		id: "reports",
 		path: "reports",
-		element: Reports,
+		element: ReportsOutlet,
 		icon: IconVisualizationLinelist24,
 		label: i18n.t("Reports"),
+		subItems: [
+			{
+				path: "",
+				id: "reports-redirect",
+				element: () => {
+					const defaultParams = getDefaultReportFilters();
+					return <Navigate to={`list?${defaultParams.toString()}`} />;
+				},
+			},
+			{
+				path: "list",
+				id: "reports-list",
+				element: Reports,
+			},
+		],
 	},
 
 	{

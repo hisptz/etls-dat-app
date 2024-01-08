@@ -7,11 +7,14 @@ import {
 	useDATDevices,
 	useReportTableData,
 } from "./components/Table/hooks/data";
-import ReportTable from "./components/Table";
 import FilterArea from "./components/Table/FilterArea";
 
 import { SelectedReport } from "./components/Table/FilterArea/components/FilterField";
 import { useRecoilState } from "recoil";
+import { ProgramsTab } from "../TBAdherence/components/ProgramsTab";
+import { useSetting } from "@dhis2/app-service-datastore";
+import ReportTable from "./components/Table";
+import { getProgramMapping } from "../shared/utils";
 
 export function ReportsOutlet() {
 	return <Outlet />;
@@ -19,26 +22,30 @@ export function ReportsOutlet() {
 
 export function Reports() {
 	const [params] = useSearchParams();
+	const [programMappings] = useSetting("programMapping", { global: true });
 	const reportType = params.get("reportType");
 	const period = params.get("periods");
 	const orgUnit = params.get("ou");
+	const program = params.get("program");
 	const { reports, pagination, loading, getAllEvents } = useReportTableData();
 	const { data, loadingDevice, paginationDAT } = useDATDevices();
-	const [enabled, setenabled] = useState<boolean>(false);
+	const [enabled, setEnabled] = useState<boolean>(false);
 	const [report] = useRecoilState<ReportConfig>(SelectedReport);
+
+	const selectedProgramMapping = getProgramMapping(programMappings, program);
 
 	useEffect(() => {
 		if (reportType != "dat-device-summary-report") {
 			if (!isEmpty(reportType && period && orgUnit)) {
 				getAllEvents();
-				setenabled(true);
+				setEnabled(true);
 			} else {
-				setenabled(false);
+				setEnabled(false);
 			}
 		} else {
-			setenabled(true);
+			setEnabled(true);
 		}
-	}, [reportType, orgUnit, period]);
+	}, [reportType, orgUnit, period, program]);
 
 	return (
 		<div
@@ -48,6 +55,7 @@ export function Reports() {
 			<h1 className="m-0" style={{ marginBottom: "16px" }}>
 				{i18n.t("Reports")}
 			</h1>
+			{!isEmpty(programMappings) ? <ProgramsTab /> : null}
 			<FilterArea />
 			<div>
 				{enabled ? (
@@ -57,6 +65,7 @@ export function Reports() {
 							pagination={pagination}
 							paginationDAT={paginationDAT}
 							loading={loading}
+							programMapping={selectedProgramMapping ?? {}}
 							data={data}
 							loadingDevices={loadingDevice}
 						/>

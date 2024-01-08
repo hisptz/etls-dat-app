@@ -2,19 +2,19 @@ import { useDataQuery } from "@dhis2/app-runtime";
 import { useEffect, useState } from "react";
 import { Pagination } from "@hisptz/dhis2-utils";
 import { useSearchParams } from "react-router-dom";
-import {  isEmpty } from "lodash";
+import { isEmpty } from "lodash";
 import {
 	DATA_ELEMENTS,
-	DAT_PROGRAM,
-	programMapping,
-	regimenSetting,
+	ProgramMapping,
+	RegimenSetting,
 } from "../../../../shared/constants";
 import { useSetting } from "@dhis2/app-service-datastore";
 import axios from "axios";
 import { atom, useRecoilState } from "recoil";
 import _ from "lodash";
 import { CustomDataTableRow } from "@hisptz/dhis2-ui";
-import { DATDevicesReportState, DHID2ReportState } from "../../../state/report";
+import { DATDevicesReportState, DHIS2ReportState } from "../../../state/report";
+import { getProgramMapping } from "../../../../shared/utils";
 
 type Data = {
 	reports: {
@@ -31,6 +31,14 @@ type Data = {
 		};
 		rows: [];
 	};
+};
+
+type CustomPagination = {
+	page: any;
+	pageSize: any;
+	total: any;
+	pageCount: number;
+	data: any;
 };
 
 const query: any = {
@@ -98,8 +106,8 @@ export function transformRowsData(headers: any, rows: any) {
 }
 
 export function useReportTableData() {
-	const [reports, setreports] = useState<[] | any>([]);
-	const [programMapping] = useSetting("programMapping", {
+	const [reports, setReports] = useState<[] | any>([]);
+	const [programMappings] = useSetting("programMapping", {
 		global: true,
 	});
 	const [regimenSetting] = useSetting("regimenSetting", {
@@ -108,38 +116,37 @@ export function useReportTableData() {
 	const [pagination, setPagination] = useState<Pagination>();
 
 	const [allData, setAllData] = useState<any[]>();
-	const [dhis2ReportData, setDHIS2ReportData] = useRecoilState<any[]>(DHID2ReportState);
-	const [paginatedEvents, setPaginatedEvents] = useState<{
-		page: any;
-		pageSize: any;
-		total: any;
-		pageCount: number;
-		data: any;
-	}>();
+	const [, setDHIS2ReportData] = useRecoilState<any[]>(DHIS2ReportState);
+	const [paginatedEvents, setPaginatedEvents] = useState<CustomPagination>();
 
-	const [currentPage, setCurrentPage] = useState<number>(1);
+	const [, setCurrentPage] = useState<number>(1);
 	const [currentPageSize, setPageSize] = useState<number>(50);
 	const [params] = useSearchParams();
 	const orgUnit = params.get("ou");
+	const program = params.get("program");
 	const period = params.get("periods");
 	const reportType = params.get("reportType");
 
-	const stage = programMapping.programStage;
+	const programMapping = getProgramMapping(
+		programMappings,
+		program,
+	) as ProgramMapping;
+	const stage = programMapping?.programStage ?? "";
 
 	const dimensions = [
-		stage + "." + programMapping.attributes.patientNumber,
-		stage + "." + programMapping.attributes.firstName,
-		stage + "." + programMapping.attributes.surname,
-		stage + "." + programMapping.attributes.phoneNumber,
-		stage + "." + programMapping.attributes.regimen,
+		stage + "." + programMapping.attributes?.patientNumber,
+		stage + "." + programMapping.attributes?.firstName,
+		stage + "." + programMapping.attributes?.surname,
+		stage + "." + programMapping.attributes?.phoneNumber,
+		stage + "." + programMapping.attributes?.regimen,
 		stage +
 			"." +
 			DATA_ELEMENTS.DEVICE_SIGNAL +
 			(reportType === "tb-adherence-report"
 				? ":IN:Once;Multiple"
 				: reportType === "patients-who-missed-doses"
-					? ":IN:Heartbeat;None"
-					: ""),
+				? ":IN:Heartbeat;None"
+				: ""),
 	];
 
 	function paginateEvent(
@@ -161,11 +168,11 @@ export function useReportTableData() {
 		};
 	}
 
-	const { data, error, refetch, loading } = useDataQuery<Data>(query, {
+	const { error, refetch, loading } = useDataQuery<Data>(query, {
 		variables: {
 			page: 1,
 			pageSize: 50,
-			program: DAT_PROGRAM(),
+			program: programMapping?.program ?? "",
 			stage,
 			pe: [period],
 			ou: [orgUnit],
@@ -187,12 +194,12 @@ export function useReportTableData() {
 
 	const getAllEvents = async () => {
 		try {
-			const result = await refetch({
+			const result = (await refetch({
 				page: 1,
 				pe: [period],
 				ou: [orgUnit],
 				dx: dimensions,
-			});
+			})) as any;
 
 			const count = result.reports?.metaData.pager.pageCount;
 
@@ -201,12 +208,12 @@ export function useReportTableData() {
 
 				for (let i = 0; i < count; i++) {
 					try {
-						const data = await refetch({
+						const data = (await refetch({
 							page: i + 1,
 							pe: [period],
 							ou: [orgUnit],
 							dx: dimensions,
-						});
+						})) as any;
 
 						if (data) {
 							promises.push(
@@ -242,8 +249,7 @@ export function useReportTableData() {
 
 	const mergedData = Object.keys(groupedData).map((tei) => {
 		const dataArray: any = groupedData[tei];
-
-		const regimen = dataArray[0][programMapping.attributes.regimen];
+		const regimen = dataArray[0][programMapping?.attributes?.regimen ?? ""];
 
 		let adherenceFrequency;
 		regimenSetting?.map((setting: any) => {
@@ -269,7 +275,7 @@ export function useReportTableData() {
 
 	useEffect(() => {
 		if (paginatedEvents) {
-			setreports(
+			setReports(
 				paginatedEvents.data.map((data: any) => {
 					return data;
 				}),
@@ -283,7 +289,6 @@ export function useReportTableData() {
 			});
 		}
 	}, [paginatedEvents]);
-	const programId = DAT_PROGRAM();
 
 	return {
 		pagination: {
@@ -302,7 +307,9 @@ export function useReportTableData() {
 export const useDATDevices = () => {
 	const [programMapping] = useSetting("programMapping", { global: true });
 	const [data, setData] = useState<any>();
-	const [allDevices, setAllDevices] = useRecoilState<any[]>(DATDevicesReportState);
+	const [allDevices, setAllDevices] = useRecoilState<any[]>(
+		DATDevicesReportState,
+	);
 	const [currentPage, setCurrentPage] = useState<number>(1);
 	const [currentPageSize, setPageSize] = useState<number>(20);
 	const [errorDevice, setError] = useState<any>();
@@ -426,23 +433,23 @@ export const useDATDevices = () => {
 
 export function sanitizeReportData(
 	data: any[],
-	regimenSettings: regimenSetting[],
-	programMapping: programMapping,
+	regimenSettings: RegimenSetting[],
+	programMapping: ProgramMapping,
 ) {
 	return data.map((report: any) => {
 		const percentage = !isEmpty(regimenSettings)
-			? regimenSettings.map((option: regimenSetting) => {
-				if (option.administration === report.adherenceFrequency) {
-					return (
-						(
-							(report.noOfSignal /
+			? regimenSettings.map((option: RegimenSetting) => {
+					if (option.administration === report.adherenceFrequency) {
+						return (
+							(
+								(report.noOfSignal /
 									parseInt(option.idealDoses)) *
 								100
-						).toFixed(2) + "%"
-					);
-				} else {
-					return "N/A";
-				}
+							).toFixed(2) + "%"
+						);
+					} else {
+						return "N/A";
+					}
 			  })
 			: "N/A";
 

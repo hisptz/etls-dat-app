@@ -1,7 +1,7 @@
 import i18n from "@dhis2/d2-i18n";
 import styles from "./ProfileArea.module.css";
 import { Button, IconEdit24, Card, ButtonStrip, IconClock24 } from "@dhis2/ui";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import EditDevice from "./EditDevice";
 import { PatientProfile } from "../../models";
 import EditAlarm from "./AddAlarm";
@@ -9,6 +9,7 @@ import NoDeviceAssigned from "./NoDeviceAssigned";
 import { DateTime } from "luxon";
 import { useAdherenceEvents } from "./utils";
 import { useSetting } from "@dhis2/app-service-datastore";
+import { useSearchParams } from "react-router-dom";
 
 export interface ProfileAreaProps {
 	profile: PatientProfile;
@@ -26,6 +27,7 @@ export function ProfileArea({
 	loading,
 }: ProfileAreaProps) {
 	const [hide, setHideDevice] = useState<boolean>(true);
+	const [params] = useSearchParams();
 	const [hideAlarm, setHideAlarm] = useState<boolean>(true);
 	const [nextRefillDate, setNextRefillDate] = useState<string>("");
 	const [nextRefillTime, setNextRefillTime] = useState<string>("");
@@ -34,10 +36,16 @@ export function ProfileArea({
 	const [programMapping] = useSetting("programMapping", {
 		global: true,
 	});
+	const currentProgram = params.get("program");
+
+	const selectedProgram = programMapping.filter(
+		(mapping: any) => mapping.name === currentProgram,
+	);
+	const program = selectedProgram[0];
 
 	const { filteredEvents } = useAdherenceEvents(
 		profile.events,
-		programMapping.programStage,
+		program?.programStage,
 	);
 
 	const onHide = () => {
@@ -74,7 +82,7 @@ export function ProfileArea({
 			"hh:mm a",
 		) ?? "";
 
-	const batteryLevel = data?.batteryLevel ? data.batteryLevel + "%" : "N/A";
+	const batteryLevel = data?.batteryLevel ?? "N/A";
 
 	return loading ? (
 		<></>

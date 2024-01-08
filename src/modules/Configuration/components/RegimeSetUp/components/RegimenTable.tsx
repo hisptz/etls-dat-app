@@ -9,13 +9,13 @@ import { Pagination } from "@hisptz/dhis2-utils";
 import { isEmpty } from "lodash";
 import { FullPageLoader } from "../../../../shared/components/Loaders";
 import { ActionButton } from "../../../../shared/components/ActionButton";
-import { regimenSetting } from "../../../../shared/constants";
+import { RegimenSetting } from "../../../../shared/constants";
 import AddSetting, { RegimenFormData } from "./EditRegimen";
 import DeleteSetting from "./DeleteRegimen";
 
 export interface regimensTableProps {
 	loading: boolean;
-	regimens: regimenSetting[];
+	regimens: RegimenSetting[];
 }
 
 export default function RegimenTable({
@@ -51,7 +51,7 @@ export default function RegimenTable({
 		},
 		{
 			key: "idealDoses",
-			label: "Ideal Doses",
+			label: "Number of Dosess",
 			path: "idealDoses",
 		},
 
