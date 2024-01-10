@@ -9,6 +9,7 @@ export interface TBAdherenceConfig {
 	key: string;
 	label: string;
 	path: string | Array<string | number>;
+	sortable?: boolean;
 }
 export interface DeviceIMEIList {
 	IMEI: string;
@@ -154,9 +155,10 @@ export const reports: ReportConfig[] = [
 
 export const TBAdherence: TBAdherenceConfig[] = [
 	{
-		key: "patientNumber",
-		label: "Patient Number",
-		path: "patientNumber",
+		key: "treatmentStart",
+		label: "Treatment Start",
+		path: "treatmentStart",
+		sortable: true,
 	},
 	{
 		key: "name",
@@ -164,18 +166,36 @@ export const TBAdherence: TBAdherenceConfig[] = [
 		path: "name",
 	},
 	{
-		key: "deviceIMEINumber",
-		label: "Device IMEI Number",
-		path: "deviceIMEINumber",
+		key: "patientNumber",
+		label: "Patient Number",
+		path: "patientNumber",
 	},
 	{
-		key: "adherenceFrequency",
-		label: "Adherence Frequency",
-		path: "adherenceFrequency",
+		key: "orgUnit",
+		label: "Organisation Unit",
+		path: "orgUnit",
+	},
+	{
+		key: "battery",
+		label: "Battery",
+		path: "battery",
+	},
+
+	{
+		key: "deviceIMEINumber",
+		label: "Device IMEI",
+		path: "deviceIMEINumber",
+		sortable: true,
+	},
+
+	{
+		key: "overallAdherence",
+		label: "Overall Adherence (%)",
+		path: "overallAdherence",
 	},
 	{
 		key: "adherenceStreak",
-		label: "Adherence Streak",
+		label: "Last 7 days adherence",
 		path: "adherenceStreak",
 	},
 ];

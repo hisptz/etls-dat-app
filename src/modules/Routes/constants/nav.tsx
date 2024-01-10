@@ -19,7 +19,7 @@ import { Dashboards } from "../../Dashboards";
 import { ProgramMapping } from "../../Configuration/components/ProgramMapping";
 import { DATDevicelists } from "../../Configuration/components/DATDeviceLists";
 import { RegimenSetUp } from "../../Configuration/components/RegimeSetUp";
-import { getDefaultTBAdherenceFilters } from "../../TBAdherence/constants/filters";
+import { getDefaultDATOverviewFilters } from "../../TBAdherence/constants/filters";
 import { getDefaultReportFilters } from "../../Reports/constants/filters";
 import AdherenceIcon from "../components/AdherenceIcon";
 
@@ -34,28 +34,28 @@ export interface NavItem {
 
 export const ROUTES: NavItem[] = [
 	{
-		id: "treatment-adherence",
-		path: "treatment-adherence",
+		id: "dat-overview",
+		path: "dat-overview",
 		element: TreatmentAdherenceOutlet,
 		icon: AdherenceIcon,
-		label: i18n.t("Treatment Adherence"),
+		label: i18n.t("DAT Overview"),
 		subItems: [
 			{
 				path: "",
-				id: "treatment-adherence-redirect",
+				id: "dat-overview-redirect",
 				element: () => {
-					const defaultParams = getDefaultTBAdherenceFilters();
+					const defaultParams = getDefaultDATOverviewFilters();
 					return <Navigate to={`list?${defaultParams.toString()}`} />;
 				},
 			},
 			{
 				path: "list",
-				id: "treatment-adherence-list",
+				id: "dat-overview-list",
 				element: TBAdherencePage,
 			},
 			{
 				path: ":id",
-				id: "treatment-adherence-details",
+				id: "dat-overview-details",
 				element: TBAdherenceDetails,
 			},
 		],

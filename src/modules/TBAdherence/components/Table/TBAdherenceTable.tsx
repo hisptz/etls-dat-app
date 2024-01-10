@@ -6,35 +6,17 @@ import {
 } from "@hisptz/dhis2-ui";
 import { Card } from "@dhis2/ui";
 import i18n from "@dhis2/d2-i18n";
-import { Pagination } from "@hisptz/dhis2-utils";
 import { useSetting } from "@dhis2/app-service-datastore";
 import { FullPageLoader } from "../../../shared/components/Loaders";
-
 import { head, isEmpty } from "lodash";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { PatientProfile } from "../../../shared/models/profile";
 import AdherenceStreak, {
 	DateEvent,
 } from "../../../shared/components/AdherenceStreak/AdherenceStreak";
-import {
-	useAdherenceEvents,
-	useDeviceData,
-} from "../../../shared/components/ProfileArea/utils";
-
-//import BatteryLevel from "./batteryLevel";
-
-export interface AdherenceTableProps {
-	loading: boolean;
-	patients: PatientProfile[];
-	pagination: Pagination;
-	onSort: (sort: any) => void;
-	sortState:
-		| {
-				name: string;
-				direction: "desc" | "default" | "asc";
-		  }
-		| undefined;
-}
+import { useAdherenceEvents } from "../../../shared/components/ProfileArea/utils";
+import { AdherenceTableProps } from ".";
+import BatteryLevel from "./batteryLevel";
 
 export default function TBAdherenceTable({
 	loading,
@@ -131,7 +113,11 @@ export default function TBAdherenceTable({
 									...(patient.tableData as CustomDataTableRow),
 									adherenceStreak:
 										getAdherenceStreak(patient),
-									// battery: <BatteryLevel patient={patient} />,
+									battery: (
+										<BatteryLevel
+											device={patient.deviceIMEINumber}
+										/>
+									),
 								};
 							})}
 							onSort={onSort}

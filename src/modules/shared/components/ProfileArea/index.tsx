@@ -10,6 +10,7 @@ import { DateTime } from "luxon";
 import { useAdherenceEvents } from "./utils";
 import { useSetting } from "@dhis2/app-service-datastore";
 import { useSearchParams } from "react-router-dom";
+import BatteryLevel from "../../../TBAdherence/components/Table/batteryLevel";
 
 export interface ProfileAreaProps {
 	profile: PatientProfile;
@@ -82,7 +83,7 @@ export function ProfileArea({
 			"hh:mm a",
 		) ?? "";
 
-	const batteryLevel = data?.batteryLevel ?? "N/A";
+	const batteryLevel = data?.batteryLevel ?? 0;
 
 	return loading ? (
 		<></>
@@ -314,7 +315,11 @@ export function ProfileArea({
 										className={styles["label-value"]}
 										htmlFor="value"
 									>
-										{batteryLevel}
+										{
+											<BatteryLevel
+												batteryLevel={batteryLevel}
+											/>
+										}
 									</label>
 								</div>
 								<div className={styles["grid-item"]}>

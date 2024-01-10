@@ -9,8 +9,9 @@ import { useSetting } from "@dhis2/app-service-datastore";
 import { isEmpty } from "lodash";
 import { OrganizationUnitState } from "../../state/filters";
 import { useRecoilState, useRecoilValue } from "recoil";
-import { getDefaultTBAdherenceFilters } from "../../constants/filters";
+import { getResetDATOverviewFilters } from "../../constants/filters";
 import { CurrentUserOrganizationUnit } from "../../../shared/state/currentUser";
+import { getProgramMapping } from "../../../shared/utils";
 
 export interface FilterAreaProps {
 	loading: boolean;
@@ -23,6 +24,10 @@ export function FilterArea({ loading, onFetch }: FilterAreaProps) {
 	const [programMapping] = useSetting("programMapping", { global: true });
 	const [, setOrganizationUnitState] = useRecoilState(OrganizationUnitState);
 	const defaultOrganizationUnit = useRecoilValue(CurrentUserOrganizationUnit);
+
+	const currentProgram = params.get("program");
+	const mapping = getProgramMapping(programMapping, currentProgram);
+	const deviceIMEIAttribute = mapping?.attributes?.deviceIMEInumber;
 	const orgUnit =
 		params.get("ou") ??
 		defaultOrganizationUnit.map(({ id }) => id).join(";");
@@ -36,12 +41,22 @@ export function FilterArea({ loading, onFetch }: FilterAreaProps) {
 	};
 
 	const onResetClick = () => {
-		const defaultValue = getDefaultTBAdherenceFilters();
+		const defaultValue = getResetDATOverviewFilters(
+			currentProgram ?? undefined,
+		);
+
+		const defaultFilter = filters.filter((item) =>
+			item.includes(`${deviceIMEIAttribute}:ne:null`),
+		);
+		isEmpty(defaultFilter)
+			? defaultFilter.push(`${deviceIMEIAttribute}:ne:null`)
+			: null;
+
 		setParams(defaultValue);
 		setOrganizationUnitState([]);
 		onFetch({
 			page: 1,
-			filters: [],
+			filters: defaultFilter,
 			startDate,
 			orgUnit: defaultOrganizationUnit.map(({ id }) => id).join(";"),
 		});

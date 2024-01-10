@@ -2,9 +2,9 @@ import { useDataQuery } from "@dhis2/app-runtime";
 import { type OrganisationUnit } from "@hisptz/dhis2-utils";
 import { useSearchParams } from "react-router-dom";
 
-export function useOrgUnit() {
+export function useOrgUnit(ou?: string) {
 	const [params, setParams] = useSearchParams();
-	const values = params.get("ou");
+	const values = params.get("ou") ?? ou;
 	const orgUnits = values?.split(";").join(",");
 
 	const orgUnitQuery = {

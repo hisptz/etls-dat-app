@@ -104,11 +104,25 @@ export function useFilters() {
 			if (filterConfig) {
 				const value = params.get(filter);
 				if (value) {
-					return `${filterConfig.attribute}:${filterConfig.operator}:${value}`;
+					return filter != "deviceIMEInumber"
+						? `${filterConfig.attribute}:${filterConfig.operator}:${value}`
+						: `${filterConfig.attribute}:${
+								filterConfig.operator
+						  }:${value}:ne:${null}`;
+				} else {
+					return `${filterConfig.attribute}:ne:${null}`;
 				}
 			}
 		}),
 	);
+
+	const containsDeviceIMEIfilter = filters.some((item) =>
+		item.includes(mapping?.attributes?.deviceIMEInumber ?? ""),
+	);
+
+	if (!containsDeviceIMEIfilter) {
+		filters.push(`${mapping?.attributes?.deviceIMEInumber}:ne:${null}`);
+	}
 
 	return {
 		filters,
@@ -134,6 +148,7 @@ export function useTBAdherenceTableData() {
 	const [pagination, setPagination] = useState<Pagination>();
 	const [params] = useSearchParams();
 	const currentProgram = params.get("program");
+
 	const orgUnit =
 		params.get("ou") ??
 		defaultOrganizationUnit.map(({ id }) => id).join(";");
@@ -212,15 +227,21 @@ export function useTBAdherenceTableData() {
 
 	const onSort = (sort: any) => {
 		if (sort.direction === "default") {
-			const columnId = programMapping.attributes[sort.name];
+			const columnId = mapping.attributes
+				? mapping.attributes[sort.name]
+				: "";
 			refetch({ order: `${columnId}:asc` });
 		}
 
 		if (sort.direction === "asc") {
-			const columnId = programMapping.attributes[sort.name];
+			const columnId = mapping.attributes
+				? mapping.attributes[sort.name]
+				: "";
 			refetch({ order: `${columnId}:asc` });
 		} else {
-			const columnId = programMapping.attributes[sort.name];
+			const columnId = mapping.attributes
+				? mapping.attributes[sort.name]
+				: "";
 			refetch({ order: `${columnId}:desc` });
 		}
 		setSortState(sort);
