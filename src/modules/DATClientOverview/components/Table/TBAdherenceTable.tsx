@@ -44,7 +44,7 @@ export default function TBAdherenceTable({
 		const row = patients.find((patient) => patient.id === id);
 
 		if (row) {
-			await navigate(`/dat-overview/${row.id}`);
+			await navigate(`/dat-client-overview/${row.id}`);
 
 			setParams(() => {
 				const updatedParams = new URLSearchParams();

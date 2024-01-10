@@ -1,7 +1,7 @@
 import { useAlert, useDataMutation } from "@dhis2/app-runtime";
 import { useSetting } from "@dhis2/app-service-datastore";
 import axios from "axios";
-import { usePatient } from "../../../TBAdherence/TBAdherenceDetails/hooks/data";
+import { usePatient } from "../../../DATClientOverview/DATClientDetails/hooks/data";
 import { TrackedEntity } from "../../types";
 import { useSearchParams } from "react-router-dom";
 

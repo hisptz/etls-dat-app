@@ -5,5 +5,5 @@ import { ROUTES } from "../constants/nav";
 
 export function MainNavigator() {
 	const initialNav = head(ROUTES);
-	return <Navigate to={initialNav?.path ?? "dat-overview"} replace />;
+	return <Navigate to={initialNav?.path ?? "dat-client-overview"} replace />;
 }

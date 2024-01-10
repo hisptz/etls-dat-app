@@ -10,7 +10,7 @@ import { DateTime } from "luxon";
 import { useAdherenceEvents } from "./utils";
 import { useSetting } from "@dhis2/app-service-datastore";
 import { useSearchParams } from "react-router-dom";
-import BatteryLevel from "../../../TBAdherence/components/Table/batteryLevel";
+import BatteryLevel from "../../../DATClientOverview/components/Table/batteryLevel";
 
 export interface ProfileAreaProps {
 	profile: PatientProfile;

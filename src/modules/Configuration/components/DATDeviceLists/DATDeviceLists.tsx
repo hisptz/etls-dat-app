@@ -8,7 +8,7 @@ import { add } from "./state";
 import EditDevice from "./components/EditDevice";
 
 import { useDevicesFromDataStore } from "./hooks/data";
-import { FilterField } from "../../../TBAdherence/components/FilterArea/components/FilterField";
+import { FilterField } from "../../../DATClientOverview/components/FilterArea/components/FilterField";
 import { useSearchParams } from "react-router-dom";
 
 export function DATDevicelists() {

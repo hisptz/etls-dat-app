@@ -11,7 +11,7 @@ import DoseStatus from "./components/doseStatus/doseStatus";
 import AdherenceCalendar from "./components/adherenceCalendar/adherenceCalendar";
 import { useDeviceData } from "../../shared/components/ProfileArea/utils";
 
-export function TBAdherenceDetails() {
+export function DATClientDetails() {
 	const { patient, error, loading, refresh } = usePatient();
 	const navigate = useNavigate();
 

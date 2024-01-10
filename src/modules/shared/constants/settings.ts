@@ -5,7 +5,7 @@ import {
 } from "../../Dashboards/constants";
 import { DashboardItem } from "../interfaces";
 
-export interface TBAdherenceConfig {
+export interface DAT_TableConfig {
 	key: string;
 	label: string;
 	path: string | Array<string | number>;
@@ -153,7 +153,7 @@ export const reports: ReportConfig[] = [
 	},
 ];
 
-export const TBAdherence: TBAdherenceConfig[] = [
+export const TBAdherence: DAT_TableConfig[] = [
 	{
 		key: "treatmentStart",
 		label: "Treatment Start",
@@ -161,15 +161,16 @@ export const TBAdherence: TBAdherenceConfig[] = [
 		sortable: true,
 	},
 	{
-		key: "name",
-		label: "Name",
-		path: "name",
-	},
-	{
 		key: "patientNumber",
 		label: "Patient Number",
 		path: "patientNumber",
 	},
+	{
+		key: "name",
+		label: "Name",
+		path: "name",
+	},
+
 	{
 		key: "orgUnit",
 		label: "Organisation Unit",
@@ -195,8 +196,33 @@ export const TBAdherence: TBAdherenceConfig[] = [
 	},
 	{
 		key: "adherenceStreak",
-		label: "Last 7 days adherence",
+		label: "Adherence Streak",
 		path: "adherenceStreak",
+	},
+];
+
+export const DATAssignment: DAT_TableConfig[] = [
+	{
+		key: "treatmentStart",
+		label: "Treatment Start",
+		path: "treatmentStart",
+		sortable: true,
+	},
+	{
+		key: "patientNumber",
+		label: "Patient Number",
+		path: "patientNumber",
+	},
+	{
+		key: "name",
+		label: "Name",
+		path: "name",
+	},
+
+	{
+		key: "orgUnit",
+		label: "Organisation Unit",
+		path: "orgUnit",
 	},
 ];
 

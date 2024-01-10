@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2024-01-09T13:18:29.922Z\n"
-"PO-Revision-Date: 2024-01-09T13:18:29.922Z\n"
+"POT-Creation-Date: 2024-01-10T12:20:20.227Z\n"
+"PO-Revision-Date: 2024-01-10T12:20:20.227Z\n"
 
 msgid "Configurations"
 msgstr "Configurations"
@@ -128,6 +128,79 @@ msgstr "Number of Dosess"
 msgid "Regimens Settings not found"
 msgstr "Regimens Settings not found"
 
+msgid "Back"
+msgstr "Back"
+
+msgid "Missing Dose Data"
+msgstr "Missing Dose Data"
+
+msgid " has no dose data recorded"
+msgstr " has no dose data recorded"
+
+msgid "Summary"
+msgstr "Summary"
+
+msgid "Enrollment time"
+msgstr "Enrollment time"
+
+msgid "Dose Taken"
+msgstr "Dose Taken"
+
+msgid "Yes"
+msgstr "Yes"
+
+msgid "No"
+msgstr "No"
+
+msgid "N/A"
+msgstr "N/A"
+
+msgid "Dose Taken at"
+msgstr "Dose Taken at"
+
+msgid "Battery Level"
+msgstr "Battery Level"
+
+msgid "Instance ID is required"
+msgstr "Instance ID is required"
+
+msgid "Patient with Instance ID {{id}} could not be found"
+msgstr "Patient with Instance ID {{id}} could not be found"
+
+msgid "DAT Client Overview"
+msgstr "DAT Client Overview"
+
+msgid ""
+"Program Mappings are not configured. Please click the link below to go to "
+"configurations."
+msgstr ""
+"Program Mappings are not configured. Please click the link below to go to "
+"configurations."
+
+msgid "Configuration"
+msgstr "Configuration"
+
+msgid "Reset"
+msgstr "Reset"
+
+msgid "Searching..."
+msgstr "Searching..."
+
+msgid "Organisation Unit"
+msgstr "Organisation Unit"
+
+msgid "Select Organisation unit"
+msgstr "Select Organisation unit"
+
+msgid "Search Criteria"
+msgstr "Search Criteria"
+
+msgid "There is no data for the selected filters"
+msgstr "There is no data for the selected filters"
+
+msgid "Downloading..."
+msgstr "Downloading..."
+
 msgid "Dashboards"
 msgstr "Dashboards"
 
@@ -157,9 +230,6 @@ msgstr "Filters"
 
 msgid "Period"
 msgstr "Period"
-
-msgid "Organisation Unit"
-msgstr "Organisation Unit"
 
 msgid "Reports"
 msgstr "Reports"
@@ -203,81 +273,14 @@ msgstr "The page you are looking for does not exist."
 msgid "Go to home page"
 msgstr "Go to home page"
 
-msgid "DAT Overview"
-msgstr "DAT Overview"
-
-msgid "Configuration"
-msgstr "Configuration"
+msgid "DAT Assignment"
+msgstr "DAT Assignment"
 
 msgid "DAT Device lists"
 msgstr "DAT Device lists"
 
 msgid "Regimen Settings"
 msgstr "Regimen Settings"
-
-msgid ""
-"Program Mappings are not configured. Please click the link below to go to "
-"configurations."
-msgstr ""
-"Program Mappings are not configured. Please click the link below to go to "
-"configurations."
-
-msgid "Back"
-msgstr "Back"
-
-msgid "Missing Dose Data"
-msgstr "Missing Dose Data"
-
-msgid " has no dose data recorded"
-msgstr " has no dose data recorded"
-
-msgid "Summary"
-msgstr "Summary"
-
-msgid "Enrollment time"
-msgstr "Enrollment time"
-
-msgid "Dose Taken"
-msgstr "Dose Taken"
-
-msgid "Yes"
-msgstr "Yes"
-
-msgid "No"
-msgstr "No"
-
-msgid "N/A"
-msgstr "N/A"
-
-msgid "Dose Taken at"
-msgstr "Dose Taken at"
-
-msgid "Battery Health"
-msgstr "Battery Health"
-
-msgid "Instance ID is required"
-msgstr "Instance ID is required"
-
-msgid "Patient with Instance ID {{id}} could not be found"
-msgstr "Patient with Instance ID {{id}} could not be found"
-
-msgid "Reset"
-msgstr "Reset"
-
-msgid "Searching..."
-msgstr "Searching..."
-
-msgid "Select Organisation unit"
-msgstr "Select Organisation unit"
-
-msgid "Search Criteria"
-msgstr "Search Criteria"
-
-msgid "There is no data for the selected filters"
-msgstr "There is no data for the selected filters"
-
-msgid "Downloading..."
-msgstr "Downloading..."
 
 msgid "View"
 msgstr "View"
@@ -335,9 +338,6 @@ msgstr "Assigned Device"
 
 msgid "Total Openings"
 msgstr "Total Openings"
-
-msgid "Battery Level"
-msgstr "Battery Level"
 
 msgid "Next dose Alarm"
 msgstr "Next dose Alarm"

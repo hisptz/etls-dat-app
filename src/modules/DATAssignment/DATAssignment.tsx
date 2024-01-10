@@ -3,21 +3,21 @@ import { Outlet, useNavigate } from "react-router-dom";
 import { DATA_TEST_PREFIX } from "../shared/constants";
 import { FilterArea } from "./components/FilterArea";
 import i18n from "@dhis2/d2-i18n";
-import TBAdherenceTable from "./components/Table/TBAdherenceTable";
 import { Card, Center } from "@dhis2/ui";
-import { useTBAdherenceTableData } from "./components/Table/hooks/data";
+import { useDATAssignmentTableData } from "./components/Table/hooks/data";
 import { useSetting } from "@dhis2/app-service-datastore";
 import { isEmpty } from "lodash";
 import { ProgramsTab } from "./components/ProgramsTab";
+import DATAssignmentTable from "./components/Table/DATAssignmentTable";
 
-export function TreatmentAdherenceOutlet() {
+export function DATAssignmentOutlet() {
 	return <Outlet />;
 }
 
-export function TBAdherencePage() {
+export function DATAssignment() {
 	const [programMapping] = useSetting("programMapping", { global: true });
 	const { patients, pagination, refetch, loading, onSort, sortState } =
-		useTBAdherenceTableData();
+		useDATAssignmentTableData();
 	const navigate = useNavigate();
 
 	return (
@@ -26,7 +26,7 @@ export function TBAdherencePage() {
 			data-test={`${DATA_TEST_PREFIX}-tb-adherence-container`}
 		>
 			<h1 className="m-0" style={{ marginBottom: "0px" }}>
-				{i18n.t("DAT Overview")}
+				{i18n.t("DAT Assignment")}
 			</h1>
 			{programMapping.length > 1 ? <ProgramsTab /> : null}
 			<FilterArea loading={loading} onFetch={refetch} />
@@ -70,7 +70,7 @@ export function TBAdherencePage() {
 					</div>
 				) : (
 					<div style={{ marginTop: "16px" }}>
-						<TBAdherenceTable
+						<DATAssignmentTable
 							patients={patients}
 							pagination={pagination}
 							loading={loading}
