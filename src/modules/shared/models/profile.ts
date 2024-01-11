@@ -1,26 +1,23 @@
 import { TrackedEntityModel } from "./trackedEntityModel";
-import { programMapping, regimenSetting } from "../constants";
+import { ProgramMapping, RegimenSetting } from "../constants";
 import { DatDeviceInfoEventModel } from "./datDeviceInfo";
 import { TrackedEntity } from "../types";
-import { filter, head, isEmpty } from "lodash";
+import { filter, head } from "lodash";
 import { DateTime } from "luxon";
-import { useAdherenceEvents } from "../components/ProfileArea/utils";
 
 export class PatientProfile extends TrackedEntityModel {
-	programMapping?: programMapping;
-	regimenSettings?: regimenSetting[];
+	programMapping?: ProgramMapping;
+	regimenSettings?: RegimenSetting[];
 	datDeviceInfoEvent?: DatDeviceInfoEventModel;
-	programStageID?: string;
 
 	constructor(
 		trackedEntity: TrackedEntity,
-		programMapping: programMapping,
-		regimenSettings: regimenSetting[],
+		programMapping: ProgramMapping,
+		regimenSettings: RegimenSetting[],
 	) {
 		super(trackedEntity);
 		this.programMapping = programMapping;
 		this.datDeviceInfoEvent = this.getDatDeviceInfoEvent();
-		this.programStageID = programMapping.programStage;
 		this.regimenSettings = regimenSettings;
 	}
 
@@ -46,8 +43,8 @@ export class PatientProfile extends TrackedEntityModel {
 		) as string;
 	}
 
-	get orgUnitFilter(): string {
-		return this.enrollment?.orgUnit ?? "";
+	get organisationUnit(): string {
+		return this.enrollment?.orgUnitName ?? "";
 	}
 
 	get sex() {
@@ -129,11 +126,7 @@ export class PatientProfile extends TrackedEntityModel {
 		const dosageTime = this.dosageTime;
 		const enrollmentDate = this.enrollmentDate;
 		const deviceSignal = this.deviceSignal;
-
-		const { filteredEvents } = useAdherenceEvents(
-			this.events,
-			this.programStageID ?? "",
-		);
+		const orgUnit = this.organisationUnit;
 
 		return {
 			id: this.id as string,
@@ -144,6 +137,7 @@ export class PatientProfile extends TrackedEntityModel {
 			sex,
 			phoneNumber,
 			deviceIMEInumber,
+			orgUnit,
 			adherenceFrequency,
 			deviceHealth,
 			batteryHealth,
@@ -156,8 +150,9 @@ export class PatientProfile extends TrackedEntityModel {
 	private getDatDeviceInfoEvent(): DatDeviceInfoEventModel {
 		const events = filter(this.events, [
 			"programStage",
-			this.programStageID,
+			this.programMapping?.programStage,
 		]).map((event) => new DatDeviceInfoEventModel({ event: event }));
+
 		return head(events) as DatDeviceInfoEventModel;
 	}
 }

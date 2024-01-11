@@ -9,7 +9,7 @@ import {
 } from "@dhis2/ui";
 import i18n from "@dhis2/d2-i18n";
 import { useSetting } from "@dhis2/app-service-datastore";
-import { deviceIMEIList } from "../../../../shared/constants";
+import { DeviceIMEIList } from "../../../../shared/constants";
 import { useAlert } from "@dhis2/app-runtime";
 
 interface DeleteDevice {
@@ -34,7 +34,7 @@ function DeleteDevice({ IMEI, inUse, hide, onHide, refresh }: DeleteDevice) {
 		if (IMEI) {
 			if (!inUse) {
 				const updatedDevices = devices.filter(
-					(item: deviceIMEIList) => item["IMEI"] !== IMEI,
+					(item: DeviceIMEIList) => item["IMEI"] !== IMEI,
 				);
 				deleteDevice(updatedDevices);
 				refresh([...updatedDevices]);

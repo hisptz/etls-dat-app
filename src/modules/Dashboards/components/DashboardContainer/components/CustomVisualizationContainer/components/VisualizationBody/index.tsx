@@ -1,5 +1,5 @@
 import React from "react";
-import {forIn} from "lodash";
+import { forIn } from "lodash";
 import Highcharts from "highcharts";
 import HighchartsReact from "highcharts-react-official";
 import i18n from "@dhis2/d2-i18n";
@@ -14,7 +14,10 @@ import {
 	DAT_ENROLLMENT_DASHBOARD_ITEM_ID,
 	ADHERENCE_PERCENTAGE_DASHBOARD_ITEM_ID,
 } from "../../../../../../constants";
-import { colorSets, COLOR_SET_DEFAULT } from "../../../D2VisualizationContainer/constants";
+import {
+	colorSets,
+	COLOR_SET_DEFAULT,
+} from "../../../D2VisualizationContainer/constants";
 
 interface CustomVisualizationBodyProps {
 	data: Record<string, any>;
@@ -75,12 +78,12 @@ function getEnrollmentSummaryByGender({
 	const series: any[] = [];
 
 	forIn(enrollmentBySex ?? {}, (value, key) => {
-		series.push({name: key, y: value});
+		series.push({ name: key, y: value });
 	});
 
 	const options = {
 		chart: {
-			type: config.options?.renderAs ?? ""
+			type: config.options?.renderAs ?? "",
 		},
 		title: {
 			text: "",
@@ -92,16 +95,17 @@ function getEnrollmentSummaryByGender({
 			pie: {
 				allowPointSelect: true,
 				cursor: "pointer",
-				colors: colorSets[COLOR_SET_DEFAULT]?.colors ?? []
-			}
+				colors: colorSets[COLOR_SET_DEFAULT]?.colors ?? [],
+			},
 		},
-		series: [{name: i18n.t("Enrolled Patients"), data: series}]
+		series: [{ name: i18n.t("Enrolled Patients"), data: series }],
 	};
 
-
-	return <div>
-		<HighchartsReact highcharts={Highcharts} options={options} />
-	</div>;
+	return (
+		<div>
+			<HighchartsReact highcharts={Highcharts} options={options} />
+		</div>
+	);
 }
 
 function getAdherencePercentageSummary({
@@ -117,7 +121,7 @@ function getAdherencePercentageSummary({
 		<div>
 			<div className="pv-8 center align-center flex">
 				<CircularProgressDashboard
-					denominator={totalDeviceSignalEvents}
+					denominator={totalDeviceSignalEvents || 1}
 					numerator={deviceSignalsForDoseTake}
 					size={100}
 				/>
@@ -139,13 +143,13 @@ export default function CustomVisualizationBody({
 }: CustomVisualizationBodyProps): React.ReactElement {
 	const { id } = config;
 	switch (id) {
-	case DEVICE_USAGE_DASHBOARD_ITEM_ID:
-		return getDeviceUsageDashboard({ data, config });
-	case DAT_ENROLLMENT_DASHBOARD_ITEM_ID:
-		return getEnrollmentSummaryByGender({ data, config });
-	case ADHERENCE_PERCENTAGE_DASHBOARD_ITEM_ID:
-		return getAdherencePercentageSummary({ data, config });
-	default:
-		return getDefaultMessageForNonExistingVisualization();
+		case DEVICE_USAGE_DASHBOARD_ITEM_ID:
+			return getDeviceUsageDashboard({ data, config });
+		case DAT_ENROLLMENT_DASHBOARD_ITEM_ID:
+			return getEnrollmentSummaryByGender({ data, config });
+		case ADHERENCE_PERCENTAGE_DASHBOARD_ITEM_ID:
+			return getAdherencePercentageSummary({ data, config });
+		default:
+			return getDefaultMessageForNonExistingVisualization();
 	}
 }

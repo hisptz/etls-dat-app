@@ -5,17 +5,17 @@ import {
 	CustomDataTableRow,
 } from "@hisptz/dhis2-ui";
 import i18n from "@dhis2/d2-i18n";
-import { Pagination } from "@hisptz/dhis2-utils";
+
 import { isEmpty } from "lodash";
 import { FullPageLoader } from "../../../../shared/components/Loaders";
 import { ActionButton } from "../../../../shared/components/ActionButton";
-import { regimenSetting } from "../../../../shared/constants";
+import { RegimenSetting } from "../../../../shared/constants";
 import AddSetting, { RegimenFormData } from "./EditRegimen";
 import DeleteSetting from "./DeleteRegimen";
 
 export interface regimensTableProps {
 	loading: boolean;
-	regimens: regimenSetting[];
+	regimens: RegimenSetting[];
 }
 
 export default function RegimenTable({
@@ -62,7 +62,7 @@ export default function RegimenTable({
 		},
 	];
 
-	function getActions(regimen: RegimenFormData, index: number) {
+	function getActions(regimen: RegimenFormData) {
 		return (
 			<>
 				<ActionButton
@@ -94,10 +94,7 @@ export default function RegimenTable({
 								return {
 									...(regimen as CustomDataTableRow),
 									sn: index + 1,
-									action: getActions(
-										regimen,
-										index ?? undefined,
-									),
+									action: getActions(regimen),
 								};
 							})}
 						/>

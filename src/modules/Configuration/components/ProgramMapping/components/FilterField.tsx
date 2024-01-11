@@ -8,7 +8,7 @@ import {
 } from "@dhis2/ui";
 import { useSearchParams } from "react-router-dom";
 import { isEmpty } from "lodash";
-import { DATA_TEST_PREFIX, deviceIMEIList } from "../../../../shared/constants";
+import { DATA_TEST_PREFIX, DeviceIMEIList } from "../../../../shared/constants";
 import { Option } from "../hooks/data";
 import { useController } from "react-hook-form";
 
@@ -18,7 +18,7 @@ export interface FilterFieldProps {
 	required?: boolean;
 	validations?: Record<string, any>;
 	initialValue?: string;
-	options?: [{ name: string; code: string }] | Option[] | deviceIMEIList[];
+	options?: [{ name: string; code: string }] | Option[] | DeviceIMEIList[];
 	update?: (val: number) => void;
 	type: "date" | "text" | "select" | "time" | "password";
 	multiSelect?: boolean;
@@ -39,7 +39,7 @@ export function FilterField({
 	multiSelect,
 	...props
 }: FilterFieldProps) {
-	const [params, setParams] = useSearchParams();
+	const [, setParams] = useSearchParams();
 	const onChange = ({ value }: { value: string }) => {
 		setParams((params) => {
 			const updatedParams = new URLSearchParams(params);

@@ -1,7 +1,7 @@
 import { useDataMutation } from "@dhis2/app-runtime";
 import { useSetting } from "@dhis2/app-service-datastore";
 import { useSearchParams } from "react-router-dom";
-import { DATA_ELEMENTS, programMapping } from "../../../../shared/constants";
+import { DATA_ELEMENTS, ProgramMapping } from "../../../../shared/constants";
 
 export function useProgramMapping() {
 	const [params] = useSearchParams();
@@ -24,7 +24,7 @@ export function useProgramMapping() {
 	const phoneNumber = params.get("phoneNumber");
 	const deviceIMEInumber = params.get("deviceIMEInumber");
 
-	const programMapping: programMapping = {
+	const programMapping: ProgramMapping = {
 		program: programId ?? "",
 		programStage: programStageID,
 		mediatorUrl: mediatorUrl ?? "",
@@ -189,9 +189,6 @@ export function useProgramStage() {
 						{
 							id: "rqvQqekCxF3",
 						},
-						{
-							id: "l8Z3eixIrDs",
-						},
 					],
 				},
 			],
@@ -227,15 +224,6 @@ export function useProgramStage() {
 					id: "rqvQqekCxF3",
 					code: "Heartbeat",
 					name: "Heartbeat",
-					sortOrder: 4,
-					optionSet: {
-						id: "lpMwLxkJor6",
-					},
-				},
-				{
-					id: "l8Z3eixIrDs",
-					code: "Enrollment",
-					name: "Enrollment",
 					sortOrder: 4,
 					optionSet: {
 						id: "lpMwLxkJor6",

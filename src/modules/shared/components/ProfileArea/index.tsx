@@ -9,6 +9,8 @@ import NoDeviceAssigned from "./NoDeviceAssigned";
 import { DateTime } from "luxon";
 import { useAdherenceEvents } from "./utils";
 import { useSetting } from "@dhis2/app-service-datastore";
+import { useSearchParams } from "react-router-dom";
+import BatteryLevel from "../BatteryLevel/BatteryLevel";
 
 export interface ProfileAreaProps {
 	profile: PatientProfile;
@@ -26,6 +28,7 @@ export function ProfileArea({
 	loading,
 }: ProfileAreaProps) {
 	const [hide, setHideDevice] = useState<boolean>(true);
+	const [params] = useSearchParams();
 	const [hideAlarm, setHideAlarm] = useState<boolean>(true);
 	const [nextRefillDate, setNextRefillDate] = useState<string>("");
 	const [nextRefillTime, setNextRefillTime] = useState<string>("");
@@ -34,10 +37,16 @@ export function ProfileArea({
 	const [programMapping] = useSetting("programMapping", {
 		global: true,
 	});
+	const currentProgram = params.get("program");
+
+	const selectedProgram = programMapping.filter(
+		(mapping: any) => mapping.name === currentProgram,
+	);
+	const program = selectedProgram[0];
 
 	const { filteredEvents } = useAdherenceEvents(
 		profile.events,
-		programMapping.programStage,
+		program?.programStage,
 	);
 
 	const onHide = () => {
@@ -74,7 +83,7 @@ export function ProfileArea({
 			"hh:mm a",
 		) ?? "";
 
-	const batteryLevel = data?.batteryLevel ? data.batteryLevel + "%" : "N/A";
+	const batteryLevel = data?.batteryLevel ?? 0;
 
 	return loading ? (
 		<></>
@@ -306,7 +315,11 @@ export function ProfileArea({
 										className={styles["label-value"]}
 										htmlFor="value"
 									>
-										{batteryLevel}
+										{
+											<BatteryLevel
+												batteryLevel={batteryLevel}
+											/>
+										}
 									</label>
 								</div>
 								<div className={styles["grid-item"]}>
