@@ -85,18 +85,14 @@ export default function DATClientTable({
 						? "takenDose"
 						: item.dataValues[0].value == "Heartbeat"
 						? "notTakenDose"
+						: item.dataValues[0].value == "Enrollment"
+						? "enrolled"
 						: item.dataValues[0].value == "None"
 						? ""
 						: "",
 			};
 		});
-		const events: DateEvent[] = [
-			...adherenceEvents,
-			{
-				date: patient.enrollmentDate,
-				event: "enrolled",
-			},
-		];
+		const events: DateEvent[] = [...adherenceEvents];
 		return (
 			<div style={{ width: "120px" }}>
 				<AdherenceStreak

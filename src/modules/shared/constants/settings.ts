@@ -21,7 +21,7 @@ export interface DeviceIMEIList {
 export interface RegimenSetting {
 	regimen: string;
 	administration: string;
-	idealDoses: string;
+	numberOfDoses: string;
 }
 export interface ProgramMapping {
 	name?: string;

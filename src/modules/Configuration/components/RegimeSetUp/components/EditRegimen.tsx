@@ -25,9 +25,9 @@ const schema = z.object({
 	administration: z
 		.string({ required_error: "Administration is required" })
 		.nonempty("Administration is required"),
-	idealDoses: z
-		.string({ required_error: "Number of Dosess is required" })
-		.nonempty("Number of Dosess is required"),
+	numberOfDoses: z
+		.string({ required_error: "Number of Doses is required" })
+		.nonempty("Number of Doses is required"),
 });
 
 export type RegimenFormData = z.infer<typeof schema>;
@@ -97,7 +97,7 @@ const AddSetting = ({
 							...setting,
 							regimen: regimenData.regimen,
 							administration: regimenData.administration,
-							idealDoses: regimenData.idealDoses,
+							numberOfDoses: regimenData.numberOfDoses,
 					  }
 					: setting,
 			);
@@ -143,8 +143,8 @@ const AddSetting = ({
 							</div>
 							<div style={{ padding: "5px" }}>
 								<FilterField
-									label={i18n.t("Number of Dosess")}
-									name="idealDoses"
+									label={i18n.t("Number Of Doses")}
+									name="numberOfDoses"
 									type="text"
 									required
 								/>

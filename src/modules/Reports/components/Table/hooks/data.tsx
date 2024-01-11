@@ -443,7 +443,7 @@ export function sanitizeReportData(
 						return (
 							(
 								(report.noOfSignal /
-									parseInt(option.idealDoses)) *
+									parseInt(option.numberOfDoses)) *
 								100
 							).toFixed(2) + "%"
 						);
