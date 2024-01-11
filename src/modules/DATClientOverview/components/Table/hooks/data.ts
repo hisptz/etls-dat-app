@@ -2,7 +2,7 @@ import { useDataQuery } from "@dhis2/app-runtime";
 import { useEffect, useState } from "react";
 import { Pagination } from "@hisptz/dhis2-utils";
 import { useSearchParams } from "react-router-dom";
-import { compact, isEmpty, head, find } from "lodash";
+import { compact, isEmpty } from "lodash";
 import { useDownloadData } from "../../../utils/download";
 import { PatientProfile } from "../../../../shared/models";
 import {
@@ -131,7 +131,7 @@ export function useFilters() {
 	};
 }
 
-export function useTBAdherenceTableData() {
+export function useDATClientTableData() {
 	const defaultOrganizationUnit = useRecoilValue(CurrentUserOrganizationUnit);
 	const { filters, startDate } = useFilters();
 	const [patients, setPatients] = useState<PatientProfile[]>([]);

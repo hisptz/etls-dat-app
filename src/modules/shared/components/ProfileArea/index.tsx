@@ -1,7 +1,7 @@
 import i18n from "@dhis2/d2-i18n";
 import styles from "./ProfileArea.module.css";
 import { Button, IconEdit24, Card, ButtonStrip, IconClock24 } from "@dhis2/ui";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import EditDevice from "./EditDevice";
 import { PatientProfile } from "../../models";
 import EditAlarm from "./AddAlarm";
@@ -10,7 +10,7 @@ import { DateTime } from "luxon";
 import { useAdherenceEvents } from "./utils";
 import { useSetting } from "@dhis2/app-service-datastore";
 import { useSearchParams } from "react-router-dom";
-import BatteryLevel from "../../../DATClientOverview/components/Table/batteryLevel";
+import BatteryLevel from "../BatteryLevel/BatteryLevel";
 
 export interface ProfileAreaProps {
 	profile: PatientProfile;

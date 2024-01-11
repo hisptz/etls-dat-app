@@ -8,7 +8,7 @@ import { useAdherenceEvents } from "../../../../shared/components/ProfileArea/ut
 import { DateTime } from "luxon";
 import { useSetting } from "@dhis2/app-service-datastore";
 import { useSearchParams } from "react-router-dom";
-import BatteryLevel from "../../../components/Table/batteryLevel";
+import BatteryLevel from "../../../../shared/components/BatteryLevel/BatteryLevel";
 
 export interface ProfileAreaProps {
 	profile: PatientProfile;

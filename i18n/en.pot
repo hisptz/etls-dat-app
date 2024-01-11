@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2024-01-10T12:20:20.227Z\n"
-"PO-Revision-Date: 2024-01-10T12:20:20.227Z\n"
+"POT-Creation-Date: 2024-01-11T05:46:41.128Z\n"
+"PO-Revision-Date: 2024-01-11T05:46:41.128Z\n"
 
 msgid "Configurations"
 msgstr "Configurations"
@@ -128,6 +128,19 @@ msgstr "Number of Dosess"
 msgid "Regimens Settings not found"
 msgstr "Regimens Settings not found"
 
+msgid "DAT Assignment"
+msgstr "DAT Assignment"
+
+msgid ""
+"Program Mappings are not configured. Please click the link below to go to "
+"configurations."
+msgstr ""
+"Program Mappings are not configured. Please click the link below to go to "
+"configurations."
+
+msgid "Configuration"
+msgstr "Configuration"
+
 msgid "Back"
 msgstr "Back"
 
@@ -167,19 +180,6 @@ msgstr "Instance ID is required"
 msgid "Patient with Instance ID {{id}} could not be found"
 msgstr "Patient with Instance ID {{id}} could not be found"
 
-msgid "DAT Client Overview"
-msgstr "DAT Client Overview"
-
-msgid ""
-"Program Mappings are not configured. Please click the link below to go to "
-"configurations."
-msgstr ""
-"Program Mappings are not configured. Please click the link below to go to "
-"configurations."
-
-msgid "Configuration"
-msgstr "Configuration"
-
 msgid "Reset"
 msgstr "Reset"
 
@@ -200,6 +200,9 @@ msgstr "There is no data for the selected filters"
 
 msgid "Downloading..."
 msgstr "Downloading..."
+
+msgid "DAT Client Overview"
+msgstr "DAT Client Overview"
 
 msgid "Dashboards"
 msgstr "Dashboards"
@@ -272,9 +275,6 @@ msgstr "The page you are looking for does not exist."
 
 msgid "Go to home page"
 msgstr "Go to home page"
-
-msgid "DAT Assignment"
-msgstr "DAT Assignment"
 
 msgid "DAT Device lists"
 msgstr "DAT Device lists"

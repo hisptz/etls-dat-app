@@ -15,16 +15,30 @@ import AdherenceStreak, {
 	DateEvent,
 } from "../../../shared/components/AdherenceStreak/AdherenceStreak";
 import { useAdherenceEvents } from "../../../shared/components/ProfileArea/utils";
-import { AdherenceTableProps } from ".";
-import BatteryLevel from "./batteryLevel";
 
-export default function TBAdherenceTable({
+import { Pagination } from "@hisptz/dhis2-utils";
+import BatteryLevel from "../../../shared/components/BatteryLevel/BatteryLevel";
+
+export interface DATClientTableProps {
+	loading: boolean;
+	patients: PatientProfile[];
+	pagination: Pagination;
+	onSort: (sort: any) => void;
+	sortState:
+		| {
+				name: string;
+				direction: "desc" | "default" | "asc";
+		  }
+		| undefined;
+}
+
+export default function DATClientTable({
 	loading,
 	patients,
 	pagination,
 	onSort,
 	sortState,
-}: AdherenceTableProps) {
+}: DATClientTableProps) {
 	const [TBAdherence] = useSetting("TBAdherence", { global: true });
 
 	const navigate = useNavigate();

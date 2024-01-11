@@ -1,5 +1,5 @@
 import React from "react";
-import { useDeviceData } from "../../../shared/components/ProfileArea/utils";
+import { useDeviceData } from "../ProfileArea/utils";
 import { CircularLoader } from "@dhis2/ui";
 
 export interface BatteryLevelProps {
@@ -12,40 +12,39 @@ function BatteryLevel({ device, batteryLevel }: BatteryLevelProps) {
 
 	let color;
 	const battery = batteryLevel ?? data?.batteryLevel ?? 0;
-	if (battery >= 75) {
-		color = "green";
-	} else if (battery >= 50) {
-		color = "#70ad47";
+
+	if (battery >= 60) {
+		color = "#4caf50";
 	} else if (battery >= 25) {
-		color = "orange";
+		color = "#f5d631";
 	} else {
-		color = "red";
+		color = "#d32f2f";
 	}
 
 	const batteryStyles = {
-		width: "35px",
-		height: "20px",
-		border: `2px solid ${color}`,
-		padding: "1px",
+		width: "37px",
+		height: "19.5px",
+		border: `1px solid ${color}`,
+		padding: "2px",
 		position: "relative",
-		borderRadius: "3px",
+		borderRadius: "3.5px",
 	};
 
 	const levelStyles = {
 		height: "100%",
 		width: battery <= 100 ? `${battery}%` : "100%",
 		backgroundColor: color,
-		borderRadius: "1px",
+		borderRadius: "1.5px",
 	};
 
 	const knobStyles = {
-		width: "5px",
-		height: "9px",
+		width: "2.4px",
+		height: "7px",
 		background: color,
 		position: "absolute",
-		left: "32px",
-		top: "4px",
-		borderRadius: "2px",
+		left: "37px",
+		top: "5px",
+		borderRadius: "0px 20px 20px 0px",
 	};
 
 	return device != "N/A" ? (

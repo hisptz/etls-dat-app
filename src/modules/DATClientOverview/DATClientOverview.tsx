@@ -3,12 +3,12 @@ import { Outlet, useNavigate } from "react-router-dom";
 import { DATA_TEST_PREFIX } from "../shared/constants";
 import { FilterArea } from "./components/FilterArea";
 import i18n from "@dhis2/d2-i18n";
-import TBAdherenceTable from "./components/Table/TBAdherenceTable";
 import { Card, Center } from "@dhis2/ui";
-import { useTBAdherenceTableData } from "./components/Table/hooks/data";
+import { useDATClientTableData } from "./components/Table/hooks/data";
 import { useSetting } from "@dhis2/app-service-datastore";
 import { isEmpty } from "lodash";
 import { ProgramsTab } from "./components/ProgramsTab";
+import DATClientTable from "./components/Table/DATClientOverviewTable";
 
 export function DATClientOverviewOutlet() {
 	return <Outlet />;
@@ -17,13 +17,13 @@ export function DATClientOverviewOutlet() {
 export function DATClientOverview() {
 	const [programMapping] = useSetting("programMapping", { global: true });
 	const { patients, pagination, refetch, loading, onSort, sortState } =
-		useTBAdherenceTableData();
+		useDATClientTableData();
 	const navigate = useNavigate();
 
 	return (
 		<div
 			className="column gap-16 p-16 h-100 w-100"
-			data-test={`${DATA_TEST_PREFIX}-tb-adherence-container`}
+			data-test={`${DATA_TEST_PREFIX}-dat-client-overview-container`}
 		>
 			<h1 className="m-0" style={{ marginBottom: "0px" }}>
 				{i18n.t("DAT Client Overview")}
@@ -70,7 +70,7 @@ export function DATClientOverview() {
 					</div>
 				) : (
 					<div style={{ marginTop: "16px" }}>
-						<TBAdherenceTable
+						<DATClientTable
 							patients={patients}
 							pagination={pagination}
 							loading={loading}

@@ -11,7 +11,21 @@ import { FullPageLoader } from "../../../shared/components/Loaders";
 import { head, isEmpty } from "lodash";
 import { useNavigate, useSearchParams } from "react-router-dom";
 
-import { AdherenceTableProps } from ".";
+import { PatientProfile } from "../../../shared/models";
+import { Pagination } from "@hisptz/dhis2-utils";
+
+export interface DATAssignmentTableProps {
+	loading: boolean;
+	patients: PatientProfile[];
+	pagination: Pagination;
+	onSort: (sort: any) => void;
+	sortState:
+		| {
+				name: string;
+				direction: "desc" | "default" | "asc";
+		  }
+		| undefined;
+}
 
 export default function DATAssignmentTable({
 	loading,
@@ -19,7 +33,7 @@ export default function DATAssignmentTable({
 	pagination,
 	onSort,
 	sortState,
-}: AdherenceTableProps) {
+}: DATAssignmentTableProps) {
 	const [DATAssignment] = useSetting("DATAssignment", { global: true });
 
 	const navigate = useNavigate();
@@ -34,7 +48,7 @@ export default function DATAssignmentTable({
 		const row = patients.find((patient) => patient.id === id);
 
 		if (row) {
-			await navigate(`/dat-client-overview/${row.id}`);
+			await navigate(`/dat-assignment/${row.id}`);
 
 			setParams(() => {
 				const updatedParams = new URLSearchParams();
