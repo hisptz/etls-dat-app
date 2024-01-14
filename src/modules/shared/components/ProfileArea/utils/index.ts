@@ -3,6 +3,7 @@ import axios from "axios";
 import { useState, useEffect, useCallback } from "react";
 import { DATA_ELEMENTS } from "../../../constants";
 import { useSearchParams } from "react-router-dom";
+import { getProgramMapping } from "../../../utils";
 
 export const useDeviceData = (imei?: string) => {
 	const [programMapping] = useSetting("programMapping", { global: true });
@@ -12,10 +13,7 @@ export const useDeviceData = (imei?: string) => {
 	const [params] = useSearchParams();
 	const currentProgram = params.get("program");
 
-	const selectedProgram = programMapping.filter(
-		(mapping: any) => mapping.program === currentProgram,
-	);
-	const program = selectedProgram[0];
+	const program = getProgramMapping(programMapping, currentProgram);
 	const MediatorUrl = program?.mediatorUrl;
 	const ApiKey = program?.apiKey;
 

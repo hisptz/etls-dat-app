@@ -11,6 +11,7 @@ import { useAdherenceEvents } from "./utils";
 import { useSetting } from "@dhis2/app-service-datastore";
 import { useSearchParams } from "react-router-dom";
 import BatteryLevel from "../BatteryLevel/BatteryLevel";
+import { getProgramMapping } from "../../utils";
 
 export interface ProfileAreaProps {
 	profile: PatientProfile;
@@ -39,14 +40,11 @@ export function ProfileArea({
 	});
 	const currentProgram = params.get("program");
 
-	const selectedProgram = programMapping.filter(
-		(mapping: any) => mapping.name === currentProgram,
-	);
-	const program = selectedProgram[0];
+	const program = getProgramMapping(programMapping, currentProgram);
 
 	const { filteredEvents } = useAdherenceEvents(
 		profile.events,
-		program?.programStage,
+		program?.programStage ?? "",
 	);
 
 	const onHide = () => {

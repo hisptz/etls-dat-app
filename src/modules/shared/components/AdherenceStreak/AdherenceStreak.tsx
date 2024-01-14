@@ -292,7 +292,7 @@ function AdherenceStreak({ events, frequency }: CalendarProps) {
 				</div>
 			) : frequency === "Weekly" ? (
 				<div className={styles["calendar-week"]}>
-					{renderWeeklyCalendar()}
+					{renderDailyCalendar()}
 				</div>
 			) : (
 				<div className={styles["calendar-monthly"]}>
