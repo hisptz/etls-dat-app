@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
 	Button,
 	Modal,
@@ -10,13 +10,13 @@ import {
 	Checkbox,
 } from "@dhis2/ui";
 import i18n from "@dhis2/d2-i18n";
-import styles from "./ProfileArea.module.css";
 import { FilterField } from "../../../Configuration/components/ProgramMapping/components/FilterField";
 import { FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useSetAlarm } from "../utils/assignAlarm";
 import { useAlert } from "@dhis2/app-runtime";
+import { isEmpty } from "lodash";
 
 interface addAlarmProps {
 	nextRefillTime: string;
@@ -30,16 +30,6 @@ interface addAlarmProps {
 	device: string;
 }
 
-export const daysInWeek: any = [
-	{ name: "Sun", code: "1" },
-	{ name: "Mon", code: "2" },
-	{ name: "Tue", code: "3" },
-	{ name: "Wed", code: "4" },
-	{ name: "Thur", code: "5" },
-	{ name: "Fri", code: "6" },
-	{ name: "Sat", code: "7" },
-];
-
 function EditAlarm({
 	nextRefillTime,
 	nextRefillDate,
@@ -52,33 +42,54 @@ function EditAlarm({
 	device,
 }: addAlarmProps) {
 	const { setAlarm } = useSetAlarm();
-	const [doseReminder, setDoseReminder] = useState<boolean>(false);
-	const [appointmentReminder, setAppointmentReminder] =
-		useState<boolean>(false);
+	const [doseReminder, setDoseReminder] = useState<boolean>();
+	const [appointmentReminder, setAppointmentReminder] = useState<boolean>();
+
+	const [daysInWeek, setDaysInWeek] = useState<any[]>([
+		{ name: "Sun", code: "1", checked: false },
+		{ name: "Mon", code: "2", checked: false },
+		{ name: "Tue", code: "3", checked: false },
+		{ name: "Wed", code: "4", checked: false },
+		{ name: "Thur", code: "5", checked: false },
+		{ name: "Fri", code: "6", checked: false },
+		{ name: "Sat", code: "7", checked: false },
+	]);
+
+	useEffect(() => {
+		setDoseReminder(isEmpty(nextDoseTime) ? false : true);
+		setAppointmentReminder(
+			isEmpty(nextRefillDate) && isEmpty(nextRefillTime) ? false : true,
+		);
+		const defaultDays = dayInWeek.split("");
+
+		setDaysInWeek(() =>
+			defaultDays.map((day, index) =>
+				day === "1"
+					? { ...daysInWeek[index], checked: true }
+					: { ...daysInWeek[index], checked: false },
+			),
+		);
+	}, []);
 
 	const schema = z.object({
-		dayInWeek:
-			frequency == "Weekly"
-				? z
-						.string({
-							required_error: "Day of the Dose is required",
-						})
-						.nonempty("Day of the Dose is required")
-				: z.string(),
 		nextDoseTime:
-			frequency == "Monthly"
+			frequency == "Monthly" || !doseReminder
 				? z.string()
 				: z
 						.string({
 							required_error: "Next Dose Time is required",
 						})
 						.nonempty("Next Dose Time is required"),
-		nextRefillDate: z
-			.string({ required_error: "Next Refill Date is required" })
-			.nonempty("Next Refill Date is required"),
-		nextRefillTime: z
-			.string({ required_error: "Next Refill Time is required" })
-			.nonempty("Next Refill Time is required"),
+		nextRefillDate: !appointmentReminder
+			? z.string()
+			: z
+					.string({ required_error: "Next Refill Date is required" })
+					.nonempty("Next Refill Date is required"),
+		nextRefillTime: !appointmentReminder
+			? z.string()
+			: z
+					.string({ required_error: "Next Refill Time is required" })
+					.nonempty("Next Refill Time is required"),
 	});
 
 	type AlarmFormData = z.infer<typeof schema>;
@@ -88,34 +99,26 @@ function EditAlarm({
 		({ type }) => ({ ...type, duration: 4000 }),
 	);
 
-	const dayIndex = dayInWeek.indexOf("1");
-	const selectedDay = daysInWeek[dayIndex]?.code;
+	function generateDays(daysInWeek: any[]) {
+		const codeString: string[] = [];
+		daysInWeek.map((day: any) => {
+			day.checked ? codeString.push("1") : codeString.push("0");
+		});
 
-	function generateDays(selectedCode: string) {
-		const codeArray = Array(7).fill("0");
-		const selectedIndex = daysInWeek.findIndex(
-			(day) => day.code === selectedCode,
-		);
-
-		if (selectedIndex !== -1) {
-			codeArray[selectedIndex] = "1";
-		}
-		const codeString = codeArray.join("");
-
-		return codeString;
+		return codeString.join("");
 	}
 
 	const onSubmit = async (data: AlarmFormData) => {
 		const alarmData = {
 			imei: device,
-			alarm: frequency != "Monthly" ? data.nextDoseTime : null,
-			refillAlarm: data.nextRefillDate + " " + data.nextRefillTime,
-			days:
-				frequency == "Daily"
-					? "1111111"
-					: frequency == "Weekly"
-					? generateDays(data.dayInWeek)
+			alarm:
+				frequency != "Monthly" && doseReminder
+					? data.nextDoseTime
 					: null,
+			refillAlarm: appointmentReminder
+				? data.nextRefillDate + " " + data.nextRefillTime
+				: null,
+			days: doseReminder ? generateDays(daysInWeek) : null,
 		};
 
 		await setAlarm({ data: alarmData }).then(async (res) => {
@@ -146,13 +149,12 @@ function EditAlarm({
 		defaultValues: {
 			nextRefillDate: nextRefillDate,
 			nextRefillTime: nextRefillTime,
-			dayInWeek: selectedDay,
 			nextDoseTime: nextDoseTime,
 		},
 		resolver: zodResolver(schema),
 	});
 
-	const alarmDays = (day: string, checked: boolean) => {
+	const alarmDays = (day: string, code: string, checked: boolean) => {
 		return (
 			<div
 				style={{
@@ -164,7 +166,13 @@ function EditAlarm({
 				<Checkbox
 					checked={checked}
 					onChange={() => {
-						null;
+						setDaysInWeek(() =>
+							daysInWeek.map((day) =>
+								day.code === code
+									? { ...day, checked: !checked }
+									: { ...day },
+							),
+						);
 					}}
 				/>
 				<span style={{ marginTop: "2px" }}>{i18n.t(day)}</span>
@@ -271,6 +279,7 @@ function EditAlarm({
 											return alarmDays(
 												day.name,
 												day.code,
+												day.checked,
 											);
 										})}
 									</div>

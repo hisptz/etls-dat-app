@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2024-01-11T09:28:07.832Z\n"
-"PO-Revision-Date: 2024-01-11T09:28:07.832Z\n"
+"POT-Creation-Date: 2024-01-14T17:31:22.482Z\n"
+"PO-Revision-Date: 2024-01-14T17:31:22.482Z\n"
 
 msgid "Configurations"
 msgstr "Configurations"
@@ -122,8 +122,8 @@ msgstr "Regimen Setting Form"
 msgid "Administration"
 msgstr "Administration"
 
-msgid "Number of Dosess"
-msgstr "Number of Dosess"
+msgid "Number Of Doses"
+msgstr "Number Of Doses"
 
 msgid "Regimens Settings not found"
 msgstr "Regimens Settings not found"
@@ -291,20 +291,36 @@ msgstr "Edit"
 msgid "Reload"
 msgstr "Reload"
 
-msgid "Set Device Alarm"
-msgstr "Set Device Alarm"
+msgid "Set Alarms"
+msgstr "Set Alarms"
 
-msgid "Select Day of the Dose"
-msgstr "Select Day of the Dose"
+msgid "Dose Reminder"
+msgstr "Dose Reminder"
 
-msgid "Time"
-msgstr "Time"
+msgid "Set a daily or weekly alarm based on the appropriate treatment regimen"
+msgstr "Set a daily or weekly alarm based on the appropriate treatment regimen"
 
-msgid "Next Dose Time"
-msgstr "Next Dose Time"
+msgid "Alarm Time"
+msgstr "Alarm Time"
+
+msgid "Alarm Day(s)"
+msgstr "Alarm Day(s)"
+
+msgid "Appointment Reminder"
+msgstr "Appointment Reminder"
+
+msgid ""
+"Set a reminder for an upcoming appointment or refill. Each new reminder "
+"must be set manually"
+msgstr ""
+"Set a reminder for an upcoming appointment or refill. Each new reminder "
+"must be set manually"
 
 msgid "Next Refill Date"
 msgstr "Next Refill Date"
+
+msgid "Time"
+msgstr "Time"
 
 msgid "Assign the device number, or click clear to clear previous device"
 msgstr "Assign the device number, or click clear to clear previous device"
