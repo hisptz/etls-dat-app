@@ -10,6 +10,8 @@ export interface BatteryLevelProps {
 function BatteryLevel({ device, batteryLevel }: BatteryLevelProps) {
 	const { data, loadingDevice } = useDeviceData(device);
 
+	// TODO update this to the millivolts mapping
+
 	let color;
 	const battery = batteryLevel ?? data?.batteryLevel ?? 0;
 

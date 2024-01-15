@@ -20,6 +20,7 @@
 		"prepare": "husky install"
 	},
 	"devDependencies": {
+		"@babel/plugin-proposal-private-property-in-object": "^7.21.11",
 		"@badeball/cypress-cucumber-preprocessor": "^18.0.6",
 		"@cucumber/cucumber": "^9.4.0",
 		"@cypress/react": "^7.0.3",
