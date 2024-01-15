@@ -19,6 +19,7 @@ import { useAdherenceEvents } from "../../../shared/components/ProfileArea/utils
 import { Pagination } from "@hisptz/dhis2-utils";
 import BatteryLevel from "../../../shared/components/BatteryLevel/BatteryLevel";
 import { getProgramMapping } from "../../../shared/utils";
+import { RegimenSetting } from "../../../shared/constants";
 
 export interface DATClientTableProps {
 	loading: boolean;
@@ -41,6 +42,9 @@ export default function DATClientTable({
 	sortState,
 }: DATClientTableProps) {
 	const [TBAdherence] = useSetting("TBAdherence", { global: true });
+	const [regimenSettings] = useSetting("regimenSetting", {
+		global: true,
+	});
 
 	const navigate = useNavigate();
 	const [programMapping] = useSetting("programMapping", {
@@ -60,6 +64,41 @@ export default function DATClientTable({
 			);
 		}
 	};
+
+	function getOverallAdherence(patient: PatientProfile) {
+		const { filteredEvents } = useAdherenceEvents(
+			patient.events,
+			mapping?.programStage ?? "",
+		);
+
+		const takenDoses = filteredEvents.filter((item: any) => {
+			return item.dataValues.some((dataValue: any) => {
+				const value = dataValue.value;
+				return value === "Once" || value === "Multiple";
+			});
+		});
+
+		const noOfSignals = takenDoses.length;
+
+		const percentage = !isEmpty(regimenSettings)
+			? regimenSettings.map((option: RegimenSetting) => {
+					if (option.administration === patient.adherenceFrequency) {
+						return (
+							(
+								(noOfSignals / parseInt(option.numberOfDoses)) *
+								100
+							).toFixed(2) + "%"
+						);
+					} else {
+						return "N/A";
+					}
+			  })
+			: "N/A";
+
+		const overallAdherence = percentage != "N/A" ? head(percentage) : "N/A";
+
+		return overallAdherence;
+	}
 
 	function getAdherenceStreak(patient: PatientProfile) {
 		const { filteredEvents } = useAdherenceEvents(
@@ -115,6 +154,8 @@ export default function DATClientTable({
 									...(patient.tableData as CustomDataTableRow),
 									adherenceStreak:
 										getAdherenceStreak(patient),
+									overallAdherence:
+										getOverallAdherence(patient),
 									battery: (
 										<BatteryLevel
 											device={patient.deviceIMEINumber}

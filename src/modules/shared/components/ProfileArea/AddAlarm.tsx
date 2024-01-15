@@ -111,11 +111,8 @@ function EditAlarm({
 	const onSubmit = async (data: AlarmFormData) => {
 		const alarmData = {
 			imei: device,
-			alarm:
-				frequency != "Monthly" && doseReminder ? data.nextDoseTime : "",
-			refillAlarm: appointmentReminder
-				? data.nextRefillDate + " " + data.nextRefillTime
-				: "",
+			alarm: data.nextDoseTime,
+			refillAlarm: data.nextRefillDate + " " + data.nextRefillTime,
 			days: generateDays(daysInWeek),
 		};
 
@@ -163,6 +160,7 @@ function EditAlarm({
 			>
 				<Checkbox
 					checked={checked}
+					disabled={!doseReminder}
 					onChange={() => {
 						setDaysInWeek(() =>
 							daysInWeek.map((day) =>
@@ -252,6 +250,7 @@ function EditAlarm({
 									name="nextDoseTime"
 									type="time"
 									width="170px"
+									disabled={!doseReminder}
 								/>
 								<div
 									style={{
@@ -350,12 +349,14 @@ function EditAlarm({
 										label={i18n.t("Next Refill Date")}
 										name="nextRefillDate"
 										type="date"
+										disabled={!appointmentReminder}
 									/>
 								</div>
 								<FilterField
 									label={i18n.t("Time")}
 									name="nextRefillTime"
 									type="time"
+									disabled={!appointmentReminder}
 								/>
 							</div>
 						</div>
