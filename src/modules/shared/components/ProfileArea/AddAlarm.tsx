@@ -112,13 +112,11 @@ function EditAlarm({
 		const alarmData = {
 			imei: device,
 			alarm:
-				frequency != "Monthly" && doseReminder
-					? data.nextDoseTime
-					: null,
+				frequency != "Monthly" && doseReminder ? data.nextDoseTime : "",
 			refillAlarm: appointmentReminder
 				? data.nextRefillDate + " " + data.nextRefillTime
-				: null,
-			days: doseReminder ? generateDays(daysInWeek) : null,
+				: "",
+			days: generateDays(daysInWeek),
 		};
 
 		await setAlarm({ data: alarmData }).then(async (res) => {

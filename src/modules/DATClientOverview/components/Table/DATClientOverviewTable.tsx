@@ -18,6 +18,7 @@ import { useAdherenceEvents } from "../../../shared/components/ProfileArea/utils
 
 import { Pagination } from "@hisptz/dhis2-utils";
 import BatteryLevel from "../../../shared/components/BatteryLevel/BatteryLevel";
+import { getProgramMapping } from "../../../shared/utils";
 
 export interface DATClientTableProps {
 	loading: boolean;
@@ -45,34 +46,25 @@ export default function DATClientTable({
 	const [programMapping] = useSetting("programMapping", {
 		global: true,
 	});
-	const [params, setParams] = useSearchParams();
-	const currentProgram =
-		params.get("program") ?? (head(programMapping) as any)?.program ?? "";
+	const [params] = useSearchParams();
+	const currentProgram = params.get("program");
 
-	const selectedProgram = programMapping.filter(
-		(mapping: any) => mapping.program === currentProgram,
-	);
-	const program = selectedProgram[0];
+	const mapping = getProgramMapping(programMapping, currentProgram);
 
 	const onRowClick = async (id: string) => {
 		const row = patients.find((patient) => patient.id === id);
 
 		if (row) {
-			await navigate(`/dat-client-overview/${row.id}`);
-
-			setParams(() => {
-				const updatedParams = new URLSearchParams();
-				updatedParams.set("program", currentProgram ?? "");
-
-				return updatedParams;
-			});
+			await navigate(
+				`/dat-client-overview/${row.id}?program=${currentProgram}`,
+			);
 		}
 	};
 
 	function getAdherenceStreak(patient: PatientProfile) {
 		const { filteredEvents } = useAdherenceEvents(
 			patient.events,
-			program?.programStage,
+			mapping?.programStage ?? "",
 		);
 
 		const adherenceEvents = filteredEvents.map((item: any) => {

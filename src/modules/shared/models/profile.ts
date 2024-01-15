@@ -56,9 +56,9 @@ export class PatientProfile extends TrackedEntityModel {
 
 	get enrollmentDate(): string {
 		return (
-			DateTime.fromISO(
-				this.enrollment?.enrolledAt as string,
-			).toISODate() ?? ""
+			DateTime.fromISO(this.enrollment?.enrolledAt as string).toFormat(
+				"dd/MM/yyyy",
+			) ?? ""
 		);
 	}
 
@@ -124,7 +124,7 @@ export class PatientProfile extends TrackedEntityModel {
 		const deviceHealth = this.deviceHealth;
 		const batteryHealth = this.batteryHealth;
 		const dosageTime = this.dosageTime;
-		const enrollmentDate = this.enrollmentDate;
+		const treatmentStart = this.enrollmentDate;
 		const deviceSignal = this.deviceSignal;
 		const orgUnit = this.organisationUnit;
 
@@ -142,7 +142,7 @@ export class PatientProfile extends TrackedEntityModel {
 			deviceHealth,
 			batteryHealth,
 			dosageTime,
-			enrollmentDate,
+			treatmentStart,
 			deviceSignal,
 		};
 	}

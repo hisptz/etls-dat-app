@@ -161,6 +161,7 @@ export function useDATClientTableData() {
 			startDate,
 			filters,
 			orgUnit,
+			order: "enrolledAt:desc",
 		},
 
 		lazy: !mapping,
@@ -227,21 +228,30 @@ export function useDATClientTableData() {
 
 	const onSort = (sort: any) => {
 		if (sort.direction === "default") {
-			const columnId = mapping.attributes
-				? mapping.attributes[sort.name]
-				: "";
+			const columnId =
+				sort.name === "treatmentStart"
+					? "enrolledAt"
+					: mapping.attributes
+					? mapping.attributes[sort.name]
+					: "";
 			refetch({ order: `${columnId}:asc` });
 		}
 
 		if (sort.direction === "asc") {
-			const columnId = mapping.attributes
-				? mapping.attributes[sort.name]
-				: "";
+			const columnId =
+				sort.name === "treatmentStart"
+					? "enrolledAt"
+					: mapping.attributes
+					? mapping.attributes[sort.name]
+					: "";
 			refetch({ order: `${columnId}:asc` });
 		} else {
-			const columnId = mapping.attributes
-				? mapping.attributes[sort.name]
-				: "";
+			const columnId =
+				sort.name === "treatmentStart"
+					? "enrolledAt"
+					: mapping.attributes
+					? mapping.attributes[sort.name]
+					: "";
 			refetch({ order: `${columnId}:desc` });
 		}
 		setSortState(sort);

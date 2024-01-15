@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2024-01-14T17:31:22.482Z\n"
-"PO-Revision-Date: 2024-01-14T17:31:22.482Z\n"
+"POT-Creation-Date: 2024-01-15T05:40:34.808Z\n"
+"PO-Revision-Date: 2024-01-15T05:40:34.808Z\n"
 
 msgid "Configurations"
 msgstr "Configurations"
@@ -171,8 +171,8 @@ msgstr "N/A"
 msgid "Dose Taken at"
 msgstr "Dose Taken at"
 
-msgid "Battery Level"
-msgstr "Battery Level"
+msgid "Battery Health"
+msgstr "Battery Health"
 
 msgid "Instance ID is required"
 msgstr "Instance ID is required"
@@ -354,6 +354,9 @@ msgstr "Assigned Device"
 
 msgid "Total Openings"
 msgstr "Total Openings"
+
+msgid "Battery Level"
+msgstr "Battery Level"
 
 msgid "Next dose Alarm"
 msgstr "Next dose Alarm"

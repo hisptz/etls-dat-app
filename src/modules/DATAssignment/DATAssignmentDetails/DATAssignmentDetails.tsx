@@ -58,7 +58,7 @@ export function DATAssignmentDetails() {
 			<div className="column gap-16">
 				<div>
 					<Button
-						onClick={() => navigate(-2)}
+						onClick={() => navigate(-1)}
 						icon={<IconArrowLeft24 />}
 					>
 						{i18n.t("Back")}

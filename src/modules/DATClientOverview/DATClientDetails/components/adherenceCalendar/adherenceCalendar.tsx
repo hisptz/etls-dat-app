@@ -9,6 +9,7 @@ import { DateTime } from "luxon";
 import { useSetting } from "@dhis2/app-service-datastore";
 import { useSearchParams } from "react-router-dom";
 import { getProgramMapping } from "../../../../shared/utils";
+import BatteryLevel from "../../../../shared/components/BatteryLevel/BatteryLevel";
 
 export interface ProfileAreaProps {
 	profile: PatientProfile;
@@ -238,13 +239,20 @@ function AdherenceCalendar({ profile, data }: ProfileAreaProps) {
 									className={styles["label-value"]}
 									htmlFor="value"
 								>
-									{eventCode == "green" || eventCode == "blue"
-										? batteryLevel === undefined
-											? "N/A"
-											: batteryLevel !== ""
-											? batteryLevel + "%"
-											: "N/A"
-										: i18n.t("N/A")}
+									{eventCode == "green" ||
+									eventCode == "blue" ? (
+										batteryLevel === undefined ? (
+											"N/A"
+										) : batteryLevel !== "" ? (
+											<BatteryLevel
+												batteryLevel={batteryLevel}
+											/>
+										) : (
+											"N/A"
+										)
+									) : (
+										i18n.t("N/A")
+									)}
 								</label>
 							</div>
 						</div>

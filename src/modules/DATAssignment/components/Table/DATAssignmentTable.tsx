@@ -8,7 +8,7 @@ import { Card } from "@dhis2/ui";
 import i18n from "@dhis2/d2-i18n";
 import { useSetting } from "@dhis2/app-service-datastore";
 import { FullPageLoader } from "../../../shared/components/Loaders";
-import { head, isEmpty } from "lodash";
+import { isEmpty } from "lodash";
 import { useNavigate, useSearchParams } from "react-router-dom";
 
 import { PatientProfile } from "../../../shared/models";
@@ -37,25 +37,17 @@ export default function DATAssignmentTable({
 	const [DATAssignment] = useSetting("DATAssignment", { global: true });
 
 	const navigate = useNavigate();
-	const [programMapping] = useSetting("programMapping", {
-		global: true,
-	});
-	const [params, setParams] = useSearchParams();
-	const currentProgram =
-		params.get("program") ?? (head(programMapping) as any)?.program ?? "";
+
+	const [params] = useSearchParams();
+	const currentProgram = params.get("program");
 
 	const onRowClick = async (id: string) => {
 		const row = patients.find((patient) => patient.id === id);
 
 		if (row) {
-			await navigate(`/dat-assignment/${row.id}`);
-
-			setParams(() => {
-				const updatedParams = new URLSearchParams();
-				updatedParams.set("program", currentProgram ?? "");
-
-				return updatedParams;
-			});
+			await navigate(
+				`/dat-assignment/${row.id}?program=${currentProgram}`,
+			);
 		}
 	};
 

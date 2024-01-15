@@ -254,7 +254,7 @@ export function ProfileArea({
 										setDayInWeek(data?.alarmDays ?? "");
 									}}
 								>
-									{i18n.t("Set Alarm")}
+									{i18n.t("Set Alarms")}
 								</Button>
 							)}
 						</ButtonStrip>

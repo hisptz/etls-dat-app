@@ -4,22 +4,22 @@ import { DateTime } from "luxon";
 
 export function getDefaultDATOverviewFilters() {
 	const endDate = DateTime.now();
-	const startDate = endDate.minus({ year: 1 });
+	const startDate = endDate.minus({ year: 5 }).toFormat("yyyy-MM-dd");
 	const [programMapping] = useSetting("programMapping", { global: true });
 	const defaultProgram = head(programMapping)?.program;
 	return new URLSearchParams({
 		// TODO remove the date
-		startDate: startDate.toFormat("yyyy-MM-dd"),
+		startDate: "2020-01-01",
 		program: defaultProgram ?? "",
 	});
 }
 
 export function getResetDATOverviewFilters(program?: string) {
 	const endDate = DateTime.now();
-	const startDate = endDate.minus({ year: 1 });
+	const startDate = endDate.minus({ year: 5 }).toFormat("yyyy-MM-dd");
 	return new URLSearchParams({
 		// TODO remove the date
-		startDate: startDate.toFormat("yyyy-MM-dd"),
+		startDate: "2020-01-01",
 		program: program ?? "",
 	});
 }
