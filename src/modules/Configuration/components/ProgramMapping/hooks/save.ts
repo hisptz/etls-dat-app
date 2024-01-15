@@ -1,7 +1,178 @@
 import { useDataMutation } from "@dhis2/app-runtime";
 import { useSetting } from "@dhis2/app-service-datastore";
 import { useSearchParams } from "react-router-dom";
-import { DATA_ELEMENTS, ProgramMapping } from "../../../../shared/constants";
+import {
+	DATA_ELEMENTS,
+	ProgramMapping,
+	TRACKED_ENTITY_ATTRIBUTES,
+} from "../../../../shared/constants";
+
+function getMigrationMetadataObject(mapping: any): any {
+	return {
+		programStages: [
+			{
+				id: mapping.programStage,
+				name: "DAT-Adherence Records",
+				repeatable: true,
+				program: {
+					id: mapping.program ?? null,
+				},
+				programStageDataElements: [
+					{
+						dataElement: {
+							id: DATA_ELEMENTS.DEVICE_HEALTH,
+						},
+					},
+					{
+						dataElement: {
+							id: DATA_ELEMENTS.BATTERY_HEALTH,
+						},
+					},
+					{
+						dataElement: {
+							id: DATA_ELEMENTS.DOSAGE_TIME,
+						},
+					},
+					{
+						dataElement: {
+							id: DATA_ELEMENTS.DEVICE_SIGNAL,
+						},
+					},
+				],
+			},
+		],
+		dataElements: [
+			{
+				code: "WISE_PILL_001",
+				id: DATA_ELEMENTS.DEVICE_HEALTH,
+				name: "Device health",
+				shortName: "Device health",
+				aggregationType: "NONE",
+				domainType: "TRACKER",
+				valueType: "TEXT",
+			},
+			{
+				code: "WISE_PILL_002",
+				id: DATA_ELEMENTS.BATTERY_HEALTH,
+				name: "Battery health",
+				shortName: "Battery health",
+				aggregationType: "NONE",
+				domainType: "TRACKER",
+				valueType: "NUMBER",
+			},
+			{
+				code: "WISE_PILL_003",
+				id: DATA_ELEMENTS.DOSAGE_TIME,
+				name: "Dosage time",
+				shortName: "Dosage time",
+				aggregationType: "NONE",
+				domainType: "TRACKER",
+				valueType: "DATETIME",
+			},
+			{
+				code: "WISE_PILL_004",
+				id: DATA_ELEMENTS.DEVICE_SIGNAL,
+				name: "Device signal",
+				shortName: "Device signal",
+				aggregationType: "NONE",
+				domainType: "TRACKER",
+				valueType: "TEXT",
+				optionSet: {
+					id: "lpMwLxkJor6",
+				},
+			},
+		],
+		trackedEntityAttributes: [
+			{
+				id: TRACKED_ENTITY_ATTRIBUTES.EPISODE_ID,
+				code: "WISE_PILL_005",
+				name: "Episode ID",
+				shortName: "Episode ID",
+				description: "Unique identifier for each wisepill episode",
+				valueType: "TEXT",
+				aggregationType: "NONE",
+				displayOnVisitSchedule: false,
+				displayInListNoProgram: false,
+				confidential: false,
+				unique: true,
+				generated: false,
+			},
+			{
+				id: TRACKED_ENTITY_ATTRIBUTES.DEVICE_IMEI,
+				code: "WISE_PILL_006",
+				name: "Device IMEI",
+				shortName: "Device IMEI",
+				description: "Wisepill device IMEI number",
+				valueType: "TEXT",
+				aggregationType: "NONE",
+				displayOnVisitSchedule: false,
+				displayInListNoProgram: false,
+				confidential: false,
+				unique: true,
+				generated: false,
+			},
+		],
+		optionSets: [
+			{
+				id: "lpMwLxkJor6",
+				name: "Device signal",
+				valueType: "TEXT",
+				options: [
+					{
+						id: "rzRYYkh8jaq",
+					},
+					{
+						id: "bXCWzsKQiIe",
+					},
+					{
+						id: "J4u3MgT8ll3",
+					},
+					{
+						id: "rqvQqekCxF3",
+					},
+				],
+			},
+		],
+		options: [
+			{
+				id: "rzRYYkh8jaq",
+				code: "Once",
+				name: "Opened Once",
+				sortOrder: 1,
+				optionSet: {
+					id: "lpMwLxkJor6",
+				},
+			},
+			{
+				id: "bXCWzsKQiIe",
+				code: "Multiple",
+				name: "Opened Multiple",
+				sortOrder: 2,
+				optionSet: {
+					id: "lpMwLxkJor6",
+				},
+			},
+			{
+				id: "J4u3MgT8ll3",
+				code: "None",
+				name: "None",
+				sortOrder: 3,
+				optionSet: {
+					id: "lpMwLxkJor6",
+				},
+			},
+			{
+				id: "rqvQqekCxF3",
+				code: "Heartbeat",
+				name: "Heartbeat",
+				sortOrder: 4,
+				optionSet: {
+					id: "lpMwLxkJor6",
+				},
+			},
+		],
+	};
+}
 
 export function useProgramMapping() {
 	const [params] = useSearchParams();
@@ -79,7 +250,7 @@ export function generateUid() {
 }
 
 export function useProgramStage() {
-	const createProgramStage: any = {
+	const migrateMetadata: any = {
 		type: "create",
 		resource: "metadata",
 		data: ({ data }: any) => data,
@@ -94,146 +265,13 @@ export function useProgramStage() {
 		async: false,
 	};
 
-	const [mutate, { loading, error }] = useDataMutation(createProgramStage);
+	const [mutate, { loading, error }] = useDataMutation(migrateMetadata);
 
 	const handleImportProgramStage = async (mapping: any) => {
-		const programStage = {
-			programStages: [
-				{
-					id: mapping.programStage,
-					name: "DAT-Adherence Records",
-					repeatable: true,
-					program: {
-						id: mapping.program ?? null,
-					},
-					programStageDataElements: [
-						{
-							dataElement: {
-								id: DATA_ELEMENTS.DEVICE_HEALTH,
-							},
-						},
-						{
-							dataElement: {
-								id: DATA_ELEMENTS.BATTERY_HEALTH,
-							},
-						},
-						{
-							dataElement: {
-								id: DATA_ELEMENTS.DOSAGE_TIME,
-							},
-						},
-						{
-							dataElement: {
-								id: DATA_ELEMENTS.DEVICE_SIGNAL,
-							},
-						},
-					],
-				},
-			],
-			dataElements: [
-				{
-					code: "WISE_PILL_001",
-					id: DATA_ELEMENTS.DEVICE_HEALTH,
-					name: "Device health",
-					shortName: "Device health",
-					aggregationType: "NONE",
-					domainType: "TRACKER",
-					valueType: "TEXT",
-				},
-				{
-					code: "WISE_PILL_002",
-					id: DATA_ELEMENTS.BATTERY_HEALTH,
-					name: "Battery health",
-					shortName: "Battery health",
-					aggregationType: "NONE",
-					domainType: "TRACKER",
-					valueType: "NUMBER",
-				},
-				{
-					code: "WISE_PILL_003",
-					id: DATA_ELEMENTS.DOSAGE_TIME,
-					name: "Dosage time",
-					shortName: "Dosage time",
-					aggregationType: "NONE",
-					domainType: "TRACKER",
-					valueType: "DATETIME",
-				},
-				{
-					code: "WISE_PILL_004",
-					id: DATA_ELEMENTS.DEVICE_SIGNAL,
-					name: "Device signal",
-					shortName: "Device signal",
-					aggregationType: "NONE",
-					domainType: "TRACKER",
-					valueType: "TEXT",
-					optionSet: {
-						id: "lpMwLxkJor6",
-					},
-				},
-			],
-			optionSets: [
-				{
-					id: "lpMwLxkJor6",
-					name: "Device signal",
-					valueType: "TEXT",
-					options: [
-						{
-							id: "rzRYYkh8jaq",
-						},
-						{
-							id: "bXCWzsKQiIe",
-						},
-						{
-							id: "J4u3MgT8ll3",
-						},
-						{
-							id: "rqvQqekCxF3",
-						},
-					],
-				},
-			],
-			options: [
-				{
-					id: "rzRYYkh8jaq",
-					code: "Once",
-					name: "Opened Once",
-					sortOrder: 1,
-					optionSet: {
-						id: "lpMwLxkJor6",
-					},
-				},
-				{
-					id: "bXCWzsKQiIe",
-					code: "Multiple",
-					name: "Opened Multiple",
-					sortOrder: 2,
-					optionSet: {
-						id: "lpMwLxkJor6",
-					},
-				},
-				{
-					id: "J4u3MgT8ll3",
-					code: "None",
-					name: "None",
-					sortOrder: 3,
-					optionSet: {
-						id: "lpMwLxkJor6",
-					},
-				},
-				{
-					id: "rqvQqekCxF3",
-					code: "Heartbeat",
-					name: "Heartbeat",
-					sortOrder: 4,
-					optionSet: {
-						id: "lpMwLxkJor6",
-					},
-				},
-			],
-		};
+		const metadata = getMigrationMetadataObject(mapping);
 		if (mapping) {
 			const res = await mutate({
-				data: programStage,
+				data: metadata,
 			});
 
 			return {
