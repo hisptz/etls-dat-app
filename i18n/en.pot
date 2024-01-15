@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2023-12-18T02:59:34.677Z\n"
-"PO-Revision-Date: 2023-12-18T02:59:34.677Z\n"
+"POT-Creation-Date: 2024-01-15T11:15:13.013Z\n"
+"PO-Revision-Date: 2024-01-15T11:15:13.013Z\n"
 
 msgid "Configurations"
 msgstr "Configurations"
@@ -122,98 +122,14 @@ msgstr "Regimen Setting Form"
 msgid "Administration"
 msgstr "Administration"
 
-msgid "Number of Dosess"
-msgstr "Number of Dosess"
+msgid "Number Of Doses"
+msgstr "Number Of Doses"
 
 msgid "Regimens Settings not found"
 msgstr "Regimens Settings not found"
 
-msgid "Dashboards"
-msgstr "Dashboards"
-
-msgid "Configured visualization does not exist"
-msgstr "Configured visualization does not exist"
-
-msgid "Total number of clients"
-msgstr "Total number of clients"
-
-msgid "Total number of devices"
-msgstr "Total number of devices"
-
-msgid "Clients registered with devices"
-msgstr "Clients registered with devices"
-
-msgid "Enrolled Patients"
-msgstr "Enrolled Patients"
-
-msgid "There are no dashboard configurations found!"
-msgstr "There are no dashboard configurations found!"
-
-msgid "Add filters"
-msgstr "Add filters"
-
-msgid "Filters"
-msgstr "Filters"
-
-msgid "Period"
-msgstr "Period"
-
-msgid "Organisation Unit"
-msgstr "Organisation Unit"
-
-msgid "Reports"
-msgstr "Reports"
-
-msgid "Excel"
-msgstr "Excel"
-
-msgid "CSV"
-msgstr "CSV"
-
-msgid "JSON"
-msgstr "JSON"
-
-msgid "Loading..."
-msgstr "Loading..."
-
-msgid "Report Types"
-msgstr "Report Types"
-
-msgid "Report"
-msgstr "Report"
-
-msgid "Organisation units"
-msgstr "Organisation units"
-
-msgid "Periods"
-msgstr "Periods"
-
-msgid "There is no report data for the selected filters"
-msgstr "There is no report data for the selected filters"
-
-msgid "There are no program mappings set, please go to configurations"
-msgstr "There are no program mappings set, please go to configurations"
-
-msgid "Something went wrong"
-msgstr "Something went wrong"
-
-msgid "The page you are looking for does not exist."
-msgstr "The page you are looking for does not exist."
-
-msgid "Go to home page"
-msgstr "Go to home page"
-
-msgid "Treatment Adherence"
-msgstr "Treatment Adherence"
-
-msgid "Configuration"
-msgstr "Configuration"
-
-msgid "DAT Device lists"
-msgstr "DAT Device lists"
-
-msgid "Regimen Settings"
-msgstr "Regimen Settings"
+msgid "DAT Assignment"
+msgstr "DAT Assignment"
 
 msgid ""
 "Program Mappings are not configured. Please click the link below to go to "
@@ -221,6 +137,9 @@ msgid ""
 msgstr ""
 "Program Mappings are not configured. Please click the link below to go to "
 "configurations."
+
+msgid "Configuration"
+msgstr "Configuration"
 
 msgid "Back"
 msgstr "Back"
@@ -267,6 +186,9 @@ msgstr "Reset"
 msgid "Searching..."
 msgstr "Searching..."
 
+msgid "Organisation Unit"
+msgstr "Organisation Unit"
+
 msgid "Select Organisation unit"
 msgstr "Select Organisation unit"
 
@@ -279,6 +201,87 @@ msgstr "There is no data for the selected filters"
 msgid "Downloading..."
 msgstr "Downloading..."
 
+msgid "DAT Client Overview"
+msgstr "DAT Client Overview"
+
+msgid "Dashboards"
+msgstr "Dashboards"
+
+msgid "Configured visualization does not exist"
+msgstr "Configured visualization does not exist"
+
+msgid "Total number of clients"
+msgstr "Total number of clients"
+
+msgid "Total number of devices"
+msgstr "Total number of devices"
+
+msgid "Clients registered with devices"
+msgstr "Clients registered with devices"
+
+msgid "Enrolled Patients"
+msgstr "Enrolled Patients"
+
+msgid "There are no dashboard configurations found!"
+msgstr "There are no dashboard configurations found!"
+
+msgid "Add filters"
+msgstr "Add filters"
+
+msgid "Filters"
+msgstr "Filters"
+
+msgid "Period"
+msgstr "Period"
+
+msgid "Reports"
+msgstr "Reports"
+
+msgid "Excel"
+msgstr "Excel"
+
+msgid "CSV"
+msgstr "CSV"
+
+msgid "JSON"
+msgstr "JSON"
+
+msgid "Loading..."
+msgstr "Loading..."
+
+msgid "Report Types"
+msgstr "Report Types"
+
+msgid "Report"
+msgstr "Report"
+
+msgid "Organisation units"
+msgstr "Organisation units"
+
+msgid "Periods"
+msgstr "Periods"
+
+msgid "There is no report data for the selected filters"
+msgstr "There is no report data for the selected filters"
+
+msgid "There are no program mappings set, please go to configurations"
+msgstr "There are no program mappings set, please go to configurations"
+
+msgid "Something went wrong"
+msgstr "Something went wrong"
+
+msgid "The page you are looking for does not exist."
+msgstr "The page you are looking for does not exist."
+
+msgid "Go to home page"
+msgstr "Go to home page"
+
+msgid "DAT Device lists"
+msgstr "DAT Device lists"
+
+msgid "Regimen Settings"
+msgstr "Regimen Settings"
+
 msgid "View"
 msgstr "View"
 
@@ -288,20 +291,36 @@ msgstr "Edit"
 msgid "Reload"
 msgstr "Reload"
 
-msgid "Set Device Alarm"
-msgstr "Set Device Alarm"
+msgid "Set Alarms"
+msgstr "Set Alarms"
 
-msgid "Select Day of the Dose"
-msgstr "Select Day of the Dose"
+msgid "Dose Reminder"
+msgstr "Dose Reminder"
 
-msgid "Time"
-msgstr "Time"
+msgid "Set a daily or weekly alarm based on the appropriate treatment regimen"
+msgstr "Set a daily or weekly alarm based on the appropriate treatment regimen"
 
-msgid "Next Dose Time"
-msgstr "Next Dose Time"
+msgid "Alarm Time"
+msgstr "Alarm Time"
+
+msgid "Alarm Day(s)"
+msgstr "Alarm Day(s)"
+
+msgid "Appointment Reminder"
+msgstr "Appointment Reminder"
+
+msgid ""
+"Set a reminder for an upcoming appointment or refill. Each new reminder "
+"must be set manually"
+msgstr ""
+"Set a reminder for an upcoming appointment or refill. Each new reminder "
+"must be set manually"
 
 msgid "Next Refill Date"
 msgstr "Next Refill Date"
+
+msgid "Time"
+msgstr "Time"
 
 msgid "Assign the device number, or click clear to clear previous device"
 msgstr "Assign the device number, or click clear to clear previous device"
@@ -320,9 +339,6 @@ msgstr "DAT device information"
 
 msgid "Edit Device"
 msgstr "Edit Device"
-
-msgid "Set Alarm"
-msgstr "Set Alarm"
 
 msgid "Missing Device Information"
 msgstr "Missing Device Information"

@@ -5,7 +5,7 @@ import {
 	CustomDataTableRow,
 } from "@hisptz/dhis2-ui";
 import i18n from "@dhis2/d2-i18n";
-import { Pagination } from "@hisptz/dhis2-utils";
+
 import { isEmpty } from "lodash";
 import { FullPageLoader } from "../../../../shared/components/Loaders";
 import { ActionButton } from "../../../../shared/components/ActionButton";
@@ -50,9 +50,9 @@ export default function RegimenTable({
 			path: "administration",
 		},
 		{
-			key: "idealDoses",
-			label: "Number of Dosess",
-			path: "idealDoses",
+			key: "numberOfDoses",
+			label: "Number Of Doses",
+			path: "numberOfDoses",
 		},
 
 		{
@@ -62,7 +62,7 @@ export default function RegimenTable({
 		},
 	];
 
-	function getActions(regimen: RegimenFormData, index: number) {
+	function getActions(regimen: RegimenFormData) {
 		return (
 			<>
 				<ActionButton
@@ -94,10 +94,7 @@ export default function RegimenTable({
 								return {
 									...(regimen as CustomDataTableRow),
 									sn: index + 1,
-									action: getActions(
-										regimen,
-										index ?? undefined,
-									),
+									action: getActions(regimen),
 								};
 							})}
 						/>

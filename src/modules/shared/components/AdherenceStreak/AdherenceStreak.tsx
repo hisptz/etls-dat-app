@@ -44,17 +44,37 @@ function AdherenceStreak({ events, frequency }: CalendarProps) {
 		for (let i = 0; i < 7; i++) {
 			const cellDate = new Date(today);
 			cellDate.setDate(today.getDate() + i - 6);
-			let cellColor = "";
 
-			for (const event of events) {
+			const dailyEvents = events.filter((event) => {
 				const eventDate = new Date(event.date);
 				eventDate.setHours(0, 0, 0, 0);
+				return eventDate.getTime() === cellDate.getTime();
+			});
 
-				if (eventDate.getTime() === cellDate.getTime()) {
-					cellColor = cellColors[event.event];
-					break;
+			const sanitizeEvents = () => {
+				let takenDoseFound = false;
+				const filteredArray = dailyEvents.filter((event) => {
+					if (event.event === "takenDose") {
+						takenDoseFound = true;
+						return true;
+					} else {
+						return false;
+					}
+				});
+
+				if (takenDoseFound) {
+					return filteredArray;
+				} else {
+					return dailyEvents;
 				}
-			}
+			};
+
+			const sanitizedEvents = sanitizeEvents();
+
+			const cellColor =
+				sanitizedEvents.length > 0
+					? cellColors[sanitizedEvents[0].event]
+					: "N/A";
 
 			const tooltipId = `daily-tooltip-${cellColor + i}`;
 			const tooltipContent = i18n.t(
@@ -64,7 +84,9 @@ function AdherenceStreak({ events, frequency }: CalendarProps) {
 							? "Dose Taken"
 							: cellColor == "blue"
 							? "Enrolled"
-							: "Dose Missed"
+							: cellColor == "red"
+							? "Dose Missed"
+							: "N/A"
 						: "N/A"
 				}`,
 			);
@@ -114,9 +136,29 @@ function AdherenceStreak({ events, frequency }: CalendarProps) {
 				);
 			});
 
+			const sanitizeEvents = () => {
+				let takenDoseFound = false;
+				const filteredArray = monthEvents.filter((event) => {
+					if (event.event === "takenDose") {
+						takenDoseFound = true;
+						return true;
+					} else {
+						return false;
+					}
+				});
+
+				if (takenDoseFound) {
+					return filteredArray;
+				} else {
+					return monthEvents;
+				}
+			};
+
+			const sanitizedEvents = sanitizeEvents();
+
 			const monthStreakColor =
-				monthEvents.length > 0
-					? cellColors[monthEvents[0].event]
+				sanitizedEvents.length > 0
+					? cellColors[sanitizedEvents[0].event]
 					: "N/A";
 
 			const tooltipId = `monthly-tooltip-${monthStreakColor + i}`;
@@ -161,10 +203,8 @@ function AdherenceStreak({ events, frequency }: CalendarProps) {
 
 	const renderWeeklyCalendar = () => {
 		const calendarCells = [];
-		const weeksInMonth = 7;
+		const weeksInMonth = 4;
 		for (let week = 1; week <= weeksInMonth; week++) {
-			let weekColor = "";
-
 			const startDate = new Date(
 				currentYear,
 				currentMonth,
@@ -176,13 +216,37 @@ function AdherenceStreak({ events, frequency }: CalendarProps) {
 				week == 4 ? week * 8 : week * 7,
 			);
 
-			for (const event of events) {
+			const weekEvents = events.filter((event) => {
 				const eventDate = new Date(event.date);
-				if (eventDate >= startDate && eventDate <= endDate) {
-					weekColor = cellColors[event.event];
-					break;
+				eventDate.setHours(0, 0, 0, 0);
+				return eventDate >= startDate && eventDate <= endDate;
+			});
+
+			const sanitizeEvents = () => {
+				let takenDoseFound = false;
+				const filteredArray = weekEvents.filter((event) => {
+					if (event.event === "takenDose") {
+						takenDoseFound = true;
+						return true;
+					} else {
+						return false;
+					}
+				});
+
+				if (takenDoseFound) {
+					return filteredArray;
+				} else {
+					return weekEvents;
 				}
-			}
+			};
+
+			const sanitizedEvents = sanitizeEvents();
+
+			const weekColor =
+				sanitizedEvents.length > 0
+					? cellColors[sanitizedEvents[0].event]
+					: "N/A";
+
 			const tooltipId = `weekly-tooltip-${weekColor + week}`;
 			const tooltipContent = i18n.t(
 				`Week: ${week}\nStatus: ${
@@ -191,7 +255,9 @@ function AdherenceStreak({ events, frequency }: CalendarProps) {
 							? "Dose Taken"
 							: weekColor == "blue"
 							? "Enrolled"
-							: "Dose Missed"
+							: weekColor == "red"
+							? "Dose Missed"
+							: "N/A"
 						: "N/A"
 				}`,
 			);
@@ -226,7 +292,7 @@ function AdherenceStreak({ events, frequency }: CalendarProps) {
 				</div>
 			) : frequency === "Weekly" ? (
 				<div className={styles["calendar-week"]}>
-					{renderWeeklyCalendar()}
+					{renderDailyCalendar()}
 				</div>
 			) : (
 				<div className={styles["calendar-monthly"]}>

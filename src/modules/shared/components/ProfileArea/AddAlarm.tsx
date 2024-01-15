@@ -1,11 +1,13 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
 	Button,
 	Modal,
 	ModalTitle,
 	ModalContent,
 	ModalActions,
+	Switch,
 	ButtonStrip,
+	Checkbox,
 } from "@dhis2/ui";
 import i18n from "@dhis2/d2-i18n";
 import { FilterField } from "../../../Configuration/components/ProgramMapping/components/FilterField";
@@ -14,6 +16,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useSetAlarm } from "../utils/assignAlarm";
 import { useAlert } from "@dhis2/app-runtime";
+import { isEmpty } from "lodash";
 
 interface addAlarmProps {
 	nextRefillTime: string;
@@ -27,16 +30,6 @@ interface addAlarmProps {
 	device: string;
 }
 
-export const daysInWeek: Option[] = [
-	{ name: "Sunday", code: "1" },
-	{ name: "Monday", code: "2" },
-	{ name: "Tuesday", code: "3" },
-	{ name: "Wednesday", code: "4" },
-	{ name: "Thursday", code: "5" },
-	{ name: "Friday", code: "6" },
-	{ name: "Saturday", code: "7" },
-];
-
 function EditAlarm({
 	nextRefillTime,
 	nextRefillDate,
@@ -49,30 +42,54 @@ function EditAlarm({
 	device,
 }: addAlarmProps) {
 	const { setAlarm } = useSetAlarm();
+	const [doseReminder, setDoseReminder] = useState<boolean>();
+	const [appointmentReminder, setAppointmentReminder] = useState<boolean>();
+
+	const [daysInWeek, setDaysInWeek] = useState<any[]>([
+		{ name: "Sun", code: "1", checked: false },
+		{ name: "Mon", code: "2", checked: false },
+		{ name: "Tue", code: "3", checked: false },
+		{ name: "Wed", code: "4", checked: false },
+		{ name: "Thur", code: "5", checked: false },
+		{ name: "Fri", code: "6", checked: false },
+		{ name: "Sat", code: "7", checked: false },
+	]);
+
+	useEffect(() => {
+		setDoseReminder(isEmpty(nextDoseTime) ? false : true);
+		setAppointmentReminder(
+			isEmpty(nextRefillDate) && isEmpty(nextRefillTime) ? false : true,
+		);
+		const defaultDays = dayInWeek.split("");
+
+		setDaysInWeek(() =>
+			defaultDays.map((day, index) =>
+				day === "1"
+					? { ...daysInWeek[index], checked: true }
+					: { ...daysInWeek[index], checked: false },
+			),
+		);
+	}, []);
 
 	const schema = z.object({
-		dayInWeek:
-			frequency == "Weekly"
-				? z
-					.string({
-						required_error: "Day of the Dose is required",
-					})
-					.nonempty("Day of the Dose is required")
-				: z.string(),
 		nextDoseTime:
-			frequency == "Monthly"
+			frequency == "Monthly" || !doseReminder
 				? z.string()
 				: z
-					.string({
-						required_error: "Next Dose Time is required",
-					})
-					.nonempty("Next Dose Time is required"),
-		nextRefillDate: z
-			.string({ required_error: "Next Refill Date is required" })
-			.nonempty("Next Refill Date is required"),
-		nextRefillTime: z
-			.string({ required_error: "Next Refill Time is required" })
-			.nonempty("Next Refill Time is required"),
+						.string({
+							required_error: "Next Dose Time is required",
+						})
+						.nonempty("Next Dose Time is required"),
+		nextRefillDate: !appointmentReminder
+			? z.string()
+			: z
+					.string({ required_error: "Next Refill Date is required" })
+					.nonempty("Next Refill Date is required"),
+		nextRefillTime: !appointmentReminder
+			? z.string()
+			: z
+					.string({ required_error: "Next Refill Time is required" })
+					.nonempty("Next Refill Time is required"),
 	});
 
 	type AlarmFormData = z.infer<typeof schema>;
@@ -82,34 +99,21 @@ function EditAlarm({
 		({ type }) => ({ ...type, duration: 4000 }),
 	);
 
-	const dayIndex = dayInWeek.indexOf("1");
-	const selectedDay = daysInWeek[dayIndex]?.code;
+	function generateDays(daysInWeek: any[]) {
+		const codeString: string[] = [];
+		daysInWeek.map((day: any) => {
+			day.checked ? codeString.push("1") : codeString.push("0");
+		});
 
-	function generateDays(selectedCode: string) {
-		const codeArray = Array(7).fill("0");
-		const selectedIndex = daysInWeek.findIndex(
-			(day) => day.code === selectedCode,
-		);
-
-		if (selectedIndex !== -1) {
-			codeArray[selectedIndex] = "1";
-		}
-		const codeString = codeArray.join("");
-
-		return codeString;
+		return codeString.join("");
 	}
 
 	const onSubmit = async (data: AlarmFormData) => {
 		const alarmData = {
 			imei: device,
-			alarm: frequency != "Monthly" ? data.nextDoseTime : null,
+			alarm: data.nextDoseTime,
 			refillAlarm: data.nextRefillDate + " " + data.nextRefillTime,
-			days:
-				frequency == "Daily"
-					? "1111111"
-					: frequency == "Weekly"
-						? generateDays(data.dayInWeek)
-						: null,
+			days: generateDays(daysInWeek),
 		};
 
 		await setAlarm({ data: alarmData }).then(async (res) => {
@@ -140,11 +144,37 @@ function EditAlarm({
 		defaultValues: {
 			nextRefillDate: nextRefillDate,
 			nextRefillTime: nextRefillTime,
-			dayInWeek: selectedDay,
 			nextDoseTime: nextDoseTime,
 		},
 		resolver: zodResolver(schema),
 	});
+
+	const alarmDays = (day: string, code: string, checked: boolean) => {
+		return (
+			<div
+				style={{
+					display: "flex",
+					flexDirection: "column",
+					paddingRight: "20px",
+				}}
+			>
+				<Checkbox
+					checked={checked}
+					disabled={!doseReminder}
+					onChange={() => {
+						setDaysInWeek(() =>
+							daysInWeek.map((day) =>
+								day.code === code
+									? { ...day, checked: !checked }
+									: { ...day },
+							),
+						);
+					}}
+				/>
+				<span style={{ marginTop: "2px" }}>{i18n.t(day)}</span>
+			</div>
+		);
+	};
 
 	return (
 		<div>
@@ -152,61 +182,155 @@ function EditAlarm({
 				<ModalTitle>
 					<h3
 						className="m-0"
-						style={{ marginBottom: "16px", fontWeight: "500" }}
+						style={{ marginBottom: "14px", fontWeight: "500" }}
 					>
-						{i18n.t("Set Device Alarm")}
+						{i18n.t("Set Alarms")}
 					</h3>
 				</ModalTitle>
 				<ModalContent>
 					<FormProvider {...form}>
 						<div
 							style={{
-								height: "300px",
+								height: "350px",
 							}}
 						>
-							{frequency == "Weekly" ? (
+							<div
+								style={{
+									display: "flex",
+									flexDirection: "row",
+									justifyContent: "flex-start",
+									alignItems: "start",
+								}}
+							>
+								<Switch
+									checked={doseReminder}
+									onChange={() => {
+										setDoseReminder(!doseReminder);
+									}}
+								/>
 								<div
 									style={{
 										display: "flex",
-										flexDirection: "row",
+										flexDirection: "column",
 									}}
 								>
-									<div
+									<span
+										className="m-0"
 										style={{
-											width: "300px",
-											marginBottom: "20px",
-											marginRight: "10px",
+											marginBottom: "5px",
+											fontWeight: "400",
+											fontSize: "24px",
 										}}
 									>
-										<FilterField
-											label={i18n.t(
-												"Select Day of the Dose",
-											)}
-											options={daysInWeek}
-											name="dayInWeek"
-											type="select"
-										/>
-									</div>
-									<FilterField
-										label={i18n.t("Time")}
-										name="nextDoseTime"
-										type="time"
-									/>
+										{i18n.t("Dose Reminder")}
+									</span>
+									<span
+										className="m-0"
+										style={{
+											marginBottom: "16px",
+											fontWeight: "300",
+											fontSize: "16px",
+											fontStyle: "italic",
+										}}
+									>
+										{i18n.t(
+											"Set a daily or weekly alarm based on the appropriate treatment regimen",
+										)}
+									</span>
 								</div>
-							) : frequency == "Daily" ? (
+							</div>
+							<div
+								style={{
+									display: "flex",
+									flexDirection: "row",
+								}}
+							>
+								<FilterField
+									label={i18n.t("Alarm Time")}
+									name="nextDoseTime"
+									type="time"
+									width="170px"
+									disabled={!doseReminder}
+								/>
 								<div
 									style={{
+										width: "350px",
 										marginBottom: "20px",
+										marginLeft: "20px",
 									}}
 								>
-									<FilterField
-										label={i18n.t("Next Dose Time")}
-										name="nextDoseTime"
-										type="time"
-										width="300px"
-									/>
+									<span
+										style={{
+											fontSize: "14px",
+											color: "#212934",
+										}}
+									>
+										{i18n.t("Alarm Day(s)")}
+									</span>
+									<div
+										style={{
+											display: "flex",
+										}}
+									>
+										{daysInWeek.map((day: any) => {
+											return alarmDays(
+												day.name,
+												day.code,
+												day.checked,
+											);
+										})}
+									</div>
 								</div>
-							) : null}
+							</div>
+
+							<div
+								style={{
+									display: "flex",
+									flexDirection: "row",
+									justifyContent: "flex-start",
+									alignItems: "start",
+									marginTop: "20px",
+								}}
+							>
+								<Switch
+									checked={appointmentReminder}
+									onChange={() => {
+										setAppointmentReminder(
+											!appointmentReminder,
+										);
+									}}
+								/>
+								<div
+									style={{
+										display: "flex",
+										flexDirection: "column",
+									}}
+								>
+									<span
+										className="m-0"
+										style={{
+											marginBottom: "5px",
+											fontWeight: "400",
+											fontSize: "24px",
+										}}
+									>
+										{i18n.t("Appointment Reminder")}
+									</span>
+									<span
+										className="m-0"
+										style={{
+											marginBottom: "16px",
+											fontWeight: "300",
+											fontSize: "16px",
+											fontStyle: "italic",
+										}}
+									>
+										{i18n.t(
+											"Set a reminder for an upcoming appointment or refill. Each new reminder must be set manually",
+										)}
+									</span>
+								</div>
+							</div>
 
 							<div
 								style={{
@@ -216,7 +340,7 @@ function EditAlarm({
 							>
 								<div
 									style={{
-										width: "300px",
+										width: "350px",
 										marginBottom: "20px",
 										marginRight: "10px",
 									}}
@@ -225,12 +349,14 @@ function EditAlarm({
 										label={i18n.t("Next Refill Date")}
 										name="nextRefillDate"
 										type="date"
+										disabled={!appointmentReminder}
 									/>
 								</div>
 								<FilterField
 									label={i18n.t("Time")}
 									name="nextRefillTime"
 									type="time"
+									disabled={!appointmentReminder}
 								/>
 							</div>
 						</div>

@@ -5,10 +5,11 @@ import {
 } from "../../Dashboards/constants";
 import { DashboardItem } from "../interfaces";
 
-export interface TBAdherenceConfig {
+export interface DAT_TableConfig {
 	key: string;
 	label: string;
 	path: string | Array<string | number>;
+	sortable?: boolean;
 }
 export interface DeviceIMEIList {
 	IMEI: string;
@@ -20,7 +21,7 @@ export interface DeviceIMEIList {
 export interface RegimenSetting {
 	regimen: string;
 	administration: string;
-	idealDoses: string;
+	numberOfDoses: string;
 }
 export interface ProgramMapping {
 	name?: string;
@@ -152,7 +153,13 @@ export const reports: ReportConfig[] = [
 	},
 ];
 
-export const TBAdherence: TBAdherenceConfig[] = [
+export const TBAdherence: DAT_TableConfig[] = [
+	{
+		key: "treatmentStart",
+		label: "Treatment Start",
+		path: "treatmentStart",
+		sortable: true,
+	},
 	{
 		key: "patientNumber",
 		label: "Patient Number",
@@ -163,20 +170,59 @@ export const TBAdherence: TBAdherenceConfig[] = [
 		label: "Name",
 		path: "name",
 	},
+
 	{
-		key: "deviceIMEINumber",
-		label: "Device IMEI Number",
-		path: "deviceIMEINumber",
+		key: "orgUnit",
+		label: "Organisation Unit",
+		path: "orgUnit",
 	},
 	{
-		key: "adherenceFrequency",
-		label: "Adherence Frequency",
-		path: "adherenceFrequency",
+		key: "battery",
+		label: "Battery",
+		path: "battery",
+	},
+
+	{
+		key: "deviceIMEINumber",
+		label: "Device IMEI",
+		path: "deviceIMEINumber",
+		sortable: true,
+	},
+
+	{
+		key: "overallAdherence",
+		label: "Overall Adherence (%)",
+		path: "overallAdherence",
 	},
 	{
 		key: "adherenceStreak",
 		label: "Adherence Streak",
 		path: "adherenceStreak",
+	},
+];
+
+export const DATAssignment: DAT_TableConfig[] = [
+	{
+		key: "treatmentStart",
+		label: "Treatment Start",
+		path: "treatmentStart",
+		sortable: true,
+	},
+	{
+		key: "patientNumber",
+		label: "Patient Number",
+		path: "patientNumber",
+	},
+	{
+		key: "name",
+		label: "Name",
+		path: "name",
+	},
+
+	{
+		key: "orgUnit",
+		label: "Organisation Unit",
+		path: "orgUnit",
 	},
 ];
 

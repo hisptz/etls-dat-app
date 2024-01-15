@@ -9,7 +9,6 @@ export class PatientProfile extends TrackedEntityModel {
 	programMapping?: ProgramMapping;
 	regimenSettings?: RegimenSetting[];
 	datDeviceInfoEvent?: DatDeviceInfoEventModel;
-	programStageID?: string;
 
 	constructor(
 		trackedEntity: TrackedEntity,
@@ -44,8 +43,8 @@ export class PatientProfile extends TrackedEntityModel {
 		) as string;
 	}
 
-	get orgUnitFilter(): string {
-		return this.enrollment?.orgUnit ?? "";
+	get organisationUnit(): string {
+		return this.enrollment?.orgUnitName ?? "";
 	}
 
 	get sex() {
@@ -57,9 +56,9 @@ export class PatientProfile extends TrackedEntityModel {
 
 	get enrollmentDate(): string {
 		return (
-			DateTime.fromISO(
-				this.enrollment?.enrolledAt as string,
-			).toISODate() ?? ""
+			DateTime.fromISO(this.enrollment?.enrolledAt as string).toFormat(
+				"dd/MM/yyyy",
+			) ?? ""
 		);
 	}
 
@@ -125,8 +124,9 @@ export class PatientProfile extends TrackedEntityModel {
 		const deviceHealth = this.deviceHealth;
 		const batteryHealth = this.batteryHealth;
 		const dosageTime = this.dosageTime;
-		const enrollmentDate = this.enrollmentDate;
+		const treatmentStart = this.enrollmentDate;
 		const deviceSignal = this.deviceSignal;
+		const orgUnit = this.organisationUnit;
 
 		return {
 			id: this.id as string,
@@ -137,11 +137,12 @@ export class PatientProfile extends TrackedEntityModel {
 			sex,
 			phoneNumber,
 			deviceIMEInumber,
+			orgUnit,
 			adherenceFrequency,
 			deviceHealth,
 			batteryHealth,
 			dosageTime,
-			enrollmentDate,
+			treatmentStart,
 			deviceSignal,
 		};
 	}
@@ -149,8 +150,9 @@ export class PatientProfile extends TrackedEntityModel {
 	private getDatDeviceInfoEvent(): DatDeviceInfoEventModel {
 		const events = filter(this.events, [
 			"programStage",
-			this.programStageID,
+			this.programMapping?.programStage,
 		]).map((event) => new DatDeviceInfoEventModel({ event: event }));
+
 		return head(events) as DatDeviceInfoEventModel;
 	}
 }

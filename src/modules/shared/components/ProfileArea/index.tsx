@@ -1,7 +1,7 @@
 import i18n from "@dhis2/d2-i18n";
 import styles from "./ProfileArea.module.css";
 import { Button, IconEdit24, Card, ButtonStrip, IconClock24 } from "@dhis2/ui";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import EditDevice from "./EditDevice";
 import { PatientProfile } from "../../models";
 import EditAlarm from "./AddAlarm";
@@ -10,6 +10,8 @@ import { DateTime } from "luxon";
 import { useAdherenceEvents } from "./utils";
 import { useSetting } from "@dhis2/app-service-datastore";
 import { useSearchParams } from "react-router-dom";
+import BatteryLevel from "../BatteryLevel/BatteryLevel";
+import { getProgramMapping } from "../../utils";
 
 export interface ProfileAreaProps {
 	profile: PatientProfile;
@@ -38,14 +40,11 @@ export function ProfileArea({
 	});
 	const currentProgram = params.get("program");
 
-	const selectedProgram = programMapping.filter(
-		(mapping: any) => mapping.name === currentProgram,
-	);
-	const program = selectedProgram[0];
+	const program = getProgramMapping(programMapping, currentProgram);
 
 	const { filteredEvents } = useAdherenceEvents(
 		profile.events,
-		program?.programStage,
+		program?.programStage ?? "",
 	);
 
 	const onHide = () => {
@@ -82,7 +81,7 @@ export function ProfileArea({
 			"hh:mm a",
 		) ?? "";
 
-	const batteryLevel = data?.batteryLevel ?? "N/A";
+	const batteryLevel = data?.batteryLevel ?? 0;
 
 	return loading ? (
 		<></>
@@ -255,7 +254,7 @@ export function ProfileArea({
 										setDayInWeek(data?.alarmDays ?? "");
 									}}
 								>
-									{i18n.t("Set Alarm")}
+									{i18n.t("Set Alarms")}
 								</Button>
 							)}
 						</ButtonStrip>
@@ -314,7 +313,11 @@ export function ProfileArea({
 										className={styles["label-value"]}
 										htmlFor="value"
 									>
-										{batteryLevel}
+										{
+											<BatteryLevel
+												batteryLevel={batteryLevel}
+											/>
+										}
 									</label>
 								</div>
 								<div className={styles["grid-item"]}>
