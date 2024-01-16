@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2024-01-15T11:15:13.013Z\n"
-"PO-Revision-Date: 2024-01-15T11:15:13.013Z\n"
+"POT-Creation-Date: 2024-01-16T13:17:18.516Z\n"
+"PO-Revision-Date: 2024-01-16T13:17:18.516Z\n"
 
 msgid "Configurations"
 msgstr "Configurations"
@@ -94,9 +94,6 @@ msgstr "Regimen"
 
 msgid "Phone Number"
 msgstr "Phone Number"
-
-msgid "Device IMEI Number"
-msgstr "Device IMEI Number"
 
 msgid "Mediator Url"
 msgstr "Mediator Url"
@@ -203,6 +200,9 @@ msgstr "Downloading..."
 
 msgid "DAT Client Overview"
 msgstr "DAT Client Overview"
+
+msgid "Device IMEI Number"
+msgstr "Device IMEI Number"
 
 msgid "Dashboards"
 msgstr "Dashboards"
