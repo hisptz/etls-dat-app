@@ -1,4 +1,5 @@
-import { useDataMutation } from "@dhis2/app-runtime";
+import { find } from "lodash";
+import { useDataMutation, useDataQuery } from "@dhis2/app-runtime";
 import { useSetting } from "@dhis2/app-service-datastore";
 import { useSearchParams } from "react-router-dom";
 import {
@@ -6,6 +7,32 @@ import {
 	ProgramMapping,
 	TRACKED_ENTITY_ATTRIBUTES,
 } from "../../../../shared/constants";
+import { Program, ProgramTrackedEntityAttribute } from "@hisptz/dhis2-utils";
+
+const programQuery: any = {
+	program: {
+		resource: "programs",
+		id: ({ program }: any) => program,
+		params: {
+			fields: [":owner", "!programStages"],
+		},
+	},
+};
+
+const metadataMutation: any = {
+	type: "create",
+	resource: "metadata",
+	data: ({ data }: any) => data,
+	importMode: "COMMIT",
+	identifier: "UID",
+	importReportMode: "ERRORS",
+	importStrategy: "CREATE_AND_UPDATE",
+	atomicMode: "ALL",
+	mergeMode: "MERGE",
+	flushMode: "AUTO",
+	inclusionStrategy: "NON_NULL",
+	async: false,
+};
 
 function getMigrationMetadataObject(mapping: any): any {
 	return {
@@ -43,7 +70,7 @@ function getMigrationMetadataObject(mapping: any): any {
 		],
 		dataElements: [
 			{
-				code: "WISE_PILL_001",
+				code: "DAT_001",
 				id: DATA_ELEMENTS.DEVICE_HEALTH,
 				name: "Device health",
 				shortName: "Device health",
@@ -52,7 +79,7 @@ function getMigrationMetadataObject(mapping: any): any {
 				valueType: "TEXT",
 			},
 			{
-				code: "WISE_PILL_002",
+				code: "DAT_002",
 				id: DATA_ELEMENTS.BATTERY_HEALTH,
 				name: "Battery health",
 				shortName: "Battery health",
@@ -61,7 +88,7 @@ function getMigrationMetadataObject(mapping: any): any {
 				valueType: "NUMBER",
 			},
 			{
-				code: "WISE_PILL_003",
+				code: "DAT_003",
 				id: DATA_ELEMENTS.DOSAGE_TIME,
 				name: "Dosage time",
 				shortName: "Dosage time",
@@ -70,7 +97,7 @@ function getMigrationMetadataObject(mapping: any): any {
 				valueType: "DATETIME",
 			},
 			{
-				code: "WISE_PILL_004",
+				code: "DAT_004",
 				id: DATA_ELEMENTS.DEVICE_SIGNAL,
 				name: "Device signal",
 				shortName: "Device signal",
@@ -85,8 +112,8 @@ function getMigrationMetadataObject(mapping: any): any {
 		trackedEntityAttributes: [
 			{
 				id: TRACKED_ENTITY_ATTRIBUTES.EPISODE_ID,
-				code: "WISE_PILL_005",
-				name: "Episode ID",
+				code: "DAT_005",
+				name: "DAT Episode ID",
 				shortName: "Episode ID",
 				description: "Unique identifier for each wisepill episode",
 				valueType: "TEXT",
@@ -99,8 +126,8 @@ function getMigrationMetadataObject(mapping: any): any {
 			},
 			{
 				id: TRACKED_ENTITY_ATTRIBUTES.DEVICE_IMEI,
-				code: "WISE_PILL_006",
-				name: "Device IMEI",
+				code: "DAT_006",
+				name: "DAT Device IMEI",
 				shortName: "Device IMEI",
 				description: "Wisepill device IMEI number",
 				valueType: "TEXT",
@@ -170,6 +197,57 @@ function getMigrationMetadataObject(mapping: any): any {
 					id: "lpMwLxkJor6",
 				},
 			},
+		],
+	};
+}
+
+function getSanitizedProgramMetadataObject(
+	program: Program,
+	metadata: any,
+): Program {
+	const { programTrackedEntityAttributes } = program;
+	const { trackedEntityAttributes } = metadata;
+
+	const trackedEntityAttributeIds: string[] = trackedEntityAttributes.map(
+		({ id }: any) => id ?? "",
+	);
+	const existingTrackedEntities: string[] = [];
+
+	const sanitizedProgramTrackedEntityAttributes =
+		programTrackedEntityAttributes?.map((programTrackedEntityAttribute) => {
+			const { trackedEntityAttribute } = programTrackedEntityAttribute;
+			if (trackedEntityAttributeIds.includes(trackedEntityAttribute.id)) {
+				const sanitizedAttribute = find(
+					trackedEntityAttributes,
+					({ id }) => id === trackedEntityAttribute.id,
+				);
+				existingTrackedEntities.push(trackedEntityAttribute.id);
+				return {
+					...programTrackedEntityAttribute,
+					trackedEntityAttribute: sanitizedAttribute,
+				};
+			} else {
+				return programTrackedEntityAttribute;
+			}
+		}) as ProgramTrackedEntityAttribute[];
+
+	return {
+		...program,
+		programTrackedEntityAttributes: [
+			...sanitizedProgramTrackedEntityAttributes,
+			...trackedEntityAttributes
+				.filter(({ id }: any) => !existingTrackedEntities.includes(id))
+				.map(
+					(trackedEntityAttribute: any) =>
+						({
+							trackedEntityAttribute,
+							program: {
+								id: program.id,
+							},
+							id: generateUid(),
+							displayName: trackedEntityAttribute.name,
+						}) as ProgramTrackedEntityAttribute,
+				),
 		],
 	};
 }
@@ -250,32 +328,29 @@ export function generateUid() {
 }
 
 export function useProgramStage() {
-	const migrateMetadata: any = {
-		type: "create",
-		resource: "metadata",
-		data: ({ data }: any) => data,
-		importMode: "COMMIT",
-		identifier: "UID",
-		importReportMode: "ERRORS",
-		importStrategy: "CREATE_AND_UPDATE",
-		atomicMode: "ALL",
-		mergeMode: "MERGE",
-		flushMode: "AUTO",
-		inclusionStrategy: "NON_NULL",
-		async: false,
-	};
-
-	const [mutate, { loading, error }] = useDataMutation(migrateMetadata);
+	const [mutate, { loading, error }] = useDataMutation(metadataMutation);
+	const { refetch: fetchProgramMetadata } = useDataQuery(programQuery, {
+		lazy: true,
+	});
 
 	const handleImportProgramStage = async (mapping: any) => {
 		const metadata = getMigrationMetadataObject(mapping);
 		if (mapping) {
-			const res = await mutate({
-				data: metadata,
+			const { program } = await fetchProgramMetadata({
+				program: mapping?.program ?? "",
+			});
+
+			const sanitizedProgramMetadata = getSanitizedProgramMetadataObject(
+				program as Program,
+				metadata,
+			);
+
+			const metadataMutationResponse = await mutate({
+				data: { ...metadata, programs: [sanitizedProgramMetadata] },
 			});
 
 			return {
-				response: res,
+				response: metadataMutationResponse,
 			};
 		}
 	};
