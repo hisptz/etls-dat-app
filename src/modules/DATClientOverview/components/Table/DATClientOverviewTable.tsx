@@ -41,7 +41,9 @@ export default function DATClientTable({
 	onSort,
 	sortState,
 }: DATClientTableProps) {
-	const [TBAdherence] = useSetting("TBAdherence", { global: true });
+	const [DATClientOverview] = useSetting("DATClientOverview", {
+		global: true,
+	});
 	const [regimenSettings] = useSetting("regimenSetting", {
 		global: true,
 	});
@@ -71,7 +73,7 @@ export default function DATClientTable({
 			mapping?.programStage ?? "",
 		);
 
-		const takenDoses = filteredEvents.filter((item: any) => {
+		const takenDoses = filteredEvents.filter((item: any): string => {
 			return item.dataValues.some((dataValue: any) => {
 				const value = dataValue.value;
 				return value === "Once" || value === "Multiple";
@@ -81,7 +83,7 @@ export default function DATClientTable({
 		const noOfSignals = takenDoses.length;
 
 		const percentage = !isEmpty(regimenSettings)
-			? regimenSettings.map((option: RegimenSetting) => {
+			? (regimenSettings ?? []).map((option: RegimenSetting) => {
 					if (option.administration === patient.adherenceFrequency) {
 						return (
 							(
@@ -106,7 +108,7 @@ export default function DATClientTable({
 			mapping?.programStage ?? "",
 		);
 
-		const adherenceEvents = filteredEvents.map((item: any) => {
+		const adherenceEvents = (filteredEvents ?? []).map((item: any) => {
 			return {
 				date: item.occurredAt[0].value,
 				event:
@@ -146,10 +148,12 @@ export default function DATClientTable({
 								"There is no data for the selected filters",
 							)}
 							loading={loading}
-							columns={TBAdherence as CustomDataTableColumn[]}
+							columns={
+								DATClientOverview as CustomDataTableColumn[]
+							}
 							onRowClick={onRowClick}
 							pagination={pagination}
-							rows={patients.map((patient) => {
+							rows={(patients ?? []).map((patient) => {
 								return {
 									...(patient.tableData as CustomDataTableRow),
 									adherenceStreak:
