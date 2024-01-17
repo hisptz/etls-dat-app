@@ -12,6 +12,8 @@ function BatteryLevel({ device, batteryLevel }: BatteryLevelProps) {
 		? useDeviceData(device)
 		: { data: null, loadingDevice: false };
 
+	// TODO update this to the millivolts mapping
+
 	let color;
 	const battery = batteryLevel ?? data?.batteryLevel ?? 0;
 
