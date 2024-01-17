@@ -63,8 +63,11 @@ export default function ReportTable({
 									report?.id !== "dat-device-summary-report"
 										? d2ReportData
 										: deviceList,
+
 									regimenSettings,
 									programMapping,
+									true,
+									deviceList,
 								)}
 								columns={report.columns as ReportColumn[]}
 							/>
@@ -92,6 +95,7 @@ export default function ReportTable({
 									: data,
 								regimenSettings,
 								programMapping,
+								false,
 							)}
 						/>
 					</>

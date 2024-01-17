@@ -57,7 +57,7 @@ export class PatientProfile extends TrackedEntityModel {
 	get enrollmentDate(): string {
 		return (
 			DateTime.fromISO(this.enrollment?.enrolledAt as string).toFormat(
-				"dd/MM/yyyy",
+				"dd/LL/yyyy",
 			) ?? ""
 		);
 	}

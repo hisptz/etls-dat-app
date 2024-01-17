@@ -2,7 +2,7 @@ import { useDataQuery } from "@dhis2/app-runtime";
 import { useEffect, useState } from "react";
 import { Pagination } from "@hisptz/dhis2-utils";
 import { useSearchParams } from "react-router-dom";
-import { isEmpty } from "lodash";
+import { head, isEmpty } from "lodash";
 import {
 	DATA_ELEMENTS,
 	ProgramMapping,
@@ -15,6 +15,10 @@ import _ from "lodash";
 import { CustomDataTableRow } from "@hisptz/dhis2-ui";
 import { DATDevicesReportState, DHIS2ReportState } from "../../../state/report";
 import { getProgramMapping } from "../../../../shared/utils";
+import BatteryLevel from "../../../../shared/components/BatteryLevel/BatteryLevel";
+import React from "react";
+import { DateTime } from "luxon";
+import GetAdherenceStreak from "./adherenceStreak";
 
 type Data = {
 	reports: {
@@ -139,6 +143,7 @@ export function useReportTableData() {
 		stage + "." + programMapping.attributes?.surname,
 		stage + "." + programMapping.attributes?.phoneNumber,
 		stage + "." + programMapping.attributes?.regimen,
+		stage + "." + programMapping.attributes?.deviceIMEInumber,
 		stage +
 			"." +
 			DATA_ELEMENTS.DEVICE_SIGNAL +
@@ -196,6 +201,8 @@ export function useReportTableData() {
 		try {
 			const result = (await refetch({
 				page: 1,
+				program: programMapping?.program ?? "",
+				stage,
 				pe: [period],
 				ou: [orgUnit],
 				dx: dimensions,
@@ -310,13 +317,16 @@ export const useDATDevices = () => {
 	const [allDevices, setAllDevices] = useRecoilState<any[]>(
 		DATDevicesReportState,
 	);
+	const [params] = useSearchParams();
 	const [currentPage, setCurrentPage] = useState<number>(1);
 	const [currentPageSize, setPageSize] = useState<number>(20);
 	const [errorDevice, setError] = useState<any>();
 	const [loadingDevice, setLoading] = useState(true);
 	const [pagination, setPagination] = useState<Pagination>();
-	const MediatorUrl = programMapping.mediatorUrl;
-	const ApiKey = programMapping.apiKey;
+	const currentProgram = params.get("program");
+	const mapping = getProgramMapping(programMapping, currentProgram);
+	const MediatorUrl = mapping?.mediatorUrl;
+	const ApiKey = mapping?.apiKey;
 	async function paginateArray(
 		eventArray: any,
 		currentPage: number,
@@ -433,8 +443,11 @@ export const useDATDevices = () => {
 
 export function sanitizeReportData(
 	data: any[],
+
 	regimenSettings: RegimenSetting[],
 	programMapping: ProgramMapping,
+	downloadable: boolean,
+	deviceList?: any[],
 ) {
 	return data.map((report: any) => {
 		const percentage = !isEmpty(regimenSettings)
@@ -454,23 +467,84 @@ export function sanitizeReportData(
 			: "N/A";
 
 		const adherencePercentage = percentage != "N/A" ? percentage[0] : "N/A";
+		const lastOpened = DateTime.fromFormat(
+			report.lastOpened ?? "",
+			"yyyy-MM-dd HH:mm:ss",
+		).toFormat("dd/LL/yyyy");
+		const lastHeartBeat = DateTime.fromFormat(
+			report.lastHeartBeat ?? "",
+			"yyyy-MM-dd HH:mm:ss",
+		).toFormat("dd/LL/yyyy");
+
+		const treatmentStart = DateTime.fromFormat(
+			report.enrollmentdate ?? "",
+			"yyyy-MM-dd HH:mm:ss.s",
+		).toFormat("dd/LL/yyyy");
+
+		const deviceIMEI =
+			report[
+				programMapping.programStage +
+					"." +
+					programMapping.attributes?.deviceIMEInumber ?? ""
+			];
+
+		const batteryLevel = head(
+			deviceList
+				?.filter((device) => deviceIMEI === device.imei)
+				.map((device) => device.batteryLevel),
+		);
+
 		return {
 			...([] as unknown as CustomDataTableRow),
-			tbIdentificationNumber:
-				report[programMapping.attributes?.patientNumber ?? ""],
+			treatmentStart: treatmentStart,
+			patientNumber:
+				report[
+					programMapping.programStage +
+						"." +
+						programMapping.attributes?.patientNumber ?? ""
+				],
 			name:
-				report[programMapping.attributes?.firstName ?? ""] +
+				report[
+					programMapping.programStage +
+						"." +
+						programMapping.attributes?.firstName ?? ""
+				] +
 				" " +
-				report[programMapping.attributes?.surname ?? ""],
-			phoneNumber: report[programMapping.attributes?.phoneNumber ?? ""],
+				report[
+					programMapping.programStage +
+						"." +
+						programMapping.attributes?.surname ?? ""
+				],
+			phoneNumber:
+				report[
+					programMapping.programStage +
+						"." +
+						programMapping.attributes?.phoneNumber ?? ""
+				],
 			adherenceFrequency: report.adherenceFrequency,
 			adherencePercentage: adherencePercentage,
+			adherenceStreak: downloadable ? (
+				report.adherenceFrequency
+			) : (
+				<GetAdherenceStreak teiID={report.tei} />
+			),
 			numberOfMissedDoses: report.noOfSignal,
+			orgUnit: report.ouname,
+			deviceIMEI: deviceIMEI,
+			battery: downloadable ? (
+				(batteryLevel ?? "N/A").toString()
+			) : (
+				<BatteryLevel batteryLevel={batteryLevel} />
+			),
 			deviceIMEINumber: report.imei,
 			daysInUse: report.daysDeviceInUse,
-			lastHeartbeat: report.lastHeartBeat,
-			lastOpened: report.lastOpened,
-			lastBatteryLevel: report.batteryLevel,
+			lastHeartbeat: lastHeartBeat,
+			lastOpened: lastOpened,
+			lastBatteryLevel: downloadable ? (
+				report.batteryLevel
+			) : (
+				<BatteryLevel batteryLevel={report.batteryLevel} />
+			),
 		};
 	});
 }

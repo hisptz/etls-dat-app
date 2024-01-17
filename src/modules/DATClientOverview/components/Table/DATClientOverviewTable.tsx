@@ -41,7 +41,9 @@ export default function DATClientTable({
 	onSort,
 	sortState,
 }: DATClientTableProps) {
-	const [TBAdherence] = useSetting("TBAdherence", { global: true });
+	const [DATClientOverview] = useSetting("DATClientOverview", {
+		global: true,
+	});
 	const [regimenSettings] = useSetting("regimenSetting", {
 		global: true,
 	});
@@ -146,7 +148,9 @@ export default function DATClientTable({
 								"There is no data for the selected filters",
 							)}
 							loading={loading}
-							columns={TBAdherence as CustomDataTableColumn[]}
+							columns={
+								DATClientOverview as CustomDataTableColumn[]
+							}
 							onRowClick={onRowClick}
 							pagination={pagination}
 							rows={patients.map((patient) => {

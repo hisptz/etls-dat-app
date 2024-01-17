@@ -526,8 +526,6 @@ function Calendar({ events, frequency, onClick }: CalendarProps) {
 
 			const uniqueMonthlyEvents = filterUnique();
 
-			console.log(uniqueMonthEvents, uniqueMonthlyEvents);
-
 			const cellContent = uniqueMonthlyEvents.map((event, index) => {
 				monthColor = cellColors[event.event];
 				return (

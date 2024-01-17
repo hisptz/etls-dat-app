@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2024-01-15T05:40:34.808Z\n"
-"PO-Revision-Date: 2024-01-15T05:40:34.808Z\n"
+"POT-Creation-Date: 2024-01-15T10:59:49.281Z\n"
+"PO-Revision-Date: 2024-01-15T10:59:49.281Z\n"
 
 msgid "Configurations"
 msgstr "Configurations"
@@ -339,9 +339,6 @@ msgstr "DAT device information"
 
 msgid "Edit Device"
 msgstr "Edit Device"
-
-msgid "Set Alarm"
-msgstr "Set Alarm"
 
 msgid "Missing Device Information"
 msgstr "Missing Device Information"
