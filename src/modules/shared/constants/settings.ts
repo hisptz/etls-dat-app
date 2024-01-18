@@ -62,9 +62,14 @@ export const reports: ReportConfig[] = [
 		filters: ["ou", "pe"],
 		columns: [
 			{
-				key: "tbIdentificationNumber",
-				label: "TB Identification Number",
-				path: "tbIdentificationNumber",
+				key: "treatmentStart",
+				label: "Treatment Start Date",
+				path: "treatmentStart",
+			},
+			{
+				key: "patientNumber",
+				label: "Patient Number",
+				path: "patientNumber",
 			},
 			{
 				key: "name",
@@ -72,19 +77,35 @@ export const reports: ReportConfig[] = [
 				path: "name",
 			},
 			{
-				key: "phoneNumber",
-				label: "Phone Number",
-				path: "phoneNumber",
+				key: "orgUnit",
+				label: "Organization Unit",
+				path: "orgUnit",
+			},
+			{
+				key: "deviceIMEI",
+				label: "Device IMEI",
+				path: "deviceIMEI",
+			},
+			{
+				key: "battery",
+				label: "Battery",
+				path: "battery",
 			},
 			{
 				key: "adherenceFrequency",
 				label: "Adherence Frequency",
 				path: "adherenceFrequency",
 			},
+
 			{
 				key: "adherencePercentage",
-				label: "Adherence Percentage",
+				label: "Overall Adherence (%)",
 				path: "adherencePercentage",
+			},
+			{
+				key: "adherenceStreak",
+				label: "Adherence Streak",
+				path: "adherenceStreak",
 			},
 		],
 	},
@@ -126,9 +147,9 @@ export const reports: ReportConfig[] = [
 		filters: ["ou", "pe"],
 		columns: [
 			{
-				key: "tbIdentificationNumber",
-				label: "TB Identification Number",
-				path: "tbIdentificationNumber",
+				key: "patientNumber",
+				label: "Patient Number",
+				path: "patientNumber",
 			},
 			{
 				key: "name",
@@ -154,7 +175,7 @@ export const reports: ReportConfig[] = [
 	},
 ];
 
-export const TBAdherence: DAT_TableConfig[] = [
+export const DATClientOverview: DAT_TableConfig[] = [
 	{
 		key: "treatmentStart",
 		label: "Treatment Start",
@@ -188,6 +209,12 @@ export const TBAdherence: DAT_TableConfig[] = [
 		label: "Device IMEI",
 		path: "deviceIMEINumber",
 		sortable: true,
+	},
+
+	{
+		key: "adherenceFrequency",
+		label: "Adherence Frequency",
+		path: "adherenceFrequency",
 	},
 
 	{
@@ -265,7 +292,8 @@ export const programMapping: ProgramMapping[] = [];
 
 export const DEFAULT_SETTINGS = {
 	settings: {},
-	TBAdherence,
+	DATClientOverview,
+	DATAssignment,
 	programMapping,
 	deviceIMEIList,
 	regimenSetting,

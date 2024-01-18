@@ -17,32 +17,38 @@ export const useDeviceData = (imei?: string) => {
 	const MediatorUrl = program?.mediatorUrl;
 	const ApiKey = program?.apiKey;
 
-	const fetchData = useCallback(async () => {
-		try {
-			const response = await axios.get(
-				`${MediatorUrl}/api/devices/details?imei=${imei}`,
-				{
-					headers: {
-						"x-api-key": ApiKey,
+	const fetchData = useCallback(
+		async (imei?: string) => {
+			try {
+				const response = await axios.get(
+					`${MediatorUrl}/api/devices/details?imei=${imei}`,
+					{
+						headers: {
+							"x-api-key": ApiKey,
+						},
 					},
-				},
-			);
-			setData(response.data);
-			setLoading(false);
-		} catch (error) {
-			setError(error);
-			setLoading(false);
-		}
-	}, [MediatorUrl, ApiKey, imei, currentProgram]);
+				);
+				setData(response.data);
+				setLoading(false);
+			} catch (error) {
+				setError(error);
+				setLoading(false);
+			}
+		},
+		[MediatorUrl, ApiKey, imei, currentProgram],
+	);
 
-	const refetch = useCallback(() => {
-		setLoading(true);
-		fetchData();
-	}, [fetchData, currentProgram]);
+	const refetch = useCallback(
+		(imei: string) => {
+			setLoading(true);
+			fetchData(imei);
+		},
+		[fetchData, currentProgram],
+	);
 
 	useEffect(() => {
 		if (imei !== "N/A") {
-			fetchData();
+			fetchData(imei);
 		} else {
 			setLoading(false);
 		}

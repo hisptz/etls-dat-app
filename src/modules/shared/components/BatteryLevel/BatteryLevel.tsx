@@ -12,7 +12,9 @@ function getSanitizedBatteryLevel(batteryLevel: number): number {
 }
 
 function BatteryLevel({ device, batteryLevel }: BatteryLevelProps) {
-	const { data, loadingDevice } = useDeviceData(device);
+	const { data, loadingDevice } = device
+		? useDeviceData(device)
+		: { data: null, loadingDevice: false };
 
 	let color;
 	const battery = getSanitizedBatteryLevel(
