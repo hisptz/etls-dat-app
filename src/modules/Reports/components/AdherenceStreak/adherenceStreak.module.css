@@ -1,0 +1,88 @@
+.calendar {
+	display: grid;
+	grid-template-columns: repeat(7, 17px);
+	width: 200px;
+	margin: 0 auto;
+	font-family: Arial, sans-serif;
+}
+
+.calendar-week {
+	display: grid;
+	grid-template-columns: repeat(7, 17px);
+	width: 200px;
+	margin: 0 auto;
+	font-family: Arial, sans-serif;
+}
+
+.calendar-monthly {
+	display: grid;
+	grid-template-columns: repeat(7, 17px);
+	width: 200px;
+	margin: 0 auto;
+	font-family: Arial, sans-serif;
+}
+
+.calendar-header {
+	font-size: 27px;
+	font-weight: bold;
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	padding: 10px 0px 10px 0px;
+}
+
+.calendar-cell {
+	width: 15px;
+	height: 15px;
+	background-color: #f44336;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-weight: "500";
+	border: 0.1rem solid #cccccc6c;
+}
+
+.calendar-week-cell {
+	width: 15px;
+	height: 15px;
+	background-color: #f44336;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-weight: "500";
+	border: 0.1rem solid #cccccc6c;
+}
+
+.calendar-cell-monthly {
+	width: 15px;
+	height: 15px;
+	background-color: #f44336;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-weight: "500";
+	border: 0.1rem solid #cccccc6c;
+}
+
+.blue {
+	background-color: #42a5f5;
+	color: white;
+	cursor: pointer;
+}
+
+.green {
+	background-color: #4caf50;
+	color: white;
+	cursor: pointer;
+}
+
+.red {
+	background-color: #f44336;
+	color: white;
+	cursor: pointer;
+}
+
+.greyed-out {
+	color: #ccc;
+	background-color: #f2f3f7;
+}

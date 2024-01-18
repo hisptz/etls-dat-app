@@ -27,6 +27,8 @@ export interface ReportTableProps {
 	paginationDAT: Pagination;
 	data: any;
 	loadingDevices: boolean;
+	error: any;
+	adherenceStreakData: any;
 }
 
 export default function ReportTable({
@@ -37,6 +39,8 @@ export default function ReportTable({
 	data,
 	programMapping,
 	loadingDevices,
+	error,
+	adherenceStreakData,
 }: ReportTableProps) {
 	const [report] = useRecoilState<ReportConfig>(SelectedReport);
 	const deviceList = useRecoilValue(DATDevicesReportState);
@@ -54,23 +58,26 @@ export default function ReportTable({
 				) : (
 					<>
 						<div style={{ display: "flex", justifyContent: "end" }}>
-							<Download
-								enabled={
-									(!loading && !isEmpty(reports)) ||
-									(!loadingDevices && !isEmpty(data))
-								}
-								data={sanitizeReportData(
-									report?.id !== "dat-device-summary-report"
-										? d2ReportData
-										: deviceList,
+							{error ? null : (
+								<Download
+									enabled={
+										(!loading && !isEmpty(reports)) ||
+										(!loadingDevices && !isEmpty(data))
+									}
+									data={sanitizeReportData(
+										report?.id !==
+											"dat-device-summary-report"
+											? d2ReportData
+											: deviceList,
 
-									regimenSettings,
-									programMapping,
-									true,
-									deviceList,
-								)}
-								columns={report.columns as ReportColumn[]}
-							/>
+										regimenSettings,
+										programMapping,
+										true,
+										deviceList,
+									)}
+									columns={report.columns as ReportColumn[]}
+								/>
+							)}
 						</div>
 						<CustomDataTable
 							emptyLabel={
@@ -89,14 +96,21 @@ export default function ReportTable({
 									? pagination
 									: paginationDAT
 							}
-							rows={sanitizeReportData(
-								report?.id !== "dat-device-summary-report"
-									? reports
-									: data,
-								regimenSettings,
-								programMapping,
-								false,
-							)}
+							rows={
+								error
+									? []
+									: sanitizeReportData(
+											report?.id !==
+												"dat-device-summary-report"
+												? reports
+												: data,
+											regimenSettings,
+											programMapping,
+											false,
+											deviceList,
+											adherenceStreakData,
+									  )
+							}
 						/>
 					</>
 				)}

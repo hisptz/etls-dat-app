@@ -18,7 +18,7 @@ import { getProgramMapping } from "../../../../shared/utils";
 import BatteryLevel from "../../../../shared/components/BatteryLevel/BatteryLevel";
 import React from "react";
 import { DateTime } from "luxon";
-import GetAdherenceStreak from "./adherenceStreak";
+import AdherenceStreak from "../../../../shared/components/AdherenceStreak/AdherenceStreak";
 
 type Data = {
 	reports: {
@@ -144,11 +144,12 @@ export function useReportTableData() {
 		stage + "." + programMapping.attributes?.phoneNumber,
 		stage + "." + programMapping.attributes?.regimen,
 		stage + "." + programMapping.attributes?.deviceIMEInumber,
+		stage + "." + DATA_ELEMENTS.DOSAGE_TIME,
 		stage +
 			"." +
 			DATA_ELEMENTS.DEVICE_SIGNAL +
 			(reportType === "tb-adherence-report"
-				? ":IN:Once;Multiple"
+				? ":IN:Once;Multiple;Heartbeat;None"
 				: reportType === "patients-who-missed-doses"
 				? ":IN:Heartbeat;None"
 				: ""),
@@ -254,9 +255,82 @@ export function useReportTableData() {
 
 	const groupedData = _.groupBy(allData, "tei");
 
-	const mergedData = Object.keys(groupedData).map((tei) => {
-		const dataArray: any = groupedData[tei];
-		const regimen = dataArray[0][programMapping?.attributes?.regimen ?? ""];
+	const getAdherenceData = () => {
+		const transformedData: any = {};
+
+		_.forEach(groupedData, (dataArray, key) => {
+			transformedData[key] = _.map(dataArray, (item) => {
+				const signal = _.get(
+					item,
+					stage + "." + DATA_ELEMENTS.DEVICE_SIGNAL,
+					"",
+				);
+				const event =
+					signal == "Once"
+						? "takenDose"
+						: signal == "Multiple"
+						? "takenDose"
+						: signal == "Heartbeat"
+						? "notTakenDose"
+						: signal == "Enrollment"
+						? "enrolled"
+						: signal == "None"
+						? ""
+						: "";
+
+				const date = !isEmpty(
+					_.get(item, stage + "." + DATA_ELEMENTS.DOSAGE_TIME, ""),
+				)
+					? _.get(item, stage + "." + DATA_ELEMENTS.DOSAGE_TIME, "")
+					: _.get(item, "eventdate", "");
+
+				return { event, date };
+			});
+		});
+
+		return transformedData;
+	};
+
+	const adherenceStreakData = getAdherenceData();
+
+	const filterData = (
+		data: any,
+		propertyName: string,
+		filterValues: string[],
+	) => {
+		for (const key in data) {
+			if (data.hasOwnProperty(key) && Array.isArray(data[key])) {
+				data[key] = data[key].filter((obj) =>
+					filterValues.includes(obj[propertyName]),
+				);
+				if (data[key].length === 0) {
+					delete data[key];
+				}
+			}
+		}
+
+		return data;
+	};
+
+	const filteredGroupedData = filterData(
+		{ ...groupedData },
+		stage + "." + DATA_ELEMENTS.DEVICE_SIGNAL,
+		["Once", "Multiple"],
+	);
+
+	const mergedData = Object.keys(
+		reportType === "tb-adherence-report"
+			? filteredGroupedData
+			: groupedData,
+	).map((tei) => {
+		const dataArray: any =
+			reportType === "tb-adherence-report"
+				? filteredGroupedData[tei]
+				: groupedData[tei];
+		const regimen =
+			dataArray[0][
+				stage + "." + programMapping?.attributes?.regimen ?? ""
+			];
 
 		let adherenceFrequency;
 		regimenSetting?.map((setting: any) => {
@@ -308,6 +382,7 @@ export function useReportTableData() {
 		error,
 		refetch,
 		getAllEvents,
+		adherenceStreakData,
 	};
 }
 
@@ -443,13 +518,25 @@ export const useDATDevices = () => {
 
 export function sanitizeReportData(
 	data: any[],
-
 	regimenSettings: RegimenSetting[],
 	programMapping: ProgramMapping,
 	downloadable: boolean,
 	deviceList?: any[],
+	adherenceStreakData?: any,
 ) {
+	function getAdherenceStreak(events: any, frequency: string) {
+		return (
+			<div style={{ width: "120px" }}>
+				<AdherenceStreak events={events} frequency={frequency} />
+			</div>
+		);
+	}
+
 	return data.map((report: any) => {
+		const eventData = adherenceStreakData
+			? adherenceStreakData[report.tei]
+			: [];
+
 		const percentage = !isEmpty(regimenSettings)
 			? regimenSettings.map((option: RegimenSetting) => {
 					if (option.administration === report.adherenceFrequency) {
@@ -523,11 +610,12 @@ export function sanitizeReportData(
 				],
 			adherenceFrequency: report.adherenceFrequency,
 			adherencePercentage: adherencePercentage,
-			adherenceStreak: downloadable ? (
-				report.adherenceFrequency
-			) : (
-				<GetAdherenceStreak teiID={report.tei} />
-			),
+			adherenceStreak: downloadable
+				? report.adherenceFrequency
+				: getAdherenceStreak(
+						eventData ?? [],
+						report.adherenceFrequency,
+				  ),
 			numberOfMissedDoses: report.noOfSignal,
 			orgUnit: report.ouname,
 			deviceIMEI: deviceIMEI,

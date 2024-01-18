@@ -90,10 +90,15 @@ export const reports: ReportConfig[] = [
 				label: "Battery",
 				path: "battery",
 			},
+			{
+				key: "adherenceFrequency",
+				label: "Adherence Frequency",
+				path: "adherenceFrequency",
+			},
 
 			{
 				key: "adherencePercentage",
-				label: "Adherence",
+				label: "Overall Adherence (%)",
 				path: "adherencePercentage",
 			},
 			{
@@ -203,6 +208,12 @@ export const DATClientOverview: DAT_TableConfig[] = [
 		label: "Device IMEI",
 		path: "deviceIMEINumber",
 		sortable: true,
+	},
+
+	{
+		key: "adherenceFrequency",
+		label: "Adherence Frequency",
+		path: "adherenceFrequency",
 	},
 
 	{

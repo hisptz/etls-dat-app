@@ -27,7 +27,14 @@ export function Reports() {
 	const period = params.get("periods");
 	const orgUnit = params.get("ou");
 	const program = params.get("program");
-	const { reports, pagination, loading, getAllEvents } = useReportTableData();
+	const {
+		reports,
+		pagination,
+		loading,
+		getAllEvents,
+		error,
+		adherenceStreakData,
+	} = useReportTableData();
 	const { data, loadingDevice, paginationDAT } = useDATDevices();
 	const [enabled, setEnabled] = useState<boolean>(false);
 	const [report] = useRecoilState<ReportConfig>(SelectedReport);
@@ -68,6 +75,8 @@ export function Reports() {
 							programMapping={mapping ?? {}}
 							data={data}
 							loadingDevices={loadingDevice}
+							error={error}
+							adherenceStreakData={adherenceStreakData}
 						/>
 					</div>
 				) : (
