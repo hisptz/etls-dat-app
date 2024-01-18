@@ -1,5 +1,5 @@
 import { useDataQuery } from "@dhis2/app-runtime";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Pagination } from "@hisptz/dhis2-utils";
 import { useSearchParams } from "react-router-dom";
 import { head, isEmpty } from "lodash";
@@ -423,7 +423,7 @@ export const useDATDevices = () => {
 		return pagination;
 	}
 
-	const fetchData = async () => {
+	const fetchData = useCallback(async () => {
 		try {
 			const response = await axios.get(`${MediatorUrl}/api/devices/`, {
 				headers: {
@@ -438,7 +438,7 @@ export const useDATDevices = () => {
 			setError(error);
 			setLoading(false);
 		}
-	};
+	}, []);
 
 	const paginateData = async ({
 		page,
@@ -495,6 +495,11 @@ export const useDATDevices = () => {
 		fetchData();
 	}, []);
 
+	const refetch = useCallback(async () => {
+		setLoading(true);
+		await fetchData();
+	}, [fetchData]);
+
 	const onPageChange = async (page: number) => {
 		setCurrentPage(page);
 		await paginateData({ page: page });
@@ -513,6 +518,7 @@ export const useDATDevices = () => {
 		data,
 		errorDevice,
 		loadingDevice,
+		refetch,
 	};
 };
 

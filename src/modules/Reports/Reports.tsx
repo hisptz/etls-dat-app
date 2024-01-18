@@ -35,7 +35,8 @@ export function Reports() {
 		error,
 		adherenceStreakData,
 	} = useReportTableData();
-	const { data, loadingDevice, paginationDAT } = useDATDevices();
+	const { data, loadingDevice, paginationDAT, refetch, errorDevice } =
+		useDATDevices();
 	const [enabled, setEnabled] = useState<boolean>(false);
 	const [report] = useRecoilState<ReportConfig>(SelectedReport);
 
@@ -51,6 +52,7 @@ export function Reports() {
 			}
 		} else {
 			setEnabled(true);
+			refetch();
 		}
 	}, [reportType, orgUnit, period, program]);
 
@@ -71,11 +73,19 @@ export function Reports() {
 							reports={reports}
 							pagination={pagination}
 							paginationDAT={paginationDAT}
-							loading={loading}
+							loading={
+								reportType === "dat-device-summary-report"
+									? loadingDevice
+									: loading
+							}
 							programMapping={mapping ?? {}}
 							data={data}
 							loadingDevices={loadingDevice}
-							error={error}
+							error={
+								reportType === "dat-device-summary-report"
+									? errorDevice
+									: error
+							}
 							adherenceStreakData={adherenceStreakData}
 						/>
 					</div>

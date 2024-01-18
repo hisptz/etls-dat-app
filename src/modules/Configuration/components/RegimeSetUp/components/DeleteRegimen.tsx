@@ -50,6 +50,7 @@ function DeleteSetting({ regimen, hide, onHide }: DeleteSetting) {
 				onClose={() => {
 					onHide();
 				}}
+				medium
 			>
 				<ModalTitle>
 					<h3
@@ -68,7 +69,7 @@ function DeleteSetting({ regimen, hide, onHide }: DeleteSetting) {
 							display: "flex",
 							flexDirection: "column",
 							alignItems: "center",
-							padding: "32px",
+							padding: "10px",
 						}}
 					>
 						<label style={{ fontSize: "16px" }}>

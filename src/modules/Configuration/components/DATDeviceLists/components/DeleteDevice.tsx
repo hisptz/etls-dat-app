@@ -61,6 +61,7 @@ function DeleteDevice({ IMEI, inUse, hide, onHide, refresh }: DeleteDevice) {
 				onClose={() => {
 					onHide();
 				}}
+				medium
 			>
 				<ModalTitle>
 					<h3
@@ -79,7 +80,7 @@ function DeleteDevice({ IMEI, inUse, hide, onHide, refresh }: DeleteDevice) {
 							display: "flex",
 							flexDirection: "column",
 							alignItems: "center",
-							padding: "32px",
+							padding: "10px",
 						}}
 					>
 						<label style={{ fontSize: "16px" }}>
