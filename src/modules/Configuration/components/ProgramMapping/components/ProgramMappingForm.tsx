@@ -194,6 +194,10 @@ function ProgramMappingForm({
 		resolver: zodResolver(schema),
 	});
 
+	const regimenOptions = attributeOptions.filter(
+		(option) => option.optionSet?.id,
+	);
+
 	return (
 		<div>
 			<Modal position="middle" hide={hide} onClose={onClose}>
@@ -273,7 +277,7 @@ function ProgramMappingForm({
 							</div>
 							<div style={{ padding: "5px" }}>
 								<FilterField
-									options={attributeOptions}
+									options={regimenOptions}
 									required={true}
 									name="attributes.regimen"
 									label={i18n.t("Regimen")}
