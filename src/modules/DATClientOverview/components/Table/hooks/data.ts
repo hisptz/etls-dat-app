@@ -104,25 +104,11 @@ export function useFilters() {
 			if (filterConfig) {
 				const value = params.get(filter);
 				if (value) {
-					return filter != "deviceIMEInumber"
-						? `${filterConfig.attribute}:${filterConfig.operator}:${value}`
-						: `${filterConfig.attribute}:${
-								filterConfig.operator
-						  }:${value}:ne:${null}`;
-				} else {
-					return `${filterConfig.attribute}:ne:${null}`;
+					return `${filterConfig.attribute}:${filterConfig.operator}:${value}`;
 				}
 			}
 		}),
 	);
-
-	const containsDeviceIMEIfilter = filters.some((item) =>
-		item.includes(mapping?.attributes?.deviceIMEInumber ?? ""),
-	);
-
-	if (!containsDeviceIMEIfilter) {
-		filters.push(`${mapping?.attributes?.deviceIMEInumber}:ne:${null}`);
-	}
 
 	return {
 		filters,
@@ -161,7 +147,7 @@ export function useDATClientTableData() {
 			startDate,
 			filters,
 			orgUnit,
-			order: "enrolledAt:desc",
+			order: `${mapping.attributes?.deviceIMEInumber}:asc,enrolledAt:desc`,
 		},
 
 		lazy: !mapping,
@@ -228,31 +214,43 @@ export function useDATClientTableData() {
 
 	const onSort = (sort: any) => {
 		if (sort.direction === "default") {
-			const columnId =
-				sort.name === "treatmentStart"
-					? "enrolledAt"
-					: mapping.attributes
-					? mapping.attributes[sort.name]
-					: "";
-			refetch({ order: `${columnId}:asc` });
+			sort.name === "treatmentStart"
+				? refetch({
+						order: `${mapping.attributes?.deviceIMEInumber}:asc,enrolledAt:asc`,
+				  })
+				: mapping.attributes
+				? refetch({
+						order: `${mapping.attributes?.deviceIMEInumber}:asc,${
+							mapping.attributes[sort.name]
+						}:asc`,
+				  })
+				: "";
 		}
 
 		if (sort.direction === "asc") {
-			const columnId =
-				sort.name === "treatmentStart"
-					? "enrolledAt"
-					: mapping.attributes
-					? mapping.attributes[sort.name]
-					: "";
-			refetch({ order: `${columnId}:asc` });
+			sort.name === "treatmentStart"
+				? refetch({
+						order: `${mapping.attributes?.deviceIMEInumber}:asc,enrolledAt:asc`,
+				  })
+				: mapping.attributes
+				? refetch({
+						order: `${mapping.attributes?.deviceIMEInumber}:asc,${
+							mapping.attributes[sort.name]
+						}:asc`,
+				  })
+				: "";
 		} else {
-			const columnId =
-				sort.name === "treatmentStart"
-					? "enrolledAt"
-					: mapping.attributes
-					? mapping.attributes[sort.name]
-					: "";
-			refetch({ order: `${columnId}:desc` });
+			sort.name === "treatmentStart"
+				? refetch({
+						order: `${mapping.attributes?.deviceIMEInumber}:asc,enrolledAt:desc`,
+				  })
+				: mapping.attributes
+				? refetch({
+						order: `${mapping.attributes?.deviceIMEInumber}:asc,${
+							mapping.attributes[sort.name]
+						}:desc`,
+				  })
+				: "";
 		}
 		setSortState(sort);
 	};

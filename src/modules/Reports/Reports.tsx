@@ -11,10 +11,11 @@ import FilterArea from "./components/Table/FilterArea";
 
 import { SelectedReport } from "./components/Table/FilterArea/components/FilterField";
 import { useRecoilState } from "recoil";
-import { ProgramsTab } from "../DATClientOverview/components/ProgramsTab";
+
 import { useSetting } from "@dhis2/app-service-datastore";
 import ReportTable from "./components/Table";
 import { getProgramMapping } from "../shared/utils";
+import { ProgramsTab } from "../shared/components/ProgramsTab";
 
 export function ReportsOutlet() {
 	return <Outlet />;

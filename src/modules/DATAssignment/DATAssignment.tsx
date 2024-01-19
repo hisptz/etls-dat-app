@@ -7,8 +7,8 @@ import { Card, Center } from "@dhis2/ui";
 import { useDATAssignmentTableData } from "./components/Table/hooks/data";
 import { useSetting } from "@dhis2/app-service-datastore";
 import { isEmpty } from "lodash";
-import { ProgramsTab } from "./components/ProgramsTab";
 import DATAssignmentTable from "./components/Table/DATAssignmentTable";
+import { ProgramsTab } from "../shared/components/ProgramsTab";
 
 export function DATAssignmentOutlet() {
 	return <Outlet />;

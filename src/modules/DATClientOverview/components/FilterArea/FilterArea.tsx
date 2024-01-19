@@ -26,8 +26,7 @@ export function FilterArea({ loading, onFetch }: FilterAreaProps) {
 	const defaultOrganizationUnit = useRecoilValue(CurrentUserOrganizationUnit);
 
 	const currentProgram = params.get("program");
-	const mapping = getProgramMapping(programMapping, currentProgram);
-	const deviceIMEIAttribute = mapping?.attributes?.deviceIMEInumber;
+
 	const orgUnit =
 		params.get("ou") ??
 		defaultOrganizationUnit.map(({ id }) => id).join(";");
@@ -45,18 +44,11 @@ export function FilterArea({ loading, onFetch }: FilterAreaProps) {
 			currentProgram ?? undefined,
 		);
 
-		const defaultFilter = filters.filter((item) =>
-			item.includes(`${deviceIMEIAttribute}:ne:null`),
-		);
-		isEmpty(defaultFilter)
-			? defaultFilter.push(`${deviceIMEIAttribute}:ne:null`)
-			: null;
-
 		setParams(defaultValue);
 		setOrganizationUnitState([]);
 		onFetch({
 			page: 1,
-			filters: defaultFilter,
+			filters: [],
 			startDate,
 			orgUnit: defaultOrganizationUnit.map(({ id }) => id).join(";"),
 		});

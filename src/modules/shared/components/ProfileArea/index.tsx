@@ -12,6 +12,8 @@ import { useSetting } from "@dhis2/app-service-datastore";
 import { useSearchParams } from "react-router-dom";
 import BatteryLevel from "../BatteryLevel/BatteryLevel";
 import { getProgramMapping } from "../../utils";
+import DoseStatus from "../doseStatus/doseStatus";
+import AdherenceCalendar from "../adherenceCalendar/adherenceCalendar";
 
 export interface ProfileAreaProps {
 	profile: PatientProfile;
@@ -63,6 +65,25 @@ export function ProfileArea({
 	});
 
 	const totalOpenings = takenDoses.length;
+
+	const dose = [
+		{
+			color: "#42a5f5",
+			status: "Enrollment Date",
+		},
+		{
+			color: "#4caf50",
+			status: "Taken the Dosage",
+		},
+		{
+			color: "#f44336",
+			status: "Missed the Dosage",
+		},
+		{
+			color: "#f2f3f7",
+			status: "N/A",
+		},
+	];
 
 	const refillAlarm =
 		DateTime.fromFormat(
@@ -375,6 +396,36 @@ export function ProfileArea({
 					)}
 				</Card>
 			</div>
+			<div
+				style={{
+					marginTop: "12px",
+					height: "auto",
+				}}
+			>
+				<Card>
+					<div style={{ padding: "12px 32px 12px 32px" }}>
+						<div
+							style={{
+								display: "flex",
+								flexDirection: "row",
+								flexWrap: "wrap",
+							}}
+						>
+							{dose.map((dose, index) => {
+								return (
+									<DoseStatus
+										key={index}
+										color={dose.color}
+										status={dose.status}
+									/>
+								);
+							})}
+						</div>
+						<AdherenceCalendar profile={profile} data={data} />
+					</div>
+				</Card>
+			</div>
+
 			{!hide && (
 				<EditDevice
 					value={

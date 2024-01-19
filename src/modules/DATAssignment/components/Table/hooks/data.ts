@@ -106,7 +106,6 @@ export function useFilters() {
 			}
 		}),
 	);
-	filters.push(`${mapping?.attributes?.deviceIMEInumber}:null`);
 
 	return {
 		filters,
@@ -145,6 +144,7 @@ export function useDATAssignmentTableData() {
 			startDate,
 			filters,
 			orgUnit,
+			order: `${mapping.attributes?.deviceIMEInumber}:desc,enrolledAt:desc`,
 		},
 
 		lazy: !mapping,
@@ -211,22 +211,43 @@ export function useDATAssignmentTableData() {
 
 	const onSort = (sort: any) => {
 		if (sort.direction === "default") {
-			const columnId = mapping.attributes
-				? mapping.attributes[sort.name]
+			sort.name === "treatmentStart"
+				? refetch({
+						order: `${mapping.attributes?.deviceIMEInumber}:desc,enrolledAt:asc`,
+				  })
+				: mapping.attributes
+				? refetch({
+						order: `${mapping.attributes?.deviceIMEInumber}:desc,${
+							mapping.attributes[sort.name]
+						}:asc`,
+				  })
 				: "";
-			refetch({ order: `${columnId}:asc` });
 		}
 
 		if (sort.direction === "asc") {
-			const columnId = mapping.attributes
-				? mapping.attributes[sort.name]
+			sort.name === "treatmentStart"
+				? refetch({
+						order: `${mapping.attributes?.deviceIMEInumber}:desc,enrolledAt:asc`,
+				  })
+				: mapping.attributes
+				? refetch({
+						order: `${mapping.attributes?.deviceIMEInumber}:desc,${
+							mapping.attributes[sort.name]
+						}:asc`,
+				  })
 				: "";
-			refetch({ order: `${columnId}:asc` });
 		} else {
-			const columnId = mapping.attributes
-				? mapping.attributes[sort.name]
+			sort.name === "treatmentStart"
+				? refetch({
+						order: `${mapping.attributes?.deviceIMEInumber}:desc,enrolledAt:desc`,
+				  })
+				: mapping.attributes
+				? refetch({
+						order: `${mapping.attributes?.deviceIMEInumber}:desc,${
+							mapping.attributes[sort.name]
+						}:desc`,
+				  })
 				: "";
-			refetch({ order: `${columnId}:desc` });
 		}
 		setSortState(sort);
 	};
