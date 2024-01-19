@@ -169,17 +169,35 @@ export function useDATClientTableData() {
 		});
 	};
 
+	const filterDataForDATClientOverview = (
+		data: any,
+		attributeValue: string,
+	) => {
+		return data.filter((item: any) => {
+			const hasAttribute = item.attributes?.some(
+				(attr: any) => attr.attribute === attributeValue,
+			);
+
+			return hasAttribute;
+		});
+	};
+
 	useEffect(() => {
 		if (data) {
-			setPatients(
+			const rawData =
 				data?.patients.instances.map((tei) => {
 					return new PatientProfile(tei, mapping, regimenSetting);
-				}) ?? [],
+				}) ?? [];
+
+			const sanitizedData = filterDataForDATClientOverview(
+				rawData,
+				mapping.attributes?.deviceIMEInumber ?? "",
 			);
+
+			setPatients(sanitizedData ?? []);
 			setPagination({
 				page: data?.patients.page,
 				pageSize: data?.patients.pageSize,
-				total: data?.patients.total,
 				pageCount: Math.ceil(
 					data?.patients.total / data?.patients.pageSize,
 				),
