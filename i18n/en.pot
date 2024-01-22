@@ -141,36 +141,6 @@ msgstr "Configuration"
 msgid "Back"
 msgstr "Back"
 
-msgid "Missing Dose Data"
-msgstr "Missing Dose Data"
-
-msgid " has no dose data recorded"
-msgstr " has no dose data recorded"
-
-msgid "Summary"
-msgstr "Summary"
-
-msgid "Enrollment time"
-msgstr "Enrollment time"
-
-msgid "Dose Taken"
-msgstr "Dose Taken"
-
-msgid "Yes"
-msgstr "Yes"
-
-msgid "No"
-msgstr "No"
-
-msgid "N/A"
-msgstr "N/A"
-
-msgid "Dose Taken at"
-msgstr "Dose Taken at"
-
-msgid "Battery Health"
-msgstr "Battery Health"
-
 msgid "Instance ID is required"
 msgstr "Instance ID is required"
 
@@ -363,3 +333,33 @@ msgstr "Next refill Alarm"
 
 msgid "Last updated"
 msgstr "Last updated"
+
+msgid "Missing Dose Data"
+msgstr "Missing Dose Data"
+
+msgid " has no dose data recorded"
+msgstr " has no dose data recorded"
+
+msgid "Summary"
+msgstr "Summary"
+
+msgid "Enrollment time"
+msgstr "Enrollment time"
+
+msgid "Dose Taken"
+msgstr "Dose Taken"
+
+msgid "Yes"
+msgstr "Yes"
+
+msgid "No"
+msgstr "No"
+
+msgid "N/A"
+msgstr "N/A"
+
+msgid "Dose Taken at"
+msgstr "Dose Taken at"
+
+msgid "Battery Health"
+msgstr "Battery Health"

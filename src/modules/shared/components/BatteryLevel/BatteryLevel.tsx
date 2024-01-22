@@ -1,6 +1,6 @@
 import React from "react";
 import { useDeviceData } from "../ProfileArea/utils";
-import { CircularLoader } from "@dhis2/ui";
+import { CircularLoader, Tooltip } from "@dhis2/ui";
 
 export interface BatteryLevelProps {
 	device?: string;
@@ -20,6 +20,8 @@ function BatteryLevel({ device, batteryLevel }: BatteryLevelProps) {
 	const battery = getSanitizedBatteryLevel(
 		batteryLevel ?? data?.batteryLevel ?? 0,
 	);
+
+	const stringifiedBattery = `${data?.batteryLevel ?? 0} mV`;
 
 	if (battery >= 60) {
 		color = "#4caf50";
@@ -59,10 +61,12 @@ function BatteryLevel({ device, batteryLevel }: BatteryLevelProps) {
 		loadingDevice && !batteryLevel ? (
 			<CircularLoader small />
 		) : (
-			<div style={batteryStyles}>
-				<div style={levelStyles}></div>
-				<div style={knobStyles}></div>
-			</div>
+			<Tooltip content={stringifiedBattery}>
+				<div style={batteryStyles}>
+					<div style={levelStyles}></div>
+					<div style={knobStyles}></div>
+				</div>
+			</Tooltip>
 		)
 	) : null;
 }

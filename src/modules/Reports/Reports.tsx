@@ -11,10 +11,11 @@ import FilterArea from "./components/Table/FilterArea";
 
 import { SelectedReport } from "./components/Table/FilterArea/components/FilterField";
 import { useRecoilState } from "recoil";
-import { ProgramsTab } from "../DATClientOverview/components/ProgramsTab";
+
 import { useSetting } from "@dhis2/app-service-datastore";
 import ReportTable from "./components/Table";
 import { getProgramMapping } from "../shared/utils";
+import { ProgramsTab } from "../shared/components/ProgramsTab";
 
 export function ReportsOutlet() {
 	return <Outlet />;
@@ -35,7 +36,8 @@ export function Reports() {
 		error,
 		adherenceStreakData,
 	} = useReportTableData();
-	const { data, loadingDevice, paginationDAT } = useDATDevices();
+	const { data, loadingDevice, paginationDAT, refetch, errorDevice } =
+		useDATDevices();
 	const [enabled, setEnabled] = useState<boolean>(false);
 	const [report] = useRecoilState<ReportConfig>(SelectedReport);
 
@@ -51,6 +53,7 @@ export function Reports() {
 			}
 		} else {
 			setEnabled(true);
+			refetch();
 		}
 	}, [reportType, orgUnit, period, program]);
 
@@ -71,11 +74,19 @@ export function Reports() {
 							reports={reports}
 							pagination={pagination}
 							paginationDAT={paginationDAT}
-							loading={loading}
+							loading={
+								reportType === "dat-device-summary-report"
+									? loadingDevice
+									: loading
+							}
 							programMapping={mapping ?? {}}
 							data={data}
 							loadingDevices={loadingDevice}
-							error={error}
+							error={
+								reportType === "dat-device-summary-report"
+									? errorDevice
+									: error
+							}
 							adherenceStreakData={adherenceStreakData}
 						/>
 					</div>
