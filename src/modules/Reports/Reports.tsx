@@ -11,10 +11,11 @@ import FilterArea from "./components/Table/FilterArea";
 
 import { SelectedReport } from "./components/Table/FilterArea/components/FilterField";
 import { useRecoilState } from "recoil";
-import { ProgramsTab } from "../DATClientOverview/components/ProgramsTab";
+
 import { useSetting } from "@dhis2/app-service-datastore";
 import ReportTable from "./components/Table";
 import { getProgramMapping } from "../shared/utils";
+import { ProgramsTab } from "../shared/components/ProgramsTab";
 
 export function ReportsOutlet() {
 	return <Outlet />;
@@ -22,17 +23,25 @@ export function ReportsOutlet() {
 
 export function Reports() {
 	const [params] = useSearchParams();
-	const [programMappings] = useSetting("programMapping", { global: true });
+	const [programMapping] = useSetting("programMapping", { global: true });
 	const reportType = params.get("reportType");
 	const period = params.get("periods");
 	const orgUnit = params.get("ou");
 	const program = params.get("program");
-	const { reports, pagination, loading, getAllEvents } = useReportTableData();
-	const { data, loadingDevice, paginationDAT } = useDATDevices();
+	const {
+		reports,
+		pagination,
+		loading,
+		getAllEvents,
+		error,
+		adherenceStreakData,
+	} = useReportTableData();
+	const { data, loadingDevice, paginationDAT, refetch, errorDevice } =
+		useDATDevices();
 	const [enabled, setEnabled] = useState<boolean>(false);
 	const [report] = useRecoilState<ReportConfig>(SelectedReport);
 
-	const selectedProgramMapping = getProgramMapping(programMappings, program);
+	const mapping = getProgramMapping(programMapping, program);
 
 	useEffect(() => {
 		if (reportType != "dat-device-summary-report") {
@@ -44,6 +53,7 @@ export function Reports() {
 			}
 		} else {
 			setEnabled(true);
+			refetch();
 		}
 	}, [reportType, orgUnit, period, program]);
 
@@ -52,10 +62,10 @@ export function Reports() {
 			className="column gap-16 p-16 h-100 w-100"
 			data-test={`${DATA_TEST_PREFIX}-reports-container`}
 		>
-			<h1 className="m-0" style={{ marginBottom: "16px" }}>
+			<h1 className="m-0" style={{ marginBottom: "0px" }}>
 				{i18n.t("Reports")}
 			</h1>
-			{!isEmpty(programMappings) ? <ProgramsTab /> : null}
+			{programMapping.length > 1 ? <ProgramsTab /> : null}
 			<FilterArea />
 			<div>
 				{enabled ? (
@@ -64,10 +74,20 @@ export function Reports() {
 							reports={reports}
 							pagination={pagination}
 							paginationDAT={paginationDAT}
-							loading={loading}
-							programMapping={selectedProgramMapping ?? {}}
+							loading={
+								reportType === "dat-device-summary-report"
+									? loadingDevice
+									: loading
+							}
+							programMapping={mapping ?? {}}
 							data={data}
 							loadingDevices={loadingDevice}
+							error={
+								reportType === "dat-device-summary-report"
+									? errorDevice
+									: error
+							}
+							adherenceStreakData={adherenceStreakData}
 						/>
 					</div>
 				) : (

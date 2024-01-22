@@ -7,8 +7,9 @@ import { Card, Center } from "@dhis2/ui";
 import { useDATClientTableData } from "./components/Table/hooks/data";
 import { useSetting } from "@dhis2/app-service-datastore";
 import { isEmpty } from "lodash";
-import { ProgramsTab } from "./components/ProgramsTab";
+
 import DATClientTable from "./components/Table/DATClientOverviewTable";
+import { ProgramsTab } from "../shared/components/ProgramsTab";
 
 export function DATClientOverviewOutlet() {
 	return <Outlet />;

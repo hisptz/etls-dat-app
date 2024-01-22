@@ -1,14 +1,17 @@
 import React, { useState } from "react";
 import i18n from "@dhis2/d2-i18n";
 import styles from "./adherenceCalendar.module.css";
-import { PatientProfile } from "../../../../shared/models";
+
 import Calendar, { DateEvent } from "./components/calendar";
-import NoDeviceAssigned from "../../../../shared/components/ProfileArea/NoDeviceAssigned";
-import { useAdherenceEvents } from "../../../../shared/components/ProfileArea/utils";
+
 import { DateTime } from "luxon";
 import { useSetting } from "@dhis2/app-service-datastore";
 import { useSearchParams } from "react-router-dom";
-import { getProgramMapping } from "../../../../shared/utils";
+import { PatientProfile } from "../../models";
+import { getProgramMapping } from "../../utils";
+import { useAdherenceEvents } from "../ProfileArea/utils";
+import NoDeviceAssigned from "../ProfileArea/NoDeviceAssigned";
+import BatteryLevel from "../BatteryLevel/BatteryLevel";
 
 export interface ProfileAreaProps {
 	profile: PatientProfile;
@@ -238,13 +241,20 @@ function AdherenceCalendar({ profile, data }: ProfileAreaProps) {
 									className={styles["label-value"]}
 									htmlFor="value"
 								>
-									{eventCode == "green" || eventCode == "blue"
-										? batteryLevel === undefined
-											? "N/A"
-											: batteryLevel !== ""
-											? batteryLevel + "%"
-											: "N/A"
-										: i18n.t("N/A")}
+									{eventCode == "green" ||
+									eventCode == "blue" ? (
+										batteryLevel === undefined ? (
+											"N/A"
+										) : batteryLevel !== "" ? (
+											<BatteryLevel
+												batteryLevel={batteryLevel}
+											/>
+										) : (
+											"N/A"
+										)
+									) : (
+										i18n.t("N/A")
+									)}
 								</label>
 							</div>
 						</div>

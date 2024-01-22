@@ -13,7 +13,7 @@ const query = {
 	programAttributes: {
 		resource: "trackedEntityAttributes",
 		params: {
-			fields: ["id", "name", "code"],
+			fields: ["id", "name", "code", "optionSet[id]"],
 			paging: false,
 		},
 	},
@@ -45,6 +45,7 @@ export interface Option {
 	displayName: string;
 	name: string;
 	code: string;
+	optionSet?: { id: string };
 }
 
 interface QueryType {
@@ -63,13 +64,14 @@ export function usePrograms() {
 		{},
 	);
 
-	const programOpts: Option[] = [];
+	const programOpts: any[] = [];
 	const attributeOpts: Option[] = [];
 	data?.programs.programs.map((prog) => {
 		const newProgram = {
 			...prog,
 			code: prog.id,
 			name: prog.displayName,
+			optionSet: prog.optionSet?.id,
 		};
 		programOpts.push(newProgram);
 	});

@@ -1,14 +1,13 @@
 import React from "react";
 import { usePatient } from "./hooks/data";
-import { Button, Card, IconArrowLeft24 } from "@dhis2/ui";
+import { Button, IconArrowLeft24 } from "@dhis2/ui";
 import i18n from "@dhis2/d2-i18n";
 import { useNavigate } from "react-router-dom";
 import { FullPageLoader } from "../../shared/components/Loaders";
 import ErrorPage from "../../shared/components/ErrorPage";
 import { DATA_TEST_PREFIX } from "../../shared/constants";
 import { ProfileArea } from "../../shared/components/ProfileArea";
-import DoseStatus from "./components/doseStatus/doseStatus";
-import AdherenceCalendar from "./components/adherenceCalendar/adherenceCalendar";
+
 import { useDeviceData } from "../../shared/components/ProfileArea/utils";
 
 export function DATAssignmentDetails() {
@@ -18,25 +17,6 @@ export function DATAssignmentDetails() {
 	const { data, loadingDevice, refetchDevice } = useDeviceData(
 		patient?.deviceIMEINumber,
 	);
-
-	const dose = [
-		{
-			color: "#42a5f5",
-			status: "Enrollment Date",
-		},
-		{
-			color: "#4caf50",
-			status: "Taken the Dosage",
-		},
-		{
-			color: "#f44336",
-			status: "Missed the Dosage",
-		},
-		{
-			color: "#f2f3f7",
-			status: "N/A",
-		},
-	];
 
 	if (loading || loadingDevice) {
 		return <FullPageLoader />;
@@ -53,7 +33,7 @@ export function DATAssignmentDetails() {
 	return (
 		<div
 			className="column gap-32 p-16 h-100 w-100"
-			data-test={`${DATA_TEST_PREFIX}-tbadherence-details-container`}
+			data-test={`${DATA_TEST_PREFIX}-dat-assignment-details-container`}
 		>
 			<div className="column gap-16">
 				<div>
@@ -72,35 +52,6 @@ export function DATAssignmentDetails() {
 						loading={loading}
 						refetchDevice={refetchDevice}
 					/>
-				</div>
-				<div
-					style={{
-						marginTop: "12px",
-						height: "auto",
-					}}
-				>
-					<Card>
-						<div style={{ padding: "12px 32px 12px 32px" }}>
-							<div
-								style={{
-									display: "flex",
-									flexDirection: "row",
-									flexWrap: "wrap",
-								}}
-							>
-								{dose.map((dose, index) => {
-									return (
-										<DoseStatus
-											key={index}
-											color={dose.color}
-											status={dose.status}
-										/>
-									);
-								})}
-							</div>
-							<AdherenceCalendar profile={patient} data={data} />
-						</div>
-					</Card>
 				</div>
 			</div>
 		</div>
