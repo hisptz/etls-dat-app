@@ -157,6 +157,9 @@ function getMigrationMetadataObject(mapping: any): any {
 					{
 						id: "rqvQqekCxF3",
 					},
+					{
+						id: "uvL7HRHHnPu",
+					},
 				],
 			},
 		],
@@ -193,6 +196,15 @@ function getMigrationMetadataObject(mapping: any): any {
 				code: "Heartbeat",
 				name: "Heartbeat",
 				sortOrder: 4,
+				optionSet: {
+					id: "lpMwLxkJor6",
+				},
+			},
+			{
+				id: "uvL7HRHHnPu",
+				code: "Enrollment",
+				name: "Enrollment",
+				sortOrder: 5,
 				optionSet: {
 					id: "lpMwLxkJor6",
 				},
