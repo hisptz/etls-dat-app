@@ -38,6 +38,7 @@ export interface ProgramMapping {
 		regimen?: string;
 		phoneNumber?: string;
 		deviceIMEInumber?: string;
+		episodeId?: string;
 	};
 }
 

@@ -1,6 +1,7 @@
-export enum TRACKED_ENTITY_ATTRIBUTES {}
-
-export enum SHARED_ATTRIBUTES {}
+export enum TRACKED_ENTITY_ATTRIBUTES {
+	EPISODE_ID = "qMMZr6Jqccr",
+	DEVICE_IMEI = "HE8z2yxSJ74",
+}
 
 export enum DATA_ELEMENTS {
 	DEVICE_HEALTH = "QH0OjHcBBpO",
@@ -8,5 +9,3 @@ export enum DATA_ELEMENTS {
 	DOSAGE_TIME = "FOHv6pUjBjv",
 	DEVICE_SIGNAL = "oHBM5fsFc6p",
 }
-
-export enum PROGRAM_STAGES {}

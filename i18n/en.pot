@@ -95,9 +95,6 @@ msgstr "Regimen"
 msgid "Phone Number"
 msgstr "Phone Number"
 
-msgid "Device IMEI Number"
-msgstr "Device IMEI Number"
-
 msgid "Mediator Url"
 msgstr "Mediator Url"
 
@@ -173,6 +170,9 @@ msgstr "Downloading..."
 
 msgid "DAT Client Overview"
 msgstr "DAT Client Overview"
+
+msgid "Device IMEI Number"
+msgstr "Device IMEI Number"
 
 msgid "Dashboards"
 msgstr "Dashboards"

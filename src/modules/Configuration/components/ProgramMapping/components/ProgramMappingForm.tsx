@@ -18,7 +18,10 @@ import { isEmpty } from "lodash";
 import { FormProvider, useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ProgramMapping } from "../../../../shared/constants";
+import {
+	ProgramMapping,
+	TRACKED_ENTITY_ATTRIBUTES,
+} from "../../../../shared/constants";
 
 interface EditProps {
 	programOptions: Option[];
@@ -66,9 +69,8 @@ const schema = z.object({
 		phoneNumber: z
 			.string({ required_error: "Phone Number attribute is required" })
 			.nonempty("Phone Number attribute is required"),
-		deviceIMEInumber: z
-			.string({ required_error: "Device IMEI Number is required" })
-			.nonempty("Device IMEI Number is required"),
+		deviceIMEInumber: z.string().optional(),
+		episodeId: z.string().optional(),
 	}),
 });
 
@@ -81,7 +83,6 @@ function ProgramMappingForm({
 	hide,
 	onHide,
 	onUpdate,
-
 	data,
 }: EditProps) {
 	const { importProgramStage } = useProgramStage();
@@ -135,6 +136,7 @@ function ProgramMappingForm({
 										mappingData.attributes.phoneNumber,
 									deviceIMEInumber:
 										mappingData.attributes.deviceIMEInumber,
+									episodeId: mappingData.attributes.episodeId,
 								},
 						  }
 						: mapping,
@@ -157,11 +159,22 @@ function ProgramMappingForm({
 			data.programStage = generateUid();
 		}
 
-		addNew ? await onSave(data) : await onEdit(data);
+		const sanitizedProgramMapping = {
+			...data,
+			attributes: {
+				...data.attributes,
+				deviceIMEInumber: TRACKED_ENTITY_ATTRIBUTES.DEVICE_IMEI,
+				episodeId: TRACKED_ENTITY_ATTRIBUTES.EPISODE_ID,
+			},
+		};
+
+		addNew
+			? await onSave(sanitizedProgramMapping)
+			: await onEdit(sanitizedProgramMapping);
 
 		if (!isEmpty(programMapping)) {
 			addNew
-				? await importProgramStage(data)
+				? await importProgramStage(sanitizedProgramMapping)
 				: await Promise.all(
 						programMapping.map(async (mapping: ProgramFormData) =>
 							mapping.program === data.program
@@ -290,15 +303,6 @@ function ProgramMappingForm({
 									required={true}
 									name="attributes.phoneNumber"
 									label={i18n.t("Phone Number")}
-									type="select"
-								/>
-							</div>
-							<div style={{ padding: "5px" }}>
-								<FilterField
-									options={attributeOptions}
-									required={true}
-									name="attributes.deviceIMEInumber"
-									label={i18n.t("Device IMEI Number")}
 									type="select"
 								/>
 							</div>
