@@ -234,7 +234,7 @@ export function ProfileArea({
 						<div style={{ alignItems: "flex-end" }} className="row">
 							<div>
 								<h2 className=" m-0">
-									{i18n.t("DAT device information")}
+									{i18n.t("DAT Device Information")}
 								</h2>
 							</div>
 						</div>
