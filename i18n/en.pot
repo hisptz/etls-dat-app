@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2024-01-15T10:59:49.281Z\n"
-"PO-Revision-Date: 2024-01-15T10:59:49.281Z\n"
+"POT-Creation-Date: 2024-01-21T09:48:33.880Z\n"
+"PO-Revision-Date: 2024-01-21T09:48:33.880Z\n"
 
 msgid "Configurations"
 msgstr "Configurations"
@@ -143,36 +143,6 @@ msgstr "Configuration"
 
 msgid "Back"
 msgstr "Back"
-
-msgid "Missing Dose Data"
-msgstr "Missing Dose Data"
-
-msgid " has no dose data recorded"
-msgstr " has no dose data recorded"
-
-msgid "Summary"
-msgstr "Summary"
-
-msgid "Enrollment time"
-msgstr "Enrollment time"
-
-msgid "Dose Taken"
-msgstr "Dose Taken"
-
-msgid "Yes"
-msgstr "Yes"
-
-msgid "No"
-msgstr "No"
-
-msgid "N/A"
-msgstr "N/A"
-
-msgid "Dose Taken at"
-msgstr "Dose Taken at"
-
-msgid "Battery Health"
-msgstr "Battery Health"
 
 msgid "Instance ID is required"
 msgstr "Instance ID is required"
@@ -334,8 +304,8 @@ msgstr "Adherence Frequency"
 msgid "Phone"
 msgstr "Phone"
 
-msgid "DAT device information"
-msgstr "DAT device information"
+msgid "DAT Device Information"
+msgstr "DAT Device Information"
 
 msgid "Edit Device"
 msgstr "Edit Device"
@@ -363,3 +333,33 @@ msgstr "Next refill Alarm"
 
 msgid "Last updated"
 msgstr "Last updated"
+
+msgid "Missing Dose Data"
+msgstr "Missing Dose Data"
+
+msgid " has no dose data recorded"
+msgstr " has no dose data recorded"
+
+msgid "Summary"
+msgstr "Summary"
+
+msgid "Enrollment time"
+msgstr "Enrollment time"
+
+msgid "Dose Taken"
+msgstr "Dose Taken"
+
+msgid "Yes"
+msgstr "Yes"
+
+msgid "No"
+msgstr "No"
+
+msgid "N/A"
+msgstr "N/A"
+
+msgid "Dose Taken at"
+msgstr "Dose Taken at"
+
+msgid "Battery Health"
+msgstr "Battery Health"
