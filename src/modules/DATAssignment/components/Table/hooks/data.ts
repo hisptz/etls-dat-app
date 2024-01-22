@@ -117,6 +117,7 @@ export function useFilters() {
 export function useDATAssignmentTableData() {
 	const defaultOrganizationUnit = useRecoilValue(CurrentUserOrganizationUnit);
 	const { filters, startDate } = useFilters();
+	const [currentPage, setCurrentPage] = useState<number>();
 	const [patients, setPatients] = useState<PatientProfile[]>([]);
 	const [programMapping] = useSetting("programMapping", {
 		global: true,
@@ -151,6 +152,7 @@ export function useDATAssignmentTableData() {
 	});
 
 	const onPageChange = (page: number) => {
+		setCurrentPage(page);
 		refetch({
 			page,
 			filters,
@@ -166,11 +168,15 @@ export function useDATAssignmentTableData() {
 		});
 	};
 
+	let lastPage: boolean;
+
 	const filterDataForDATAssignment = (data: any, attributeValue: string) => {
 		return data.filter((item: any) => {
 			const hasAttribute = item.attributes?.some(
 				(attr: any) => attr.attribute === attributeValue,
 			);
+
+			lastPage = hasAttribute;
 
 			return !hasAttribute;
 		});
@@ -188,14 +194,19 @@ export function useDATAssignmentTableData() {
 				mapping.attributes?.deviceIMEInumber ?? "",
 			);
 
+			isEmpty(sanitizedData)
+				? refetch({
+						page: (currentPage ?? 2) - 1,
+						filters,
+						orgUnit,
+				  })
+				: null;
+
 			setPatients(sanitizedData ?? []);
 			setPagination({
 				page: data?.patients.page,
 				pageSize: data?.patients.pageSize,
-
-				pageCount: Math.ceil(
-					data?.patients.total / data?.patients.pageSize,
-				),
+				isLastPage: lastPage,
 			});
 		}
 	}, [data, currentProgram]);

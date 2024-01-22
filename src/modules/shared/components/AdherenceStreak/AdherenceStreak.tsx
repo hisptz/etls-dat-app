@@ -35,6 +35,14 @@ function AdherenceStreak({ events, frequency }: CalendarProps) {
 		return date.toLocaleDateString(undefined, options);
 	};
 
+	const formatWeekDate = (date: Date) => {
+		const options = {
+			year: "numeric",
+			month: "short",
+		};
+		return date.toLocaleDateString(undefined, options);
+	};
+
 	const renderDailyCalendar = () => {
 		const calendarCells = [];
 
@@ -203,28 +211,28 @@ function AdherenceStreak({ events, frequency }: CalendarProps) {
 
 	const renderWeeklyCalendar = () => {
 		const calendarCells = [];
-		const weeksInMonth = 4;
-		for (let week = 1; week <= weeksInMonth; week++) {
-			const startDate = new Date(
-				currentYear,
-				currentMonth,
-				(week - 1) * 7 + 1,
-			);
-			const endDate = new Date(
-				currentYear,
-				currentMonth,
-				week == 4 ? week * 8 : week * 7,
-			);
 
-			const weekEvents = events.filter((event) => {
+		const today = new Date();
+		today.setHours(0, 0, 0, 0);
+
+		for (let i = 6; i > -1; i--) {
+			const cellDate = new Date(today);
+			cellDate.setDate(today.getDate() - i * 7);
+
+			const weekNumber = getISOWeek(cellDate);
+
+			const dailyEvents = events.filter((event) => {
 				const eventDate = new Date(event.date);
 				eventDate.setHours(0, 0, 0, 0);
-				return eventDate >= startDate && eventDate <= endDate;
+				return (
+					eventDate.getTime() === cellDate.getTime() &&
+					eventDate.getTime() <= cellDate.getTime()
+				);
 			});
 
 			const sanitizeEvents = () => {
 				let takenDoseFound = false;
-				const filteredArray = weekEvents.filter((event) => {
+				const filteredArray = dailyEvents.filter((event) => {
 					if (event.event === "takenDose") {
 						takenDoseFound = true;
 						return true;
@@ -236,36 +244,37 @@ function AdherenceStreak({ events, frequency }: CalendarProps) {
 				if (takenDoseFound) {
 					return filteredArray;
 				} else {
-					return weekEvents;
+					return dailyEvents;
 				}
 			};
 
 			const sanitizedEvents = sanitizeEvents();
 
-			const weekColor =
+			const cellColor =
 				sanitizedEvents.length > 0
 					? cellColors[sanitizedEvents[0].event]
 					: "N/A";
 
-			const tooltipId = `weekly-tooltip-${weekColor + week}`;
+			const tooltipId = `daily-tooltip-${cellColor + i}`;
 			const tooltipContent = i18n.t(
-				`Week: ${week}\nStatus: ${
-					weekColor
-						? weekColor == "green"
+				`Date: Week ${weekNumber} ${formatWeekDate(cellDate)} Status: ${
+					cellColor
+						? cellColor == "green"
 							? "Dose Taken"
-							: weekColor == "blue"
+							: cellColor == "blue"
 							? "Enrolled"
-							: weekColor == "red"
+							: cellColor == "red"
 							? "Dose Missed"
 							: "N/A"
 						: "N/A"
 				}`,
 			);
+
 			calendarCells.push(
 				<>
 					<div
-						key={`before-${week}`}
-						className={`${styles["calendar-week-cell"]} ${styles[weekColor]}`}
+						key={i}
+						className={`${styles["calendar-cell"]} ${styles[cellColor]}`}
 						style={{ fontSize: "18px" }}
 						data-tooltip-id={tooltipId}
 					></div>
@@ -283,6 +292,22 @@ function AdherenceStreak({ events, frequency }: CalendarProps) {
 
 		return calendarCells;
 	};
+	const getISOWeek = (date: any) => {
+		const d = new Date(date);
+		d.setHours(0, 0, 0, 0);
+		d.setDate(d.getDate() + 7 - (d.getDay() || 7));
+		const dayOfMonth = d.getDate();
+		const firstDayOfMonth = new Date(
+			d.getFullYear(),
+			d.getMonth(),
+			1,
+		).getDay();
+		const offset = (firstDayOfMonth + 6) % 7;
+
+		const weekOfMonth = Math.ceil((dayOfMonth + offset) / 7);
+
+		return weekOfMonth;
+	};
 
 	return (
 		<>
@@ -292,7 +317,7 @@ function AdherenceStreak({ events, frequency }: CalendarProps) {
 				</div>
 			) : frequency === "Weekly" ? (
 				<div className={styles["calendar-week"]}>
-					{renderDailyCalendar()}
+					{renderWeeklyCalendar()}
 				</div>
 			) : (
 				<div className={styles["calendar-monthly"]}>
