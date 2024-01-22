@@ -1,6 +1,6 @@
 export enum TRACKED_ENTITY_ATTRIBUTES {
 	EPISODE_ID = "qMMZr6Jqccr",
-	DEVICE_IMEI = "HE8z2yxSJ74",
+	DEVICE_IMEI = "ayhQ0Uu3DHx",
 }
 
 export enum DATA_ELEMENTS {
