@@ -11,7 +11,6 @@ import { OrganizationUnitState } from "../../state/filters";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { getResetDATOverviewFilters } from "../../constants/filters";
 import { CurrentUserOrganizationUnit } from "../../../shared/state/currentUser";
-import { getProgramMapping } from "../../../shared/utils";
 
 export interface FilterAreaProps {
 	loading: boolean;
@@ -20,7 +19,7 @@ export interface FilterAreaProps {
 
 export function FilterArea({ loading, onFetch }: FilterAreaProps) {
 	const [params, setParams] = useSearchParams();
-	const { filters, startDate } = useFilters();
+	const { filters } = useFilters();
 	const [programMapping] = useSetting("programMapping", { global: true });
 	const [, setOrganizationUnitState] = useRecoilState(OrganizationUnitState);
 	const defaultOrganizationUnit = useRecoilValue(CurrentUserOrganizationUnit);
@@ -34,7 +33,6 @@ export function FilterArea({ loading, onFetch }: FilterAreaProps) {
 		onFetch({
 			page: 1,
 			filters,
-			startDate,
 			orgUnit,
 		});
 	};
@@ -49,7 +47,6 @@ export function FilterArea({ loading, onFetch }: FilterAreaProps) {
 		onFetch({
 			page: 1,
 			filters: [],
-			startDate,
 			orgUnit: defaultOrganizationUnit.map(({ id }) => id).join(";"),
 		});
 	};

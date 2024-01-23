@@ -70,8 +70,8 @@ function EditDevice({
 					device.IMEI === data.IMEI
 						? true
 						: device.IMEI === value && value !== data.IMEI
-							? false
-							: device.inUse,
+						? false
+						: device.inUse,
 			}));
 
 			await assignDeviceWisePill({

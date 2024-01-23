@@ -38,13 +38,10 @@ export const useDeviceData = (imei?: string) => {
 		[MediatorUrl, ApiKey, imei, currentProgram],
 	);
 
-	const refetch = useCallback(
-		(imei: string) => {
-			setLoading(true);
-			fetchData(imei);
-		},
-		[fetchData, currentProgram],
-	);
+	const refetch = useCallback(() => {
+		setLoading(true);
+		fetchData(imei);
+	}, [fetchData, currentProgram]);
 
 	useEffect(() => {
 		if (imei !== "N/A") {

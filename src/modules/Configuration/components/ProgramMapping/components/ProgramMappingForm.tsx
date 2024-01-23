@@ -1,5 +1,5 @@
 /* eslint-disable indent */
-import React from "react";
+import React, { useEffect } from "react";
 import {
 	Button,
 	Modal,
@@ -14,8 +14,8 @@ import { Option } from "../hooks/data";
 import { generateUid, useProgramStage } from "../hooks/save";
 import { useSetting } from "@dhis2/app-service-datastore";
 import { useAlert, useDataQuery } from "@dhis2/app-runtime";
-import { isEmpty } from "lodash";
-import { FormProvider, useForm } from "react-hook-form";
+import { head, isEmpty } from "lodash";
+import { FormProvider, useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -25,7 +25,6 @@ import {
 
 interface EditProps {
 	programOptions: Option[];
-	attributeOptions: Option[];
 	error: any;
 	onUpdate?: ReturnType<typeof useDataQuery>["refetch"];
 	hide: boolean;
@@ -78,7 +77,7 @@ export type ProgramFormData = z.infer<typeof schema>;
 
 function ProgramMappingForm({
 	programOptions,
-	attributeOptions,
+
 	error,
 	hide,
 	onHide,
@@ -207,8 +206,37 @@ function ProgramMappingForm({
 		resolver: zodResolver(schema),
 	});
 
-	const regimenOptions = attributeOptions.filter(
-		(option) => option.optionSet?.id,
+	const programValue = useWatch({
+		control: form.control,
+		name: "program",
+	});
+
+	const disableFields = programValue === undefined || programValue === "";
+
+	useEffect(() => {
+		[
+			"name",
+			"attributes.firstName",
+			"attributes.surname",
+			"attributes.patientNumber",
+			"attributes.age",
+			"attributes.sex",
+			"attributes.regimen",
+			"attributes.phoneNumber",
+			"mediatorUrl",
+			"apiKey",
+		].forEach((fieldName: any) => {
+			form.setValue(fieldName, undefined, { shouldValidate: false });
+			form.clearErrors(fieldName);
+		});
+	}, [programValue, form]);
+
+	const selectedProgramAttributes = head(
+		programOptions?.filter((program) => program.id === programValue),
+	)?.programTrackedEntityAttributes;
+
+	const regimenOptions = selectedProgramAttributes?.filter(
+		(option: any) => option.optionSet?.id,
 	);
 
 	return (
@@ -228,14 +256,6 @@ function ProgramMappingForm({
 							<div style={{ padding: "5px" }}>
 								<FilterField
 									required={true}
-									name="name"
-									label={i18n.t("Name")}
-									type="text"
-								/>
-							</div>
-							<div style={{ padding: "5px" }}>
-								<FilterField
-									required={true}
 									disabled={addNew ? false : true}
 									options={programOptions}
 									name="program"
@@ -245,7 +265,17 @@ function ProgramMappingForm({
 							</div>
 							<div style={{ padding: "5px" }}>
 								<FilterField
-									options={attributeOptions}
+									disabled={disableFields}
+									required={true}
+									name="name"
+									label={i18n.t("Name")}
+									type="text"
+								/>
+							</div>
+							<div style={{ padding: "5px" }}>
+								<FilterField
+									disabled={disableFields}
+									options={selectedProgramAttributes}
 									required={true}
 									name="attributes.firstName"
 									label={i18n.t("First Name")}
@@ -254,7 +284,8 @@ function ProgramMappingForm({
 							</div>
 							<div style={{ padding: "5px" }}>
 								<FilterField
-									options={attributeOptions}
+									disabled={disableFields}
+									options={selectedProgramAttributes}
 									required={true}
 									name="attributes.surname"
 									label={i18n.t("Surname")}
@@ -263,7 +294,8 @@ function ProgramMappingForm({
 							</div>
 							<div style={{ padding: "5px" }}>
 								<FilterField
-									options={attributeOptions}
+									disabled={disableFields}
+									options={selectedProgramAttributes}
 									required={true}
 									name="attributes.patientNumber"
 									label={i18n.t("Patient Number")}
@@ -272,7 +304,8 @@ function ProgramMappingForm({
 							</div>
 							<div style={{ padding: "5px" }}>
 								<FilterField
-									options={attributeOptions}
+									disabled={disableFields}
+									options={selectedProgramAttributes}
 									required={true}
 									name="attributes.age"
 									label={i18n.t("Age")}
@@ -281,7 +314,8 @@ function ProgramMappingForm({
 							</div>
 							<div style={{ padding: "5px" }}>
 								<FilterField
-									options={attributeOptions}
+									disabled={disableFields}
+									options={selectedProgramAttributes}
 									required={true}
 									name="attributes.sex"
 									label={i18n.t("Sex")}
@@ -290,6 +324,7 @@ function ProgramMappingForm({
 							</div>
 							<div style={{ padding: "5px" }}>
 								<FilterField
+									disabled={disableFields}
 									options={regimenOptions}
 									required={true}
 									name="attributes.regimen"
@@ -299,7 +334,8 @@ function ProgramMappingForm({
 							</div>
 							<div style={{ padding: "5px" }}>
 								<FilterField
-									options={attributeOptions}
+									disabled={disableFields}
+									options={selectedProgramAttributes}
 									required={true}
 									name="attributes.phoneNumber"
 									label={i18n.t("Phone Number")}
@@ -308,6 +344,7 @@ function ProgramMappingForm({
 							</div>
 							<div style={{ padding: "5px" }}>
 								<FilterField
+									disabled={disableFields}
 									required={true}
 									name="mediatorUrl"
 									label={i18n.t("Mediator Url")}
@@ -316,6 +353,7 @@ function ProgramMappingForm({
 							</div>
 							<div style={{ padding: "5px" }}>
 								<FilterField
+									disabled={disableFields}
 									required={true}
 									name="apiKey"
 									label={i18n.t("API Key")}

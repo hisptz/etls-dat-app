@@ -102,6 +102,10 @@ export function ProfileArea({
 			"hh:mm a",
 		) ?? "";
 
+	const alarmStatus = data?.alarmStatus ?? null;
+
+	const refillAlarmStatus = data?.refillAlarmStatus ?? null;
+
 	const batteryLevel = data?.batteryLevel ?? 0;
 
 	return loading ? (
@@ -452,10 +456,12 @@ export function ProfileArea({
 							? nextRefillTime
 							: ""
 					}
-					dayInWeek={dayInweek}
+					dayInWeek={dayInweek == "" ? "0000000" : dayInweek}
 					nextDoseTime={
 						nextDoseTime != "Invalid DateTime" ? nextDoseTime : ""
 					}
+					alarmStatus={alarmStatus}
+					refillAlarmStatus={refillAlarmStatus}
 					refetch={refetchDevice}
 					hide={hideAlarm}
 					onHide={onHideAlarm}

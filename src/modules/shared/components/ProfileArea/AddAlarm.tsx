@@ -17,12 +17,15 @@ import { z } from "zod";
 import { useSetAlarm } from "../utils/assignAlarm";
 import { useAlert } from "@dhis2/app-runtime";
 import { isEmpty } from "lodash";
+import { DateTime } from "luxon";
 
 interface addAlarmProps {
 	nextRefillTime: string;
 	nextRefillDate: string;
 	nextDoseTime: string;
 	dayInWeek: string;
+	alarmStatus: string;
+	refillAlarmStatus: string;
 	hide: boolean;
 	onHide: () => void;
 	refetch: () => void;
@@ -35,6 +38,8 @@ function EditAlarm({
 	nextRefillDate,
 	dayInWeek,
 	nextDoseTime,
+	alarmStatus,
+	refillAlarmStatus,
 	hide,
 	onHide,
 	refetch,
@@ -56,10 +61,8 @@ function EditAlarm({
 	]);
 
 	useEffect(() => {
-		setDoseReminder(isEmpty(nextDoseTime) ? false : true);
-		setAppointmentReminder(
-			isEmpty(nextRefillDate) && isEmpty(nextRefillTime) ? false : true,
-		);
+		setDoseReminder(alarmStatus === "1" ? true : false);
+		setAppointmentReminder(refillAlarmStatus === "1" ? true : false);
 		const defaultDays = dayInWeek.split("");
 
 		setDaysInWeek(() =>
@@ -109,11 +112,16 @@ function EditAlarm({
 	}
 
 	const onSubmit = async (data: AlarmFormData) => {
+		const currentDate = DateTime.now().toFormat("yyyy-MM-dd");
 		const alarmData = {
 			imei: device,
-			alarm: data.nextDoseTime,
-			refillAlarm: data.nextRefillDate + " " + data.nextRefillTime,
+			alarm: doseReminder ? data.nextDoseTime : "00:00",
+			refillAlarm: appointmentReminder
+				? data.nextRefillDate + " " + data.nextRefillTime
+				: `${currentDate} 00:00`,
 			days: generateDays(daysInWeek),
+			alarmStatus: doseReminder ? 1 : 0,
+			refillAlarmStatus: appointmentReminder ? 1 : 0,
 		};
 
 		await setAlarm({ data: alarmData }).then(async (res) => {
