@@ -49,6 +49,7 @@ export default function D2VisualizationContainer(
 
 	const ouParams = searchParams.get("ou");
 	const peParams = searchParams.get("pe");
+	const programParam = searchParams.get("program");
 
 	const pe: string[] = peParams ? peParams.split(";") : selectedPeriods ?? [];
 	const ou: string[] = ouParams

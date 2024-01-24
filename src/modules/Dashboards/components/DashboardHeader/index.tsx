@@ -37,14 +37,30 @@ export default function DashboardHeader(): React.ReactElement {
 				}}
 			/>
 			<div className="flex gap-16">
-				<span>
-					Selected organization unit:{" "}
-					<span className="bold">{selectedOrgUnit}</span>
-				</span>
-				<span>
-					Selected period:{" "}
-					<span className="bold">{selectedPeriod}</span>
-				</span>
+				<div
+					style={{
+						backgroundColor: "#212934",
+						padding: "9px 20px 9px 20px",
+						borderRadius: "5px",
+					}}
+				>
+					<span style={{ color: "white" }}>
+						Organization unit:{" "}
+						<span className="bold">{selectedOrgUnit}</span>
+					</span>
+				</div>
+
+				<div
+					style={{
+						backgroundColor: "#212934",
+						padding: "9px 20px 9px 20px",
+						borderRadius: "5px",
+					}}
+				>
+					<span style={{ color: "white" }}>
+						Period: <span className="bold">{selectedPeriod}</span>
+					</span>
+				</div>
 			</div>
 		</div>
 	);
