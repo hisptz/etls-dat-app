@@ -1,4 +1,4 @@
-import { find } from "lodash";
+import { find, uniqBy } from "lodash";
 import { useDataMutation, useDataQuery } from "@dhis2/app-runtime";
 import { useSetting } from "@dhis2/app-service-datastore";
 import { useSearchParams } from "react-router-dom";
@@ -14,7 +14,7 @@ const programQuery: any = {
 		resource: "programs",
 		id: ({ program }: any) => program,
 		params: {
-			fields: [":owner", "!programStages"],
+			fields: [":owner"],
 		},
 	},
 };
@@ -218,7 +218,7 @@ function getSanitizedProgramMetadataObject(
 	metadata: any,
 ): Program {
 	const { programTrackedEntityAttributes } = program;
-	const { trackedEntityAttributes } = metadata;
+	const { trackedEntityAttributes, programStages } = metadata;
 
 	const trackedEntityAttributeIds: string[] = trackedEntityAttributes.map(
 		({ id }: any) => id ?? "",
@@ -245,6 +245,13 @@ function getSanitizedProgramMetadataObject(
 
 	return {
 		...program,
+		programStages: uniqBy(
+			[
+				...(program.programStages ?? []),
+				...programStages.map(({ id }: any) => ({ id })),
+			],
+			"id",
+		),
 		programTrackedEntityAttributes: [
 			...sanitizedProgramTrackedEntityAttributes,
 			...trackedEntityAttributes
