@@ -4,6 +4,8 @@ import axios from "axios";
 import { usePatient } from "../../../DATClientOverview/DATClientDetails/hooks/data";
 import { TrackedEntity } from "../../types";
 import { useSearchParams } from "react-router-dom";
+import { DATA_ELEMENTS, TRACKED_ENTITY_ATTRIBUTES } from "../../constants";
+import { getProgramMapping } from "../../utils";
 
 export function useAssignDevice() {
 	const [programMapping] = useSetting("programMapping", { global: true });
@@ -12,11 +14,10 @@ export function useAssignDevice() {
 	const [params] = useSearchParams();
 	const currentProgram = params.get("program");
 
-	const selectedProgram = programMapping.filter(
-		(mapping: any) => mapping.program === currentProgram,
-	);
-	const program = selectedProgram[0];
-	const TEA_ID = program?.attributes.deviceIMEInumber;
+	const program = getProgramMapping(programMapping, currentProgram);
+
+	const TEA_ID = TRACKED_ENTITY_ATTRIBUTES.DEVICE_IMEI;
+	const EPISODE_ID = TRACKED_ENTITY_ATTRIBUTES.EPISODE_ID;
 	const MediatorUrl = program?.mediatorUrl;
 	const ApiKey = program?.apiKey;
 
@@ -60,6 +61,10 @@ export function useAssignDevice() {
 							attribute: TEA_ID,
 							value: data,
 						},
+						// {
+						// 	attribute: EPISODE_ID,
+						// 	value: episodeID,
+						// },
 				  ]
 				: patientTei!.attributes.map((attribute, index) =>
 						index === attributeIndex

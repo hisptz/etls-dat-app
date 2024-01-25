@@ -9,8 +9,7 @@ import ProgramMappingTable from "./components/ProgramMappingTable";
 
 export function ProgramMapping() {
 	const [hide, setHide] = useState<boolean>(true);
-	const { attributeOptions, programOptions, error, loading, refetch } =
-		usePrograms();
+	const { programOptions, error, loading, refetch } = usePrograms();
 	const [programMapping] = useSetting("programMapping", { global: true });
 
 	const onHide = () => {
@@ -47,7 +46,6 @@ export function ProgramMapping() {
 					</div>
 					{!hide && (
 						<ProgramMappingForm
-							attributeOptions={attributeOptions}
 							programOptions={programOptions}
 							error={error}
 							onUpdate={refetch}

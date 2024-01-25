@@ -21,7 +21,7 @@ function BatteryLevel({ device, batteryLevel }: BatteryLevelProps) {
 		batteryLevel ?? data?.batteryLevel ?? 0,
 	);
 
-	const stringifiedBattery = `${data?.batteryLevel ?? 0} mV`;
+	const stringifiedBattery = `${batteryLevel ?? data?.batteryLevel ?? 0} mV`;
 
 	if (battery >= 60) {
 		color = "#4caf50";

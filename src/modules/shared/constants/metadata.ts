@@ -5,7 +5,7 @@ import { useSearchParams } from "react-router-dom";
 import { getProgramMapping } from "../utils";
 
 export const DATA_TEST_PREFIX = "d2-dat";
-export const DATASTORE_NAMESPACE = "hisptz-dat-app";
+export const DATASTORE_NAMESPACE = "dat-app";
 export const DAT_PROGRAM = (): string => {
 	const [programMapping] = useSetting("programMapping", {
 		global: true,

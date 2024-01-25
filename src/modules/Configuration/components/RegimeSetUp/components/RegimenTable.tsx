@@ -6,12 +6,14 @@ import {
 } from "@hisptz/dhis2-ui";
 import i18n from "@dhis2/d2-i18n";
 
-import { isEmpty } from "lodash";
+import { head, isEmpty } from "lodash";
 import { FullPageLoader } from "../../../../shared/components/Loaders";
 import { ActionButton } from "../../../../shared/components/ActionButton";
 import { RegimenSetting } from "../../../../shared/constants";
 import AddSetting, { RegimenFormData } from "./EditRegimen";
 import DeleteSetting from "./DeleteRegimen";
+import { useSetting } from "@dhis2/app-service-datastore";
+import { useRegimens } from "../hooks/data";
 
 export interface regimensTableProps {
 	loading: boolean;
@@ -23,8 +25,12 @@ export default function RegimenTable({
 	regimens,
 }: regimensTableProps) {
 	const [hideDel, setDelete] = useState<boolean>(true);
+	const { loading: loadingRegimens, allRegimenOptions } = useRegimens();
 	const [hide, setEdit] = useState<boolean>(true);
 	const [selectedRegimen, setSelectedRegimen] = useState<RegimenFormData>();
+	const [programMapping] = useSetting("programMapping", {
+		global: true,
+	});
 
 	const onHide = () => {
 		setEdit(true);
@@ -43,6 +49,11 @@ export default function RegimenTable({
 			key: "regimen",
 			label: "Regimen",
 			path: "regimen",
+		},
+		{
+			key: "program",
+			label: "Program",
+			path: "program",
 		},
 		{
 			key: "administration",
@@ -79,6 +90,26 @@ export default function RegimenTable({
 		);
 	}
 
+	function getMappedProgram(regimen: RegimenFormData) {
+		const attribute = head(
+			allRegimenOptions.filter(
+				(option) => regimen.regimen === option.code,
+			),
+		);
+
+		const programName = head(
+			programMapping
+				.map((mapping: any) => {
+					return mapping.attributes.regimen === attribute?.attributeID
+						? mapping.name
+						: null;
+				})
+				.filter((name: any) => name != null),
+		);
+
+		return programName ?? "Loading...";
+	}
+
 	return (
 		<div className="w-100 h-100" style={{ height: "auto" }}>
 			<div className=" w-100 h-100 gap-16 column">
@@ -91,9 +122,11 @@ export default function RegimenTable({
 							loading={loading}
 							columns={regimensColumns as CustomDataTableColumn[]}
 							rows={regimens.map((regimen, index) => {
+								getMappedProgram(regimen);
 								return {
 									...(regimen as CustomDataTableRow),
 									sn: index + 1,
+									program: getMappedProgram(regimen),
 									action: getActions(regimen),
 								};
 							})}

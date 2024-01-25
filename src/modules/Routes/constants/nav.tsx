@@ -18,7 +18,7 @@ import { Navigate } from "react-router-dom";
 import { DATClientDetails } from "../../DATClientOverview/DATClientDetails/DATClientDetails";
 
 import { Configuration } from "../../Configuration";
-import { Dashboards } from "../../Dashboards";
+import { Dashboards, DashboardsOutlet } from "../../Dashboards";
 import { ProgramMapping } from "../../Configuration/components/ProgramMapping";
 import { DATDevicelists } from "../../Configuration/components/DATDeviceLists";
 import { RegimenSetUp } from "../../Configuration/components/RegimeSetUp";
@@ -95,9 +95,24 @@ export const ROUTES: NavItem[] = [
 	{
 		id: "dashboards",
 		path: "dashboards",
-		element: Dashboards,
+		element: DashboardsOutlet,
 		icon: IconDashboardWindow24,
 		label: i18n.t("Dashboards"),
+		subItems: [
+			{
+				path: "",
+				id: "dashboards-redirect",
+				element: () => {
+					const defaultParams = getDefaultReportFilters();
+					return <Navigate to={`list?${defaultParams.toString()}`} />;
+				},
+			},
+			{
+				path: "list",
+				id: "dashboards-list",
+				element: Dashboards,
+			},
+		],
 	},
 	{
 		id: "reports",

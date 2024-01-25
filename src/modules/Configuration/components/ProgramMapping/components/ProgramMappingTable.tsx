@@ -106,12 +106,12 @@ export default function RegimenTable({
 									mappedProgram: loadingNames
 										? "Loading..."
 										: programName?.map((program) => {
-											if (
-												program.id ===
+												if (
+													program.id ===
 													mapping.program
-											) {
-												return program.displayName;
-											}
+												) {
+													return program.displayName;
+												}
 										  }),
 								};
 							})}
@@ -119,7 +119,6 @@ export default function RegimenTable({
 
 						{!hide && (
 							<ProgramMappingForm
-								attributeOptions={attributeOptions}
 								programOptions={programOptions}
 								error={error}
 								onUpdate={refetch}

@@ -23,8 +23,6 @@ const query: any = {
 			page,
 			pageSize,
 			filters,
-			startDate,
-			endDate,
 			program,
 			orgUnit,
 			order,
@@ -32,16 +30,12 @@ const query: any = {
 			page: number;
 			pageSize: number;
 			filters?: string[];
-			startDate?: string;
-			endDate?: string;
 			program: string;
 			orgUnit?: string;
 			order?: string;
 		}) => ({
 			pageSize,
 			page,
-			enrollmentEnrolledAfter: startDate,
-			enrollmentEnrolledBefore: endDate,
 			program,
 			orgUnit,
 			rootJunction: "OR",
@@ -112,14 +106,12 @@ export function useFilters() {
 
 	return {
 		filters,
-		startDate: params.get("startDate"),
-		endDate: params.get("endDate"),
 	};
 }
 
 export function useDATClientTableData() {
 	const defaultOrganizationUnit = useRecoilValue(CurrentUserOrganizationUnit);
-	const { filters, startDate } = useFilters();
+	const { filters } = useFilters();
 	const [currentPage, setCurrentPage] = useState<number>();
 	const [patients, setPatients] = useState<PatientProfile[]>([]);
 	const [programMapping] = useSetting("programMapping", {
@@ -145,7 +137,6 @@ export function useDATClientTableData() {
 			page: 1,
 			pageSize: 10,
 			program: mapping?.program,
-			startDate,
 			filters,
 			orgUnit,
 			order: `${mapping.attributes?.deviceIMEInumber}:asc,enrolledAt:desc`,
@@ -232,7 +223,7 @@ export function useDATClientTableData() {
 	});
 
 	const onDownload = (type: "xlsx" | "csv" | "json") => {
-		if (!isEmpty(orgUnit) && !isEmpty(startDate)) {
+		if (!isEmpty(orgUnit)) {
 			download(type, {
 				orgUnit,
 				filters,

@@ -300,7 +300,7 @@ export function useReportTableData() {
 	) => {
 		for (const key in data) {
 			if (data.hasOwnProperty(key) && Array.isArray(data[key])) {
-				data[key] = data[key].filter((obj) =>
+				data[key] = data[key].filter((obj: any) =>
 					filterValues.includes(obj[propertyName]),
 				);
 				if (data[key].length === 0) {

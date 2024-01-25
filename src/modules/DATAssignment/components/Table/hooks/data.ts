@@ -2,7 +2,7 @@ import { useDataQuery } from "@dhis2/app-runtime";
 import { useEffect, useState } from "react";
 import { Pagination } from "@hisptz/dhis2-utils";
 import { useSearchParams } from "react-router-dom";
-import { compact, isEmpty, head, find } from "lodash";
+import { compact, isEmpty } from "lodash";
 import { useDownloadData } from "../../../utils/download";
 import { PatientProfile } from "../../../../shared/models";
 import {
@@ -23,8 +23,7 @@ const query: any = {
 			page,
 			pageSize,
 			filters,
-			startDate,
-			endDate,
+
 			program,
 			orgUnit,
 			order,
@@ -32,16 +31,13 @@ const query: any = {
 			page: number;
 			pageSize: number;
 			filters?: string[];
-			startDate?: string;
-			endDate?: string;
 			program: string;
 			orgUnit?: string;
 			order?: string;
 		}) => ({
 			pageSize,
 			page,
-			enrollmentEnrolledAfter: startDate,
-			enrollmentEnrolledBefore: endDate,
+
 			program,
 			orgUnit,
 			rootJunction: "OR",
@@ -109,14 +105,12 @@ export function useFilters() {
 
 	return {
 		filters,
-		startDate: params.get("startDate"),
-		endDate: params.get("endDate"),
 	};
 }
 
 export function useDATAssignmentTableData() {
 	const defaultOrganizationUnit = useRecoilValue(CurrentUserOrganizationUnit);
-	const { filters, startDate } = useFilters();
+	const { filters } = useFilters();
 	const [currentPage, setCurrentPage] = useState<number>();
 	const [patients, setPatients] = useState<PatientProfile[]>([]);
 	const [programMapping] = useSetting("programMapping", {
@@ -142,7 +136,7 @@ export function useDATAssignmentTableData() {
 			page: 1,
 			pageSize: 10,
 			program: mapping?.program,
-			startDate,
+
 			filters,
 			orgUnit,
 			order: `${mapping.attributes?.deviceIMEInumber}:desc,enrolledAt:desc`,
@@ -227,7 +221,7 @@ export function useDATAssignmentTableData() {
 	});
 
 	const onDownload = (type: "xlsx" | "csv" | "json") => {
-		if (!isEmpty(orgUnit) && !isEmpty(startDate)) {
+		if (!isEmpty(orgUnit)) {
 			download(type, {
 				orgUnit,
 				filters,

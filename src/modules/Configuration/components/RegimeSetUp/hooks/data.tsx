@@ -8,7 +8,7 @@ const query = {
 		resource: "trackedEntityAttributes",
 		params: ({ filters }: { filters?: string }) => ({
 			filter: filters,
-			fields: ["optionSet[options[code,id,name,displayName]]"],
+			fields: ["id,optionSet[options[code,id,name,displayName]]"],
 		}),
 	},
 };
@@ -44,7 +44,7 @@ export function useRegimens() {
 	});
 
 	const options = data?.optionSet.trackedEntityAttributes.map((item: any) => {
-		return item.optionSet.options;
+		return item;
 	});
 
 	const result = () => {
@@ -55,19 +55,57 @@ export function useRegimens() {
 	};
 
 	const regimenOptions = result();
-	const regimenOptionsArray = regimenOptions?.map((option) => option.code);
-	const filteredRegimenOptions = regimenOptionsArray?.filter((regimen) => {
-		return !settings.some(
-			(item: RegimenSetting) => item.regimen === regimen,
-		);
-	});
+
+	const updatedOptionSets = regimenOptions?.map((option: any) => ({
+		...option.optionSet?.options.map((opt: any) => ({
+			...opt,
+			attributeID: option.id,
+		})),
+	}));
+
+	function combineNestedArrays() {
+		let combinedArray: any = [];
+
+		for (const array of updatedOptionSets ?? []) {
+			combinedArray = combinedArray.concat(Object.values(array));
+		}
+
+		return combinedArray;
+	}
+
+	const sanitizedRegimenOptions = combineNestedArrays();
+
+	const regimenOptionsArray = sanitizedRegimenOptions?.map(
+		(option: any) => option,
+	);
+
+	const filteredRegimenOptions = regimenOptionsArray?.filter(
+		(regimen: any) => {
+			return !settings.some(
+				(item: RegimenSetting) => item.regimen === regimen.code,
+			);
+		},
+	);
+
 	const transformedSettings: Option[] =
-		filteredRegimenOptions?.map((item: string) => {
+		filteredRegimenOptions?.map((item: any) => {
 			return {
-				id: item,
-				name: item,
-				displayName: item,
-				code: item,
+				id: item.code,
+				name: item.code,
+				displayName: item.code,
+				code: item.code,
+				attributeID: item.attributeID,
+			};
+		}) ?? [];
+
+	const allRegimenOptions: Option[] =
+		regimenOptionsArray?.map((item: any) => {
+			return {
+				id: item.code,
+				name: item.code,
+				displayName: item.code,
+				code: item.code,
+				attributeID: item.attributeID,
 			};
 		}) ?? [];
 
@@ -76,5 +114,6 @@ export function useRegimens() {
 		error,
 		refetch,
 		regimenOptions: transformedSettings,
+		allRegimenOptions: allRegimenOptions,
 	};
 }

@@ -173,6 +173,7 @@ function AdherenceStreak({ events, frequency }: CalendarProps) {
 			const tooltipContent = i18n.t(
 				`Month: ${targetMonth.toLocaleString("default", {
 					month: "long",
+					year: "numeric",
 				})} \n Status: ${
 					!isEmpty(monthStreakColor)
 						? monthStreakColor == "green"
@@ -255,7 +256,7 @@ function AdherenceStreak({ events, frequency }: CalendarProps) {
 					? cellColors[sanitizedEvents[0].event]
 					: "N/A";
 
-			const tooltipId = `daily-tooltip-${cellColor + i}`;
+			const tooltipId = `daily-tooltip-${weekNumber + cellColor + i}`;
 			const tooltipContent = i18n.t(
 				`Date: Week ${weekNumber} ${formatWeekDate(cellDate)} Status: ${
 					cellColor

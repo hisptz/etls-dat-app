@@ -6,14 +6,11 @@ const query = {
 	programs: {
 		resource: "programs",
 		params: {
-			fields: ["id", "displayName"],
-		},
-	},
-
-	programAttributes: {
-		resource: "trackedEntityAttributes",
-		params: {
-			fields: ["id", "name", "code", "optionSet[id]"],
+			fields: [
+				"id",
+				"displayName",
+				"programTrackedEntityAttributes[trackedEntityAttribute[id,name,code,optionSet[id]]]",
+			],
 			paging: false,
 		},
 	},
@@ -25,6 +22,7 @@ const programQuery = {
 		params: ({ filters }: { filters?: string }) => ({
 			filter: filters,
 			fields: ["id, displayName"],
+			paging: false,
 		}),
 	},
 };
@@ -55,7 +53,6 @@ interface QueryType {
 	programID: {
 		displayName: string;
 	};
-	programAttributes: { trackedEntityAttributes: Option[] };
 }
 
 export function usePrograms() {
@@ -65,23 +62,24 @@ export function usePrograms() {
 	);
 
 	const programOpts: any[] = [];
-	const attributeOpts: Option[] = [];
+
 	data?.programs.programs.map((prog) => {
 		const newProgram = {
 			...prog,
 			code: prog.id,
 			name: prog.displayName,
 			optionSet: prog.optionSet?.id,
+			programTrackedEntityAttributes:
+				prog.programTrackedEntityAttributes.map((attribute: any) => {
+					return {
+						code: attribute.trackedEntityAttribute.id,
+						id: attribute.trackedEntityAttribute.id,
+						name: attribute.trackedEntityAttribute.name,
+						optionSet: attribute.trackedEntityAttribute.optionSet,
+					};
+				}),
 		};
 		programOpts.push(newProgram);
-	});
-
-	data?.programAttributes.trackedEntityAttributes.map((attribute) => {
-		const newAttribute = {
-			...attribute,
-			code: attribute.id,
-		};
-		attributeOpts.push(newAttribute);
 	});
 
 	return {
@@ -89,7 +87,6 @@ export function usePrograms() {
 		error,
 		refetch,
 		programOptions: programOpts,
-		attributeOptions: attributeOpts,
 	};
 }
 

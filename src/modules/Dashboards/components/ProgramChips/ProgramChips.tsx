@@ -1,11 +1,11 @@
 import React from "react";
-import { head, orderBy } from "lodash";
-import { Tab, TabBar } from "@dhis2/ui";
-import { useSearchParams } from "react-router-dom";
-import { DATA_TEST_PREFIX } from "../../../shared/constants";
+import { Chip } from "@dhis2/ui";
 import { useSetting } from "@dhis2/app-service-datastore";
+import { useSearchParams } from "react-router-dom";
+import { head, orderBy } from "lodash";
+import { DATA_TEST_PREFIX } from "../../../shared/constants";
 
-export function ProgramsTab() {
+function ProgramChips() {
 	const [programMapping] = useSetting("programMapping", { global: true });
 	const [params, setParams] = useSearchParams();
 
@@ -13,10 +13,10 @@ export function ProgramsTab() {
 		params.get("program") ?? (head(programMapping) as any)?.program ?? "";
 
 	return (
-		<TabBar>
+		<div style={{ display: "flex" }}>
 			{orderBy(programMapping, "name").map((mapping: any) => {
 				return (
-					<Tab
+					<Chip
 						selected={program == mapping.program ? true : false}
 						onClick={() => {
 							setParams((params) => {
@@ -32,9 +32,11 @@ export function ProgramsTab() {
 						key={`${mapping.name}-tab-item`}
 					>
 						{mapping.name}
-					</Tab>
+					</Chip>
 				);
 			})}
-		</TabBar>
+		</div>
 	);
 }
+
+export default ProgramChips;
