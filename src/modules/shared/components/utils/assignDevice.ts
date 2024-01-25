@@ -25,6 +25,10 @@ export function useAssignDevice() {
 		(attribute) => attribute.attribute === TEA_ID,
 	);
 
+	const attributeEpisodeIndex = patientTei?.attributes.findIndex(
+		(attribute) => attribute.attribute === EPISODE_ID,
+	);
+
 	const { trackedEntity, trackedEntityType, orgUnit } =
 		patientTei as TrackedEntity;
 
@@ -52,23 +56,31 @@ export function useAssignDevice() {
 		},
 	});
 
-	const handleAssignDevice = async (data: string) => {
+	const handleAssignDevice = async ({
+		data,
+		episodeID,
+	}: {
+		data: string;
+		episodeID: string;
+	}) => {
 		const updatedAttributes =
-			attributeIndex === -1
+			attributeIndex === -1 || attributeEpisodeIndex === -1
 				? [
 						...patientTei!.attributes,
 						{
 							attribute: TEA_ID,
 							value: data,
 						},
-						// {
-						// 	attribute: EPISODE_ID,
-						// 	value: episodeID,
-						// },
+						{
+							attribute: EPISODE_ID,
+							value: episodeID,
+						},
 				  ]
 				: patientTei!.attributes.map((attribute, index) =>
 						index === attributeIndex
 							? { ...attribute, value: data }
+							: index === attributeEpisodeIndex
+							? { ...attribute, value: episodeID }
 							: attribute,
 				  );
 		const updatedTei = {
