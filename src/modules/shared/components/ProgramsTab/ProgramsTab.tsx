@@ -1,5 +1,5 @@
 import React from "react";
-import { head } from "lodash";
+import { head, orderBy } from "lodash";
 import { Tab, TabBar } from "@dhis2/ui";
 import { useSearchParams } from "react-router-dom";
 import { DATA_TEST_PREFIX } from "../../../shared/constants";
@@ -14,7 +14,7 @@ export function ProgramsTab() {
 
 	return (
 		<TabBar>
-			{programMapping.map((mapping: any) => {
+			{orderBy(programMapping, "name").map((mapping: any) => {
 				return (
 					<Tab
 						selected={program == mapping.program ? true : false}

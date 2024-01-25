@@ -2,7 +2,7 @@ import React from "react";
 import { Chip } from "@dhis2/ui";
 import { useSetting } from "@dhis2/app-service-datastore";
 import { useSearchParams } from "react-router-dom";
-import { head } from "lodash";
+import { head, orderBy } from "lodash";
 import { DATA_TEST_PREFIX } from "../../../shared/constants";
 
 function ProgramChips() {
@@ -14,7 +14,7 @@ function ProgramChips() {
 
 	return (
 		<div style={{ display: "flex" }}>
-			{programMapping.map((mapping: any) => {
+			{orderBy(programMapping, "name").map((mapping: any) => {
 				return (
 					<Chip
 						selected={program == mapping.program ? true : false}
