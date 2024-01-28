@@ -237,11 +237,16 @@ export function useDATAssignmentTableData() {
 						order: `${mapping.attributes?.deviceIMEInumber}:desc,enrolledAt:asc`,
 				  })
 				: mapping.attributes
-				? refetch({
-						order: `${mapping.attributes?.deviceIMEInumber}:desc,${
-							mapping.attributes[sort.name]
-						}:asc`,
-				  })
+				? sort.name === "name"
+					? refetch({
+							order: `${mapping.attributes?.deviceIMEInumber}:desc,${mapping.attributes.firstName}:asc`,
+					  })
+					: refetch({
+							order: `${mapping.attributes
+								?.deviceIMEInumber}:desc,${
+								mapping.attributes[sort.name]
+							}:asc`,
+					  })
 				: "";
 		}
 
@@ -251,11 +256,16 @@ export function useDATAssignmentTableData() {
 						order: `${mapping.attributes?.deviceIMEInumber}:desc,enrolledAt:asc`,
 				  })
 				: mapping.attributes
-				? refetch({
-						order: `${mapping.attributes?.deviceIMEInumber}:desc,${
-							mapping.attributes[sort.name]
-						}:asc`,
-				  })
+				? sort.name === "name"
+					? refetch({
+							order: `${mapping.attributes?.deviceIMEInumber}:desc,${mapping.attributes.firstName}:asc`,
+					  })
+					: refetch({
+							order: `${mapping.attributes
+								?.deviceIMEInumber}:desc,${
+								mapping.attributes[sort.name]
+							}:asc`,
+					  })
 				: "";
 		} else {
 			sort.name === "treatmentStart"
@@ -263,11 +273,16 @@ export function useDATAssignmentTableData() {
 						order: `${mapping.attributes?.deviceIMEInumber}:desc,enrolledAt:desc`,
 				  })
 				: mapping.attributes
-				? refetch({
-						order: `${mapping.attributes?.deviceIMEInumber}:desc,${
-							mapping.attributes[sort.name]
-						}:desc`,
-				  })
+				? sort.name === "name"
+					? refetch({
+							order: `${mapping.attributes?.deviceIMEInumber}:desc,${mapping.attributes.firstName}:desc`,
+					  })
+					: refetch({
+							order: `${mapping.attributes
+								?.deviceIMEInumber}:desc,${
+								mapping.attributes[sort.name]
+							}:desc`,
+					  })
 				: "";
 		}
 		setSortState(sort);
