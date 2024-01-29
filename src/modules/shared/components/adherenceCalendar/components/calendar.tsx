@@ -290,8 +290,47 @@ function Calendar({ events, frequency, onClick }: CalendarProps) {
 		return calendarCells;
 	};
 
+	const getISOWeekInfo = (date: any) => {
+		const d = new Date(date);
+		d.setHours(0, 0, 0, 0);
+		d.setDate(d.getDate() + 7 - (d.getDay() || 7));
+
+		const dayOfMonth = d.getDate();
+		const firstDayOfMonth = new Date(
+			d.getFullYear(),
+			d.getMonth(),
+			1,
+		).getDay();
+		const offset = (firstDayOfMonth + 6) % 7;
+
+		const weekOfMonth = Math.ceil((dayOfMonth + offset) / 7);
+
+		const startDate = new Date(d);
+		startDate.setDate(startDate.getDate() - 6);
+
+		const endDate = new Date(d);
+
+		const firstDayNextMonth = new Date(
+			d.getFullYear(),
+			d.getMonth() + 1,
+			1,
+		);
+		const lastDayOfMonth = new Date(firstDayNextMonth.getTime() - 1);
+		const totalWeeksInMonth = Math.ceil(
+			(lastDayOfMonth.getDate() + firstDayOfMonth - 1) / 7,
+		);
+
+		return {
+			week: weekOfMonth,
+			startDate: startDate,
+			endDate: endDate,
+			totalWeeksInMonth: totalWeeksInMonth,
+		};
+	};
+
 	const renderWeeklyCalendar = () => {
 		const calendarCells = [];
+
 		const weeksInMonth = 4;
 
 		const getEventsForDate = (date: any) => {
