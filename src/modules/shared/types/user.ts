@@ -3,6 +3,7 @@ export interface CurrentUser {
 	name?: string;
 	userGroups?: Array<{
 		id: string;
+		code: string;
 	}>;
 	organisationUnits?: Array<OrganisationUnitSelection>;
 }

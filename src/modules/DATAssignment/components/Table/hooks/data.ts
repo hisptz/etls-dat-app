@@ -139,10 +139,10 @@ export function useDATAssignmentTableData() {
 
 			filters,
 			orgUnit,
-			order: `${mapping.attributes?.deviceIMEInumber}:desc,enrolledAt:desc`,
+			order: `${mapping?.attributes?.deviceIMEInumber}:desc,enrolledAt:desc`,
 		},
 
-		lazy: !mapping,
+		lazy: !mapping || isEmpty(programMapping),
 	});
 
 	const onPageChange = (page: number) => {

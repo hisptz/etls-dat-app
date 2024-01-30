@@ -138,12 +138,12 @@ export function useReportTableData() {
 	const stage = programMapping?.programStage ?? "";
 
 	const dimensions = [
-		stage + "." + programMapping.attributes?.patientNumber,
-		stage + "." + programMapping.attributes?.firstName,
-		stage + "." + programMapping.attributes?.surname,
-		stage + "." + programMapping.attributes?.phoneNumber,
-		stage + "." + programMapping.attributes?.regimen,
-		stage + "." + programMapping.attributes?.deviceIMEInumber,
+		stage + "." + programMapping?.attributes?.patientNumber,
+		stage + "." + programMapping?.attributes?.firstName,
+		stage + "." + programMapping?.attributes?.surname,
+		stage + "." + programMapping?.attributes?.phoneNumber,
+		stage + "." + programMapping?.attributes?.regimen,
+		stage + "." + programMapping?.attributes?.deviceIMEInumber,
 		stage + "." + DATA_ELEMENTS.DOSAGE_TIME,
 		stage +
 			"." +
@@ -492,7 +492,9 @@ export const useDATDevices = () => {
 	}, [allDevices]);
 
 	useEffect(() => {
-		fetchData();
+		if (!isEmpty(programMapping)) {
+			fetchData();
+		}
 	}, []);
 
 	const refetch = useCallback(async () => {

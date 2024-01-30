@@ -1,6 +1,6 @@
 import React from "react";
 import { Outlet, useNavigate } from "react-router-dom";
-import { DATA_TEST_PREFIX } from "../shared/constants";
+import { DATA_TEST_PREFIX, USERGROUP_CODE } from "../shared/constants";
 import { FilterArea } from "./components/FilterArea";
 import i18n from "@dhis2/d2-i18n";
 import { Card, Center } from "@dhis2/ui";
@@ -10,6 +10,8 @@ import { isEmpty } from "lodash";
 
 import DATClientTable from "./components/Table/DATClientOverviewTable";
 import { ProgramsTab } from "../shared/components/ProgramsTab";
+import { useRecoilValue } from "recoil";
+import { CurrentUserGroup } from "../shared/state/currentUser";
 
 export function DATClientOverviewOutlet() {
 	return <Outlet />;
@@ -20,6 +22,11 @@ export function DATClientOverview() {
 	const { patients, pagination, refetch, loading, onSort, sortState } =
 		useDATClientTableData();
 	const navigate = useNavigate();
+	const currentUserGroup = useRecoilValue(CurrentUserGroup);
+
+	const hasAcces = currentUserGroup.some(
+		(userGroup) => userGroup.code === USERGROUP_CODE,
+	);
 
 	return (
 		<div
@@ -47,24 +54,34 @@ export function DATClientOverview() {
 										alignItems: "center",
 									}}
 								>
-									<span>
-										{i18n.t(
-											"Program Mappings are not configured. Please click the link below to go to configurations.",
-										)}
-									</span>
-									<br />
-									<span
-										style={{
-											color: "#1362bc",
-											cursor: "pointer",
-											fontWeight: "600",
-										}}
-										onClick={() =>
-											navigate("/configuration")
-										}
-									>
-										{i18n.t("Configuration")}
-									</span>
+									{hasAcces ? (
+										<>
+											<span>
+												{i18n.t(
+													"Program Mappings are not configured. Please click the link below to go to configurations.",
+												)}
+											</span>
+											<br />
+											<span
+												style={{
+													color: "#1362bc",
+													cursor: "pointer",
+													fontWeight: "600",
+												}}
+												onClick={() =>
+													navigate("/configuration")
+												}
+											>
+												{i18n.t("Configuration")}
+											</span>
+										</>
+									) : (
+										<span>
+											{i18n.t(
+												"Program Mappings are not configured. Please contact the administrators.",
+											)}
+										</span>
+									)}
 								</div>
 							</Center>
 						</Card>

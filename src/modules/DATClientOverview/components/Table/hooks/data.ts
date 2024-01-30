@@ -139,10 +139,10 @@ export function useDATClientTableData() {
 			program: mapping?.program,
 			filters,
 			orgUnit,
-			order: `${mapping.attributes?.deviceIMEInumber}:asc,enrolledAt:desc`,
+			order: `${mapping?.attributes?.deviceIMEInumber}:asc,enrolledAt:desc`,
 		},
 
-		lazy: !mapping,
+		lazy: !mapping || isEmpty(programMapping),
 	});
 
 	const onPageChange = (page: number) => {

@@ -27,6 +27,8 @@ import { getDefaultReportFilters } from "../../Reports/constants/filters";
 import AdherenceIcon from "../components/AdherenceIcon";
 import { DATAssignment, DATAssignmentOutlet } from "../../DATAssignment";
 import { DATAssignmentDetails } from "../../DATAssignment/DATAssignmentDetails/DATAssignmentDetails";
+import { useRecoilValue } from "recoil";
+import { CurrentUserSelector } from "../../shared/state/currentUser";
 
 export interface NavItem {
 	label?: string | ((data: any) => any);

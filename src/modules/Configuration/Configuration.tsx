@@ -1,10 +1,22 @@
 import React from "react";
 import { SettingsTab } from "./components/SettingsTab";
 import { Outlet } from "react-router-dom";
-import { DATA_TEST_PREFIX } from "../shared/constants";
+import { DATA_TEST_PREFIX, USERGROUP_CODE } from "../shared/constants";
 import i18n from "@dhis2/d2-i18n";
+import { useRecoilValue } from "recoil";
+import { CurrentUserGroup } from "../shared/state/currentUser";
 
 export function Configuration() {
+	const currentUserGroup = useRecoilValue(CurrentUserGroup);
+
+	const hasAcces = currentUserGroup.some(
+		(userGroup) => userGroup.code === USERGROUP_CODE,
+	);
+
+	if (!hasAcces) {
+		return null;
+	}
+
 	return (
 		<div
 			className="column gap-16 p-16 h-100 w-100"
