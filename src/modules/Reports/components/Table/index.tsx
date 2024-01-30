@@ -52,7 +52,7 @@ export default function ReportTable({
 
 	const { show } = useAlert(
 		({ message }) => message,
-		({ type }) => ({ ...type, duration: 700 }),
+		({ type }) => ({ ...type, duration: 2000 }),
 	);
 
 	if (error) {

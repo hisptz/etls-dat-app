@@ -186,11 +186,13 @@ export const DATClientOverview: DAT_TableConfig[] = [
 		key: "patientNumber",
 		label: "Patient Number",
 		path: "patientNumber",
+		sortable: true,
 	},
 	{
 		key: "name",
 		label: "Name",
 		path: "name",
+		sortable: true,
 	},
 
 	{
@@ -240,11 +242,13 @@ export const DATAssignment: DAT_TableConfig[] = [
 		key: "patientNumber",
 		label: "Patient Number",
 		path: "patientNumber",
+		sortable: true,
 	},
 	{
 		key: "name",
 		label: "Name",
 		path: "name",
+		sortable: true,
 	},
 
 	{
