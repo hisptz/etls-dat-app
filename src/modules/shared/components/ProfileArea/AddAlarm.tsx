@@ -17,7 +17,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useSetAlarm } from "../utils/assignAlarm";
 import { useAlert } from "@dhis2/app-runtime";
-import { isEmpty } from "lodash";
 import { DateTime } from "luxon";
 
 interface addAlarmProps {
@@ -127,11 +126,7 @@ function EditAlarm({
 	const parsedDate = DateTime.fromISO(refillDate).startOf("day");
 
 	useEffect(() => {
-		["nextRefillDate", "nextRefillTime"].forEach((fieldName: any) => {
-			parsedDate < today
-				? form.setValue(fieldName, "", { shouldValidate: false })
-				: null;
-		});
+		setAppointmentReminder(parsedDate < today ? false : true);
 	}, [refillDate, form]);
 
 	function generateDays(daysInWeek: any[]) {
@@ -317,13 +312,7 @@ function EditAlarm({
 									</div>
 								</div>
 							</div>
-							<hr
-								style={{
-									margin: "30px 0",
-									border: "0.5px solid #e2e2e4",
-								}}
-							/>
-
+							<Divider />
 							<div
 								style={{
 									display: "flex",
@@ -399,12 +388,6 @@ function EditAlarm({
 									disabled={!appointmentReminder}
 								/>
 							</div>
-							<hr
-								style={{
-									margin: "30px 0",
-									border: "0.5px solid #e2e2e4",
-								}}
-							/>
 						</div>
 					</FormProvider>
 				</ModalContent>

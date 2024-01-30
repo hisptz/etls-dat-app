@@ -16,13 +16,13 @@ export function useAssignDevice() {
 
 	const program = getProgramMapping(programMapping, currentProgram);
 
-	const TEA_ID = TRACKED_ENTITY_ATTRIBUTES.DEVICE_IMEI;
+	const DEVICE_IMEI = TRACKED_ENTITY_ATTRIBUTES.DEVICE_IMEI;
 	const EPISODE_ID = TRACKED_ENTITY_ATTRIBUTES.EPISODE_ID;
 	const MediatorUrl = program?.mediatorUrl;
 	const ApiKey = program?.apiKey;
 
 	const attributeIndex = patientTei?.attributes.findIndex(
-		(attribute) => attribute.attribute === TEA_ID,
+		(attribute) => attribute.attribute === DEVICE_IMEI,
 	);
 
 	const attributeEpisodeIndex = patientTei?.attributes.findIndex(
@@ -68,7 +68,7 @@ export function useAssignDevice() {
 				? [
 						...patientTei!.attributes,
 						{
-							attribute: TEA_ID,
+							attribute: DEVICE_IMEI,
 							value: data,
 						},
 						{
