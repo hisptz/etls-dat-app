@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
 import { DATA_TEST_PREFIX, USERGROUP_CODE } from "../shared/constants";
 import { FilterArea } from "./components/FilterArea";
@@ -18,8 +18,15 @@ export function DATAssignmentOutlet() {
 
 export function DATAssignment() {
 	const [programMapping] = useSetting("programMapping", { global: true });
-	const { patients, pagination, refetch, loading, onSort, sortState } =
-		useDATAssignmentTableData();
+	const {
+		patients,
+		pagination,
+		refetch,
+		loading,
+		onSort,
+		sortState,
+		refreshing,
+	} = useDATAssignmentTableData();
 	const navigate = useNavigate();
 	const currentUserGroup = useRecoilValue(CurrentUserGroup);
 
@@ -90,7 +97,7 @@ export function DATAssignment() {
 						<DATAssignmentTable
 							patients={patients}
 							pagination={pagination}
-							loading={loading}
+							loading={loading || refreshing}
 							onSort={onSort}
 							sortState={sortState}
 						/>

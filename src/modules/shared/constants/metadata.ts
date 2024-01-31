@@ -20,6 +20,7 @@ export const DAT_PROGRAM = (): string => {
 
 export const TEI_FIELDS = [
 	"trackedEntity",
+	"trackedEntityType",
 	"created",
 	"lastUpdated",
 	"orgUnit",

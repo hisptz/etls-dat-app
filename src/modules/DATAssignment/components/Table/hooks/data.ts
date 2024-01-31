@@ -112,6 +112,7 @@ export function useDATAssignmentTableData() {
 	const defaultOrganizationUnit = useRecoilValue(CurrentUserOrganizationUnit);
 	const { filters } = useFilters();
 	const [currentPage, setCurrentPage] = useState<number>();
+	const [refreshing, setLoading] = useState<boolean>(false);
 	const [patients, setPatients] = useState<PatientProfile[]>([]);
 	const [programMapping] = useSetting("programMapping", {
 		global: true,
@@ -211,6 +212,18 @@ export function useDATAssignmentTableData() {
 		}
 	}, [currentProgram]);
 
+	const refreshingData = async () => {
+		await refetch({ program: mapping?.program, page: 1, filters, orgUnit });
+		setLoading(false);
+	};
+
+	useEffect(() => {
+		setLoading(true);
+		if (!isEmpty(programMapping)) {
+			refreshingData();
+		}
+	}, []);
+
 	const { download, downloading } = useDownloadData({
 		resource: "tracker/trackedEntities",
 		query: query,
@@ -298,6 +311,7 @@ export function useDATAssignmentTableData() {
 		downloading,
 		download: onDownload,
 		loading,
+		refreshing,
 		error,
 		refetch,
 		onSort,

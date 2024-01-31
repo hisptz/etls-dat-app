@@ -79,7 +79,7 @@ function EditDevice({
 				patientId: patientId,
 			}).then(async (response) => {
 				if (response.response) {
-					const episodeID = response.response.response.data.episode;
+					const episodeID = response.response.data.episode.toString();
 					await assignDevice({
 						data: data.IMEI,
 						episodeID: episodeID,
