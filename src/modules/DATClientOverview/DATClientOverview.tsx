@@ -19,8 +19,15 @@ export function DATClientOverviewOutlet() {
 
 export function DATClientOverview() {
 	const [programMapping] = useSetting("programMapping", { global: true });
-	const { patients, pagination, refetch, loading, onSort, sortState } =
-		useDATClientTableData();
+	const {
+		patients,
+		pagination,
+		refetch,
+		loading,
+		onSort,
+		sortState,
+		refreshing,
+	} = useDATClientTableData();
 	const navigate = useNavigate();
 	const currentUserGroup = useRecoilValue(CurrentUserGroup);
 
@@ -91,7 +98,7 @@ export function DATClientOverview() {
 						<DATClientTable
 							patients={patients}
 							pagination={pagination}
-							loading={loading}
+							loading={loading || refreshing}
 							onSort={onSort}
 							sortState={sortState}
 						/>
