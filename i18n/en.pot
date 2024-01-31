@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2024-01-23T13:56:45.569Z\n"
-"PO-Revision-Date: 2024-01-23T13:56:45.569Z\n"
+"POT-Creation-Date: 2024-01-31T11:28:27.687Z\n"
+"PO-Revision-Date: 2024-01-31T11:28:27.687Z\n"
 
 msgid "Configurations"
 msgstr "Configurations"
@@ -137,6 +137,9 @@ msgstr ""
 
 msgid "Configuration"
 msgstr "Configuration"
+
+msgid "Program Mappings are not configured. Please contact the administrators."
+msgstr "Program Mappings are not configured. Please contact the administrators."
 
 msgid "Back"
 msgstr "Back"
