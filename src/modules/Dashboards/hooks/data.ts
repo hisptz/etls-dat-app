@@ -150,6 +150,9 @@ export function useDefaultDashboardData() {
 	const controller = new AbortController();
 	const { orgUnit: selectedOrgUnits, periods: selectedPeriods } =
 		useRecoilValue(DashboardFilterState);
+	const [selectedPrograms] = useSearchParams();
+	const selectedProgramId = selectedPrograms.get("program");
+
 	const [programMappings] = useSetting("programMapping", { global: true });
 	const [devices] = useSetting("deviceIMEIList", { global: true });
 
@@ -303,6 +306,9 @@ export function useDefaultDashboardData() {
 		programMapping: ProgramMapping[],
 	): Promise<void> => {
 		try {
+			programMapping = filter(programMapping, ({ program }) => {
+				return program === selectedProgramId;
+			});
 			setLoadingEnrollemntStatus(true);
 			let aggregatedEnrollmentSummary: EnrollmentSummary | any = {};
 			if (programMapping.length) {
@@ -380,6 +386,9 @@ export function useDefaultDashboardData() {
 		programMapping: ProgramMapping[],
 	): Promise<void> => {
 		try {
+			programMapping = filter(programMapping, ({ program }) => {
+				return program === selectedProgramId;
+			});
 			setLoadingAdherenceSummary(true);
 			let aggregatedAdherenceSummary: AdherenceSummary | any = {};
 
@@ -438,7 +447,7 @@ export function useDefaultDashboardData() {
 		return () => {
 			controller.abort();
 		};
-	}, [selectedOrgUnits, selectedPeriods]);
+	}, [selectedOrgUnits, selectedPeriods, selectedProgramId]);
 
 	return {
 		loadingEnrollemntStatus,
