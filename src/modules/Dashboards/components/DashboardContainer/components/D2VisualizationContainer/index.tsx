@@ -8,7 +8,9 @@ import {
 	getDataItems,
 	getDefaultType,
 	getLayout,
+	getOrgUnits,
 	getOrganisationUnitGroupSetDimensions,
+	getPeriods,
 } from "./utils/visualization";
 import { FullPageLoader } from "../../../../../shared/components/Loaders";
 import { useSearchParams } from "react-router-dom";
@@ -49,12 +51,13 @@ export default function D2VisualizationContainer(
 
 	const ouParams = searchParams.get("ou");
 	const peParams = searchParams.get("pe");
-	const programParam = searchParams.get("program");
 
-	const pe: string[] = peParams ? peParams.split(";") : selectedPeriods ?? [];
+	const pe: string[] = peParams
+		? peParams.split(";")
+		: getPeriods(visualization) ?? [];
 	const ou: string[] = ouParams
 		? ouParams.split(";")
-		: (selectedOrgUnits?.orgUnits ?? []).map(({ id }) => id);
+		: getOrgUnits(visualization);
 
 	return (
 		<div style={{ padding: 16 }}>
@@ -87,7 +90,7 @@ export default function D2VisualizationContainer(
 						dimensions={{
 							pe,
 							ou,
-							dx: getDataItems(visualization), // TODO: ability to fetch periods from selections
+							dx: getDataItems(visualization),
 							...getCategoryOptions(visualization),
 							...getOrganisationUnitGroupSetDimensions(
 								visualization,
