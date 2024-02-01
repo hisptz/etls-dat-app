@@ -342,6 +342,7 @@ export function useReportTableData() {
 		return {
 			...dataArray[0],
 			noOfSignal: dataArray.length,
+			regimen: regimen,
 			adherenceFrequency: adherenceFrequency ?? "Daily",
 		};
 	});
@@ -546,22 +547,27 @@ export function sanitizeReportData(
 			: [];
 
 		const percentage = !isEmpty(regimenSettings)
-			? regimenSettings.map((option: RegimenSetting) => {
-					if (option.administration === report.adherenceFrequency) {
-						return (
-							(
-								(report.noOfSignal /
-									parseInt(option.numberOfDoses)) *
-								100
-							).toFixed(2) + "%"
-						);
-					} else {
-						return "N/A";
-					}
-			  })
+			? regimenSettings
+					.map((option: RegimenSetting) => {
+						if (option.regimen === report.regimen) {
+							return (
+								(
+									(report.noOfSignal /
+										parseInt(option.numberOfDoses)) *
+									100
+								).toFixed(2) + "%"
+							);
+						} else {
+							return "N/A";
+						}
+					})
+					.filter((val: any) => val !== "N/A")
 			: "N/A";
 
-		const adherencePercentage = percentage != "N/A" ? percentage[0] : "N/A";
+		const adherencePercentage =
+			percentage != "N/A" && !isEmpty(percentage)
+				? head(percentage)
+				: "N/A";
 		const lastOpened = DateTime.fromFormat(
 			report.lastOpened ?? "",
 			"yyyy-MM-dd HH:mm:ss",

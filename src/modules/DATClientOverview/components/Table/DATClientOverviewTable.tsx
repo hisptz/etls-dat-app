@@ -83,21 +83,27 @@ export default function DATClientTable({
 		const noOfSignals = takenDoses.length;
 
 		const percentage = !isEmpty(regimenSettings)
-			? (regimenSettings ?? []).map((option: RegimenSetting) => {
-					if (option.administration === patient.adherenceFrequency) {
-						return (
-							(
-								(noOfSignals / parseInt(option.numberOfDoses)) *
-								100
-							).toFixed(2) + "%"
-						);
-					} else {
-						return "N/A";
-					}
-			  })
+			? (regimenSettings ?? [])
+					.map((option: RegimenSetting) => {
+						if (option.regimen === patient.regimen) {
+							return (
+								(
+									(noOfSignals /
+										parseInt(option.numberOfDoses)) *
+									100
+								).toFixed(2) + "%"
+							);
+						} else {
+							return "N/A";
+						}
+					})
+					.filter((val: any) => val !== "N/A")
 			: "N/A";
 
-		const overallAdherence = percentage != "N/A" ? head(percentage) : "N/A";
+		const overallAdherence =
+			percentage != "N/A" && !isEmpty(percentage)
+				? head(percentage)
+				: "N/A";
 
 		return overallAdherence;
 	}
