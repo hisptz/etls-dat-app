@@ -36,6 +36,20 @@ export default function DashboardHeader(): React.ReactElement {
 					excludedPeriodTypes: ["Weekly"],
 				}}
 			/>
+			<FilterButton
+				filter={filter}
+				onFilterChange={setFilter}
+				orgUnitProps={{
+					singleSelection: true,
+				}}
+				periodProps={{
+					enablePeriodSelector: true,
+					singleSelection: true,
+					enableDateRange: false,
+					excludeRelativePeriods: false,
+					excludedPeriodTypes: ["Weekly"],
+				}}
+			/>
 			<div className="flex gap-16">
 				<div
 					style={{
