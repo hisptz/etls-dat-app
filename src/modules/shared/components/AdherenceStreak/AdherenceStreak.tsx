@@ -220,15 +220,12 @@ function AdherenceStreak({ events, frequency }: CalendarProps) {
 			const cellDate = new Date(today);
 			cellDate.setDate(today.getDate() - i * 7);
 
-			const weekNumber = getISOWeek(cellDate);
+			const { week, startDate, endDate } = getISOWeek(cellDate);
 
 			const dailyEvents = events.filter((event) => {
 				const eventDate = new Date(event.date);
 				eventDate.setHours(0, 0, 0, 0);
-				return (
-					eventDate.getTime() === cellDate.getTime() &&
-					eventDate.getTime() <= cellDate.getTime()
-				);
+				return eventDate >= startDate && eventDate <= endDate;
 			});
 
 			const sanitizeEvents = () => {
@@ -256,9 +253,9 @@ function AdherenceStreak({ events, frequency }: CalendarProps) {
 					? cellColors[sanitizedEvents[0].event]
 					: "N/A";
 
-			const tooltipId = `daily-tooltip-${weekNumber + cellColor + i}`;
+			const tooltipId = `daily-tooltip-${week + cellColor + i}`;
 			const tooltipContent = i18n.t(
-				`Date: Week ${weekNumber} ${formatWeekDate(cellDate)} Status: ${
+				`Date: Week ${week} ${formatWeekDate(endDate)} Status: ${
 					cellColor
 						? cellColor == "green"
 							? "Dose Taken"
@@ -297,6 +294,7 @@ function AdherenceStreak({ events, frequency }: CalendarProps) {
 		const d = new Date(date);
 		d.setHours(0, 0, 0, 0);
 		d.setDate(d.getDate() + 7 - (d.getDay() || 7));
+
 		const dayOfMonth = d.getDate();
 		const firstDayOfMonth = new Date(
 			d.getFullYear(),
@@ -307,7 +305,16 @@ function AdherenceStreak({ events, frequency }: CalendarProps) {
 
 		const weekOfMonth = Math.ceil((dayOfMonth + offset) / 7);
 
-		return weekOfMonth;
+		const startDate = new Date(d);
+		startDate.setDate(startDate.getDate() - 6);
+
+		const endDate = new Date(d);
+
+		return {
+			week: weekOfMonth,
+			startDate: startDate,
+			endDate: endDate,
+		};
 	};
 
 	return (

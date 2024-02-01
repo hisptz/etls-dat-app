@@ -18,6 +18,7 @@ import { useSetting } from "@dhis2/app-service-datastore";
 import { sanitizeReportData } from "./hooks/data";
 import { DATDevicesReportState, DHIS2ReportState } from "../../state/report";
 import Download from "../Download";
+import { useAlert } from "@dhis2/app-runtime";
 
 export interface ReportTableProps {
 	loading: boolean;
@@ -48,6 +49,18 @@ export default function ReportTable({
 	const [regimenSettings] = useSetting("regimenSetting", {
 		global: true,
 	});
+
+	const { show } = useAlert(
+		({ message }) => message,
+		({ type }) => ({ ...type, duration: 2000 }),
+	);
+
+	if (error) {
+		show({
+			message: `${error}`,
+			type: { info: true },
+		});
+	}
 
 	return (
 		<div className="w-100 h-100">

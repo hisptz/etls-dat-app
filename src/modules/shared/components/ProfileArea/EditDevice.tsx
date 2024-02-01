@@ -79,28 +79,40 @@ function EditDevice({
 				patientId: patientId,
 			}).then(async (response) => {
 				if (response.response) {
-					await assignDevice(data.IMEI).then(async (res) => {
-						if (res?.updated != 0) {
-							await updateDevice(updatedDevices).then(
-								async () => {
-									show({
-										message: "Update successful",
-										type: { success: true },
-									});
-									refetch();
-								},
-							);
-						} else if (res.ignored != 0) {
-							show({
-								message: `Could not update: ${res.error[0].message}`,
-								type: { info: true },
-							});
-						}
-					});
+					const episodeID =
+						response.response.data?.episode?.toString();
+					if (episodeID) {
+						await assignDevice({
+							data: data.IMEI,
+							episodeID: episodeID,
+						}).then(async (res) => {
+							if (res?.updated != 0) {
+								await updateDevice(updatedDevices).then(
+									async () => {
+										show({
+											message: "Update successful",
+											type: { success: true },
+										});
+										refetch();
+									},
+								);
+							} else if (res.ignored != 0) {
+								show({
+									message: `Could not update: ${res.error[0].message}`,
+									type: { critical: true },
+								});
+							}
+						});
+					} else {
+						show({
+							message: `Could not assign DAT device ${data.IMEI} to patient ${patientId}`,
+							type: { critical: true },
+						});
+					}
 				} else if (response.error) {
 					show({
 						message: `Could not update: ${response.error.response.data.message}`,
-						type: { info: true },
+						type: { critical: true },
 					});
 				}
 			});

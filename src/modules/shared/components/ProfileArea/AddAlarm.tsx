@@ -7,16 +7,16 @@ import {
 	ModalActions,
 	Switch,
 	ButtonStrip,
+	Divider,
 	Checkbox,
 } from "@dhis2/ui";
 import i18n from "@dhis2/d2-i18n";
 import { FilterField } from "../../../Configuration/components/ProgramMapping/components/FilterField";
-import { FormProvider, useForm } from "react-hook-form";
+import { FormProvider, useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useSetAlarm } from "../utils/assignAlarm";
 import { useAlert } from "@dhis2/app-runtime";
-import { isEmpty } from "lodash";
 import { DateTime } from "luxon";
 
 interface addAlarmProps {
@@ -48,6 +48,7 @@ function EditAlarm({
 }: addAlarmProps) {
 	const { setAlarm } = useSetAlarm();
 	const [doseReminder, setDoseReminder] = useState<boolean>();
+
 	const [appointmentReminder, setAppointmentReminder] = useState<boolean>();
 
 	const [daysInWeek, setDaysInWeek] = useState<any[]>([
@@ -86,12 +87,16 @@ function EditAlarm({
 		nextRefillDate: !appointmentReminder
 			? z.string()
 			: z
-					.string({ required_error: "Next Refill Date is required" })
+					.string({
+						required_error: "Next Refill Date is required",
+					})
 					.nonempty("Next Refill Date is required"),
 		nextRefillTime: !appointmentReminder
 			? z.string()
 			: z
-					.string({ required_error: "Next Refill Time is required" })
+					.string({
+						required_error: "Next Refill Time is required",
+					})
 					.nonempty("Next Refill Time is required"),
 	});
 
@@ -102,6 +107,28 @@ function EditAlarm({
 		({ type }) => ({ ...type, duration: 4000 }),
 	);
 
+	const form = useForm<AlarmFormData>({
+		defaultValues: {
+			nextRefillDate: nextRefillDate,
+			nextRefillTime: nextRefillTime,
+			nextDoseTime: nextDoseTime,
+		},
+		resolver: zodResolver(schema),
+	});
+
+	const refillDate = useWatch({
+		control: form.control,
+		name: "nextRefillDate",
+	});
+
+	const today = DateTime.now().startOf("day");
+
+	const parsedDate = DateTime.fromISO(refillDate).startOf("day");
+
+	useEffect(() => {
+		setAppointmentReminder(parsedDate < today ? false : true);
+	}, [refillDate, form]);
+
 	function generateDays(daysInWeek: any[]) {
 		const codeString: string[] = [];
 		daysInWeek.map((day: any) => {
@@ -111,51 +138,10 @@ function EditAlarm({
 		return codeString.join("");
 	}
 
-	const onSubmit = async (data: AlarmFormData) => {
-		const currentDate = DateTime.now().toFormat("yyyy-MM-dd");
-		const alarmData = {
-			imei: device,
-			alarm: doseReminder ? data.nextDoseTime : "00:00",
-			refillAlarm: appointmentReminder
-				? data.nextRefillDate + " " + data.nextRefillTime
-				: `${currentDate} 00:00`,
-			days: generateDays(daysInWeek),
-			alarmStatus: doseReminder ? 1 : 0,
-			refillAlarmStatus: appointmentReminder ? 1 : 0,
-		};
-
-		await setAlarm({ data: alarmData }).then(async (res) => {
-			if (res.response) {
-				show({
-					message: `Alarm for ${device} has been set successfully`,
-					type: { success: true },
-				});
-				await onClose();
-				refetch();
-			}
-
-			if (res.error) {
-				show({
-					message: `Could not update: ${res.error.response.data.message}`,
-					type: { info: true },
-				});
-			}
-		});
-	};
-
 	const onClose = async () => {
 		form.reset({});
 		onHide();
 	};
-
-	const form = useForm<AlarmFormData>({
-		defaultValues: {
-			nextRefillDate: nextRefillDate,
-			nextRefillTime: nextRefillTime,
-			nextDoseTime: nextDoseTime,
-		},
-		resolver: zodResolver(schema),
-	});
 
 	const alarmDays = (day: string, code: string, checked: boolean) => {
 		return (
@@ -184,6 +170,42 @@ function EditAlarm({
 		);
 	};
 
+	const onSubmit = async (data: AlarmFormData) => {
+		const currentDate = DateTime.now()
+			.minus({ days: 1 })
+			.toFormat("yyyy-MM-dd");
+		const alarmData = {
+			imei: device,
+			alarm: doseReminder ? data.nextDoseTime : "00:00",
+			refillAlarm:
+				appointmentReminder || parsedDate > today
+					? data.nextRefillDate + " " + data.nextRefillTime
+					: `${currentDate} 00:00`,
+			days: generateDays(daysInWeek),
+			alarmStatus: doseReminder ? 1 : 0,
+			refillAlarmStatus:
+				appointmentReminder && parsedDate > today ? 1 : 0,
+		};
+
+		await setAlarm({ data: alarmData }).then(async (res) => {
+			if (res.response) {
+				show({
+					message: `Alarm for ${device} has been set successfully`,
+					type: { success: true },
+				});
+				await onClose();
+				refetch();
+			}
+
+			if (res.error) {
+				show({
+					message: `Could not update: ${res.error.response.data.message}`,
+					type: { info: true },
+				});
+			}
+		});
+	};
+
 	return (
 		<div>
 			<Modal position="middle" hide={hide} onClose={onClose}>
@@ -199,7 +221,7 @@ function EditAlarm({
 					<FormProvider {...form}>
 						<div
 							style={{
-								height: "350px",
+								height: "410px",
 							}}
 						>
 							<div
@@ -290,7 +312,7 @@ function EditAlarm({
 									</div>
 								</div>
 							</div>
-
+							<Divider />
 							<div
 								style={{
 									display: "flex",
@@ -339,7 +361,6 @@ function EditAlarm({
 									</span>
 								</div>
 							</div>
-
 							<div
 								style={{
 									display: "flex",

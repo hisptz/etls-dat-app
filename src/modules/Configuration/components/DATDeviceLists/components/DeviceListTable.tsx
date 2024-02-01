@@ -4,6 +4,7 @@ import {
 	CustomDataTableColumn,
 	CustomDataTableRow,
 } from "@hisptz/dhis2-ui";
+import { IconCheckmark24 } from "@dhis2/ui";
 import i18n from "@dhis2/d2-i18n";
 import { Pagination } from "@hisptz/dhis2-utils";
 
@@ -20,6 +21,14 @@ export interface DevicesTableProps {
 	devices: DeviceIMEIList[];
 	pagination: Pagination;
 	refresh: (newDevices: any) => void;
+}
+
+export function InUseDevice({ IMEI }: { IMEI: string }) {
+	return (
+		<div>
+			{IMEI} <IconCheckmark24 color={"#4caf50"} />
+		</div>
+	);
 }
 
 export default function DeviceListTable({
@@ -83,8 +92,16 @@ export default function DeviceListTable({
 							pagination={pagination}
 							columns={devicesColumns as CustomDataTableColumn[]}
 							rows={devices.map((device, index) => {
+								const inUse = device.inUse;
+
 								return {
 									...(device as CustomDataTableRow),
+									IMEI: inUse ? (
+										<InUseDevice IMEI={device.IMEI} />
+									) : (
+										device.IMEI
+									),
+
 									action: getActions(device),
 								};
 							})}

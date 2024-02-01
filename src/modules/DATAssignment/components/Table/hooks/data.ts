@@ -112,6 +112,7 @@ export function useDATAssignmentTableData() {
 	const defaultOrganizationUnit = useRecoilValue(CurrentUserOrganizationUnit);
 	const { filters } = useFilters();
 	const [currentPage, setCurrentPage] = useState<number>();
+	const [refreshing, setLoading] = useState<boolean>(false);
 	const [patients, setPatients] = useState<PatientProfile[]>([]);
 	const [programMapping] = useSetting("programMapping", {
 		global: true,
@@ -139,10 +140,10 @@ export function useDATAssignmentTableData() {
 
 			filters,
 			orgUnit,
-			order: `${mapping.attributes?.deviceIMEInumber}:desc,enrolledAt:desc`,
+			order: `${mapping?.attributes?.deviceIMEInumber}:desc,enrolledAt:desc`,
 		},
 
-		lazy: !mapping,
+		lazy: !mapping || isEmpty(programMapping),
 	});
 
 	const onPageChange = (page: number) => {
@@ -211,6 +212,18 @@ export function useDATAssignmentTableData() {
 		}
 	}, [currentProgram]);
 
+	const refreshingData = async () => {
+		await refetch({ program: mapping?.program, page: 1, filters, orgUnit });
+		setLoading(false);
+	};
+
+	useEffect(() => {
+		setLoading(true);
+		if (!isEmpty(programMapping)) {
+			refreshingData();
+		}
+	}, []);
+
 	const { download, downloading } = useDownloadData({
 		resource: "tracker/trackedEntities",
 		query: query,
@@ -237,11 +250,16 @@ export function useDATAssignmentTableData() {
 						order: `${mapping.attributes?.deviceIMEInumber}:desc,enrolledAt:asc`,
 				  })
 				: mapping.attributes
-				? refetch({
-						order: `${mapping.attributes?.deviceIMEInumber}:desc,${
-							mapping.attributes[sort.name]
-						}:asc`,
-				  })
+				? sort.name === "name"
+					? refetch({
+							order: `${mapping.attributes?.deviceIMEInumber}:desc,${mapping.attributes.firstName}:asc`,
+					  })
+					: refetch({
+							order: `${mapping.attributes
+								?.deviceIMEInumber}:desc,${
+								mapping.attributes[sort.name]
+							}:asc`,
+					  })
 				: "";
 		}
 
@@ -251,11 +269,16 @@ export function useDATAssignmentTableData() {
 						order: `${mapping.attributes?.deviceIMEInumber}:desc,enrolledAt:asc`,
 				  })
 				: mapping.attributes
-				? refetch({
-						order: `${mapping.attributes?.deviceIMEInumber}:desc,${
-							mapping.attributes[sort.name]
-						}:asc`,
-				  })
+				? sort.name === "name"
+					? refetch({
+							order: `${mapping.attributes?.deviceIMEInumber}:desc,${mapping.attributes.firstName}:asc`,
+					  })
+					: refetch({
+							order: `${mapping.attributes
+								?.deviceIMEInumber}:desc,${
+								mapping.attributes[sort.name]
+							}:asc`,
+					  })
 				: "";
 		} else {
 			sort.name === "treatmentStart"
@@ -263,11 +286,16 @@ export function useDATAssignmentTableData() {
 						order: `${mapping.attributes?.deviceIMEInumber}:desc,enrolledAt:desc`,
 				  })
 				: mapping.attributes
-				? refetch({
-						order: `${mapping.attributes?.deviceIMEInumber}:desc,${
-							mapping.attributes[sort.name]
-						}:desc`,
-				  })
+				? sort.name === "name"
+					? refetch({
+							order: `${mapping.attributes?.deviceIMEInumber}:desc,${mapping.attributes.firstName}:desc`,
+					  })
+					: refetch({
+							order: `${mapping.attributes
+								?.deviceIMEInumber}:desc,${
+								mapping.attributes[sort.name]
+							}:desc`,
+					  })
 				: "";
 		}
 		setSortState(sort);
@@ -283,6 +311,7 @@ export function useDATAssignmentTableData() {
 		downloading,
 		download: onDownload,
 		loading,
+		refreshing,
 		error,
 		refetch,
 		onSort,

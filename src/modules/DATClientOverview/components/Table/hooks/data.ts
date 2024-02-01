@@ -114,6 +114,7 @@ export function useDATClientTableData() {
 	const { filters } = useFilters();
 	const [currentPage, setCurrentPage] = useState<number>();
 	const [patients, setPatients] = useState<PatientProfile[]>([]);
+	const [refreshing, setLoading] = useState<boolean>(false);
 	const [programMapping] = useSetting("programMapping", {
 		global: true,
 	});
@@ -139,10 +140,10 @@ export function useDATClientTableData() {
 			program: mapping?.program,
 			filters,
 			orgUnit,
-			order: `${mapping.attributes?.deviceIMEInumber}:asc,enrolledAt:desc`,
+			order: `${mapping?.attributes?.deviceIMEInumber}:asc,enrolledAt:desc`,
 		},
 
-		lazy: !mapping,
+		lazy: !mapping || isEmpty(programMapping),
 	});
 
 	const onPageChange = (page: number) => {
@@ -213,6 +214,18 @@ export function useDATClientTableData() {
 		}
 	}, [currentProgram]);
 
+	const refreshingData = async () => {
+		await refetch({ program: mapping?.program, page: 1, filters, orgUnit });
+		setLoading(false);
+	};
+
+	useEffect(() => {
+		setLoading(true);
+		if (!isEmpty(programMapping)) {
+			refreshingData();
+		}
+	}, []);
+
 	const { download, downloading } = useDownloadData({
 		resource: "tracker/trackedEntities",
 		query: query,
@@ -239,11 +252,16 @@ export function useDATClientTableData() {
 						order: `${mapping.attributes?.deviceIMEInumber}:asc,enrolledAt:asc`,
 				  })
 				: mapping.attributes
-				? refetch({
-						order: `${mapping.attributes?.deviceIMEInumber}:asc,${
-							mapping.attributes[sort.name]
-						}:asc`,
-				  })
+				? sort.name === "name"
+					? refetch({
+							order: `${mapping.attributes?.deviceIMEInumber}:asc,${mapping.attributes?.firstName}:asc`,
+					  })
+					: refetch({
+							order: `${mapping.attributes
+								?.deviceIMEInumber}:asc,${
+								mapping.attributes[sort.name]
+							}:asc`,
+					  })
 				: "";
 		}
 
@@ -253,11 +271,16 @@ export function useDATClientTableData() {
 						order: `${mapping.attributes?.deviceIMEInumber}:asc,enrolledAt:asc`,
 				  })
 				: mapping.attributes
-				? refetch({
-						order: `${mapping.attributes?.deviceIMEInumber}:asc,${
-							mapping.attributes[sort.name]
-						}:asc`,
-				  })
+				? sort.name === "name"
+					? refetch({
+							order: `${mapping.attributes?.deviceIMEInumber}:asc,${mapping.attributes.firstName}:asc`,
+					  })
+					: refetch({
+							order: `${mapping.attributes
+								?.deviceIMEInumber}:asc,${
+								mapping.attributes[sort.name]
+							}:asc`,
+					  })
 				: "";
 		} else {
 			sort.name === "treatmentStart"
@@ -265,11 +288,16 @@ export function useDATClientTableData() {
 						order: `${mapping.attributes?.deviceIMEInumber}:asc,enrolledAt:desc`,
 				  })
 				: mapping.attributes
-				? refetch({
-						order: `${mapping.attributes?.deviceIMEInumber}:asc,${
-							mapping.attributes[sort.name]
-						}:desc`,
-				  })
+				? sort.name === "name"
+					? refetch({
+							order: `${mapping.attributes?.deviceIMEInumber}:asc,${mapping.attributes.firstName}:desc`,
+					  })
+					: refetch({
+							order: `${mapping.attributes
+								?.deviceIMEInumber}:asc,${
+								mapping.attributes[sort.name]
+							}:desc`,
+					  })
 				: "";
 		}
 		setSortState(sort);
@@ -283,6 +311,7 @@ export function useDATClientTableData() {
 		},
 		patients,
 		downloading,
+		refreshing,
 		download: onDownload,
 		loading,
 		error,

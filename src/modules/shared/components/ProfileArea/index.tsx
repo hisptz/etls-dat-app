@@ -85,11 +85,19 @@ export function ProfileArea({
 		},
 	];
 
+	const today = DateTime.now();
+
 	const refillAlarm =
 		DateTime.fromFormat(
 			data?.refillAlarm ?? "",
 			"yyyy-MM-dd HH:mm:ss",
 		).toFormat("MMMM dd, yyyy hh:mm a") ?? "";
+
+	const isPastToday =
+		DateTime.fromFormat(
+			data?.refillAlarm ?? "",
+			"yyyy-MM-dd HH:mm:ss",
+		).startOf("day") < today.startOf("day");
 
 	const lastUpdated =
 		DateTime.fromFormat(
@@ -373,7 +381,8 @@ export function ProfileArea({
 										className={styles["label-value"]}
 										htmlFor="value"
 									>
-										{refillAlarm != "Invalid DateTime"
+										{refillAlarm != "Invalid DateTime" &&
+										!isPastToday
 											? refillAlarm
 											: "N/A"}
 									</label>

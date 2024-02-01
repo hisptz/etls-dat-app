@@ -180,17 +180,19 @@ export const DATClientOverview: DAT_TableConfig[] = [
 		key: "treatmentStart",
 		label: "Treatment Start",
 		path: "treatmentStart",
-		sortable: true,
+		sortable: false,
 	},
 	{
 		key: "patientNumber",
 		label: "Patient Number",
 		path: "patientNumber",
+		sortable: false,
 	},
 	{
 		key: "name",
 		label: "Name",
 		path: "name",
+		sortable: false,
 	},
 
 	{
@@ -208,7 +210,7 @@ export const DATClientOverview: DAT_TableConfig[] = [
 		key: "deviceIMEINumber",
 		label: "Device IMEI",
 		path: "deviceIMEINumber",
-		sortable: true,
+		sortable: false,
 	},
 
 	{
@@ -240,11 +242,13 @@ export const DATAssignment: DAT_TableConfig[] = [
 		key: "patientNumber",
 		label: "Patient Number",
 		path: "patientNumber",
+		sortable: true,
 	},
 	{
 		key: "name",
 		label: "Name",
 		path: "name",
+		sortable: true,
 	},
 
 	{

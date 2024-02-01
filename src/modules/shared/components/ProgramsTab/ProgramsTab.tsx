@@ -10,7 +10,9 @@ export function ProgramsTab() {
 	const [params, setParams] = useSearchParams();
 
 	const program: string =
-		params.get("program") ?? (head(programMapping) as any)?.program ?? "";
+		params.get("program") ??
+		(head(orderBy(programMapping, "name")) as any)?.program ??
+		"";
 
 	return (
 		<TabBar>

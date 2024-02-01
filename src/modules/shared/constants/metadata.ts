@@ -6,6 +6,7 @@ import { getProgramMapping } from "../utils";
 
 export const DATA_TEST_PREFIX = "d2-dat";
 export const DATASTORE_NAMESPACE = "dat-app";
+export const USERGROUP_CODE = "DAT_MANAGE";
 export const DAT_PROGRAM = (): string => {
 	const [programMapping] = useSetting("programMapping", {
 		global: true,
@@ -19,6 +20,7 @@ export const DAT_PROGRAM = (): string => {
 
 export const TEI_FIELDS = [
 	"trackedEntity",
+	"trackedEntityType",
 	"created",
 	"lastUpdated",
 	"orgUnit",
@@ -30,7 +32,7 @@ export const CURRENT_USER_QUERY: Query = {
 	me: {
 		resource: "me",
 		params: {
-			fields: "id,name,userGroups,organisationUnits[id,displayName,path]",
+			fields: "id,name,userGroups[id,code],organisationUnits[id,displayName,path]",
 		},
 	},
 };

@@ -81,6 +81,13 @@ export class PatientProfile extends TrackedEntityModel {
 
 		return device == "" ? "N/A" : device;
 	}
+	get regimen() {
+		const regimen = this.getAttributeValue(
+			this.programMapping?.attributes?.regimen ?? "",
+		);
+
+		return regimen;
+	}
 	get adherenceFrequency() {
 		const regimen = this.getAttributeValue(
 			this.programMapping?.attributes?.regimen ?? "",
@@ -127,6 +134,7 @@ export class PatientProfile extends TrackedEntityModel {
 		const treatmentStart = this.enrollmentDate;
 		const deviceSignal = this.deviceSignal;
 		const orgUnit = this.organisationUnit;
+		const regimen = this.regimen;
 
 		return {
 			id: this.id as string,
@@ -144,6 +152,7 @@ export class PatientProfile extends TrackedEntityModel {
 			dosageTime,
 			treatmentStart,
 			deviceSignal,
+			regimen,
 		};
 	}
 

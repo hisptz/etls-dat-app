@@ -12,10 +12,20 @@ export const CurrentUserSelector = selector<CurrentUser | undefined>({
 	},
 });
 
-export const CurrentUserOrganizationUnit = selector<OrganisationUnitSelection[]>({
+export const CurrentUserOrganizationUnit = selector<
+	OrganisationUnitSelection[]
+>({
 	key: "current-user-organisation-unit",
 	get: async ({ get }) => {
-		const currentUser =   get(CurrentUserSelector);
+		const currentUser = get(CurrentUserSelector);
 		return currentUser ? currentUser?.organisationUnits ?? [] : [];
+	},
+});
+
+export const CurrentUserGroup = selector<any[]>({
+	key: "current-user-group",
+	get: async ({ get }) => {
+		const currentUser = get(CurrentUserSelector);
+		return currentUser ? currentUser?.userGroups ?? [] : [];
 	},
 });
