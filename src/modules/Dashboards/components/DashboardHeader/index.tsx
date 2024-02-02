@@ -15,7 +15,7 @@ export default function DashboardHeader(): React.ReactElement {
 		.join(", ");
 	const pe = params.get("pe");
 	const selectedPeriod = (
-		pe ? pe.split(";") : periodSelection ?? ["THIS_MONTH"]
+		pe ? pe.split(";") : periodSelection ?? ["THIS_YEAR"]
 	)
 		.map((pe: string) => PeriodUtility.getPeriodById(pe).name)
 		.join(", ");
