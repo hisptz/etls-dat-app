@@ -6,13 +6,11 @@ import i18n from "@dhis2/d2-i18n";
 import {
 	SingleValueContainer,
 	SingleValueContainerProps,
-	CircularProgressDashboard,
 } from "@hisptz/dhis2-analytics";
 import { DashboardItem } from "../../../../../../../shared/interfaces";
 import {
 	DEVICE_USAGE_DASHBOARD_ITEM_ID,
 	DAT_ENROLLMENT_DASHBOARD_ITEM_ID,
-	ADHERENCE_PERCENTAGE_DASHBOARD_ITEM_ID,
 } from "../../../../../../constants";
 import {
 	colorSets,
@@ -108,35 +106,6 @@ function getEnrollmentSummaryByGender({
 	);
 }
 
-function getAdherencePercentageSummary({
-	data,
-	config,
-}: CustomVisualizationBodyProps): React.ReactElement {
-	const { totalDeviceSignalEvents, deviceSignalsForDoseTake } = data;
-	if (config.options?.renderAs !== "progress") {
-		return getDefaultMessageForNonExistingVisualization();
-	}
-
-	return (
-		<div>
-			<div className="pv-8 center align-center flex">
-				<CircularProgressDashboard
-					denominator={totalDeviceSignalEvents || 1}
-					numerator={deviceSignalsForDoseTake}
-					size={100}
-				/>
-			</div>
-
-			<div className="center align-center flex">
-				{i18n.t("Number of reported devices:")}&nbsp;&nbsp;
-				<span style={{ fontWeight: "bold" }}>
-					{totalDeviceSignalEvents}
-				</span>
-			</div>
-		</div>
-	);
-}
-
 export default function CustomVisualizationBody({
 	data,
 	config,
@@ -147,8 +116,6 @@ export default function CustomVisualizationBody({
 			return getDeviceUsageDashboard({ data, config });
 		case DAT_ENROLLMENT_DASHBOARD_ITEM_ID:
 			return getEnrollmentSummaryByGender({ data, config });
-		case ADHERENCE_PERCENTAGE_DASHBOARD_ITEM_ID:
-			return getAdherencePercentageSummary({ data, config });
 		default:
 			return getDefaultMessageForNonExistingVisualization();
 	}

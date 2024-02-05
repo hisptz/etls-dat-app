@@ -22,47 +22,6 @@ export const TRACKED_ENTITY_INSTANCE_QUERY = {
 	},
 };
 
-export const EVENTS_QUERY = {
-	query: {
-		resource: "events",
-		params: ({ programStage, page, orgUnit, startDate, endDate }: any) => ({
-			programStage,
-			orgUnit,
-			startDate,
-			endDate,
-			totalPages: false,
-			page: page ?? 1,
-			pageSize: DEFAULT_PAGE_SIZE,
-			ouMode: "DESCENDANTS",
-			fields: [
-				"event",
-				"trackedEntityInstance",
-				"eventDate",
-				"dataValues[dataElement,value]",
-			],
-		}),
-	},
-};
-
-export const EVENTS_PAGINATION_QUERY = {
-	query: {
-		resource: "events",
-		params: ({ orgUnit, programStage, startDate, endDate }: any) => {
-			return {
-				orgUnit,
-				programStage,
-				startDate,
-				endDate,
-				ouMode: "DESCENDANTS",
-				totalPages: true,
-				pageSize: 1,
-				page: 1,
-				fields: ["event"],
-			};
-		},
-	},
-};
-
 export const TRACKED_ENTITY_INSTANCE_PAGINATION_QUERY = {
 	query: {
 		resource: "trackedEntityInstances",
