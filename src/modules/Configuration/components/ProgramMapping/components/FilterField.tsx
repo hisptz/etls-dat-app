@@ -123,6 +123,7 @@ export function FilterField({
 		<InputField
 			{...props}
 			type={type}
+			dataTest={`${DATA_TEST_PREFIX}-${name}`}
 			error={!!fieldState.error}
 			validationText={fieldState.error?.message}
 			inputWidth={type == "time" ? width : null}
