@@ -8,6 +8,7 @@ export interface DashboardItem {
 		renderAs?: "singleValue" | "progress" | "pie";
 		title: string;
 	};
+	program?: string;
 }
 
 export interface DimensionFilter {

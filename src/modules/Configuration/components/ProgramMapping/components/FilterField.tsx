@@ -18,9 +18,9 @@ export interface FilterFieldProps {
 	required?: boolean;
 	validations?: Record<string, any>;
 	initialValue?: string;
-	options?: [{ name: string; code: string }] | Option[] | DeviceIMEIList[];
+	options?: { name: string; code: string }[] | Option[] | DeviceIMEIList[];
 	update?: (val: number) => void;
-	type: "date" | "text" | "select" | "time" | "password";
+	type: "date" | "text" | "select" | "time" | "password" | "number";
 	multiSelect?: boolean;
 	loading?: boolean;
 	width?: string;
@@ -128,7 +128,9 @@ export function FilterField({
 			inputWidth={type == "time" ? width : null}
 			required={required}
 			onChange={({ value }) => {
-				field.onChange(value);
+				field.onChange(
+					type == "number" ? parseInt(value ? value : "0") : value,
+				);
 			}}
 			value={field.value}
 			name={name}

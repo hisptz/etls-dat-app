@@ -11,7 +11,7 @@ export const DefaultDashboardFilter = selector<DimensionFilter>({
 			orgUnit: {
 				orgUnits: currentUserOrganisationUnit ?? [],
 			},
-			periods: ["THIS_MONTH"],
+			periods: ["THIS_YEAR"],
 		};
 	},
 });

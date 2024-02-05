@@ -26,7 +26,6 @@ function ProgramChips() {
 									params,
 								);
 								updatedParams.set("program", mapping.program);
-
 								return updatedParams;
 							});
 						}}

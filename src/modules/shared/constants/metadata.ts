@@ -6,7 +6,7 @@ import { getProgramMapping } from "../utils";
 
 export const DATA_TEST_PREFIX = "d2-dat";
 export const DATASTORE_NAMESPACE = "dat-app";
-export const USERGROUP_CODE = "DAT_MANAGE";
+export const MANAGER_USER_GROUP_CODE = "DAT_MANAGE";
 export const DAT_PROGRAM = (): string => {
 	const [programMapping] = useSetting("programMapping", {
 		global: true,

@@ -1,6 +1,6 @@
 import React from "react";
 import { Outlet, useNavigate } from "react-router-dom";
-import { DATA_TEST_PREFIX, USERGROUP_CODE } from "../shared/constants";
+import { DATA_TEST_PREFIX, MANAGER_USER_GROUP_CODE } from "../shared/constants";
 import { FilterArea } from "./components/FilterArea";
 import i18n from "@dhis2/d2-i18n";
 import { Card, Center } from "@dhis2/ui";
@@ -31,8 +31,8 @@ export function DATClientOverview() {
 	const navigate = useNavigate();
 	const currentUserGroup = useRecoilValue(CurrentUserGroup);
 
-	const hasAcces = currentUserGroup.some(
-		(userGroup) => userGroup.code === USERGROUP_CODE,
+	const hasAccess = currentUserGroup.some(
+		(userGroup) => userGroup.code === MANAGER_USER_GROUP_CODE,
 	);
 
 	return (
@@ -61,7 +61,7 @@ export function DATClientOverview() {
 										alignItems: "center",
 									}}
 								>
-									{hasAcces ? (
+									{hasAccess ? (
 										<>
 											<span>
 												{i18n.t(
