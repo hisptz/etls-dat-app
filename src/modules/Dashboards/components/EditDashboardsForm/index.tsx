@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-
 import {
 	Button,
 	Modal,
@@ -12,8 +11,12 @@ import i18n from "@dhis2/d2-i18n";
 import { FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { uniqBy } from "lodash";
+
 import VisualizationOptionsField from "./components/VisualizationOptionsField";
 import VisualizationSpanField from "./components/VisualizationSpanField";
+import { DashboardVisualization } from "./types";
+import VisualizationItem from "./components/VisualizationItem";
 
 const schema = z.object({
 	dashboardItem: z
@@ -29,10 +32,32 @@ type EditCustomDashboardsFormProps = {
 	hide: boolean;
 };
 
+function onAddDashboardVisualizations(
+	visualizations: DashboardVisualization[],
+	addedVisualization: EditCustomDashboardsFormData,
+): DashboardVisualization[] {
+	const sanitizedVisualization = {
+		id: addedVisualization.dashboardItem,
+		span: addedVisualization.span,
+	};
+
+	return uniqBy([...visualizations, sanitizedVisualization], "id");
+}
+
+function onRemoveDashboardVisualization(
+	visualizations: DashboardVisualization[],
+	id: string,
+): DashboardVisualization[] {
+	return visualizations.filter((visualization) => visualization.id !== id);
+}
+
 export default function EditCustomDashboardsForm({
 	onClose,
 	hide,
 }: EditCustomDashboardsFormProps): React.ReactElement {
+	const [dashboardVisualizations, setDashboardVisualizations] = useState<
+		DashboardVisualization[]
+	>([]);
 	const form = useForm<EditCustomDashboardsFormData>({
 		resolver: zodResolver(schema),
 	});
@@ -42,9 +67,22 @@ export default function EditCustomDashboardsForm({
 		onClose();
 	};
 
-	const onSubmit = async (data: EditCustomDashboardsFormData) => {
-		console.log(data);
-		// form.reset();
+	const onAddVisualization = (data: EditCustomDashboardsFormData) => {
+		const sanitizedVisualizations = onAddDashboardVisualizations(
+			dashboardVisualizations,
+			data,
+		);
+		setDashboardVisualizations(sanitizedVisualizations);
+		form.reset();
+	};
+
+	const onDeleteVisualization = (id: string) => {
+		console.log("onDeleteVisualization", id);
+		const sanitizedVisualizations = onRemoveDashboardVisualization(
+			dashboardVisualizations,
+			id,
+		);
+		setDashboardVisualizations(sanitizedVisualizations);
 	};
 
 	return (
@@ -56,6 +94,7 @@ export default function EditCustomDashboardsForm({
 						display: "flex",
 						gap: "16px",
 						alignItems: "end",
+						marginBottom: "16px",
 					}}
 				>
 					<FormProvider {...form}>
@@ -69,10 +108,40 @@ export default function EditCustomDashboardsForm({
 					<div>
 						<Button
 							loading={form.formState.isSubmitting}
-							onClick={form.handleSubmit(onSubmit)}
+							onClick={form.handleSubmit(onAddVisualization)}
 						>
 							{i18n.t("Save")}
 						</Button>
+					</div>
+				</div>
+
+				<div>
+					<p style={{ margin: "16px 8px" }}>
+						{i18n.t("Selected Visualizations:")}
+					</p>
+					<div style={{ margin: "16px 8px" }}>
+						{dashboardVisualizations &&
+						dashboardVisualizations.length ? (
+							dashboardVisualizations.map((visualization) => (
+								<div key={visualization.id}>
+									<VisualizationItem
+										id={visualization.id}
+										onDelete={onDeleteVisualization}
+									/>
+								</div>
+							))
+						) : (
+							<p
+								style={{
+									textAlign: "center",
+									fontSize: "14px",
+								}}
+							>
+								{i18n.t(
+									"There are no custom dashboard items added to this program. You can add from existing visualizations above",
+								)}
+							</p>
+						)}
 					</div>
 				</div>
 			</ModalContent>
