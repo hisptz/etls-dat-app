@@ -11,12 +11,15 @@ import i18n from "@dhis2/d2-i18n";
 import { FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { uniqBy } from "lodash";
+import { uniqBy, filter, map } from "lodash";
 
 import VisualizationOptionsField from "./components/VisualizationOptionsField";
 import VisualizationSpanField from "./components/VisualizationSpanField";
 import { DashboardVisualization } from "./types";
 import VisualizationItem from "./components/VisualizationItem";
+import { useSetting } from "@dhis2/app-service-datastore";
+import { useSearchParams } from "react-router-dom";
+import { DashboardItem } from "../../types";
 
 const schema = z.object({
 	dashboardItem: z
@@ -51,20 +54,63 @@ function onRemoveDashboardVisualization(
 	return visualizations.filter((visualization) => visualization.id !== id);
 }
 
+function filterDashboardItemsByProgram(
+	dashboardItems: DashboardItem[],
+	programId: string,
+): DashboardVisualization[] {
+	return dashboardItems
+		.filter(({ program, migrated }) => program === programId && !migrated)
+		.map(({ id, span }) => ({ id, span }));
+}
+
 export default function EditCustomDashboardsForm({
 	onClose,
 	hide,
 }: EditCustomDashboardsFormProps): React.ReactElement {
+	const [selectedPrograms] = useSearchParams();
+	const selectedProgramId = selectedPrograms.get("program") ?? "";
+
+	const [dashboardItems, { set: updateDashboardItems }] = useSetting(
+		"dashboards",
+		{
+			global: true,
+		},
+	);
+
 	const [dashboardVisualizations, setDashboardVisualizations] = useState<
 		DashboardVisualization[]
-	>([]);
+	>(filterDashboardItemsByProgram(dashboardItems ?? [], selectedProgramId));
+
 	const form = useForm<EditCustomDashboardsFormData>({
 		resolver: zodResolver(schema),
 	});
 
 	const onCloseModal = () => {
+		setDashboardVisualizations(
+			filterDashboardItemsByProgram(
+				dashboardItems ?? [],
+				selectedProgramId,
+			) ?? [],
+		);
 		form.reset();
 		onClose();
+	};
+
+	const onUpdateDashboardVisualizationList = () => {
+		const updatedDashboardMapping = [
+			...(dashboardItems ?? ([] as DashboardItem[])).filter(
+				({ id }: DashboardItem) =>
+					!map(dashboardVisualizations, ({ id }) => id).includes(id),
+			),
+			...map(dashboardVisualizations, ({ id, span }) => ({
+				id,
+				span,
+				program: selectedProgramId,
+				type: "visualization",
+			})),
+		];
+		updateDashboardItems(updatedDashboardMapping);
+		onCloseModal();
 	};
 
 	const onAddVisualization = (data: EditCustomDashboardsFormData) => {
@@ -110,7 +156,7 @@ export default function EditCustomDashboardsForm({
 							loading={form.formState.isSubmitting}
 							onClick={form.handleSubmit(onAddVisualization)}
 						>
-							{i18n.t("Save")}
+							{i18n.t("Add")}
 						</Button>
 					</div>
 				</div>
@@ -148,7 +194,10 @@ export default function EditCustomDashboardsForm({
 			<ModalActions>
 				<ButtonStrip end>
 					<Button onClick={onCloseModal}>{i18n.t("Cancel")}</Button>
-					<Button primary onClick={onClose}>
+					<Button
+						primary
+						onClick={onUpdateDashboardVisualizationList}
+					>
 						{i18n.t("Save")}
 					</Button>
 				</ButtonStrip>
