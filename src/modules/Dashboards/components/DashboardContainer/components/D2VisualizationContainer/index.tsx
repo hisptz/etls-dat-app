@@ -62,7 +62,7 @@ export default function D2VisualizationContainer(
 	return (
 		<div style={{ padding: 16 }}>
 			{/* Chart header */}
-			{config.options?.title && (
+			{
 				<div
 					className="w-100 center align-center"
 					style={{
@@ -73,10 +73,10 @@ export default function D2VisualizationContainer(
 					}}
 				>
 					{config.options?.title ??
-						data?.visualization?.displayFormName ??
-						data?.visualization?.displayName}
+						data?.visualization?.displayName ??
+						""}
 				</div>
-			)}
+			}
 			<div
 				style={{ minHeight: 400 }}
 				className="w-100 h-100 column gap-16"
