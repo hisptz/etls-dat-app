@@ -54,7 +54,7 @@ function onRemoveDashboardVisualization(
 	return visualizations.filter((visualization) => visualization.id !== id);
 }
 
-function filterDashboardItemsByProgram(
+function getFilteredDashboardItemsByProgram(
 	dashboardItems: DashboardItem[],
 	programId: string,
 ): DashboardVisualization[] {
@@ -79,7 +79,12 @@ export default function EditCustomDashboardsForm({
 
 	const [dashboardVisualizations, setDashboardVisualizations] = useState<
 		DashboardVisualization[]
-	>(filterDashboardItemsByProgram(dashboardItems ?? [], selectedProgramId));
+	>(
+		getFilteredDashboardItemsByProgram(
+			dashboardItems ?? [],
+			selectedProgramId,
+		),
+	);
 
 	const form = useForm<EditCustomDashboardsFormData>({
 		resolver: zodResolver(schema),
@@ -87,7 +92,7 @@ export default function EditCustomDashboardsForm({
 
 	const onCloseModal = () => {
 		setDashboardVisualizations(
-			filterDashboardItemsByProgram(
+			getFilteredDashboardItemsByProgram(
 				dashboardItems ?? [],
 				selectedProgramId,
 			) ?? [],
@@ -99,8 +104,11 @@ export default function EditCustomDashboardsForm({
 	const onUpdateDashboardVisualizationList = () => {
 		const updatedDashboardMapping = [
 			...(dashboardItems ?? ([] as DashboardItem[])).filter(
-				({ id }: DashboardItem) =>
-					!map(dashboardVisualizations, ({ id }) => id).includes(id),
+				({ id, program, migrated }: DashboardItem) =>
+					!map(dashboardVisualizations, ({ id }) => id).includes(
+						id,
+					) &&
+					(program !== selectedProgramId || migrated),
 			),
 			...map(dashboardVisualizations, ({ id, span }) => ({
 				id,
@@ -123,7 +131,6 @@ export default function EditCustomDashboardsForm({
 	};
 
 	const onDeleteVisualization = (id: string) => {
-		console.log("onDeleteVisualization", id);
 		const sanitizedVisualizations = onRemoveDashboardVisualization(
 			dashboardVisualizations,
 			id,
