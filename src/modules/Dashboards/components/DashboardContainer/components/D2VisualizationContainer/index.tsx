@@ -86,7 +86,7 @@ export default function D2VisualizationContainer(
 				<div className="flex-1">
 					<Visualization
 						showToolbar
-						showPeriodSelector={true}
+						showPeriodSelector={false}
 						layout={getLayout(visualization)}
 						defaultVisualizationType={getDefaultType(visualization)}
 						dimensions={{

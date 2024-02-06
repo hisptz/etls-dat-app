@@ -194,7 +194,7 @@ export default function IndicatorVisualizationContainer(
 				<div className="flex-1">
 					<Visualization
 						showToolbar
-						showPeriodSelector={true}
+						showPeriodSelector={false}
 						layout={getLayout(config)}
 						defaultVisualizationType={getVisualizationType(config)}
 						dimensions={{
