@@ -531,6 +531,18 @@ export function useMetadataImport() {
 				},
 			});
 
+			const updatedProgramMapping = map(programMapping, (mapping) => {
+				if (mapping.program === mapping.program) {
+					return {
+						...mapping,
+						indicators: mapValues(dashboardIndicators, "id"),
+					};
+				}
+
+				return mapping;
+			});
+			updateProgramMapping(updatedProgramMapping);
+
 			return {
 				response: metadataMutationResponse,
 			};
