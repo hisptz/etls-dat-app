@@ -1,9 +1,10 @@
-import { find, uniqBy, head, map, mapValues } from "lodash";
+import { find, findIndex, uniqBy, head, map, mapValues } from "lodash";
 import { useDataMutation, useDataQuery } from "@dhis2/app-runtime";
 import { useSetting } from "@dhis2/app-service-datastore";
 import { useSearchParams } from "react-router-dom";
 import {
 	DATA_ELEMENTS,
+	DEFAULT_DASHBOARD_PERIOD,
 	ProgramMapping,
 	TRACKED_ENTITY_ATTRIBUTES,
 } from "../../../../shared/constants";
@@ -476,13 +477,86 @@ function getDashboardIndicators(
 	};
 }
 
+function generateMappedDashboardConfig(
+	mapping: ProgramFormData,
+	dashboardMapping: any,
+	clientsEnrolledInProgram: any,
+	clientsEnrolledInDATWithDevice: any,
+	adherencePercentage: any,
+) {
+	const deviceUsageDashboardConfig = {
+		id: `${mapping.program}_device_usage`,
+		span: 4,
+		migrated: true,
+		options: {
+			title: "Device Usage",
+			filters: {
+				pe: DEFAULT_DASHBOARD_PERIOD,
+			},
+			dimensions: {
+				dx: [
+					clientsEnrolledInProgram.id,
+					clientsEnrolledInDATWithDevice.id,
+				],
+				ou: "USER_ORGUNIT_GRANDCHILDREN",
+			},
+		},
+		type: "indicator",
+		program: mapping.program,
+		sortOrder: 2,
+	};
+	const adherenceDashboardConfig = {
+		id: `${mapping.program}_adherence`,
+		span: 4,
+		migrated: true,
+		options: {
+			title: "Adherence",
+			filters: {
+				pe: DEFAULT_DASHBOARD_PERIOD,
+			},
+			dimensions: {
+				dx: [adherencePercentage.id],
+				ou: "USER_ORGUNIT_GRANDCHILDREN",
+			},
+		},
+		type: "indicator",
+		sortOrder: 2,
+		program: mapping.program,
+	};
+	const updatedDashboardMapping = [...dashboardMapping];
+	const deviceUsageDashboardIndex = findIndex(
+		updatedDashboardMapping,
+		({ id }) => id === deviceUsageDashboardConfig.id,
+	);
+	const adherenceDashboardIndex = findIndex(
+		updatedDashboardMapping,
+		({ id }) => id === adherenceDashboardConfig.id,
+	);
+
+	if (deviceUsageDashboardIndex !== -1) {
+		updatedDashboardMapping[deviceUsageDashboardIndex] =
+			deviceUsageDashboardConfig;
+	} else {
+		updatedDashboardMapping.push(deviceUsageDashboardConfig);
+	}
+
+	if (adherenceDashboardIndex !== -1) {
+		updatedDashboardMapping[adherenceDashboardIndex] =
+			adherenceDashboardConfig;
+	} else {
+		updatedDashboardMapping.push(adherenceDashboardConfig);
+	}
+
+	return updatedDashboardMapping;
+}
+
 export function useMetadataImport() {
 	const [programMapping, { set: updateProgramMapping }] = useSetting(
 		"programMapping",
 		{ global: true },
 	);
 	const [dashboardMapping, { set: updateDashboardMapping }] = useSetting(
-		"dashboardMapping",
+		"dashboards",
 		{
 			global: true,
 		},
@@ -543,6 +617,15 @@ export function useMetadataImport() {
 				return mapping;
 			});
 			updateProgramMapping(updatedProgramMapping);
+
+			const updatedDashboardMapping = generateMappedDashboardConfig(
+				mapping,
+				dashboardMapping,
+				clientsEnrolledInProgram,
+				clientsEnrolledInDATWithDevice,
+				adherencePercentage,
+			);
+			updateDashboardMapping(updatedDashboardMapping);
 
 			return {
 				response: metadataMutationResponse,
