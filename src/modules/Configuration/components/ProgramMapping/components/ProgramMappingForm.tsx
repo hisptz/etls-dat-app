@@ -11,7 +11,7 @@ import {
 import i18n from "@dhis2/d2-i18n";
 import { FilterField } from "./FilterField";
 import { Option } from "../hooks/data";
-import { generateUid, useProgramStage } from "../hooks/save";
+import { generateUid, useMetadataImport } from "../hooks/save";
 import { useSetting } from "@dhis2/app-service-datastore";
 import { useAlert, useDataQuery } from "@dhis2/app-runtime";
 import { head, isEmpty } from "lodash";
@@ -93,7 +93,7 @@ function ProgramMappingForm({
 	onUpdate,
 	data,
 }: EditProps) {
-	const { importUpdatedMetadata } = useProgramStage();
+	const { importUpdatedMetadata } = useMetadataImport();
 
 	const [programMapping, { set: setProgramMapping }] = useSetting(
 		"programMapping",

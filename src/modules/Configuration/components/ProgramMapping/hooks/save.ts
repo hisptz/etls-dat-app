@@ -1,4 +1,4 @@
-import { find, uniqBy, head } from "lodash";
+import { find, uniqBy, head, map, mapValues } from "lodash";
 import { useDataMutation, useDataQuery } from "@dhis2/app-runtime";
 import { useSetting } from "@dhis2/app-service-datastore";
 import { useSearchParams } from "react-router-dom";
@@ -8,10 +8,7 @@ import {
 	TRACKED_ENTITY_ATTRIBUTES,
 } from "../../../../shared/constants";
 import { Program, ProgramTrackedEntityAttribute } from "@hisptz/dhis2-utils";
-import {
-	IndicatorFormData,
-	ProgramFormData,
-} from "../components/ProgramMappingForm";
+import { ProgramFormData } from "../components/ProgramMappingForm";
 
 const metadataQuery: any = {
 	program: {
@@ -44,6 +41,23 @@ const metadataMutation: any = {
 	inclusionStrategy: "NON_NULL",
 	async: false,
 };
+
+export function generateUid() {
+	const letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+	const allowedChars = "0123456789$" + letters;
+	const numberOfCodePoints = allowedChars.length;
+	const codeSize = 11;
+	let uid = "";
+	const charIndex = Math.floor(((Math.random() * 10) / 10) * letters.length);
+	uid = letters.substring(charIndex, charIndex + 1);
+	for (let i = 1; i < codeSize; ++i) {
+		const charIndex = Math.floor(
+			((Math.random() * 10) / 10) * numberOfCodePoints,
+		);
+		uid += allowedChars.substring(charIndex, charIndex + 1);
+	}
+	return uid;
+}
 
 function getMigrationMetadataObject(mapping: any): any {
 	return {
@@ -285,20 +299,14 @@ function getSanitizedProgramMetadataObject(
 export function useProgramMapping() {
 	const [params] = useSearchParams();
 	const programId = params.get("mappedTbProgram");
-	const [programMap, { set: updateProgramMapping }] = useSetting(
+	const [programMapping, { set: updateProgramMapping }] = useSetting(
 		"programMapping",
 		{ global: true },
 	);
-	const [dashboardMapping, { set: updateDashboardMapping }] = useSetting(
-		"dashboardMapping",
-		{
-			global: true,
-		},
-	);
 
 	const programStageID =
-		programId == programMap.program
-			? programMap.programStage
+		programId == programMapping.program
+			? programMapping.programStage
 			: generateUid();
 
 	const mediatorUrl = params.get("mediatorUrl");
@@ -312,7 +320,7 @@ export function useProgramMapping() {
 	const phoneNumber = params.get("phoneNumber");
 	const deviceIMEInumber = params.get("deviceIMEInumber");
 
-	const programMapping: ProgramMapping = {
+	const mapping: ProgramMapping = {
 		program: programId ?? "",
 		programStage: programStageID,
 		mediatorUrl: mediatorUrl ?? "",
@@ -329,7 +337,7 @@ export function useProgramMapping() {
 		},
 	};
 
-	return { programMapping };
+	return { programMapping: mapping };
 }
 
 export function getDefaultFilters() {
@@ -347,66 +355,6 @@ export function getDefaultFilters() {
 		phoneNumber: programMapping.attributes?.phoneNumber ?? "",
 		deviceIMEInumber: programMapping.attributes?.deviceIMEInumber ?? "",
 	});
-}
-
-export function generateUid() {
-	const letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-	const allowedChars = "0123456789$" + letters;
-	const numberOfCodePoints = allowedChars.length;
-	const codeSize = 11;
-	let uid = "";
-	const charIndex = Math.floor(((Math.random() * 10) / 10) * letters.length);
-	uid = letters.substring(charIndex, charIndex + 1);
-	for (let i = 1; i < codeSize; ++i) {
-		const charIndex = Math.floor(
-			((Math.random() * 10) / 10) * numberOfCodePoints,
-		);
-		uid += allowedChars.substring(charIndex, charIndex + 1);
-	}
-	return uid;
-}
-
-export function useProgramStage() {
-	const [mutate, { loading, error }] = useDataMutation(metadataMutation);
-	const { refetch: fetchDHIS2Metadata } = useDataQuery(metadataQuery, {
-		lazy: true,
-	});
-
-	const handleImportProgramStage = async (mapping: any) => {
-		const metadata = getMigrationMetadataObject(mapping);
-
-		if (mapping) {
-			const { program, indicatorTypesQuery } = await fetchDHIS2Metadata({
-				program: mapping?.program ?? "",
-			});
-
-			const dashboardIndicators = getDashboardIndicators(
-				mapping,
-				head((indicatorTypesQuery as any)?.indicatorTypes ?? []) ?? {},
-			);
-
-			console.log({ dashboardIndicators });
-
-			const sanitizedProgramMetadata = getSanitizedProgramMetadataObject(
-				program as Program,
-				metadata,
-			);
-
-			const metadataMutationResponse = await mutate({
-				data: { ...metadata, programs: [sanitizedProgramMetadata] },
-			});
-
-			return {
-				response: metadataMutationResponse,
-			};
-		}
-	};
-
-	return {
-		importUpdatedMetadata: handleImportProgramStage,
-		loading,
-		error,
-	};
 }
 
 function getDashboardIndicators(
@@ -524,5 +472,74 @@ function getDashboardIndicators(
 		clientsEnrolledInProgram,
 		clientsEnrolledInDATWithDevice,
 		adherencePercentage,
+	};
+}
+
+export function useMetadataImport() {
+	const [programMapping, { set: updateProgramMapping }] = useSetting(
+		"programMapping",
+		{ global: true },
+	);
+	const [dashboardMapping, { set: updateDashboardMapping }] = useSetting(
+		"dashboardMapping",
+		{
+			global: true,
+		},
+	);
+	const [mutate, { loading, error }] = useDataMutation(metadataMutation);
+	const { refetch: fetchDHIS2Metadata } = useDataQuery(metadataQuery, {
+		lazy: true,
+	});
+
+	const handleImportProgramStage = async (mapping: any) => {
+		const metadata = getMigrationMetadataObject(mapping);
+
+		if (mapping) {
+			const { program, indicatorTypesQuery } = await fetchDHIS2Metadata({
+				program: mapping?.program ?? "",
+			});
+
+			const dashboardIndicators = getDashboardIndicators(
+				mapping,
+				head((indicatorTypesQuery as any)?.indicatorTypes ?? []) ?? {},
+			);
+
+			const sanitizedProgramMetadata = getSanitizedProgramMetadataObject(
+				program as Program,
+				metadata,
+			);
+
+			const {
+				receivedDATSignals,
+				signalReceivedForDoseTaken,
+				clientsEnrolledInProgram,
+				clientsEnrolledInDATWithDevice,
+				adherencePercentage,
+			} = dashboardIndicators;
+
+			const metadataMutationResponse = await mutate({
+				data: {
+					...metadata,
+					programs: [sanitizedProgramMetadata],
+					indicators: [adherencePercentage],
+					programIndicators: [
+						receivedDATSignals,
+						signalReceivedForDoseTaken,
+						clientsEnrolledInProgram,
+						clientsEnrolledInDATWithDevice,
+					],
+				},
+			});
+
+			return {
+				response: metadataMutationResponse,
+			};
+		}
+	};
+
+	return {
+		importUpdatedMetadata: handleImportProgramStage,
+		loading,
+		error,
 	};
 }
