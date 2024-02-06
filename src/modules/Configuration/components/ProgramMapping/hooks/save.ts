@@ -1,4 +1,4 @@
-import { find, uniqBy } from "lodash";
+import { find, uniqBy, head } from "lodash";
 import { useDataMutation, useDataQuery } from "@dhis2/app-runtime";
 import { useSetting } from "@dhis2/app-service-datastore";
 import { useSearchParams } from "react-router-dom";
@@ -8,13 +8,24 @@ import {
 	TRACKED_ENTITY_ATTRIBUTES,
 } from "../../../../shared/constants";
 import { Program, ProgramTrackedEntityAttribute } from "@hisptz/dhis2-utils";
+import {
+	IndicatorFormData,
+	ProgramFormData,
+} from "../components/ProgramMappingForm";
 
-const programQuery: any = {
+const metadataQuery: any = {
 	program: {
 		resource: "programs",
 		id: ({ program }: any) => program,
 		params: {
 			fields: [":owner"],
+		},
+	},
+	indicatorTypesQuery: {
+		resource: "indicatorTypes",
+		params: {
+			filter: ["factor:eq:100"],
+			fields: ["id", "displayName"],
 		},
 	},
 };
@@ -274,7 +285,16 @@ function getSanitizedProgramMetadataObject(
 export function useProgramMapping() {
 	const [params] = useSearchParams();
 	const programId = params.get("mappedTbProgram");
-	const [programMap] = useSetting("programMapping", { global: true });
+	const [programMap, { set: updateProgramMapping }] = useSetting(
+		"programMapping",
+		{ global: true },
+	);
+	const [dashboardMapping, { set: updateDashboardMapping }] = useSetting(
+		"dashboardMapping",
+		{
+			global: true,
+		},
+	);
 
 	const programStageID =
 		programId == programMap.program
@@ -348,16 +368,24 @@ export function generateUid() {
 
 export function useProgramStage() {
 	const [mutate, { loading, error }] = useDataMutation(metadataMutation);
-	const { refetch: fetchProgramMetadata } = useDataQuery(programQuery, {
+	const { refetch: fetchDHIS2Metadata } = useDataQuery(metadataQuery, {
 		lazy: true,
 	});
 
 	const handleImportProgramStage = async (mapping: any) => {
 		const metadata = getMigrationMetadataObject(mapping);
+
 		if (mapping) {
-			const { program } = await fetchProgramMetadata({
+			const { program, indicatorTypesQuery } = await fetchDHIS2Metadata({
 				program: mapping?.program ?? "",
 			});
+
+			const dashboardIndicators = getDashboardIndicators(
+				mapping,
+				head((indicatorTypesQuery as any)?.indicatorTypes ?? []) ?? {},
+			);
+
+			console.log({ dashboardIndicators });
 
 			const sanitizedProgramMetadata = getSanitizedProgramMetadataObject(
 				program as Program,
@@ -375,8 +403,126 @@ export function useProgramStage() {
 	};
 
 	return {
-		importProgramStage: handleImportProgramStage,
+		importUpdatedMetadata: handleImportProgramStage,
 		loading,
 		error,
+	};
+}
+
+function getDashboardIndicators(
+	mapping: ProgramFormData,
+	percentageIndicatorType: any,
+): any {
+	const { program, programStage, indicators, name } = mapping;
+
+	const receivedDATSignals = {
+		id: indicators?.receivedDATSignals ?? generateUid(),
+		name: `${name}_DAT signals received`,
+		shortName: `${name}_DAT signals received`.slice(0, 50),
+		aggregationType: "SUM",
+		program: {
+			id: program,
+		},
+		expression: "V{event_count}",
+		analyticsType: "EVENT",
+		analyticsPeriodBoundaries: [
+			{
+				boundaryTarget: "EVENT_DATE",
+				analyticsPeriodBoundaryType: "BEFORE_END_OF_REPORTING_PERIOD",
+			},
+			{
+				boundaryTarget: "EVENT_DATE",
+				analyticsPeriodBoundaryType: "AFTER_START_OF_REPORTING_PERIOD",
+			},
+		],
+	};
+
+	const signalReceivedForDoseTaken = {
+		id: indicators?.signalReceivedForDoseTaken ?? generateUid(),
+		name: `${name}_DAT dose taking signals received`,
+		shortName: `${name}_DAT dose taken signals`.slice(0, 50),
+		aggregationType: "SUM",
+		program: {
+			id: program,
+		},
+		expression: "V{event_count}",
+		filter: `#{${programStage}.${DATA_ELEMENTS.DEVICE_SIGNAL}}== "Once"  || #{${programStage}.${DATA_ELEMENTS.DEVICE_SIGNAL}} == "Multiple"`,
+		analyticsType: "EVENT",
+		analyticsPeriodBoundaries: [
+			{
+				boundaryTarget: "EVENT_DATE",
+				analyticsPeriodBoundaryType: "BEFORE_END_OF_REPORTING_PERIOD",
+			},
+			{
+				boundaryTarget: "EVENT_DATE",
+				analyticsPeriodBoundaryType: "AFTER_START_OF_REPORTING_PERIOD",
+			},
+		],
+	};
+
+	const clientsEnrolledInProgram = {
+		id: indicators?.clientsEnrolledInProgram ?? generateUid(),
+		name: `${name}_Clients enrolled in program`,
+		shortName: `${name}_Clients`.slice(0, 50),
+		aggregationType: "COUNT",
+		program: {
+			id: program,
+		},
+		expression: "V{enrollment_count}",
+		analyticsType: "ENROLLMENT",
+		analyticsPeriodBoundaries: [
+			{
+				boundaryTarget: "ENROLLMENT_DATE",
+				analyticsPeriodBoundaryType: "AFTER_START_OF_REPORTING_PERIOD",
+			},
+			{
+				boundaryTarget: "ENROLLMENT_DATE",
+				analyticsPeriodBoundaryType: "BEFORE_END_OF_REPORTING_PERIOD",
+			},
+		],
+	};
+
+	const clientsEnrolledInDATWithDevice = {
+		id: indicators?.clientsEnrolledInDATWithDevice ?? generateUid(),
+		name: `${name}_Clients registered on DAT`,
+		shortName: `${name}_Clients on DAT`.slice(0, 50),
+		aggregationType: "COUNT",
+		program: {
+			id: program,
+		},
+		expression: "V{enrollment_count}",
+		filter: `d2:hasValue(A{${TRACKED_ENTITY_ATTRIBUTES.EPISODE_ID}}) || d2:hasValue(A{${TRACKED_ENTITY_ATTRIBUTES.DEVICE_IMEI}})`,
+		analyticsType: "ENROLLMENT",
+		analyticsPeriodBoundaries: [
+			{
+				boundaryTarget: "ENROLLMENT_DATE",
+				analyticsPeriodBoundaryType: "AFTER_START_OF_REPORTING_PERIOD",
+			},
+			{
+				boundaryTarget: "ENROLLMENT_DATE",
+				analyticsPeriodBoundaryType: "BEFORE_END_OF_REPORTING_PERIOD",
+			},
+		],
+	};
+
+	const adherencePercentage = {
+		name: `${name}_Adherence Percentage`,
+		shortName: `${name}_Adherence %`.slice(0, 50),
+		indicatorType: {
+			id: percentageIndicatorType.id ?? "",
+		},
+		numerator: `I{${signalReceivedForDoseTaken.id}}`,
+		numeratorDescription:
+			"Number of signals received from DAT for dose taken",
+		denominator: `greatest(I{${receivedDATSignals.id}}, 1)`,
+		denominatorDescription: "Total number of signals received from DAT",
+	};
+
+	return {
+		receivedDATSignals,
+		signalReceivedForDoseTaken,
+		clientsEnrolledInProgram,
+		clientsEnrolledInDATWithDevice,
+		adherencePercentage,
 	};
 }

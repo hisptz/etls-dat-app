@@ -32,6 +32,14 @@ interface EditProps {
 	data?: ProgramMapping;
 }
 
+const indicatorSchema = z.object({
+	receivedDATSignals: z.string().optional(),
+	signalReceivedForDoseTaken: z.string().optional(),
+	clientsEnrolledInProgram: z.string().optional(),
+	clientsEnrolledInDATWithDevice: z.string().optional(),
+	adherencePercentage: z.string().optional(),
+});
+
 const schema = z.object({
 	name: z
 		.string({ required_error: "Name is required" })
@@ -71,20 +79,21 @@ const schema = z.object({
 		deviceIMEInumber: z.string().optional(),
 		episodeId: z.string().optional(),
 	}),
+	indicators: indicatorSchema.optional(),
 });
 
 export type ProgramFormData = z.infer<typeof schema>;
+export type IndicatorFormData = z.infer<typeof indicatorSchema>;
 
 function ProgramMappingForm({
 	programOptions,
-
 	error,
 	hide,
 	onHide,
 	onUpdate,
 	data,
 }: EditProps) {
-	const { importProgramStage } = useProgramStage();
+	const { importUpdatedMetadata } = useProgramStage();
 
 	const [programMapping, { set: setProgramMapping }] = useSetting(
 		"programMapping",
@@ -173,11 +182,11 @@ function ProgramMappingForm({
 
 		if (!isEmpty(programMapping)) {
 			addNew
-				? await importProgramStage(sanitizedProgramMapping)
+				? await importUpdatedMetadata(sanitizedProgramMapping)
 				: await Promise.all(
 						programMapping.map(async (mapping: ProgramFormData) =>
 							mapping.program === data.program
-								? importProgramStage(mapping)
+								? importUpdatedMetadata(mapping)
 								: null,
 						),
 				  );
