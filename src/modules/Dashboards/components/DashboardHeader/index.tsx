@@ -9,6 +9,7 @@ import { DashboardFilterState } from "../../states/dashboardsHeader";
 import FilterButton from "../FilterButton";
 import EditCustomDashboardsForm from "../EditDashboardsForm";
 import { CanManageDAT } from "../../../shared/state/currentUser";
+import { DEFAULT_DASHBOARD_PERIOD } from "../../../shared/constants";
 
 export default function DashboardHeader(): React.ReactElement {
 	const [params] = useSearchParams();
@@ -22,7 +23,7 @@ export default function DashboardHeader(): React.ReactElement {
 		.join(", ");
 	const pe = params.get("pe");
 	const selectedPeriod = (
-		pe ? pe.split(";") : periodSelection ?? ["THIS_YEAR"]
+		pe ? pe.split(";") : periodSelection ?? [DEFAULT_DASHBOARD_PERIOD]
 	)
 		.map((pe: string) => PeriodUtility.getPeriodById(pe).name)
 		.join(", ");

@@ -17,7 +17,7 @@ export const DAT_PROGRAM = (): string => {
 	const program = mapping.program ?? "";
 	return program;
 };
-
+export const DEFAULT_DASHBOARD_PERIOD = "THIS_YEAR";
 export const TEI_FIELDS = [
 	"trackedEntity",
 	"trackedEntityType",
@@ -27,7 +27,6 @@ export const TEI_FIELDS = [
 	"attributes[*]",
 	"enrollments[orgUnitName,enrollment,enrolledAt,orgUnit,program,events[event,dataValues,programStage,enrollment,occurredAt,program,orgUnit]]",
 ];
-
 export const CURRENT_USER_QUERY: Query = {
 	me: {
 		resource: "me",

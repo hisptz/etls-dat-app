@@ -454,6 +454,7 @@ function getDashboardIndicators(
 	};
 
 	const adherencePercentage = {
+		id: indicators?.adherencePercentage ?? generateUid(),
 		name: `${name}_Adherence Percentage`,
 		shortName: `${name}_Adherence %`.slice(0, 50),
 		indicatorType: {
