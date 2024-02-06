@@ -4,26 +4,26 @@ import { colorSets, supportedCharts } from "../constants";
 
 function getLayout(visualization: any) {
 	return {
-		rows: visualization.rows.map((row: any) => row.id),
-		columns: visualization.columns.map((col: any) => col.id),
-		filters: visualization.filters.map((filter: any) => filter.id),
+		rows: (visualization?.rows ?? []).map((row: any) => row.id),
+		columns: (visualization?.columns ?? []).map((col: any) => col.id),
+		filters: (visualization?.filters ?? []).map((filter: any) => filter.id),
 	};
 }
 
 function getDefaultType(visualization: any) {
-	if (supportedCharts.includes(visualization.type)) {
+	if (supportedCharts.includes(visualization?.type)) {
 		return "chart";
 	}
 
-	if (["PIVOT_TABLE"].includes(visualization.type)) {
+	if (["PIVOT_TABLE"].includes(visualization?.type)) {
 		return "pivotTable";
 	}
 
-	if (["MAP"].includes(visualization.type)) {
+	if (["MAP"].includes(visualization?.type)) {
 		return "map";
 	}
 
-	return visualization.type;
+	return visualization?.type;
 }
 
 function getChartType(type: string): string {
@@ -41,85 +41,88 @@ function getChartType(type: string): string {
 
 function getConfig(visualization: any, { height }: { height?: number }) {
 	const type = getDefaultType(visualization);
-	const colorSetId: keyof typeof colorSets = visualization.colorSet as any;
-	const colors: Array<any | string> = (colorSets[colorSetId] as any)?.colors ??
-    (colorSets[colorSetId] as any)?.pattern ?? [
-		"#a8bf24",
-		"#518cc3",
-		"#d74554",
-		"#ff9e21",
-		"#968f8f",
-		"#ba3ba1",
-		"#ffda54",
-		"#45beae",
-		"#b98037",
-		"#676767",
-		"#6b2dd4",
-		"#47792c",
-		"#fcbdbd",
-		"#830000",
-		"#a5ffc0",
-		"#000078",
-		"#817c00",
-		"#bdf023",
-		"#fffac4",
-	];
+	const colorSetId: keyof typeof colorSets = visualization?.colorSet as any;
+	const colors: Array<any | string> = (colorSets[colorSetId] as any)
+		?.colors ??
+		(colorSets[colorSetId] as any)?.pattern ?? [
+			"#a8bf24",
+			"#518cc3",
+			"#d74554",
+			"#ff9e21",
+			"#968f8f",
+			"#ba3ba1",
+			"#ffda54",
+			"#45beae",
+			"#b98037",
+			"#676767",
+			"#6b2dd4",
+			"#47792c",
+			"#fcbdbd",
+			"#830000",
+			"#a5ffc0",
+			"#000078",
+			"#817c00",
+			"#bdf023",
+			"#fffac4",
+		];
 	const layout = getLayout(visualization);
-	const sortOrder = visualization.sortOrder;
+	const sortOrder = visualization?.sortOrder;
 
 	switch (type) {
-	case "chart":
-		return {
-			chart: {
-				type: getChartType(visualization.type),
-				layout: {
-					filter: layout.filters,
-					series: layout.columns,
-					category: layout.rows,
-				},
-				highChartOverrides: (options: Highcharts.Options) => {
-					const series = options.series?.map((series) => {
+		case "chart":
+			return {
+				chart: {
+					type: getChartType(visualization?.type),
+					layout: {
+						filter: layout.filters,
+						series: layout.columns,
+						category: layout.rows,
+					},
+					highChartOverrides: (options: Highcharts.Options) => {
+						const series = options.series?.map((series) => {
+							return {
+								...series,
+								dataSorting: {
+									enabled: sortOrder !== 0,
+								},
+							};
+						});
 						return {
-							...series,
-							dataSorting: {
-								enabled: sortOrder !== 0,
+							...options,
+							series,
+							xAxis: {
+								...options.xAxis,
+								reversed: sortOrder === -1,
 							},
 						};
-					});
-					return {
-						...options,
-						series,
-						xAxis: {
-							...options.xAxis,
-							reversed: sortOrder === -1,
-						},
-					};
+					},
+					colors,
+					height,
 				},
-				colors,
-				height,
-			},
-		};
-	case "pivotTable":
-		return {
-			pivotTable: {
-				fixColumnHeaders: true,
-				fixRowHeaders: true,
-			},
-		};
+			};
+		case "pivotTable":
+			return {
+				pivotTable: {
+					fixColumnHeaders: true,
+					fixRowHeaders: true,
+				},
+			};
 	}
 }
 
 function getDataItems(visualization: any) {
-	return visualization.dataDimensionItems?.map(
-		(item: any) => item[camelCase(item.dataDimensionItemType)]?.id
+	return visualization?.dataDimensionItems?.map(
+		(item: any) => item[camelCase(item.dataDimensionItemType)]?.id,
 	);
 }
 
 function getPeriods(visualization: any) {
-	const periods = visualization.periods.map(({ id }: { id: string }) => id);
-	const relativePeriods = Object.keys(visualization.relativePeriods).filter(
-		(key) => visualization.relativePeriods[key]
+	const periods = (visualization?.periods ?? []).map(
+		({ id }: { id: string }) => id,
 	);
+	const relativePeriods = Object.keys(
+		visualization?.relativePeriods ?? [],
+	).filter((key) => visualization?.relativePeriods[key]);
 	return [
 		...periods,
 		...relativePeriods.map((period) => snakeCase(period).toUpperCase()),
@@ -127,9 +130,9 @@ function getPeriods(visualization: any) {
 }
 
 function getOrgUnits(visualization: any) {
-	const orgUnits = visualization.organisationUnits;
-	const orgUnitLevels = visualization.organisationUnitLevels;
-	const orgUnitGroups = visualization.itemOrganisationUnitGroups;
+	const orgUnits = visualization?.organisationUnits ?? [];
+	const orgUnitLevels = visualization?.organisationUnitLevels ?? [];
+	const orgUnitGroups = visualization?.itemOrganisationUnitGroups ?? [];
 	if (!isEmpty(orgUnits)) {
 		const orgUnitIds = orgUnits.map((orgUnit: any) => orgUnit.id);
 
@@ -148,13 +151,13 @@ function getOrgUnits(visualization: any) {
 	}
 	const userOrgUnits = [];
 
-	if (visualization.userOrganisationUnit) {
+	if (visualization?.userOrganisationUni) {
 		userOrgUnits.push("USER_ORGUNIT");
 	}
-	if (visualization.userOrganisationUnitChildren) {
+	if (visualization?.userOrganisationUnitChildren) {
 		userOrgUnits.push("USER_ORGUNIT_CHILDREN");
 	}
-	if (visualization.userOrganisationUnitGrandChildren) {
+	if (visualization?.userOrganisationUnitGrandChildren) {
 		userOrgUnits.push("USER_ORGUNIT_GRANDCHILDREN");
 	}
 
@@ -162,14 +165,14 @@ function getOrgUnits(visualization: any) {
 }
 
 function getCategoryOptionGroupSets(visualization: any) {
-	if (visualization.categoryOptionGroupSetDimensions) {
+	if (visualization?.categoryOptionGroupSetDimensions) {
 		return fromPairs(
-			visualization.categoryOptionGroupSetDimensions.map(
+			visualization?.categoryOptionGroupSetDimensions.map(
 				({ categoryOptionGroupSet, categoryOptionGroups }: any) => [
 					categoryOptionGroupSet.id,
 					categoryOptionGroups.map((option: any) => option.id),
-				]
-			)
+				],
+			),
 		);
 	}
 
@@ -177,28 +180,28 @@ function getCategoryOptionGroupSets(visualization: any) {
 }
 
 function getCategoryOptions(visualization: any) {
-	if (visualization.categoryDimensions) {
+	if (visualization?.categoryDimensions) {
 		return fromPairs(
-			visualization.categoryDimensions.map(
+			visualization?.categoryDimensions.map(
 				({ category, categoryOptions }: any) => [
 					category.id,
 					categoryOptions.map((option: any) => option.id),
-				]
-			)
+				],
+			),
 		);
 	}
 	return {};
 }
 
 function getOrganisationUnitGroupSetDimensions(visualization: any) {
-	if (visualization.organisationUnitGroupSetDimensions) {
+	if (visualization?.organisationUnitGroupSetDimensions) {
 		return fromPairs(
-			visualization.organisationUnitGroupSetDimensions.map(
+			visualization?.organisationUnitGroupSetDimensions.map(
 				({ organisationUnitGroupSet, organisationUnitGroups }: any) => [
 					organisationUnitGroupSet.id,
 					organisationUnitGroups.map((option: any) => option.id),
-				]
-			)
+				],
+			),
 		);
 	}
 	return {};

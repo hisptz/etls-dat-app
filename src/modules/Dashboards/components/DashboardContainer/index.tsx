@@ -13,6 +13,7 @@ import {
 	DAT_ENROLLMENT_DASHBOARD_ITEM_ID,
 } from "../../constants";
 import { useSearchParams } from "react-router-dom";
+import IndicatorVisualizationContainer from "./components/IndicatorVisualizationContainer";
 
 const customEnrollmentDashboardItems = [
 	DEVICE_USAGE_DASHBOARD_ITEM_ID,
@@ -83,19 +84,30 @@ export default function DashboardContainer(): React.ReactElement {
 					>
 						<Box height="100%" width="100%">
 							<Card>
-								{dashboardConfiguration.type == "custom" ? (
+								{dashboardConfiguration.type === "custom" ? (
 									<CustomVisualizationContainer
 										config={dashboardConfiguration}
 										loading={loadingEnrollemntStatus}
 										data={enrollmentSummary ?? {}}
 									/>
-								) : "visualization" ? (
+								) : dashboardConfiguration.type ===
+								  "visualization" ? (
 									<D2VisualizationContainer
+										{...dashboardConfiguration}
+									/>
+								) : dashboardConfiguration.type ===
+								  "indicator" ? (
+									<IndicatorVisualizationContainer
 										{...dashboardConfiguration}
 									/>
 								) : (
 									// TODO Add handler for d2 visualizations
-									<p style={{ textAlign: "center" }}>
+									<p
+										style={{
+											textAlign: "center",
+											margin: "16px auto",
+										}}
+									>
 										Visualization of type{" "}
 										{dashboardConfiguration.type} is not
 										Supported!
