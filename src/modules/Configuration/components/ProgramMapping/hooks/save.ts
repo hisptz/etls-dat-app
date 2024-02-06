@@ -491,14 +491,16 @@ function generateMappedDashboardConfig(
 		options: {
 			title: "Device Usage",
 			filters: {
-				pe: DEFAULT_DASHBOARD_PERIOD,
+				pe: [DEFAULT_DASHBOARD_PERIOD],
 			},
 			dimensions: {
 				dx: [
 					clientsEnrolledInProgram.id,
 					clientsEnrolledInDATWithDevice.id,
 				],
-				ou: "USER_ORGUNIT_GRANDCHILDREN",
+			},
+			rows: {
+				ou: ["USER_ORGUNIT_GRANDCHILDREN"],
 			},
 		},
 		type: "indicator",
@@ -512,11 +514,13 @@ function generateMappedDashboardConfig(
 		options: {
 			title: "Adherence",
 			filters: {
-				pe: DEFAULT_DASHBOARD_PERIOD,
+				pe: [DEFAULT_DASHBOARD_PERIOD],
 			},
-			dimensions: {
+			columns: {
 				dx: [adherencePercentage.id],
-				ou: "USER_ORGUNIT_GRANDCHILDREN",
+			},
+			rows: {
+				ou: ["USER_ORGUNIT_GRANDCHILDREN"],
 			},
 		},
 		type: "indicator",
