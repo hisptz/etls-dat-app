@@ -1,4 +1,4 @@
- Feature: DAT Client Overview features
+ Feature: DAT Assignment features
  
  Scenario: User performs search for a DAT Client for Assignment
  Given an authorized user
