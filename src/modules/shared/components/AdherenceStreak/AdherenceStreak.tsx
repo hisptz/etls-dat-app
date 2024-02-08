@@ -26,6 +26,8 @@ function AdherenceStreak({ events, frequency }: CalendarProps) {
 	const [currentMonth] = useState(month);
 	const [currentYear] = useState(year);
 
+	const priorityOrder = ["enrolled", "takenDose", "notTakenDose", ""];
+
 	const formatDate = (date: Date) => {
 		const options = {
 			year: "numeric",
@@ -56,6 +58,7 @@ function AdherenceStreak({ events, frequency }: CalendarProps) {
 			const dailyEvents = events.filter((event) => {
 				const eventDate = new Date(event.date);
 				eventDate.setHours(0, 0, 0, 0);
+
 				return eventDate.getTime() === cellDate.getTime();
 			});
 
@@ -79,9 +82,13 @@ function AdherenceStreak({ events, frequency }: CalendarProps) {
 
 			const sanitizedEvents = sanitizeEvents();
 
+			const sortedEvents = _.sortBy(sanitizedEvents, (item) => {
+				return priorityOrder.indexOf(item.event);
+			});
+
 			const cellColor =
 				sanitizedEvents.length > 0
-					? cellColors[sanitizedEvents[0].event]
+					? cellColors[sortedEvents[0].event]
 					: "N/A";
 
 			const tooltipId = `daily-tooltip-${cellColor + i}`;
@@ -138,6 +145,7 @@ function AdherenceStreak({ events, frequency }: CalendarProps) {
 			const monthEvents = events.filter((event) => {
 				const eventDate = new Date(event.date);
 				eventDate.setHours(0, 0, 0, 0);
+
 				return (
 					eventDate.getFullYear() === targetMonth.getFullYear() &&
 					eventDate.getMonth() === targetMonth.getMonth()
@@ -164,9 +172,13 @@ function AdherenceStreak({ events, frequency }: CalendarProps) {
 
 			const sanitizedEvents = sanitizeEvents();
 
+			const sortedEvents = _.sortBy(sanitizedEvents, (item) => {
+				return priorityOrder.indexOf(item.event);
+			});
+
 			const monthStreakColor =
 				sanitizedEvents.length > 0
-					? cellColors[sanitizedEvents[0].event]
+					? cellColors[sortedEvents[0].event]
 					: "N/A";
 
 			const tooltipId = `monthly-tooltip-${monthStreakColor + i}`;
@@ -247,10 +259,13 @@ function AdherenceStreak({ events, frequency }: CalendarProps) {
 			};
 
 			const sanitizedEvents = sanitizeEvents();
+			const sortedEvents = _.sortBy(sanitizedEvents, (item) => {
+				return priorityOrder.indexOf(item.event);
+			});
 
 			const cellColor =
 				sanitizedEvents.length > 0
-					? cellColors[sanitizedEvents[0].event]
+					? cellColors[sortedEvents[0].event]
 					: "N/A";
 
 			const tooltipId = `daily-tooltip-${week + cellColor + i}`;

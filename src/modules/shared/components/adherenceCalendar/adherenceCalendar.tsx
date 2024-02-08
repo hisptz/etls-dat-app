@@ -1,9 +1,7 @@
 import React, { useState } from "react";
 import i18n from "@dhis2/d2-i18n";
 import styles from "./adherenceCalendar.module.css";
-
 import Calendar, { DateEvent } from "./components/calendar";
-
 import { DateTime } from "luxon";
 import { useSetting } from "@dhis2/app-service-datastore";
 import { useSearchParams } from "react-router-dom";
@@ -55,6 +53,26 @@ function AdherenceCalendar({ profile, data }: ProfileAreaProps) {
 
 	const [eventCode, setEventCode] = useState<string>();
 
+	const enrollmentDate =
+		DateTime.fromFormat(
+			data?.enrollmentDate ?? "",
+			"yyyy-MM-dd HH:mm:ss",
+		).toISO() ?? "";
+
+	filteredEvents.push({
+		dataValues: [
+			{
+				value: "DeviceEnrollmentDate",
+			},
+		],
+		occurredAt: [
+			{
+				value: enrollmentDate,
+			},
+		],
+		batteryLevel: [],
+	});
+
 	const adherenceEvents = filteredEvents.map((item: any) => {
 		return {
 			date: item.occurredAt[0].value,
@@ -65,7 +83,7 @@ function AdherenceCalendar({ profile, data }: ProfileAreaProps) {
 					? "takenDose"
 					: item.dataValues[0].value == "Heartbeat"
 					? "notTakenDose"
-					: item.dataValues[0].value == "Enrollment"
+					: item.dataValues[0].value == "DeviceEnrollmentDate"
 					? "enrolled"
 					: item.dataValues[0].value == "None"
 					? ""

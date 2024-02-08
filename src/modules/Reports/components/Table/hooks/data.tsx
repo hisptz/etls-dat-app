@@ -272,8 +272,6 @@ export function useReportTableData() {
 						? "takenDose"
 						: signal == "Heartbeat"
 						? "notTakenDose"
-						: signal == "Enrollment"
-						? "enrolled"
 						: signal == "None"
 						? ""
 						: "";
