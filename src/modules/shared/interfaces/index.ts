@@ -5,9 +5,17 @@ export interface DashboardItem {
 	span: number;
 	type: "visualization" | "custom";
 	options?: {
-		renderAs?: "singleValue" | "progress" | "pie";
-		title: string;
+		title?: string;
+		renderAs?: string;
+		chartType?: string;
+		filters?: Record<string, any>;
+		dimensions?: Record<string, any>;
+		columns?: Record<string, any>;
+		rows?: Record<string, any>;
+		series?: Record<string, any>;
+		category?: Record<string, any>;
 	};
+	sortOrder?: number;
 	program?: string;
 }
 

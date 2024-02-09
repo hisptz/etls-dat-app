@@ -1,24 +1,12 @@
 import { useRecoilValue } from "recoil";
 import { DashboardFilterState } from "../states/dashboardsHeader";
 import { useEffect, useState } from "react";
-import {
-	head,
-	isEmpty,
-	flattenDeep,
-	filter,
-	forIn,
-	find,
-	groupBy,
-	keys,
-	set,
-} from "lodash";
+import { head, isEmpty, flattenDeep, filter, forIn, find } from "lodash";
 import { mapLimit, parallel } from "async-es";
 import { useDataEngine } from "@dhis2/app-runtime";
 import { useSearchParams } from "react-router-dom";
 import {
 	DEFAULT_PAGE_SIZE,
-	EVENTS_PAGINATION_QUERY,
-	EVENTS_QUERY,
 	TRACKED_ENTITY_ATTRIBUTE_QUERY,
 	TRACKED_ENTITY_INSTANCE_PAGINATION_QUERY,
 	TRACKED_ENTITY_INSTANCE_QUERY,
@@ -26,14 +14,9 @@ import {
 import { PeriodUtility, TrackedEntityInstance } from "@hisptz/dhis2-utils";
 import { useSetting } from "@dhis2/app-service-datastore";
 import { getDhis2FormattedDate } from "../../shared/utils";
-import {
-	Event as DHIS2Event,
-	Option,
-	TrackedEntityAttribute,
-} from "../../shared/types";
-import { DateTime } from "luxon";
-import { DATA_ELEMENTS, ProgramMapping } from "../../shared/constants";
+import { Option, TrackedEntityAttribute } from "../../shared/types";
 import { asyncify } from "async";
+import { ProgramMapping } from "../../shared/constants";
 
 const CONCURRENT_REQUESTS = 5;
 type EnrollmentSummary = {
@@ -43,11 +26,6 @@ type EnrollmentSummary = {
 	enrollmentBySex: {
 		[sex: string]: number;
 	};
-};
-
-type AdherenceSummary = {
-	totalDeviceSignalEvents: number;
-	deviceSignalsForDoseTake: number;
 };
 
 function getEnrollmentSummary(
@@ -90,35 +68,6 @@ function getEnrollmentSummary(
 	};
 }
 
-function getAdherenceSummary(events: DHIS2Event[]): AdherenceSummary {
-	const doseTakenSignals = ["Once", "Multiple"];
-
-	const eventForDoseTaken = filter(events, ({ dataValues }) => {
-		const deviceSignalDataValue = find(
-			dataValues,
-			({ dataElement }) => dataElement === DATA_ELEMENTS.DEVICE_SIGNAL,
-		);
-
-		return (
-			deviceSignalDataValue &&
-			doseTakenSignals.includes(deviceSignalDataValue.value)
-		);
-	});
-
-	const countOfEventsForDoseTaken = keys(
-		groupBy(eventForDoseTaken, "trackedEntityInstance"),
-	).length;
-
-	const countOfEventUniqueByTei = keys(
-		groupBy(events, "trackedEntityInstance"),
-	).length;
-
-	return {
-		totalDeviceSignalEvents: countOfEventUniqueByTei,
-		deviceSignalsForDoseTake: countOfEventsForDoseTaken,
-	};
-}
-
 function getPaginationList(totalItems: number): number[] {
 	let pages: number[] = [];
 	for (
@@ -134,16 +83,10 @@ function getPaginationList(totalItems: number): number[] {
 export function useDefaultDashboardData() {
 	const [loadingEnrollemntStatus, setLoadingEnrollemntStatus] =
 		useState<boolean>(false);
-	const [loadingAdherenceSummary, setLoadingAdherenceSummary] =
-		useState<boolean>(false);
 	const [enrollemntStatusError, setEnrollemntStatusError] =
-		useState<any>(null);
-	const [adherenceSummaryError, setAdherenceSummaryError] =
 		useState<any>(null);
 	const [enrollmentSummary, setEnrollmentSummary] =
 		useState<EnrollmentSummary | null>(null);
-	const [adherenceSummary, setAdherenceSummary] =
-		useState<AdherenceSummary | null>(null);
 
 	const [searchParams] = useSearchParams();
 	const engine = useDataEngine();
@@ -166,18 +109,11 @@ export function useDefaultDashboardData() {
 		head(peParams ? peParams.split(";") : selectedPeriods),
 	);
 
-	const today = DateTime.now().minus({ days: 1 }).toFormat("yyyy-MM-dd");
 	const trackedEntityInstanceQueryParams = {
 		ou,
 		startDate: getDhis2FormattedDate(startDate),
 		endDate: getDhis2FormattedDate(endDate),
 	};
-	const eventsQueryParams = {
-		orgUnit: ou,
-		startDate: today,
-		endDate: today,
-	};
-
 	const getTrackedEntityInstancePaginations = async (
 		program: string,
 	): Promise<number[]> => {
@@ -187,16 +123,6 @@ export function useDefaultDashboardData() {
 				variables: { ...trackedEntityInstanceQueryParams, program },
 			},
 		);
-		const { pager } = (data.query as any) ?? {};
-		return getPaginationList(pager.total ?? 0);
-	};
-
-	const getEventsPaginations = async (
-		programStage: string,
-	): Promise<number[]> => {
-		const data = await engine.query(EVENTS_PAGINATION_QUERY, {
-			variables: { ...eventsQueryParams, programStage },
-		});
 		const { pager } = (data.query as any) ?? {};
 		return getPaginationList(pager.total ?? 0);
 	};
@@ -226,30 +152,6 @@ export function useDefaultDashboardData() {
 		}
 
 		return trackedEntityInstances;
-	};
-
-	const getEvents = async (
-		programStage: string,
-		page: number,
-	): Promise<Event[]> => {
-		let events: Event[] = [];
-
-		try {
-			const data = await engine.query(EVENTS_QUERY, {
-				variables: {
-					...eventsQueryParams,
-					page,
-					programStage,
-				},
-				signal: controller.signal,
-			});
-
-			const fetchedEvents = (data?.query as any).events ?? [];
-			events = [...events, fetchedEvents];
-		} catch (error: any) {
-			setAdherenceSummaryError(error);
-		}
-		return events;
 	};
 
 	const getSexOptionsMapping = async (
@@ -365,78 +267,12 @@ export function useDefaultDashboardData() {
 		setLoadingEnrollemntStatus(false);
 	};
 
-	const aggregateAdherenceSummary = (
-		aggregatedAdherenceSummary: AdherenceSummary | any,
-		fetchedAdherenceSummary: AdherenceSummary,
-	): AdherenceSummary => {
-		const { totalDeviceSignalEvents, deviceSignalsForDoseTake } =
-			fetchedAdherenceSummary;
-		return {
-			...aggregatedAdherenceSummary,
-			totalDeviceSignalEvents:
-				aggregatedAdherenceSummary?.totalDeviceSignalEvents ??
-				0 + totalDeviceSignalEvents,
-			deviceSignalsForDoseTake:
-				aggregatedAdherenceSummary?.deviceSignalsForDoseTake ??
-				0 + deviceSignalsForDoseTake,
-		};
-	};
-
-	const fetchAdherenceSummary = async (
-		programMapping: ProgramMapping[],
-	): Promise<void> => {
-		try {
-			programMapping = filter(programMapping, ({ program }) => {
-				return program === selectedProgramId;
-			});
-			setLoadingAdherenceSummary(true);
-			let aggregatedAdherenceSummary: AdherenceSummary | any = {};
-
-			if (programMapping.length) {
-				for (const mapping of programMapping ?? []) {
-					await getEventsPaginations(mapping.programStage ?? "").then(
-						async (totalPages) => {
-							let events: DHIS2Event[] = await mapLimit(
-								totalPages,
-								CONCURRENT_REQUESTS,
-								async (page: number) => {
-									return await getEvents(
-										mapping.programStage ?? "",
-										page,
-									);
-								},
-							);
-							events = flattenDeep(events);
-							aggregatedAdherenceSummary =
-								aggregateAdherenceSummary(
-									aggregatedAdherenceSummary,
-									getAdherenceSummary(events),
-								);
-						},
-						(error: any) => {
-							setAdherenceSummaryError(error);
-						},
-					);
-				}
-				setAdherenceSummary(
-					aggregatedAdherenceSummary as AdherenceSummary,
-				);
-			}
-		} catch (error) {
-			setAdherenceSummaryError(error);
-		}
-
-		setLoadingAdherenceSummary(false);
-	};
-
 	useEffect(() => {
 		async function getDefaultDashboardData() {
 			await asyncify(
 				parallel(
 					// Fetching enrollment summary
 					fetchEnrollemntSummary(programMappings ?? []),
-					// Fetching adherence summary
-					fetchAdherenceSummary(programMappings ?? []),
 				),
 			);
 		}
@@ -451,10 +287,7 @@ export function useDefaultDashboardData() {
 
 	return {
 		loadingEnrollemntStatus,
-		loadingAdherenceSummary,
 		enrollemntStatusError,
-		adherenceSummaryError,
 		enrollmentSummary,
-		adherenceSummary,
 	};
 }

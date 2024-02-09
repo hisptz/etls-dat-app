@@ -13,6 +13,7 @@ import {
 	DAT_ENROLLMENT_DASHBOARD_ITEM_ID,
 } from "../../constants";
 import { useSearchParams } from "react-router-dom";
+import IndicatorVisualizationContainer from "./components/IndicatorVisualizationContainer";
 
 const customEnrollmentDashboardItems = [
 	DEVICE_USAGE_DASHBOARD_ITEM_ID,
@@ -22,30 +23,12 @@ const customEnrollmentDashboardItems = [
 export default function DashboardContainer(): React.ReactElement {
 	const {
 		loadingEnrollemntStatus,
-		loadingAdherenceSummary,
 		enrollemntStatusError,
-		adherenceSummaryError,
 		enrollmentSummary,
-		adherenceSummary,
 	} = useDefaultDashboardData();
 	const [selectedPrograms] = useSearchParams();
 	const selectedProgramId = selectedPrograms.get("program");
 
-	const getCustomDashboardItemLoading = (config: DashboardItem): boolean => {
-		const { id } = config;
-		return customEnrollmentDashboardItems.includes(id)
-			? loadingEnrollemntStatus
-			: loadingAdherenceSummary;
-	};
-
-	const getCustomDashboardItemData = (
-		config: DashboardItem,
-	): Record<string, any> => {
-		const { id } = config;
-		return customEnrollmentDashboardItems.includes(id)
-			? enrollmentSummary ?? {}
-			: adherenceSummary ?? {};
-	};
 	const [dashboardConfigurations] = useSetting("dashboards", {
 		global: true,
 	});
@@ -78,11 +61,8 @@ export default function DashboardContainer(): React.ReactElement {
 		);
 	}
 
-	if (enrollemntStatusError || adherenceSummaryError) {
-		const errorMessage = enrollemntStatusError
-			? enrollemntStatusError.toString()
-			: adherenceSummaryError.toString();
-		showAlert({ message: errorMessage, type: { critical: true } });
+	if (enrollemntStatusError) {
+		showAlert({ message: enrollemntStatusError, type: { critical: true } });
 	}
 
 	return (
@@ -104,23 +84,34 @@ export default function DashboardContainer(): React.ReactElement {
 					>
 						<Box height="100%" width="100%">
 							<Card>
-								{dashboardConfiguration.type == "custom" ? (
+								{dashboardConfiguration.type === "custom" ? (
 									<CustomVisualizationContainer
 										config={dashboardConfiguration}
-										loading={getCustomDashboardItemLoading(
-											dashboardConfiguration,
-										)}
-										data={getCustomDashboardItemData(
-											dashboardConfiguration,
-										)}
+										loading={loadingEnrollemntStatus}
+										data={enrollmentSummary ?? {}}
 									/>
 								) : dashboardConfiguration.type ===
 								  "visualization" ? (
 									<D2VisualizationContainer
 										{...dashboardConfiguration}
 									/>
+								) : dashboardConfiguration.type ===
+								  "indicator" ? (
+									<IndicatorVisualizationContainer
+										{...dashboardConfiguration}
+									/>
 								) : (
-									<p>Not found</p>
+									// TODO Add handler for d2 visualizations
+									<p
+										style={{
+											textAlign: "center",
+											margin: "16px auto",
+										}}
+									>
+										Visualization of type{" "}
+										{dashboardConfiguration.type} is not
+										Supported!
+									</p>
 								)}
 							</Card>
 						</Box>
