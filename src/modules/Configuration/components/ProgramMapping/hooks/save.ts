@@ -1,20 +1,29 @@
-import { find, uniqBy } from "lodash";
+import { find, findIndex, uniqBy, head, map, mapValues } from "lodash";
 import { useDataMutation, useDataQuery } from "@dhis2/app-runtime";
 import { useSetting } from "@dhis2/app-service-datastore";
 import { useSearchParams } from "react-router-dom";
 import {
 	DATA_ELEMENTS,
+	DEFAULT_DASHBOARD_PERIOD,
 	ProgramMapping,
 	TRACKED_ENTITY_ATTRIBUTES,
 } from "../../../../shared/constants";
 import { Program, ProgramTrackedEntityAttribute } from "@hisptz/dhis2-utils";
+import { ProgramFormData } from "../components/ProgramMappingForm";
 
-const programQuery: any = {
+const metadataQuery: any = {
 	program: {
 		resource: "programs",
 		id: ({ program }: any) => program,
 		params: {
 			fields: [":owner"],
+		},
+	},
+	indicatorTypesQuery: {
+		resource: "indicatorTypes",
+		params: {
+			filter: ["factor:eq:100"],
+			fields: ["id", "displayName"],
 		},
 	},
 };
@@ -23,16 +32,35 @@ const metadataMutation: any = {
 	type: "create",
 	resource: "metadata",
 	data: ({ data }: any) => data,
-	importMode: "COMMIT",
-	identifier: "UID",
-	importReportMode: "ERRORS",
-	importStrategy: "CREATE_AND_UPDATE",
-	atomicMode: "ALL",
-	mergeMode: "MERGE",
-	flushMode: "AUTO",
-	inclusionStrategy: "NON_NULL",
-	async: false,
+	params: {
+		importMode: "COMMIT",
+		identifier: "UID",
+		importReportMode: "ERRORS",
+		importStrategy: "CREATE_AND_UPDATE",
+		atomicMode: "ALL",
+		mergeMode: "MERGE",
+		flushMode: "AUTO",
+		inclusionStrategy: "NON_NULL",
+		async: false,
+	},
 };
+
+export function generateUid() {
+	const letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+	const allowedChars = "0123456789$" + letters;
+	const numberOfCodePoints = allowedChars.length;
+	const codeSize = 11;
+	let uid = "";
+	const charIndex = Math.floor(((Math.random() * 10) / 10) * letters.length);
+	uid = letters.substring(charIndex, charIndex + 1);
+	for (let i = 1; i < codeSize; ++i) {
+		const charIndex = Math.floor(
+			((Math.random() * 10) / 10) * numberOfCodePoints,
+		);
+		uid += allowedChars.substring(charIndex, charIndex + 1);
+	}
+	return uid;
+}
 
 function getMigrationMetadataObject(mapping: any): any {
 	return {
@@ -274,11 +302,11 @@ function getSanitizedProgramMetadataObject(
 export function useProgramMapping() {
 	const [params] = useSearchParams();
 	const programId = params.get("mappedTbProgram");
-	const [programMap] = useSetting("programMapping", { global: true });
+	const [programMapping] = useSetting("programMapping", { global: true });
 
 	const programStageID =
-		programId == programMap.program
-			? programMap.programStage
+		programId == programMapping.program
+			? programMapping.programStage
 			: generateUid();
 
 	const mediatorUrl = params.get("mediatorUrl");
@@ -292,7 +320,7 @@ export function useProgramMapping() {
 	const phoneNumber = params.get("phoneNumber");
 	const deviceIMEInumber = params.get("deviceIMEInumber");
 
-	const programMapping: ProgramMapping = {
+	const mapping: ProgramMapping = {
 		program: programId ?? "",
 		programStage: programStageID,
 		mediatorUrl: mediatorUrl ?? "",
@@ -309,7 +337,7 @@ export function useProgramMapping() {
 		},
 	};
 
-	return { programMapping };
+	return { programMapping: mapping };
 }
 
 export function getDefaultFilters() {
@@ -329,44 +357,314 @@ export function getDefaultFilters() {
 	});
 }
 
-export function generateUid() {
-	const letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-	const allowedChars = "0123456789$" + letters;
-	const numberOfCodePoints = allowedChars.length;
-	const codeSize = 11;
-	let uid = "";
-	const charIndex = Math.floor(((Math.random() * 10) / 10) * letters.length);
-	uid = letters.substring(charIndex, charIndex + 1);
-	for (let i = 1; i < codeSize; ++i) {
-		const charIndex = Math.floor(
-			((Math.random() * 10) / 10) * numberOfCodePoints,
-		);
-		uid += allowedChars.substring(charIndex, charIndex + 1);
-	}
-	return uid;
+function getDashboardIndicators(
+	mapping: ProgramFormData,
+	percentageIndicatorType: any,
+): any {
+	const { program, programStage, indicators, name } = mapping;
+
+	const receivedDATSignals = {
+		id: indicators?.receivedDATSignals ?? generateUid(),
+		name: `${name}_DAT signals received`,
+		shortName: `${name}_DAT signals received`.slice(0, 50),
+		aggregationType: "SUM",
+		program: {
+			id: program,
+		},
+		expression: "V{event_count}",
+		analyticsType: "EVENT",
+		analyticsPeriodBoundaries: [
+			{
+				boundaryTarget: "ENROLLMENT_DATE",
+				analyticsPeriodBoundaryType: "AFTER_START_OF_REPORTING_PERIOD",
+			},
+			{
+				boundaryTarget: "EVENT_DATE",
+				analyticsPeriodBoundaryType: "AFTER_START_OF_REPORTING_PERIOD",
+			},
+			{
+				boundaryTarget: "EVENT_DATE",
+				analyticsPeriodBoundaryType: "BEFORE_END_OF_REPORTING_PERIOD",
+			},
+			{
+				boundaryTarget: "ENROLLMENT_DATE",
+				analyticsPeriodBoundaryType: "BEFORE_END_OF_REPORTING_PERIOD",
+			},
+		],
+	};
+
+	const signalReceivedForDoseTaken = {
+		id: indicators?.signalReceivedForDoseTaken ?? generateUid(),
+		name: `${name}_DAT dose taking signals received`,
+		shortName: `${name}_DAT dose taken signals`.slice(0, 50),
+		aggregationType: "SUM",
+		program: {
+			id: program,
+		},
+		expression: "V{event_count}",
+		filter: `#{${programStage}.${DATA_ELEMENTS.DEVICE_SIGNAL}}== "Once"  || #{${programStage}.${DATA_ELEMENTS.DEVICE_SIGNAL}} == "Multiple"`,
+		analyticsType: "EVENT",
+		analyticsPeriodBoundaries: [
+			{
+				boundaryTarget: "ENROLLMENT_DATE",
+				analyticsPeriodBoundaryType: "AFTER_START_OF_REPORTING_PERIOD",
+			},
+			{
+				boundaryTarget: "EVENT_DATE",
+				analyticsPeriodBoundaryType: "AFTER_START_OF_REPORTING_PERIOD",
+			},
+			{
+				boundaryTarget: "EVENT_DATE",
+				analyticsPeriodBoundaryType: "BEFORE_END_OF_REPORTING_PERIOD",
+			},
+			{
+				boundaryTarget: "ENROLLMENT_DATE",
+				analyticsPeriodBoundaryType: "BEFORE_END_OF_REPORTING_PERIOD",
+			},
+		],
+	};
+
+	const clientsEnrolledInProgram = {
+		id: indicators?.clientsEnrolledInProgram ?? generateUid(),
+		name: `${name}_Clients enrolled in program`,
+		shortName: `${name}_Clients`.slice(0, 50),
+		aggregationType: "SUM",
+		program: {
+			id: program,
+		},
+		expression: "V{enrollment_count}",
+		analyticsType: "ENROLLMENT",
+		analyticsPeriodBoundaries: [
+			{
+				boundaryTarget: "ENROLLMENT_DATE",
+				analyticsPeriodBoundaryType: "AFTER_START_OF_REPORTING_PERIOD",
+			},
+			{
+				boundaryTarget: "ENROLLMENT_DATE",
+				analyticsPeriodBoundaryType: "BEFORE_END_OF_REPORTING_PERIOD",
+			},
+		],
+	};
+
+	const clientsEnrolledInDATWithDevice = {
+		id: indicators?.clientsEnrolledInDATWithDevice ?? generateUid(),
+		name: `${name}_Clients registered on DAT`,
+		shortName: `${name}_Clients on DAT`.slice(0, 50),
+		aggregationType: "SUM",
+		program: {
+			id: program,
+		},
+		expression: "V{enrollment_count}",
+		filter: `d2:hasValue(A{${TRACKED_ENTITY_ATTRIBUTES.EPISODE_ID}}) || d2:hasValue(A{${TRACKED_ENTITY_ATTRIBUTES.DEVICE_IMEI}})`,
+		analyticsType: "ENROLLMENT",
+		analyticsPeriodBoundaries: [
+			{
+				boundaryTarget: "ENROLLMENT_DATE",
+				analyticsPeriodBoundaryType: "AFTER_START_OF_REPORTING_PERIOD",
+			},
+			{
+				boundaryTarget: "ENROLLMENT_DATE",
+				analyticsPeriodBoundaryType: "BEFORE_END_OF_REPORTING_PERIOD",
+			},
+		],
+	};
+
+	const adherencePercentage = {
+		id: indicators?.adherencePercentage ?? generateUid(),
+		name: `${name}_Adherence Percentage`,
+		shortName: `${name}_Adherence %`.slice(0, 50),
+		indicatorType: {
+			id: percentageIndicatorType.id ?? "",
+		},
+		numerator: `I{${signalReceivedForDoseTaken.id}}`,
+		numeratorDescription:
+			"Number of signals received from DAT for dose taken",
+		denominator: `greatest(I{${receivedDATSignals.id}}, 1)`,
+		denominatorDescription: "Total number of signals received from DAT",
+	};
+
+	return {
+		receivedDATSignals,
+		signalReceivedForDoseTaken,
+		clientsEnrolledInProgram,
+		clientsEnrolledInDATWithDevice,
+		adherencePercentage,
+	};
 }
 
-export function useProgramStage() {
+function generateMappedDashboardConfig(
+	mapping: ProgramFormData,
+	dashboardMapping: any,
+	clientsEnrolledInProgram: any,
+	clientsEnrolledInDATWithDevice: any,
+	adherencePercentage: any,
+) {
+	const deviceUsageDashboardConfig = {
+		id: `${mapping.program}_device_usage`,
+		span: 4,
+		migrated: true,
+		options: {
+			title: "Device Usage",
+			filters: {
+				pe: [DEFAULT_DASHBOARD_PERIOD],
+			},
+			columns: {
+				dx: [
+					clientsEnrolledInProgram.id,
+					clientsEnrolledInDATWithDevice.id,
+				],
+			},
+			rows: {
+				ou: ["USER_ORGUNIT_GRANDCHILDREN"],
+			},
+		},
+		type: "indicator",
+		program: mapping.program,
+		sortOrder: 2,
+	};
+	const adherenceDashboardConfig = {
+		id: `${mapping.program}_adherence`,
+		span: 4,
+		migrated: true,
+		options: {
+			title: "Adherence",
+			filters: {
+				pe: [DEFAULT_DASHBOARD_PERIOD],
+			},
+			columns: {
+				dx: [adherencePercentage.id],
+			},
+			rows: {
+				ou: ["USER_ORGUNIT_GRANDCHILDREN"],
+			},
+		},
+		type: "indicator",
+		sortOrder: 2,
+		program: mapping.program,
+	};
+	const updatedDashboardMapping = [...dashboardMapping];
+	const deviceUsageDashboardIndex = findIndex(
+		updatedDashboardMapping,
+		({ id }) => id === deviceUsageDashboardConfig.id,
+	);
+	const adherenceDashboardIndex = findIndex(
+		updatedDashboardMapping,
+		({ id }) => id === adherenceDashboardConfig.id,
+	);
+
+	if (deviceUsageDashboardIndex !== -1) {
+		updatedDashboardMapping[deviceUsageDashboardIndex] =
+			deviceUsageDashboardConfig;
+	} else {
+		updatedDashboardMapping.push(deviceUsageDashboardConfig);
+	}
+
+	if (adherenceDashboardIndex !== -1) {
+		updatedDashboardMapping[adherenceDashboardIndex] =
+			adherenceDashboardConfig;
+	} else {
+		updatedDashboardMapping.push(adherenceDashboardConfig);
+	}
+
+	return uniqBy(updatedDashboardMapping, "id");
+}
+
+export function useMetadataImport() {
+	const [programMappings, { set: updateProgramMapping }] = useSetting(
+		"programMapping",
+		{ global: true },
+	);
+	const [dashboardMapping, { set: updateDashboardMapping }] = useSetting(
+		"dashboards",
+		{
+			global: true,
+		},
+	);
 	const [mutate, { loading, error }] = useDataMutation(metadataMutation);
-	const { refetch: fetchProgramMetadata } = useDataQuery(programQuery, {
+	const { refetch: fetchDHIS2Metadata } = useDataQuery(metadataQuery, {
 		lazy: true,
 	});
 
-	const handleImportProgramStage = async (mapping: any) => {
+	const handleImportProgramStage = async (mapping: ProgramFormData) => {
 		const metadata = getMigrationMetadataObject(mapping);
+
 		if (mapping) {
-			const { program } = await fetchProgramMetadata({
+			const { program, indicatorTypesQuery } = await fetchDHIS2Metadata({
 				program: mapping?.program ?? "",
 			});
+
+			const dashboardIndicators = getDashboardIndicators(
+				mapping,
+				head((indicatorTypesQuery as any)?.indicatorTypes ?? []) ?? {},
+			);
 
 			const sanitizedProgramMetadata = getSanitizedProgramMetadataObject(
 				program as Program,
 				metadata,
 			);
 
+			const {
+				receivedDATSignals,
+				signalReceivedForDoseTaken,
+				clientsEnrolledInProgram,
+				clientsEnrolledInDATWithDevice,
+				adherencePercentage,
+			} = dashboardIndicators;
+
 			const metadataMutationResponse = await mutate({
-				data: { ...metadata, programs: [sanitizedProgramMetadata] },
+				data: {
+					...metadata,
+					programs: [sanitizedProgramMetadata],
+					indicators: [adherencePercentage],
+					programIndicators: [
+						receivedDATSignals,
+						signalReceivedForDoseTaken,
+						clientsEnrolledInProgram,
+						clientsEnrolledInDATWithDevice,
+					],
+				},
 			});
+
+			const mergeProgram = (
+				allMappings: ProgramFormData[],
+				currentMapping: ProgramFormData,
+			): ProgramFormData[] => {
+				const index = findIndex(
+					allMappings,
+					({ program }) => program === currentMapping.program,
+				);
+				if (index !== -1) {
+					allMappings[index] = currentMapping;
+				} else {
+					allMappings.push(currentMapping);
+				}
+
+				return allMappings;
+			};
+
+			const updatedProgramMapping = map(
+				mergeProgram(programMappings as ProgramFormData[], mapping),
+				(programMapping) => {
+					if (mapping.program === programMapping.program) {
+						return {
+							...programMapping,
+							indicators: mapValues(dashboardIndicators, "id"),
+						};
+					}
+
+					return programMapping;
+				},
+			);
+			updateProgramMapping(updatedProgramMapping);
+
+			const updatedDashboardMapping = generateMappedDashboardConfig(
+				mapping,
+				dashboardMapping,
+				clientsEnrolledInProgram,
+				clientsEnrolledInDATWithDevice,
+				adherencePercentage,
+			);
+			updateDashboardMapping(updatedDashboardMapping);
 
 			return {
 				response: metadataMutationResponse,
@@ -375,7 +673,7 @@ export function useProgramStage() {
 	};
 
 	return {
-		importProgramStage: handleImportProgramStage,
+		importUpdatedMetadata: handleImportProgramStage,
 		loading,
 		error,
 	};

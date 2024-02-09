@@ -10,8 +10,7 @@ import {
 } from "@dhis2/ui";
 import i18n from "@dhis2/d2-i18n";
 import { FilterField } from "./FilterField";
-import { Option } from "../hooks/data";
-import { generateUid, useProgramStage } from "../hooks/save";
+import { generateUid, useMetadataImport } from "../hooks/save";
 import { useSetting } from "@dhis2/app-service-datastore";
 import { useAlert, useDataQuery } from "@dhis2/app-runtime";
 import { head, isEmpty } from "lodash";
@@ -24,13 +23,21 @@ import {
 } from "../../../../shared/constants";
 
 interface EditProps {
-	programOptions: Option[];
+	programOptions: any[];
 	error: any;
 	onUpdate?: ReturnType<typeof useDataQuery>["refetch"];
 	hide: boolean;
 	onHide: () => void;
 	data?: ProgramMapping;
 }
+
+const indicatorSchema = z.object({
+	receivedDATSignals: z.string().optional(),
+	signalReceivedForDoseTaken: z.string().optional(),
+	clientsEnrolledInProgram: z.string().optional(),
+	clientsEnrolledInDATWithDevice: z.string().optional(),
+	adherencePercentage: z.string().optional(),
+});
 
 const schema = z.object({
 	name: z
@@ -71,20 +78,21 @@ const schema = z.object({
 		deviceIMEInumber: z.string().optional(),
 		episodeId: z.string().optional(),
 	}),
+	indicators: indicatorSchema.optional(),
 });
 
 export type ProgramFormData = z.infer<typeof schema>;
+export type IndicatorFormData = z.infer<typeof indicatorSchema>;
 
 function ProgramMappingForm({
 	programOptions,
-
 	error,
 	hide,
 	onHide,
 	onUpdate,
 	data,
 }: EditProps) {
-	const { importProgramStage } = useProgramStage();
+	const { importUpdatedMetadata } = useMetadataImport();
 
 	const [programMapping, { set: setProgramMapping }] = useSetting(
 		"programMapping",
@@ -104,14 +112,14 @@ function ProgramMappingForm({
 		await setProgramMapping(updatedMapping);
 	};
 
-	const onSave = async (mappingData: ProgramFormData) => {
+	const onAddNewMapping = async (mappingData: ProgramFormData) => {
 		if (mappingData) {
 			const updatedMapping = [...programMapping, mappingData];
 			await updateProgramMappingAndShowSuccess(updatedMapping);
 		}
 	};
 
-	const onEdit = async (mappingData: ProgramFormData) => {
+	const onEditMapping = async (mappingData: ProgramFormData) => {
 		if (mappingData) {
 			const updatedMapping = programMapping.map(
 				(mapping: ProgramMapping) =>
@@ -144,43 +152,35 @@ function ProgramMappingForm({
 		}
 	};
 
-	const onSubmit = async (data: ProgramFormData) => {
+	const onSubmitProgramMappingForm = async (formData: ProgramFormData) => {
 		let foundMapping = false;
 
 		programMapping.forEach((mapping: ProgramFormData) => {
-			if (mapping.program === data.program) {
-				data.programStage = mapping.programStage;
+			if (mapping.program === formData.program) {
+				formData.programStage = mapping.programStage;
 				foundMapping = true;
 			}
 		});
 
 		if (!foundMapping) {
-			data.programStage = generateUid();
+			formData.programStage = generateUid();
 		}
 
 		const sanitizedProgramMapping = {
-			...data,
+			...formData,
 			attributes: {
-				...data.attributes,
+				...formData.attributes,
 				deviceIMEInumber: TRACKED_ENTITY_ATTRIBUTES.DEVICE_IMEI,
 				episodeId: TRACKED_ENTITY_ATTRIBUTES.EPISODE_ID,
 			},
 		};
 
 		addNew
-			? await onSave(sanitizedProgramMapping)
-			: await onEdit(sanitizedProgramMapping);
+			? await onAddNewMapping(sanitizedProgramMapping)
+			: await onEditMapping(sanitizedProgramMapping);
 
 		if (!isEmpty(programMapping)) {
-			addNew
-				? await importProgramStage(sanitizedProgramMapping)
-				: await Promise.all(
-						programMapping.map(async (mapping: ProgramFormData) =>
-							mapping.program === data.program
-								? importProgramStage(mapping)
-								: null,
-						),
-				  );
+			await importUpdatedMetadata(sanitizedProgramMapping);
 		}
 		onUpdate ? await onUpdate() : null;
 
@@ -370,7 +370,9 @@ function ProgramMappingForm({
 						</Button>
 						<Button
 							loading={form.formState.isSubmitting}
-							onClick={form.handleSubmit(onSubmit)}
+							onClick={form.handleSubmit(
+								onSubmitProgramMappingForm,
+							)}
 							primary
 						>
 							{i18n.t("Save")}

@@ -2,13 +2,19 @@ import React from "react";
 import AdherenceStreak, {
 	DateEvent,
 } from "../../../../shared/components/AdherenceStreak/AdherenceStreak";
-import { useAdherenceEvents } from "../../../../shared/components/ProfileArea/utils";
-import { usePatient } from "../../../../DATClientOverview/DATClientDetails/hooks/data";
+import {
+	useAdherenceEvents,
+	useDeviceData,
+} from "../../../../shared/components/ProfileArea/utils";
 import { useSetting } from "@dhis2/app-service-datastore";
 import { useSearchParams } from "react-router-dom";
 import { getProgramMapping } from "../../../../shared/utils";
+import { DateTime } from "luxon";
+import { PatientProfile } from "../../../../shared/models";
+import { CircularLoader } from "@dhis2/ui";
 
-function GetAdherenceStreak({ teiID }: { teiID: string }) {
+function GetAdherenceStreak({ patient }: { patient: PatientProfile }) {
+	const { data, loadingDevice } = useDeviceData(patient?.deviceIMEINumber);
 	const [programMapping] = useSetting("programMapping", {
 		global: true,
 	});
@@ -17,13 +23,32 @@ function GetAdherenceStreak({ teiID }: { teiID: string }) {
 	const currentProgram = params.get("program");
 
 	const program = getProgramMapping(programMapping, currentProgram);
-	const { patient } = usePatient(teiID);
+
 	const { filteredEvents } = useAdherenceEvents(
 		patient?.events ?? [],
 		program?.programStage ?? "",
 	);
 
-	const adherenceEvents = filteredEvents.map((item: any) => {
+	const enrollmentDate = DateTime.fromFormat(
+		data?.enrollmentDate ?? "",
+		"yyyy-MM-dd HH:mm:ss",
+	).toISO();
+
+	filteredEvents.push({
+		dataValues: [
+			{
+				value: "DeviceEnrollmentDate",
+			},
+		],
+		occurredAt: [
+			{
+				value: enrollmentDate,
+			},
+		],
+		batteryLevel: [],
+	});
+
+	const adherenceEvents = (filteredEvents ?? []).map((item: any) => {
 		return {
 			date: item.occurredAt[0].value,
 			event:
@@ -33,7 +58,7 @@ function GetAdherenceStreak({ teiID }: { teiID: string }) {
 					? "takenDose"
 					: item.dataValues[0].value == "Heartbeat"
 					? "notTakenDose"
-					: item.dataValues[0].value == "Enrollment"
+					: item.dataValues[0].value == "DeviceEnrollmentDate"
 					? "enrolled"
 					: item.dataValues[0].value == "None"
 					? ""
@@ -42,7 +67,9 @@ function GetAdherenceStreak({ teiID }: { teiID: string }) {
 	});
 	const events: DateEvent[] = [...adherenceEvents];
 
-	return (
+	return loadingDevice ? (
+		<CircularLoader small />
+	) : (
 		<div style={{ width: "120px" }}>
 			<AdherenceStreak
 				events={events}

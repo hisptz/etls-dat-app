@@ -14,12 +14,17 @@ import { PatientProfile } from "../../../shared/models/profile";
 import AdherenceStreak, {
 	DateEvent,
 } from "../../../shared/components/AdherenceStreak/AdherenceStreak";
-import { useAdherenceEvents } from "../../../shared/components/ProfileArea/utils";
+import {
+	useAdherenceEvents,
+	useDeviceData,
+} from "../../../shared/components/ProfileArea/utils";
 
 import { Pagination } from "@hisptz/dhis2-utils";
 import BatteryLevel from "../../../shared/components/BatteryLevel/BatteryLevel";
 import { getProgramMapping } from "../../../shared/utils";
 import { RegimenSetting } from "../../../shared/constants";
+import { DateTime } from "luxon";
+import GetAdherenceStreak from "../../../Reports/components/Table/hooks/adherenceStreak";
 
 export interface DATClientTableProps {
 	loading: boolean;
@@ -108,40 +113,6 @@ export default function DATClientTable({
 		return overallAdherence;
 	}
 
-	function getAdherenceStreak(patient: PatientProfile) {
-		const { filteredEvents } = useAdherenceEvents(
-			patient.events,
-			mapping?.programStage ?? "",
-		);
-
-		const adherenceEvents = (filteredEvents ?? []).map((item: any) => {
-			return {
-				date: item.occurredAt[0].value,
-				event:
-					item.dataValues[0].value == "Once"
-						? "takenDose"
-						: item.dataValues[0].value == "Multiple"
-						? "takenDose"
-						: item.dataValues[0].value == "Heartbeat"
-						? "notTakenDose"
-						: item.dataValues[0].value == "Enrollment"
-						? "enrolled"
-						: item.dataValues[0].value == "None"
-						? ""
-						: "",
-			};
-		});
-		const events: DateEvent[] = [...adherenceEvents];
-		return (
-			<div style={{ width: "120px" }}>
-				<AdherenceStreak
-					events={events}
-					frequency={patient.adherenceFrequency}
-				/>
-			</div>
-		);
-	}
-
 	return (
 		<div className="w-100 h-100">
 			<Card id="reportTable">
@@ -162,8 +133,9 @@ export default function DATClientTable({
 							rows={(patients ?? []).map((patient) => {
 								return {
 									...(patient.tableData as CustomDataTableRow),
-									adherenceStreak:
-										getAdherenceStreak(patient),
+									adherenceStreak: (
+										<GetAdherenceStreak patient={patient} />
+									),
 									overallAdherence:
 										getOverallAdherence(patient),
 									battery: (

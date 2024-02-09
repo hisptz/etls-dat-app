@@ -77,6 +77,8 @@ export default function D2VisualizationContainer(
 						""}
 				</div>
 			}
+
+			{/* Visualization contents */}
 			<div
 				style={{ minHeight: 400 }}
 				className="w-100 h-100 column gap-16"
