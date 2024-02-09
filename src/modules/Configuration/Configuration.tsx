@@ -1,7 +1,7 @@
 import React from "react";
 import { SettingsTab } from "./components/SettingsTab";
 import { Outlet } from "react-router-dom";
-import { DATA_TEST_PREFIX, USERGROUP_CODE } from "../shared/constants";
+import { DATA_TEST_PREFIX, MANAGER_USER_GROUP_CODE } from "../shared/constants";
 import i18n from "@dhis2/d2-i18n";
 import { useRecoilValue } from "recoil";
 import { CurrentUserGroup } from "../shared/state/currentUser";
@@ -9,11 +9,11 @@ import { CurrentUserGroup } from "../shared/state/currentUser";
 export function Configuration() {
 	const currentUserGroup = useRecoilValue(CurrentUserGroup);
 
-	const hasAcces = currentUserGroup.some(
-		(userGroup) => userGroup.code === USERGROUP_CODE,
+	const hasAccess = currentUserGroup.some(
+		(userGroup) => userGroup.code === MANAGER_USER_GROUP_CODE,
 	);
 
-	if (!hasAcces) {
+	if (!hasAccess) {
 		return null;
 	}
 

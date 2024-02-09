@@ -1,7 +1,7 @@
 import {
 	DATA_TEST_PREFIX,
 	ReportConfig,
-	USERGROUP_CODE,
+	MANAGER_USER_GROUP_CODE,
 } from "../shared/constants";
 import React, { useEffect, useState } from "react";
 import i18n from "@dhis2/d2-i18n";
@@ -53,7 +53,7 @@ export function Reports() {
 	const currentUserGroup = useRecoilValue(CurrentUserGroup);
 
 	const hasAccess = currentUserGroup.some(
-		(userGroup) => userGroup.code === USERGROUP_CODE,
+		(userGroup) => userGroup.code === MANAGER_USER_GROUP_CODE,
 	);
 
 	useEffect(() => {

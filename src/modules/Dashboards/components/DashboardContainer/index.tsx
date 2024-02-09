@@ -1,4 +1,5 @@
 import React from "react";
+import { filter } from "lodash";
 import { Box, Card } from "@dhis2/ui";
 import i18n from "@dhis2/d2-i18n";
 import { useDefaultDashboardData } from "../../hooks/data";
@@ -11,6 +12,7 @@ import {
 	DEVICE_USAGE_DASHBOARD_ITEM_ID,
 	DAT_ENROLLMENT_DASHBOARD_ITEM_ID,
 } from "../../constants";
+import { useSearchParams } from "react-router-dom";
 
 const customEnrollmentDashboardItems = [
 	DEVICE_USAGE_DASHBOARD_ITEM_ID,
@@ -26,6 +28,8 @@ export default function DashboardContainer(): React.ReactElement {
 		enrollmentSummary,
 		adherenceSummary,
 	} = useDefaultDashboardData();
+	const [selectedPrograms] = useSearchParams();
+	const selectedProgramId = selectedPrograms.get("program");
 
 	const getCustomDashboardItemLoading = (config: DashboardItem): boolean => {
 		const { id } = config;
@@ -50,7 +54,20 @@ export default function DashboardContainer(): React.ReactElement {
 		({ type }) => ({ ...type, duration: 3000 }),
 	);
 
-	if (!dashboardConfigurations || dashboardConfigurations.length == 0) {
+	const sanitizedDashboardConfigurations = filter(
+		dashboardConfigurations,
+		(dashboardConfiguration: DashboardItem) => {
+			return (
+				!dashboardConfiguration.program ||
+				dashboardConfiguration.program == selectedProgramId
+			);
+		},
+	);
+
+	if (
+		!sanitizedDashboardConfigurations ||
+		sanitizedDashboardConfigurations.length == 0
+	) {
 		return (
 			<div
 				className="w-100 center align-center"
@@ -77,7 +94,7 @@ export default function DashboardContainer(): React.ReactElement {
 				gridTemplateColumns: "1fr 1fr 1fr 1fr",
 			}}
 		>
-			{(dashboardConfigurations as DashboardItem[]).map(
+			{(sanitizedDashboardConfigurations as DashboardItem[]).map(
 				(dashboardConfiguration: DashboardItem) => (
 					<div
 						key={`${dashboardConfiguration.id}-visualization-container`}

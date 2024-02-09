@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2024-01-31T11:28:27.687Z\n"
-"PO-Revision-Date: 2024-01-31T11:28:27.687Z\n"
+"POT-Creation-Date: 2024-02-05T06:37:48.652Z\n"
+"PO-Revision-Date: 2024-02-05T06:37:48.652Z\n"
 
 msgid "Configurations"
 msgstr "Configurations"
@@ -197,6 +197,25 @@ msgstr "Enrolled Patients"
 
 msgid "There are no dashboard configurations found!"
 msgstr "There are no dashboard configurations found!"
+
+msgid "Edit Dashboard"
+msgstr "Edit Dashboard"
+
+msgid "Failed to Load DHIS2 visualization"
+msgstr "Failed to Load DHIS2 visualization"
+
+msgid "Dashboard Item"
+msgstr "Dashboard Item"
+
+msgid "Span"
+msgstr "Span"
+
+msgid ""
+"There are no custom dashboard items added to this program. You can add from "
+"existing visualizations above"
+msgstr ""
+"There are no custom dashboard items added to this program. You can add from "
+"existing visualizations above"
 
 msgid "Add filters"
 msgstr "Add filters"
