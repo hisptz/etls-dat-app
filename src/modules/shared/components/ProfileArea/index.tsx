@@ -64,7 +64,7 @@ export function ProfileArea({
 		});
 	});
 
-	const totalOpenings = takenDoses.length;
+	const totalOpenings = data?.deviceOpenings ?? "N/A";
 
 	const dose = [
 		{
@@ -101,7 +101,7 @@ export function ProfileArea({
 
 	const lastUpdated =
 		DateTime.fromFormat(
-			data?.lastOpened ?? "",
+			data?.lastHeartBeat ?? "",
 			"yyyy-MM-dd HH:mm:ss",
 		).toFormat("MMMM dd, yyyy hh:mm a") ?? "";
 

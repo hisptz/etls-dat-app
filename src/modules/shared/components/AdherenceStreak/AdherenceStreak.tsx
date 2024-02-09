@@ -26,6 +26,8 @@ function AdherenceStreak({ events, frequency }: CalendarProps) {
 	const [currentMonth] = useState(month);
 	const [currentYear] = useState(year);
 
+	const priorityOrder = ["enrolled", "takenDose", "notTakenDose", ""];
+
 	const formatDate = (date: Date) => {
 		const options = {
 			year: "numeric",
@@ -56,6 +58,7 @@ function AdherenceStreak({ events, frequency }: CalendarProps) {
 			const dailyEvents = events.filter((event) => {
 				const eventDate = new Date(event.date);
 				eventDate.setHours(0, 0, 0, 0);
+
 				return eventDate.getTime() === cellDate.getTime();
 			});
 
@@ -79,12 +82,18 @@ function AdherenceStreak({ events, frequency }: CalendarProps) {
 
 			const sanitizedEvents = sanitizeEvents();
 
+			const sortedEvents = _.sortBy(sanitizedEvents, (item) => {
+				return priorityOrder.indexOf(item.event);
+			});
+
 			const cellColor =
 				sanitizedEvents.length > 0
-					? cellColors[sanitizedEvents[0].event]
+					? cellColors[sortedEvents[0].event]
 					: "N/A";
 
-			const tooltipId = `daily-tooltip-${cellColor + i}`;
+			const tooltipId = `daily-tooltip-${
+				cellDate + "-" + cellColor + "-" + i
+			}`;
 			const tooltipContent = i18n.t(
 				`Date: ${formatDate(cellDate)} Status: ${
 					cellColor
@@ -138,6 +147,7 @@ function AdherenceStreak({ events, frequency }: CalendarProps) {
 			const monthEvents = events.filter((event) => {
 				const eventDate = new Date(event.date);
 				eventDate.setHours(0, 0, 0, 0);
+
 				return (
 					eventDate.getFullYear() === targetMonth.getFullYear() &&
 					eventDate.getMonth() === targetMonth.getMonth()
@@ -164,12 +174,18 @@ function AdherenceStreak({ events, frequency }: CalendarProps) {
 
 			const sanitizedEvents = sanitizeEvents();
 
-			const monthStreakColor =
-				sanitizedEvents.length > 0
-					? cellColors[sanitizedEvents[0].event]
-					: "N/A";
+			const sortedEvents = _.sortBy(sanitizedEvents, (item) => {
+				return priorityOrder.indexOf(item.event);
+			});
 
-			const tooltipId = `monthly-tooltip-${monthStreakColor + i}`;
+			const monthStreakColor = !isEmpty(sortedEvents)
+				? cellColors[sortedEvents[0].event]
+				: "N/A";
+
+			const tooltipId = `monthly-tooltip-${
+				targetMonth.getMonth() + "-" + monthStreakColor + "-" + i
+			}`;
+
 			const tooltipContent = i18n.t(
 				`Month: ${targetMonth.toLocaleString("default", {
 					month: "long",
@@ -247,13 +263,18 @@ function AdherenceStreak({ events, frequency }: CalendarProps) {
 			};
 
 			const sanitizedEvents = sanitizeEvents();
+			const sortedEvents = _.sortBy(sanitizedEvents, (item) => {
+				return priorityOrder.indexOf(item.event);
+			});
 
 			const cellColor =
 				sanitizedEvents.length > 0
-					? cellColors[sanitizedEvents[0].event]
+					? cellColors[sortedEvents[0].event]
 					: "N/A";
 
-			const tooltipId = `daily-tooltip-${week + cellColor + i}`;
+			const tooltipId = `weekly-tooltip-${
+				week + "-" + cellColor + "-" + i
+			}`;
 			const tooltipContent = i18n.t(
 				`Date: Week ${week} ${formatWeekDate(endDate)} Status: ${
 					cellColor

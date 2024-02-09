@@ -1,3 +1,4 @@
+/* eslint-disable no-case-declarations */
 /* eslint-disable no-mixed-spaces-and-tabs */
 /* eslint-disable indent */
 import React, { useEffect, useState } from "react";
@@ -217,9 +218,13 @@ function Calendar({ events, frequency, onClick }: CalendarProps) {
 								: undefined,
 					}}
 					onClick={() => {
-						if (isEmpty(cellColor) || cellColor[0] == undefined) {
+						if (
+							(isEmpty(cellColor) || cellColor[0] == undefined) &&
+							!isDatePresent
+						) {
 							const currentDate =
 								DateTime.fromJSDate(date).toISODate();
+
 							showDetails(currentDate ?? "", "", "");
 						}
 					}}
@@ -483,7 +488,7 @@ function Calendar({ events, frequency, onClick }: CalendarProps) {
 						cursor: !weekColor ? "pointer" : undefined,
 					}}
 					onClick={() => {
-						if (!weekColor) {
+						if (!weekColor && !isDatePresent) {
 							const currentDate =
 								DateTime.fromJSDate(startDate).toISODate();
 							showDetails(currentDate ?? "", "", "");

@@ -219,12 +219,12 @@ export function useDATClientTableData() {
 		setLoading(false);
 	};
 
-	useEffect(() => {
-		setLoading(true);
-		if (!isEmpty(programMapping)) {
-			refreshingData();
-		}
-	}, []);
+	// useEffect(() => {
+	// 	setLoading(true);
+	// 	if (!isEmpty(programMapping)) {
+	// 		refreshingData();
+	// 	}
+	// }, []);
 
 	const { download, downloading } = useDownloadData({
 		resource: "tracker/trackedEntities",
