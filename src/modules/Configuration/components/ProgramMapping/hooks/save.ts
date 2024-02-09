@@ -375,12 +375,20 @@ function getDashboardIndicators(
 		analyticsType: "EVENT",
 		analyticsPeriodBoundaries: [
 			{
-				boundaryTarget: "EVENT_DATE",
-				analyticsPeriodBoundaryType: "BEFORE_END_OF_REPORTING_PERIOD",
+				boundaryTarget: "ENROLLMENT_DATE",
+				analyticsPeriodBoundaryType: "AFTER_START_OF_REPORTING_PERIOD",
 			},
 			{
 				boundaryTarget: "EVENT_DATE",
 				analyticsPeriodBoundaryType: "AFTER_START_OF_REPORTING_PERIOD",
+			},
+			{
+				boundaryTarget: "EVENT_DATE",
+				analyticsPeriodBoundaryType: "BEFORE_END_OF_REPORTING_PERIOD",
+			},
+			{
+				boundaryTarget: "ENROLLMENT_DATE",
+				analyticsPeriodBoundaryType: "BEFORE_END_OF_REPORTING_PERIOD",
 			},
 		],
 	};
@@ -398,12 +406,20 @@ function getDashboardIndicators(
 		analyticsType: "EVENT",
 		analyticsPeriodBoundaries: [
 			{
-				boundaryTarget: "EVENT_DATE",
-				analyticsPeriodBoundaryType: "BEFORE_END_OF_REPORTING_PERIOD",
+				boundaryTarget: "ENROLLMENT_DATE",
+				analyticsPeriodBoundaryType: "AFTER_START_OF_REPORTING_PERIOD",
 			},
 			{
 				boundaryTarget: "EVENT_DATE",
 				analyticsPeriodBoundaryType: "AFTER_START_OF_REPORTING_PERIOD",
+			},
+			{
+				boundaryTarget: "EVENT_DATE",
+				analyticsPeriodBoundaryType: "BEFORE_END_OF_REPORTING_PERIOD",
+			},
+			{
+				boundaryTarget: "ENROLLMENT_DATE",
+				analyticsPeriodBoundaryType: "BEFORE_END_OF_REPORTING_PERIOD",
 			},
 		],
 	};
@@ -412,7 +428,7 @@ function getDashboardIndicators(
 		id: indicators?.clientsEnrolledInProgram ?? generateUid(),
 		name: `${name}_Clients enrolled in program`,
 		shortName: `${name}_Clients`.slice(0, 50),
-		aggregationType: "COUNT",
+		aggregationType: "SUM",
 		program: {
 			id: program,
 		},
@@ -434,7 +450,7 @@ function getDashboardIndicators(
 		id: indicators?.clientsEnrolledInDATWithDevice ?? generateUid(),
 		name: `${name}_Clients registered on DAT`,
 		shortName: `${name}_Clients on DAT`.slice(0, 50),
-		aggregationType: "COUNT",
+		aggregationType: "SUM",
 		program: {
 			id: program,
 		},
