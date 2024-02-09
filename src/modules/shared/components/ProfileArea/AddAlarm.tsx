@@ -18,6 +18,7 @@ import { z } from "zod";
 import { useSetAlarm } from "../utils/assignAlarm";
 import { useAlert } from "@dhis2/app-runtime";
 import { DateTime } from "luxon";
+import { DATA_TEST_PREFIX } from "../../constants";
 
 interface addAlarmProps {
 	nextRefillTime: string;
@@ -153,6 +154,7 @@ function EditAlarm({
 				}}
 			>
 				<Checkbox
+					dataTest={`${DATA_TEST_PREFIX}-${day}`}
 					checked={checked}
 					disabled={!doseReminder}
 					onChange={() => {
@@ -233,6 +235,7 @@ function EditAlarm({
 								}}
 							>
 								<Switch
+									dataTest={`${DATA_TEST_PREFIX}-${"doseReminder"}`}
 									checked={doseReminder}
 									onChange={() => {
 										setDoseReminder(!doseReminder);
@@ -323,6 +326,7 @@ function EditAlarm({
 								}}
 							>
 								<Switch
+									dataTest={`${DATA_TEST_PREFIX}-${"appointmentReminder"}`}
 									checked={appointmentReminder}
 									onChange={() => {
 										setAppointmentReminder(

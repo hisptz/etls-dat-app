@@ -275,6 +275,7 @@ export function FilterField({
 										}}
 									>
 										<MenuItem
+											dataTest={`${DATA_TEST_PREFIX}-${report.name}`}
 											key={i}
 											icon={<IconTable24 />}
 											onClick={async () => {
