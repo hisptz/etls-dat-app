@@ -32,15 +32,17 @@ const metadataMutation: any = {
 	type: "create",
 	resource: "metadata",
 	data: ({ data }: any) => data,
-	importMode: "COMMIT",
-	identifier: "UID",
-	importReportMode: "ERRORS",
-	importStrategy: "CREATE_AND_UPDATE",
-	atomicMode: "ALL",
-	mergeMode: "MERGE",
-	flushMode: "AUTO",
-	inclusionStrategy: "NON_NULL",
-	async: false,
+	params: {
+		importMode: "COMMIT",
+		identifier: "UID",
+		importReportMode: "ERRORS",
+		importStrategy: "CREATE_AND_UPDATE",
+		atomicMode: "ALL",
+		mergeMode: "MERGE",
+		flushMode: "AUTO",
+		inclusionStrategy: "NON_NULL",
+		async: false,
+	},
 };
 
 export function generateUid() {
@@ -300,10 +302,7 @@ function getSanitizedProgramMetadataObject(
 export function useProgramMapping() {
 	const [params] = useSearchParams();
 	const programId = params.get("mappedTbProgram");
-	const [programMapping, { set: updateProgramMapping }] = useSetting(
-		"programMapping",
-		{ global: true },
-	);
+	const [programMapping] = useSetting("programMapping", { global: true });
 
 	const programStageID =
 		programId == programMapping.program
@@ -493,7 +492,7 @@ function generateMappedDashboardConfig(
 			filters: {
 				pe: [DEFAULT_DASHBOARD_PERIOD],
 			},
-			dimensions: {
+			columns: {
 				dx: [
 					clientsEnrolledInProgram.id,
 					clientsEnrolledInDATWithDevice.id,
@@ -551,11 +550,11 @@ function generateMappedDashboardConfig(
 		updatedDashboardMapping.push(adherenceDashboardConfig);
 	}
 
-	return updatedDashboardMapping;
+	return uniqBy(updatedDashboardMapping, "id");
 }
 
 export function useMetadataImport() {
-	const [programMapping, { set: updateProgramMapping }] = useSetting(
+	const [programMappings, { set: updateProgramMapping }] = useSetting(
 		"programMapping",
 		{ global: true },
 	);
@@ -570,7 +569,7 @@ export function useMetadataImport() {
 		lazy: true,
 	});
 
-	const handleImportProgramStage = async (mapping: any) => {
+	const handleImportProgramStage = async (mapping: ProgramFormData) => {
 		const metadata = getMigrationMetadataObject(mapping);
 
 		if (mapping) {
@@ -610,16 +609,36 @@ export function useMetadataImport() {
 				},
 			});
 
-			const updatedProgramMapping = map(programMapping, (mapping) => {
-				if (mapping.program === mapping.program) {
-					return {
-						...mapping,
-						indicators: mapValues(dashboardIndicators, "id"),
-					};
+			const mergeProgram = (
+				allMappings: ProgramFormData[],
+				currentMapping: ProgramFormData,
+			): ProgramFormData[] => {
+				const index = findIndex(
+					allMappings,
+					({ program }) => program === currentMapping.program,
+				);
+				if (index !== -1) {
+					allMappings[index] = currentMapping;
+				} else {
+					allMappings.push(currentMapping);
 				}
 
-				return mapping;
-			});
+				return allMappings;
+			};
+
+			const updatedProgramMapping = map(
+				mergeProgram(programMappings as ProgramFormData[], mapping),
+				(programMapping) => {
+					if (mapping.program === programMapping.program) {
+						return {
+							...programMapping,
+							indicators: mapValues(dashboardIndicators, "id"),
+						};
+					}
+
+					return programMapping;
+				},
+			);
 			updateProgramMapping(updatedProgramMapping);
 
 			const updatedDashboardMapping = generateMappedDashboardConfig(
