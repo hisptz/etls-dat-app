@@ -91,7 +91,9 @@ function AdherenceStreak({ events, frequency }: CalendarProps) {
 					? cellColors[sortedEvents[0].event]
 					: "N/A";
 
-			const tooltipId = `daily-tooltip-${cellColor + i}`;
+			const tooltipId = `daily-tooltip-${
+				cellDate + "-" + cellColor + "-" + i
+			}`;
 			const tooltipContent = i18n.t(
 				`Date: ${formatDate(cellDate)} Status: ${
 					cellColor
@@ -176,12 +178,14 @@ function AdherenceStreak({ events, frequency }: CalendarProps) {
 				return priorityOrder.indexOf(item.event);
 			});
 
-			const monthStreakColor =
-				sanitizedEvents.length > 0
-					? cellColors[sortedEvents[0].event]
-					: "N/A";
+			const monthStreakColor = !isEmpty(sortedEvents)
+				? cellColors[sortedEvents[0].event]
+				: "N/A";
 
-			const tooltipId = `monthly-tooltip-${monthStreakColor + i}`;
+			const tooltipId = `monthly-tooltip-${
+				targetMonth.getMonth() + "-" + monthStreakColor + "-" + i
+			}`;
+
 			const tooltipContent = i18n.t(
 				`Month: ${targetMonth.toLocaleString("default", {
 					month: "long",
@@ -268,7 +272,9 @@ function AdherenceStreak({ events, frequency }: CalendarProps) {
 					? cellColors[sortedEvents[0].event]
 					: "N/A";
 
-			const tooltipId = `daily-tooltip-${week + cellColor + i}`;
+			const tooltipId = `weekly-tooltip-${
+				week + "-" + cellColor + "-" + i
+			}`;
 			const tooltipContent = i18n.t(
 				`Date: Week ${week} ${formatWeekDate(endDate)} Status: ${
 					cellColor

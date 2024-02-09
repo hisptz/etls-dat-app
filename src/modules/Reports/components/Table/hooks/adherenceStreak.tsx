@@ -34,21 +34,19 @@ function GetAdherenceStreak({ patient }: { patient: PatientProfile }) {
 		"yyyy-MM-dd HH:mm:ss",
 	).toISO();
 
-	loadingDevice
-		? null
-		: filteredEvents.push({
-				dataValues: [
-					{
-						value: "DeviceEnrollmentDate",
-					},
-				],
-				occurredAt: [
-					{
-						value: enrollmentDate,
-					},
-				],
-				batteryLevel: [],
-		  });
+	filteredEvents.push({
+		dataValues: [
+			{
+				value: "DeviceEnrollmentDate",
+			},
+		],
+		occurredAt: [
+			{
+				value: enrollmentDate,
+			},
+		],
+		batteryLevel: [],
+	});
 
 	const adherenceEvents = (filteredEvents ?? []).map((item: any) => {
 		return {
@@ -67,9 +65,11 @@ function GetAdherenceStreak({ patient }: { patient: PatientProfile }) {
 					: "",
 		};
 	});
-	const events: DateEvent[] = loadingDevice ? [] : [...adherenceEvents];
+	const events: DateEvent[] = [...adherenceEvents];
 
-	return (
+	return loadingDevice ? (
+		<CircularLoader small />
+	) : (
 		<div style={{ width: "120px" }}>
 			<AdherenceStreak
 				events={events}
