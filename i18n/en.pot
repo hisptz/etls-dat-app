@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2024-02-05T06:37:48.652Z\n"
-"PO-Revision-Date: 2024-02-05T06:37:48.652Z\n"
+"POT-Creation-Date: 2024-02-12T06:01:29.478Z\n"
+"PO-Revision-Date: 2024-02-12T06:01:29.478Z\n"
 
 msgid "Configurations"
 msgstr "Configurations"
@@ -209,6 +209,9 @@ msgstr "Dashboard Item"
 
 msgid "Span"
 msgstr "Span"
+
+msgid "Add"
+msgstr "Add"
 
 msgid ""
 "There are no custom dashboard items added to this program. You can add from "

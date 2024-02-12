@@ -19,6 +19,7 @@ import BatteryLevel from "../../../../shared/components/BatteryLevel/BatteryLeve
 import React from "react";
 import { DateTime } from "luxon";
 import AdherenceStreak from "../../../../shared/components/AdherenceStreak/AdherenceStreak";
+import { GetAdherenceStreakForReport } from "./adherenceStreak";
 
 type Data = {
 	reports: {
@@ -531,14 +532,6 @@ export function sanitizeReportData(
 	deviceList?: any[],
 	adherenceStreakData?: any,
 ) {
-	function getAdherenceStreak(events: any, frequency: string) {
-		return (
-			<div style={{ width: "120px" }}>
-				<AdherenceStreak events={events} frequency={frequency} />
-			</div>
-		);
-	}
-
 	return data.map((report: any) => {
 		const eventData = adherenceStreakData
 			? adherenceStreakData[report.tei]
@@ -622,19 +615,22 @@ export function sanitizeReportData(
 				],
 			adherenceFrequency: report.adherenceFrequency,
 			adherencePercentage: adherencePercentage,
-			adherenceStreak: downloadable
-				? report.adherenceFrequency
-				: getAdherenceStreak(
-						eventData ?? [],
-						report.adherenceFrequency,
-				  ),
+			adherenceStreak: downloadable ? (
+				report.adherenceFrequency
+			) : (
+				<GetAdherenceStreakForReport
+					device={deviceIMEI}
+					events={eventData}
+					frequency={report.adherenceFrequency}
+				/>
+			),
 			numberOfMissedDoses: report.noOfSignal,
 			orgUnit: report.ouname,
 			deviceIMEI: deviceIMEI,
 			battery: downloadable ? (
 				(batteryLevel ?? "N/A").toString()
 			) : (
-				<BatteryLevel batteryLevel={batteryLevel} />
+				<BatteryLevel device={deviceIMEI} />
 			),
 			deviceIMEINumber: report.imei,
 			daysInUse: report.daysDeviceInUse,

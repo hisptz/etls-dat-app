@@ -24,7 +24,7 @@ import BatteryLevel from "../../../shared/components/BatteryLevel/BatteryLevel";
 import { getProgramMapping } from "../../../shared/utils";
 import { RegimenSetting } from "../../../shared/constants";
 import { DateTime } from "luxon";
-import GetAdherenceStreak from "../../../Reports/components/Table/hooks/adherenceStreak";
+import { GetAdherenceStreak } from "../../../Reports/components/Table/hooks/adherenceStreak";
 
 export interface DATClientTableProps {
 	loading: boolean;
