@@ -1,5 +1,4 @@
 import {
-	ADHERENCE_PERCENTAGE_DASHBOARD_ITEM_ID,
 	DAT_ENROLLMENT_DASHBOARD_ITEM_ID,
 	DEVICE_USAGE_DASHBOARD_ITEM_ID,
 } from "../../Dashboards/constants";
@@ -261,7 +260,7 @@ export const DATAssignment: DAT_TableConfig[] = [
 export const dashboards: DashboardItem[] = [
 	{
 		id: DEVICE_USAGE_DASHBOARD_ITEM_ID,
-		span: 3,
+		span: 4,
 		type: "custom",
 		options: {
 			renderAs: "singleValue",
@@ -269,17 +268,8 @@ export const dashboards: DashboardItem[] = [
 		},
 	},
 	{
-		id: ADHERENCE_PERCENTAGE_DASHBOARD_ITEM_ID,
-		span: 1,
-		type: "custom",
-		options: {
-			renderAs: "progress",
-			title: "Last 1 day Patience Adherence ",
-		},
-	},
-	{
 		id: DAT_ENROLLMENT_DASHBOARD_ITEM_ID,
-		span: 2,
+		span: 4,
 		type: "custom",
 		options: {
 			renderAs: "pie",
