@@ -90,7 +90,6 @@ export default function IndicatorVisualizationContainer(
 
 	const getVisualizationConfig = (config: DashboardItem): any => {
 		const layout = getLayout(config);
-		const sortOrder = config?.sortOrder ?? 1;
 		const colors: string[] = [
 			"#a8bf24",
 			"#518cc3",
@@ -127,9 +126,6 @@ export default function IndicatorVisualizationContainer(
 							const series = options.series?.map((series) => {
 								return {
 									...series,
-									dataSorting: {
-										enabled: sortOrder !== 0,
-									},
 								};
 							});
 							return {
@@ -137,7 +133,6 @@ export default function IndicatorVisualizationContainer(
 								series,
 								xAxis: {
 									...options.xAxis,
-									reversed: sortOrder === -1,
 								},
 							};
 						},
