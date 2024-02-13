@@ -367,7 +367,7 @@ function getDashboardIndicators(
 		id: indicators?.receivedDATSignals ?? generateUid(),
 		name: `${name}_DAT signals received`,
 		shortName: `${name}_DAT signals received`.slice(0, 50),
-		aggregationType: "SUM",
+		aggregationType: "COUNT",
 		program: {
 			id: program,
 		},
@@ -391,13 +391,14 @@ function getDashboardIndicators(
 				analyticsPeriodBoundaryType: "BEFORE_END_OF_REPORTING_PERIOD",
 			},
 		],
+		filter: `d2:hasValue(#{${programStage}.${DATA_ELEMENTS.DEVICE_SIGNAL}})`,
 	};
 
 	const signalReceivedForDoseTaken = {
 		id: indicators?.signalReceivedForDoseTaken ?? generateUid(),
 		name: `${name}_DAT dose taking signals received`,
 		shortName: `${name}_DAT dose taken signals`.slice(0, 50),
-		aggregationType: "SUM",
+		aggregationType: "COUNT",
 		program: {
 			id: program,
 		},
@@ -428,7 +429,7 @@ function getDashboardIndicators(
 		id: indicators?.clientsEnrolledInProgram ?? generateUid(),
 		name: `${name}_Clients enrolled in program`,
 		shortName: `${name}_Clients`.slice(0, 50),
-		aggregationType: "SUM",
+		aggregationType: "COUNT",
 		program: {
 			id: program,
 		},
@@ -450,7 +451,7 @@ function getDashboardIndicators(
 		id: indicators?.clientsEnrolledInDATWithDevice ?? generateUid(),
 		name: `${name}_Clients registered on DAT`,
 		shortName: `${name}_Clients on DAT`.slice(0, 50),
-		aggregationType: "SUM",
+		aggregationType: "COUNT",
 		program: {
 			id: program,
 		},
