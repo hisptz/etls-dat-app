@@ -83,9 +83,11 @@ export default function DATClientTable({
 				const value = dataValue.value;
 				return value === "Once" || value === "Multiple";
 			});
-		});
+		}).length;
 
-		const noOfSignals = takenDoses.length;
+		const allEvents = isEmpty(filteredEvents) ? 1 : filteredEvents.length;
+
+		const newPercentage = ((takenDoses / allEvents) * 100).toFixed(2) + "%";
 
 		const percentage = !isEmpty(regimenSettings)
 			? (regimenSettings ?? [])
@@ -93,7 +95,7 @@ export default function DATClientTable({
 						if (option.regimen === patient.regimen) {
 							return (
 								(
-									(noOfSignals /
+									(takenDoses /
 										parseInt(option.numberOfDoses)) *
 									100
 								).toFixed(2) + "%"
@@ -110,7 +112,7 @@ export default function DATClientTable({
 				? head(percentage)
 				: "N/A";
 
-		return overallAdherence;
+		return newPercentage;
 	}
 
 	return (
