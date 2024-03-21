@@ -150,7 +150,7 @@ export function useReportTableData() {
 			"." +
 			DATA_ELEMENTS.DEVICE_SIGNAL +
 			(reportType === "tb-adherence-report"
-				? ":IN:Once;Multiple;Heartbeat;None"
+				? ""
 				: reportType === "patients-who-missed-doses"
 				? ":IN:Heartbeat;None"
 				: ""),
@@ -326,6 +326,8 @@ export function useReportTableData() {
 			reportType === "tb-adherence-report"
 				? filteredGroupedData[tei]
 				: groupedData[tei];
+
+		const allDataArray: any = groupedData[tei];
 		const regimen =
 			dataArray[0][
 				stage + "." + programMapping?.attributes?.regimen ?? ""
@@ -341,6 +343,7 @@ export function useReportTableData() {
 		return {
 			...dataArray[0],
 			noOfSignal: dataArray.length,
+			allEvents: isEmpty(allDataArray) ? 1 : allDataArray.length,
 			regimen: regimen,
 			adherenceFrequency: adherenceFrequency ?? "Daily",
 		};
@@ -537,6 +540,9 @@ export function sanitizeReportData(
 			? adherenceStreakData[report.tei]
 			: [];
 
+		const newPercentage =
+			((report.noOfSignal / report.allEvents) * 100).toFixed(2) + "%";
+
 		const percentage = !isEmpty(regimenSettings)
 			? regimenSettings
 					.map((option: RegimenSetting) => {
@@ -614,7 +620,7 @@ export function sanitizeReportData(
 						programMapping.attributes?.phoneNumber ?? ""
 				],
 			adherenceFrequency: report.adherenceFrequency,
-			adherencePercentage: adherencePercentage,
+			adherencePercentage: newPercentage,
 			adherenceStreak: downloadable ? (
 				report.adherenceFrequency
 			) : (
