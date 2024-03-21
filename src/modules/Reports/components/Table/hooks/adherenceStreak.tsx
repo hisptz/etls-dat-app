@@ -84,7 +84,7 @@ export function GetAdherenceStreakForReport({
 	frequency,
 	device,
 }: {
-	events: any;
+	events: any[];
 	frequency: string;
 	device: string;
 }) {
@@ -95,10 +95,12 @@ export function GetAdherenceStreakForReport({
 		"yyyy-MM-dd HH:mm:ss",
 	).toISO();
 
-	events.push({
-		event: "enrolled",
-		date: enrollmentDate,
-	});
+	events != undefined
+		? events.push({
+				event: "enrolled",
+				date: enrollmentDate,
+		  })
+		: null;
 
 	return loadingDevice ? (
 		<CircularLoader small />
