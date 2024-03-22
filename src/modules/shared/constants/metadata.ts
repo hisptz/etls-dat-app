@@ -1,7 +1,6 @@
 import { useSetting } from "@dhis2/app-service-datastore";
 
 import { Query } from "../interfaces";
-import { useSearchParams } from "react-router-dom";
 import { getProgramMapping } from "../utils";
 
 export const DATA_TEST_PREFIX = "d2-dat";

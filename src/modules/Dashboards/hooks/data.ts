@@ -148,7 +148,9 @@ export function useDefaultDashboardData() {
 				fetchedTrackedEntityInstances,
 			];
 		} catch (error: any) {
-			setEnrollemntStatusError(error);
+			if (!controller.signal.aborted) {
+				setEnrollemntStatusError(error);
+			}
 		}
 
 		return trackedEntityInstances;
