@@ -178,7 +178,7 @@ export function useReportTableData() {
 	const { error, refetch, loading } = useDataQuery<Data>(query, {
 		variables: {
 			page: 1,
-			pageSize: 50,
+			pageSize: 100,
 			program: programMapping?.program ?? "",
 			stage,
 			pe: [period],
@@ -540,8 +540,93 @@ export function sanitizeReportData(
 			? adherenceStreakData[report.tei]
 			: [];
 
+		const groupDataByWeeks = () => {
+			const groupedData: any = {};
+			eventData?.forEach((item: any) => {
+				const occurredDate = new Date(item.date);
+				const weekStartDate = new Date(
+					occurredDate.getFullYear(),
+					occurredDate.getMonth(),
+					occurredDate.getDate() - occurredDate.getDay(),
+				);
+				const weekEndDate = new Date(
+					weekStartDate.getFullYear(),
+					weekStartDate.getMonth(),
+					weekStartDate.getDate() + 6,
+				);
+				const week = `${weekStartDate.toLocaleDateString()} - ${weekEndDate.toLocaleDateString()}`;
+				if (!groupedData[week]) {
+					groupedData[week] = [];
+				}
+				groupedData[week].push(item);
+			});
+			return groupedData;
+		};
+
+		const groupDataByMonths = () => {
+			const groupedData: any = {};
+			eventData?.forEach((item: any) => {
+				const occurredDate = new Date(item.date);
+				const year = occurredDate.getFullYear();
+				const month = occurredDate.getMonth();
+				const monthStartDate = new Date(year, month, 1);
+				const monthEndDate = new Date(year, month + 1, 0);
+				const monthKey = `${monthStartDate.toLocaleDateString()} - ${monthEndDate.toLocaleDateString()}`;
+				if (!groupedData[monthKey]) {
+					groupedData[monthKey] = [];
+				}
+				groupedData[monthKey].push(item);
+			});
+			return groupedData;
+		};
+
+		const groupedData =
+			report.adherenceFrequency == "Weekly"
+				? groupDataByWeeks()
+				: report.adherenceFrequency == "Monthly"
+				? groupDataByMonths()
+				: {};
+
+		const priortizeData = (dataArray: any) => {
+			for (const key in dataArray) {
+				const objects = dataArray[key];
+				let found = false;
+				for (let i = 0; i < objects.length; i++) {
+					if (objects[i].event === "takenDose") {
+						found = true;
+						break;
+					}
+				}
+				if (found) {
+					dataArray[key] = objects.filter(
+						(obj: any) => obj.event === "takenDose",
+					);
+				}
+			}
+			return dataArray;
+		};
+
+		const transformData = (dataArray: any) => {
+			const resultArray = [];
+			for (const key in dataArray) {
+				if (dataArray[key].length > 0) {
+					resultArray.push(dataArray[key][0]);
+				}
+			}
+			return resultArray;
+		};
+
+		const events =
+			report.adherenceFrequency == "Daily"
+				? eventData
+				: transformData(priortizeData(groupedData));
+
+		const takenDose = events?.filter(
+			(event: any) => event.event === "takenDose",
+		).length;
+
 		const newPercentage =
-			((report.noOfSignal / report.allEvents) * 100).toFixed(2) + "%";
+			((takenDose / events.length) * 100).toFixed(2) + "%";
 
 		const percentage = !isEmpty(regimenSettings)
 			? regimenSettings
