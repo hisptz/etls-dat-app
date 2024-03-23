@@ -95,12 +95,10 @@ export function GetAdherenceStreakForReport({
 		"yyyy-MM-dd HH:mm:ss",
 	).toISO();
 
-	events != undefined
-		? events.push({
-				event: "enrolled",
-				date: enrollmentDate,
-		  })
-		: null;
+	events?.push({
+		event: "enrolled",
+		date: enrollmentDate,
+	});
 
 	return loadingDevice ? (
 		<CircularLoader small />
