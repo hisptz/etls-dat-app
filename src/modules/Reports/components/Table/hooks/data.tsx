@@ -200,6 +200,7 @@ export function useReportTableData() {
 	};
 
 	const getAllEvents = async () => {
+		setAllData([]);
 		try {
 			const result = (await refetch({
 				page: 1,
@@ -627,7 +628,7 @@ export function sanitizeReportData(
 		).length;
 
 		const newPercentage =
-			((takenDose / events.length) * 100).toFixed(2) + "%";
+			((takenDose / events?.length) * 100).toFixed(2) + "%";
 
 		const lastOpened = DateTime.fromFormat(
 			report.lastOpened ?? "",
@@ -690,7 +691,7 @@ export function sanitizeReportData(
 			) : (
 				<GetAdherenceStreakForReport
 					device={deviceIMEI}
-					events={eventData}
+					events={eventData ?? []}
 					frequency={report.adherenceFrequency}
 				/>
 			),
