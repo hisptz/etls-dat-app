@@ -25,6 +25,7 @@ import { getProgramMapping } from "../../../shared/utils";
 import { RegimenSetting } from "../../../shared/constants";
 import { DateTime } from "luxon";
 import { GetAdherenceStreak } from "../../../Reports/components/Table/hooks/adherenceStreak";
+import { getOverallAdherence } from "./hooks/data";
 
 export interface DATClientTableProps {
 	loading: boolean;
@@ -175,29 +176,6 @@ export default function DATClientTable({
 		const allEvents = isEmpty(filteredEvents) ? 1 : events.length;
 
 		const newPercentage = ((takenDoses / allEvents) * 100).toFixed(2) + "%";
-
-		const percentage = !isEmpty(regimenSettings)
-			? (regimenSettings ?? [])
-					.map((option: RegimenSetting) => {
-						if (option.regimen === patient.regimen) {
-							return (
-								(
-									(takenDoses /
-										parseInt(option.numberOfDoses)) *
-									100
-								).toFixed(2) + "%"
-							);
-						} else {
-							return "N/A";
-						}
-					})
-					.filter((val: any) => val !== "N/A")
-			: "N/A";
-
-		const overallAdherence =
-			percentage != "N/A" && !isEmpty(percentage)
-				? head(percentage)
-				: "N/A";
 
 		return newPercentage;
 	}

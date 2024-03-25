@@ -298,6 +298,7 @@ export function useReportTableData() {
 		filterValues: string[],
 	) => {
 		for (const key in data) {
+			// eslint-disable-next-line no-prototype-builtins
 			if (data.hasOwnProperty(key) && Array.isArray(data[key])) {
 				data[key] = data[key].filter((obj: any) =>
 					filterValues.includes(obj[propertyName]),
@@ -628,28 +629,6 @@ export function sanitizeReportData(
 		const newPercentage =
 			((takenDose / events.length) * 100).toFixed(2) + "%";
 
-		const percentage = !isEmpty(regimenSettings)
-			? regimenSettings
-					.map((option: RegimenSetting) => {
-						if (option.regimen === report.regimen) {
-							return (
-								(
-									(report.noOfSignal /
-										parseInt(option.numberOfDoses)) *
-									100
-								).toFixed(2) + "%"
-							);
-						} else {
-							return "N/A";
-						}
-					})
-					.filter((val: any) => val !== "N/A")
-			: "N/A";
-
-		const adherencePercentage =
-			percentage != "N/A" && !isEmpty(percentage)
-				? head(percentage)
-				: "N/A";
 		const lastOpened = DateTime.fromFormat(
 			report.lastOpened ?? "",
 			"yyyy-MM-dd HH:mm:ss",
