@@ -87,6 +87,7 @@ export default function ReportTable({
 										programMapping,
 										true,
 										deviceList,
+										adherenceStreakData,
 									)}
 									columns={report.columns as ReportColumn[]}
 								/>
