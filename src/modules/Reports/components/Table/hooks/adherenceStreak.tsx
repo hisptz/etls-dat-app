@@ -13,7 +13,7 @@ import { DateTime } from "luxon";
 import { PatientProfile } from "../../../../shared/models";
 import { CircularLoader } from "@dhis2/ui";
 
-function GetAdherenceStreak({ patient }: { patient: PatientProfile }) {
+export function GetAdherenceStreak({ patient }: { patient: PatientProfile }) {
 	const { data, loadingDevice } = useDeviceData(patient?.deviceIMEINumber);
 	const [programMapping] = useSetting("programMapping", {
 		global: true,
@@ -79,4 +79,32 @@ function GetAdherenceStreak({ patient }: { patient: PatientProfile }) {
 	);
 }
 
-export default GetAdherenceStreak;
+export function GetAdherenceStreakForReport({
+	events,
+	frequency,
+	device,
+}: {
+	events: any[];
+	frequency: string;
+	device: string;
+}) {
+	const { data, loadingDevice } = useDeviceData(device);
+
+	const enrollmentDate = DateTime.fromFormat(
+		data?.enrollmentDate ?? "",
+		"yyyy-MM-dd HH:mm:ss",
+	).toISO();
+
+	events?.push({
+		event: "enrolled",
+		date: enrollmentDate,
+	});
+
+	return loadingDevice ? (
+		<CircularLoader small />
+	) : (
+		<div style={{ width: "120px" }}>
+			<AdherenceStreak events={events} frequency={frequency ?? ""} />
+		</div>
+	);
+}

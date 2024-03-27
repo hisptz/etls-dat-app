@@ -19,6 +19,7 @@ import BatteryLevel from "../../../../shared/components/BatteryLevel/BatteryLeve
 import React from "react";
 import { DateTime } from "luxon";
 import AdherenceStreak from "../../../../shared/components/AdherenceStreak/AdherenceStreak";
+import { GetAdherenceStreakForReport } from "./adherenceStreak";
 
 type Data = {
 	reports: {
@@ -149,7 +150,7 @@ export function useReportTableData() {
 			"." +
 			DATA_ELEMENTS.DEVICE_SIGNAL +
 			(reportType === "tb-adherence-report"
-				? ":IN:Once;Multiple;Heartbeat;None"
+				? ""
 				: reportType === "patients-who-missed-doses"
 				? ":IN:Heartbeat;None"
 				: ""),
@@ -177,7 +178,7 @@ export function useReportTableData() {
 	const { error, refetch, loading } = useDataQuery<Data>(query, {
 		variables: {
 			page: 1,
-			pageSize: 50,
+			pageSize: 100,
 			program: programMapping?.program ?? "",
 			stage,
 			pe: [period],
@@ -199,6 +200,7 @@ export function useReportTableData() {
 	};
 
 	const getAllEvents = async () => {
+		setAllData([]);
 		try {
 			const result = (await refetch({
 				page: 1,
@@ -297,6 +299,7 @@ export function useReportTableData() {
 		filterValues: string[],
 	) => {
 		for (const key in data) {
+			// eslint-disable-next-line no-prototype-builtins
 			if (data.hasOwnProperty(key) && Array.isArray(data[key])) {
 				data[key] = data[key].filter((obj: any) =>
 					filterValues.includes(obj[propertyName]),
@@ -325,6 +328,8 @@ export function useReportTableData() {
 			reportType === "tb-adherence-report"
 				? filteredGroupedData[tei]
 				: groupedData[tei];
+
+		const allDataArray: any = groupedData[tei];
 		const regimen =
 			dataArray[0][
 				stage + "." + programMapping?.attributes?.regimen ?? ""
@@ -340,6 +345,7 @@ export function useReportTableData() {
 		return {
 			...dataArray[0],
 			noOfSignal: dataArray.length,
+			allEvents: isEmpty(allDataArray) ? 1 : allDataArray.length,
 			regimen: regimen,
 			adherenceFrequency: adherenceFrequency ?? "Daily",
 		};
@@ -531,41 +537,99 @@ export function sanitizeReportData(
 	deviceList?: any[],
 	adherenceStreakData?: any,
 ) {
-	function getAdherenceStreak(events: any, frequency: string) {
-		return (
-			<div style={{ width: "120px" }}>
-				<AdherenceStreak events={events} frequency={frequency} />
-			</div>
-		);
-	}
-
 	return data.map((report: any) => {
 		const eventData = adherenceStreakData
 			? adherenceStreakData[report.tei]
 			: [];
 
-		const percentage = !isEmpty(regimenSettings)
-			? regimenSettings
-					.map((option: RegimenSetting) => {
-						if (option.regimen === report.regimen) {
-							return (
-								(
-									(report.noOfSignal /
-										parseInt(option.numberOfDoses)) *
-									100
-								).toFixed(2) + "%"
-							);
-						} else {
-							return "N/A";
-						}
-					})
-					.filter((val: any) => val !== "N/A")
-			: "N/A";
+		const groupDataByWeeks = () => {
+			const groupedData: any = {};
+			eventData?.forEach((item: any) => {
+				const occurredDate = new Date(item.date);
+				const weekStartDate = new Date(
+					occurredDate.getFullYear(),
+					occurredDate.getMonth(),
+					occurredDate.getDate() - occurredDate.getDay(),
+				);
+				const weekEndDate = new Date(
+					weekStartDate.getFullYear(),
+					weekStartDate.getMonth(),
+					weekStartDate.getDate() + 6,
+				);
+				const week = `${weekStartDate.toLocaleDateString()} - ${weekEndDate.toLocaleDateString()}`;
+				if (!groupedData[week]) {
+					groupedData[week] = [];
+				}
+				groupedData[week].push(item);
+			});
+			return groupedData;
+		};
 
-		const adherencePercentage =
-			percentage != "N/A" && !isEmpty(percentage)
-				? head(percentage)
-				: "N/A";
+		const groupDataByMonths = () => {
+			const groupedData: any = {};
+			eventData?.forEach((item: any) => {
+				const occurredDate = new Date(item.date);
+				const year = occurredDate.getFullYear();
+				const month = occurredDate.getMonth();
+				const monthStartDate = new Date(year, month, 1);
+				const monthEndDate = new Date(year, month + 1, 0);
+				const monthKey = `${monthStartDate.toLocaleDateString()} - ${monthEndDate.toLocaleDateString()}`;
+				if (!groupedData[monthKey]) {
+					groupedData[monthKey] = [];
+				}
+				groupedData[monthKey].push(item);
+			});
+			return groupedData;
+		};
+
+		const groupedData =
+			report.adherenceFrequency == "Weekly"
+				? groupDataByWeeks()
+				: report.adherenceFrequency == "Monthly"
+				? groupDataByMonths()
+				: {};
+
+		const priortizeData = (dataArray: any) => {
+			for (const key in dataArray) {
+				const objects = dataArray[key];
+				let found = false;
+				for (let i = 0; i < objects.length; i++) {
+					if (objects[i].event === "takenDose") {
+						found = true;
+						break;
+					}
+				}
+				if (found) {
+					dataArray[key] = objects.filter(
+						(obj: any) => obj.event === "takenDose",
+					);
+				}
+			}
+			return dataArray;
+		};
+
+		const transformData = (dataArray: any) => {
+			const resultArray = [];
+			for (const key in dataArray) {
+				if (dataArray[key].length > 0) {
+					resultArray.push(dataArray[key][0]);
+				}
+			}
+			return resultArray;
+		};
+
+		const events =
+			report.adherenceFrequency == "Daily"
+				? eventData
+				: transformData(priortizeData(groupedData));
+
+		const takenDose = events?.filter(
+			(event: any) => event.event === "takenDose",
+		).length;
+
+		const newPercentage =
+			((takenDose / events?.length) * 100).toFixed(2) + "%";
+
 		const lastOpened = DateTime.fromFormat(
 			report.lastOpened ?? "",
 			"yyyy-MM-dd HH:mm:ss",
@@ -621,20 +685,23 @@ export function sanitizeReportData(
 						programMapping.attributes?.phoneNumber ?? ""
 				],
 			adherenceFrequency: report.adherenceFrequency,
-			adherencePercentage: adherencePercentage,
-			adherenceStreak: downloadable
-				? report.adherenceFrequency
-				: getAdherenceStreak(
-						eventData ?? [],
-						report.adherenceFrequency,
-				  ),
+			adherencePercentage: newPercentage,
+			adherenceStreak: downloadable ? (
+				report.adherenceFrequency
+			) : (
+				<GetAdherenceStreakForReport
+					device={deviceIMEI}
+					events={eventData ?? []}
+					frequency={report.adherenceFrequency}
+				/>
+			),
 			numberOfMissedDoses: report.noOfSignal,
 			orgUnit: report.ouname,
 			deviceIMEI: deviceIMEI,
 			battery: downloadable ? (
 				(batteryLevel ?? "N/A").toString()
 			) : (
-				<BatteryLevel batteryLevel={batteryLevel} />
+				<BatteryLevel device={deviceIMEI} />
 			),
 			deviceIMEINumber: report.imei,
 			daysInUse: report.daysDeviceInUse,

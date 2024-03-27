@@ -24,7 +24,8 @@ import BatteryLevel from "../../../shared/components/BatteryLevel/BatteryLevel";
 import { getProgramMapping } from "../../../shared/utils";
 import { RegimenSetting } from "../../../shared/constants";
 import { DateTime } from "luxon";
-import GetAdherenceStreak from "../../../Reports/components/Table/hooks/adherenceStreak";
+import { GetAdherenceStreak } from "../../../Reports/components/Table/hooks/adherenceStreak";
+import { getOverallAdherence } from "./hooks/data";
 
 export interface DATClientTableProps {
 	loading: boolean;
@@ -78,39 +79,105 @@ export default function DATClientTable({
 			mapping?.programStage ?? "",
 		);
 
-		const takenDoses = filteredEvents.filter((item: any): string => {
+		const groupDataByWeeks = () => {
+			const groupedData: any = {};
+			filteredEvents?.forEach((item: any) => {
+				const occurredDate = new Date(item.occurredAt[0].value);
+				const weekStartDate = new Date(
+					occurredDate.getFullYear(),
+					occurredDate.getMonth(),
+					occurredDate.getDate() - occurredDate.getDay(),
+				);
+				const weekEndDate = new Date(
+					weekStartDate.getFullYear(),
+					weekStartDate.getMonth(),
+					weekStartDate.getDate() + 6,
+				);
+				const week = `${weekStartDate.toLocaleDateString()} - ${weekEndDate.toLocaleDateString()}`;
+				if (!groupedData[week]) {
+					groupedData[week] = [];
+				}
+				groupedData[week].push(item);
+			});
+			return groupedData;
+		};
+
+		const groupDataByMonths = () => {
+			const groupedData: any = {};
+			filteredEvents?.forEach((item: any) => {
+				const occurredDate = new Date(item.occurredAt[0].value);
+				const year = occurredDate.getFullYear();
+				const month = occurredDate.getMonth();
+				const monthStartDate = new Date(year, month, 1);
+				const monthEndDate = new Date(year, month + 1, 0);
+				const monthKey = `${monthStartDate.toLocaleDateString()} - ${monthEndDate.toLocaleDateString()}`;
+				if (!groupedData[monthKey]) {
+					groupedData[monthKey] = [];
+				}
+				groupedData[monthKey].push(item);
+			});
+			return groupedData;
+		};
+
+		const groupedData =
+			patient.adherenceFrequency == "Weekly"
+				? groupDataByWeeks()
+				: patient.adherenceFrequency == "Monthly"
+				? groupDataByMonths()
+				: {};
+
+		const priortizeData = (dataArray: any) => {
+			for (const key in dataArray) {
+				const objects = dataArray[key];
+				let found = false;
+				for (let i = 0; i < objects.length; i++) {
+					if (
+						objects[i].dataValues.length > 0 &&
+						(objects[i].dataValues[0].value === "Once" ||
+							objects[i].dataValues[0].value === "Multiple")
+					) {
+						found = true;
+						break;
+					}
+				}
+				if (found) {
+					dataArray[key] = objects.filter(
+						(obj: any) =>
+							obj.dataValues[0].value == "Once" ||
+							obj.dataValues[0].value == "Multiple",
+					);
+				}
+			}
+			return dataArray;
+		};
+
+		const transformData = (dataArray: any) => {
+			const resultArray = [];
+			for (const key in dataArray) {
+				if (dataArray[key].length > 0) {
+					resultArray.push(dataArray[key][0]);
+				}
+			}
+			return resultArray;
+		};
+
+		const events =
+			patient.adherenceFrequency == "Daily"
+				? filteredEvents
+				: transformData(priortizeData(groupedData));
+
+		const takenDoses = events?.filter((item: any): string => {
 			return item.dataValues.some((dataValue: any) => {
 				const value = dataValue.value;
 				return value === "Once" || value === "Multiple";
 			});
-		});
+		}).length;
 
-		const noOfSignals = takenDoses.length;
+		const allEvents = isEmpty(filteredEvents) ? 1 : events.length;
 
-		const percentage = !isEmpty(regimenSettings)
-			? (regimenSettings ?? [])
-					.map((option: RegimenSetting) => {
-						if (option.regimen === patient.regimen) {
-							return (
-								(
-									(noOfSignals /
-										parseInt(option.numberOfDoses)) *
-									100
-								).toFixed(2) + "%"
-							);
-						} else {
-							return "N/A";
-						}
-					})
-					.filter((val: any) => val !== "N/A")
-			: "N/A";
+		const newPercentage = ((takenDoses / allEvents) * 100).toFixed(2) + "%";
 
-		const overallAdherence =
-			percentage != "N/A" && !isEmpty(percentage)
-				? head(percentage)
-				: "N/A";
-
-		return overallAdherence;
+		return newPercentage;
 	}
 
 	return (
