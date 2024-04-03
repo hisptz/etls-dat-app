@@ -6,7 +6,6 @@ import { Pagination } from "@hisptz/dhis2-utils";
 
 import { FullPageLoader } from "../../../shared/components/Loaders";
 import { isEmpty } from "lodash";
-
 import {
 	ReportColumn,
 	ReportConfig,

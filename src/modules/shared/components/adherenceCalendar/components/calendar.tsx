@@ -167,11 +167,22 @@ function Calendar({ events, frequency, onClick }: CalendarProps) {
 				(event) => event.event === "takenDose",
 			);
 
+			const currentDate = DateTime.now().toJSDate();
+
 			if (takenDosePresent) {
 				return filteredEvents.filter(
 					(event) => event.event !== "notTakenDose",
 				);
 			} else {
+				filteredEvents.map((event) => {
+					isSameDay(
+						DateTime.fromISO(event.date).toJSDate(),
+						currentDate,
+					)
+						? (event.event = "")
+						: null;
+				});
+
 				return filteredEvents;
 			}
 		};

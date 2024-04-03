@@ -3,10 +3,12 @@ import styles from "./adherenceStreak.module.css";
 import { Tooltip } from "react-tooltip";
 import i18n from "@dhis2/d2-i18n";
 import { isEmpty } from "lodash";
+import { isSameDay } from "date-fns";
+import { DateTime } from "luxon";
 
 export interface DateEvent {
 	date: string;
-	event: "enrolled" | "takenDose" | "notTakenDose";
+	event: "enrolled" | "takenDose" | "notTakenDose" | string;
 }
 
 interface CalendarProps {
@@ -73,9 +75,20 @@ function AdherenceStreak({ events, frequency }: CalendarProps) {
 					}
 				});
 
+				const currentDate = DateTime.now().toJSDate();
+
 				if (takenDoseFound) {
 					return filteredArray;
 				} else {
+					dailyEvents.map((event) => {
+						isSameDay(
+							DateTime.fromISO(event.date).toJSDate(),
+							currentDate,
+						)
+							? (event.event = "")
+							: null;
+					});
+
 					return dailyEvents;
 				}
 			};
