@@ -1,28 +1,27 @@
 name: DHIS2 development server deployment
 
 on:
-  pull_request:
-    types:
-      - closed
-    branches:
-      - develop
+    pull_request:
+        types:
+            - closed
+        branches:
+            - develop
 
 jobs:
-  deploy:
-    if: github.event.pull_request.merged == true
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 16.20.1
-          cache: yarn
-      - name: Install JS dependencies
-        run: yarn install --frozen-lockfile
-      - name: Build
-        run: yarn build
-      - name: Deploy
-        run: yarn deploy:manager ${{ vars.DHIS2_PROXY }} --username ${{ secrets.DHIS2_USERNAME }}
-        env:
-          D2_PASSWORD: ${{ secrets.DHIS2_PASSWORD }}
-
+    deploy:
+        if: github.event.pull_request.merged == true
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v3
+            - uses: actions/setup-node@v3
+              with:
+                  node-version: 18.18.0
+                  cache: yarn
+            - name: Install JS dependencies
+              run: yarn install --frozen-lockfile
+            - name: Build
+              run: yarn build
+            - name: Deploy
+              run: yarn deploy:manager ${{ vars.DHIS2_PROXY }} --username ${{ secrets.DHIS2_USERNAME }}
+              env:
+                  D2_PASSWORD: ${{ secrets.DHIS2_PASSWORD }}

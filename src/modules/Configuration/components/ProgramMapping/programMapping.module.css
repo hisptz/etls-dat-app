@@ -1,0 +1,22 @@
+.program-mapping-container {
+	flex: 1;
+	display: grid;
+	grid-template-rows: repeat(2, 1fr);
+	gap: 32px;
+	width: 100%;
+}
+
+.grid-item {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+}
+
+.label-title {
+	font-size: 16px;
+}
+
+.label-value {
+	font-size: 17px;
+	font-weight: 500;
+}
