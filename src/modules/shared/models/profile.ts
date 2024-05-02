@@ -22,7 +22,7 @@ export class PatientProfile extends TrackedEntityModel {
 	}
 
 	get id(): string {
-		return this.trackedEntity as string;
+		return this.trackedEntityInstance as string;
 	}
 
 	get name() {
@@ -56,9 +56,9 @@ export class PatientProfile extends TrackedEntityModel {
 
 	get enrollmentDate(): string {
 		return (
-			DateTime.fromISO(this.enrollment?.enrolledAt as string).toFormat(
-				"dd/LL/yyyy",
-			) ?? ""
+			DateTime.fromISO(
+				this.enrollment?.enrollmentDate as string,
+			).toFormat("dd/LL/yyyy") ?? ""
 		);
 	}
 

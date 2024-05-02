@@ -39,7 +39,7 @@ export function useAssignDevice() {
 
 	const trackedEntityAttributesMutation: any = {
 		type: "create",
-		resource: "tracker",
+		resource: "trackedEntityInstance",
 		params: {
 			async: false,
 		},
@@ -92,7 +92,7 @@ export function useAssignDevice() {
 
 		if (data) {
 			const res = await update({
-				data: { trackedEntities: [updatedTei] },
+				data: { trackedEntityInstances: [updatedTei] },
 			});
 
 			return {

@@ -19,13 +19,14 @@ export const DAT_PROGRAM = (): string => {
 };
 export const DEFAULT_DASHBOARD_PERIOD = "THIS_YEAR";
 export const TEI_FIELDS = [
+	"trackedEntityInstance",
 	"trackedEntity",
 	"trackedEntityType",
 	"created",
 	"lastUpdated",
 	"orgUnit",
 	"attributes[*]",
-	"enrollments[orgUnitName,enrollment,enrolledAt,orgUnit,program,events[event,dataValues,programStage,enrollment,occurredAt,program,orgUnit]]",
+	"enrollments[enrollmentDate,orgUnitName,enrollment,enrolledAt,orgUnit,program,events[event,dataValues,programStage,enrollment,occurredAt,program,orgUnit]]",
 ];
 export const CURRENT_USER_QUERY: Query = {
 	me: {
