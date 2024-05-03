@@ -29,7 +29,7 @@ export function useAssignDevice() {
 		(attribute) => attribute.attribute === EPISODE_ID,
 	);
 
-	const { trackedEntity, trackedEntityType, orgUnit } =
+	const { trackedEntityInstance, trackedEntityType, orgUnit } =
 		patientTei as TrackedEntity;
 
 	const { show } = useAlert(
@@ -85,7 +85,7 @@ export function useAssignDevice() {
 				  );
 		const updatedTei = {
 			attributes: updatedAttributes,
-			trackedEntity,
+			trackedEntity: trackedEntityInstance,
 			trackedEntityType,
 			orgUnit,
 		};
