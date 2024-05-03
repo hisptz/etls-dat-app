@@ -39,12 +39,11 @@ export function useAssignDevice() {
 
 	const trackedEntityAttributesMutation: any = {
 		type: "create",
-		resource: "trackedEntityInstance",
+		resource: "trackedEntityInstances",
 		params: {
-			async: false,
+			strategy: "CREATE_AND_UPDATE",
 		},
 		data: ({ data }: any) => data,
-		async: false,
 	};
 
 	const [update] = useDataMutation(trackedEntityAttributesMutation, {
