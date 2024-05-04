@@ -154,7 +154,9 @@ export function Reports() {
 											? errorDevice
 											: error
 									}
-									adherenceStreakData={adherenceStreakData}
+									adherenceStreakData={
+										adherenceStreakData ?? []
+									}
 								/>
 							</div>
 						) : (
