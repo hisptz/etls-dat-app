@@ -98,7 +98,7 @@ function EditDevice({
 								);
 							} else if (res.ignored != 0) {
 								show({
-									message: `Could not update: ${res.error[0].message}`,
+									message: `Could not update: ${res.error[0]?.value}`,
 									type: { critical: true },
 								});
 							}

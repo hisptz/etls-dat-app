@@ -29,8 +29,7 @@ export function useAssignDevice() {
 		(attribute) => attribute.attribute === EPISODE_ID,
 	);
 
-	const { trackedEntityInstance, trackedEntityType, orgUnit } =
-		patientTei as TrackedEntity;
+	const { trackedEntityInstance, orgUnit } = patientTei as TrackedEntity;
 
 	const { show } = useAlert(
 		({ message }) => message,
@@ -50,7 +49,7 @@ export function useAssignDevice() {
 		onError: (error) => {
 			show({
 				message: `Could not update: ${error}`,
-				type: { info: true },
+				type: { critical: true },
 			});
 		},
 	});
@@ -84,8 +83,7 @@ export function useAssignDevice() {
 				  );
 		const updatedTei = {
 			attributes: updatedAttributes,
-			trackedEntity: trackedEntityInstance,
-			trackedEntityType,
+			trackedEntityInstance,
 			orgUnit,
 		};
 
@@ -95,16 +93,11 @@ export function useAssignDevice() {
 			});
 
 			return {
-				updated:
-					res?.bundleReport.typeReportMap.TRACKED_ENTITY.stats
-						.updated,
+				updated: res?.response.importSummaries[0].importCount.updated,
 
-				ignored:
-					res?.bundleReport.typeReportMap.TRACKED_ENTITY.stats
-						.ignored,
+				ignored: res?.response.importSummaries[0].importCount.ignored,
 
-				error: res?.bundleReport.typeReportMap.TRACKED_ENTITY
-					.objectReports[0].errorReports,
+				error: res?.response.importSummaries[0].conflicts,
 			};
 		}
 	};
@@ -133,7 +126,11 @@ export function useAssignDevice() {
 			);
 			loading = false;
 
-			return { response: response, error: null, loading };
+			return {
+				response: response,
+				error: null,
+				loading,
+			};
 		} catch (error) {
 			loading = false;
 			return { response: null, error, loading };
