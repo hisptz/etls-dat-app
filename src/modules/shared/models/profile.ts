@@ -81,20 +81,52 @@ export class PatientProfile extends TrackedEntityModel {
 
 		return device == "" ? "N/A" : device;
 	}
-	get regimen() {
-		const regimen = this.getAttributeValue(
-			this.programMapping?.attributes?.regimen ?? "",
+
+	getRegimenFromDataElements(): string {
+		let regimen = "";
+
+		const regimenEvents = (
+			this.programMapping?.regimenProgramStages ?? []
+		).map((programStage) => {
+			return this.getLatestEvent(programStage);
+		});
+
+		const latestRegimenEvent = head(
+			(regimenEvents ?? []).sort((a: any, b: any) => {
+				return (
+					new Date(b.occurredAt).getTime() -
+					new Date(a.occurredAt).getTime()
+				);
+			}),
 		);
+
+		regimen =
+			latestRegimenEvent?.dataValues?.find(
+				(dataValue: any) =>
+					this.programMapping?.regimenDataElements?.includes(
+						dataValue.dataElement,
+					),
+			)?.value ?? "";
 
 		return regimen;
 	}
-	get adherenceFrequency() {
-		const regimen = this.getAttributeValue(
+
+	get regimen() {
+		const regimenAttribute = this.getAttributeValue(
 			this.programMapping?.attributes?.regimen ?? "",
 		);
+
+		const regimenDataElement = this.getRegimenFromDataElements();
+
+		return regimenDataElement && regimenDataElement !== ""
+			? regimenDataElement
+			: regimenAttribute;
+	}
+
+	get adherenceFrequency() {
 		let adherenceFrequency;
 		this.regimenSettings?.map((setting) => {
-			if (setting.regimen === regimen) {
+			if (setting.regimen === this.regimen) {
 				adherenceFrequency = setting.administration as string;
 			}
 		});

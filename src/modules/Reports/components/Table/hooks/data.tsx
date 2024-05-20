@@ -138,6 +138,7 @@ export function useReportTableData() {
 	) as ProgramMapping;
 	const stage = programMapping?.programStage ?? "";
 
+	// TODO Add extra mapping for event regimens
 	const dimensions = [
 		stage + "." + programMapping?.attributes?.patientNumber,
 		stage + "." + programMapping?.attributes?.firstName,
@@ -330,6 +331,8 @@ export function useReportTableData() {
 				: groupedData[tei];
 
 		const allDataArray: any = groupedData[tei];
+
+		// TODO extract mapping for event regimens
 		const regimen =
 			dataArray[0][
 				stage + "." + programMapping?.attributes?.regimen ?? ""

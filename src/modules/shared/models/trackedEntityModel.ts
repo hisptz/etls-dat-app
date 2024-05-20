@@ -50,6 +50,30 @@ export class TrackedEntityModel {
 		);
 	}
 
+	getLatestEvent(
+		programStage: string,
+	): WebapiControllerTrackerViewRelationshipItem_Event | undefined {
+		return head(
+			this.events
+				.sort((a, b) => {
+					return (
+						new Date(b.occurredAt).getTime() -
+						new Date(a.occurredAt).getTime()
+					);
+				})
+				.filter((event) => event.programStage === programStage),
+		);
+	}
+
+	getLatestEventValue(programStage: string, dataElement: string): string {
+		const event = this.getLatestEvent(programStage);
+		return (
+			event?.dataValues.find(
+				(dataValue) => dataValue.dataElement === dataElement,
+			)?.value ?? ""
+		);
+	}
+
 	toJSON(): Partial<TrackedEntity> {
 		return {
 			orgUnit: this.orgUnit as string,
