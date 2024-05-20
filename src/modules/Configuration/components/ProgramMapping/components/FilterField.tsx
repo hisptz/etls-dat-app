@@ -6,8 +6,6 @@ import {
 	SingleSelectField,
 	SingleSelectOption,
 } from "@dhis2/ui";
-import { useSearchParams } from "react-router-dom";
-import { isEmpty } from "lodash";
 import { DATA_TEST_PREFIX, DeviceIMEIList } from "../../../../shared/constants";
 import { Option } from "../hooks/data";
 import { useController } from "react-hook-form";
@@ -39,16 +37,6 @@ export function FilterField({
 	multiSelect,
 	...props
 }: FilterFieldProps) {
-	const [, setParams] = useSearchParams();
-	const onChange = ({ value }: { value: string }) => {
-		setParams((params) => {
-			const updatedParams = new URLSearchParams(params);
-			updatedParams.set(name, value);
-
-			return updatedParams;
-		});
-	};
-
 	const { field, fieldState } = useController({
 		name,
 		rules: validations,
@@ -66,7 +54,12 @@ export function FilterField({
 					validationText={fieldState.error?.message}
 					required={required}
 					selected={
-						isEmpty(field.value) ? [] : field.value?.split(",")
+						(field.value ?? []).every(
+							(value: any) =>
+								options?.some(({ code }) => code === value),
+						)
+							? field.value
+							: []
 					}
 					filterable={(options?.length ?? 0) > 5}
 					onChange={({ selected }: { selected: string[] }) => {
