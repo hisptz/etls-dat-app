@@ -13,7 +13,7 @@ import { FilterField } from "./FilterField";
 import { generateUid, useMetadataImport } from "../hooks/save";
 import { useSetting } from "@dhis2/app-service-datastore";
 import { useAlert, useDataQuery } from "@dhis2/app-runtime";
-import { head, isEmpty } from "lodash";
+import { head, isEmpty, flattenDeep, some } from "lodash";
 import { FormProvider, useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -21,6 +21,8 @@ import {
 	ProgramMapping,
 	TRACKED_ENTITY_ATTRIBUTES,
 } from "../../../../shared/constants";
+
+type D2Option = { name: string; code: string };
 
 interface EditProps {
 	programOptions: any[];
@@ -53,6 +55,9 @@ const schema = z.object({
 	apiKey: z
 		.string({ required_error: "API Key is required" })
 		.nonempty("API Key is required"),
+	treatmentOutcomeProgramStages: z.array(z.string()).optional(),
+	regimenProgramStages: z.array(z.string()).optional(),
+	regimenDataElements: z.array(z.string()).optional(),
 	attributes: z.object({
 		firstName: z
 			.string({ required_error: "First Name attribute is required" })
@@ -69,12 +74,12 @@ const schema = z.object({
 		sex: z
 			.string({ required_error: "Sex attribute is required" })
 			.nonempty("Sex attribute is required"),
-		regimen: z
-			.string({ required_error: "Regimen attribute is required" })
-			.nonempty("Regimen attribute is required"),
 		phoneNumber: z
 			.string({ required_error: "Phone Number attribute is required" })
 			.nonempty("Phone Number attribute is required"),
+		regimen: z
+			.string({ required_error: "Regimen attribute is required" })
+			.nonempty("Regimen attribute is required"),
 		deviceIMEInumber: z.string().optional(),
 		episodeId: z.string().optional(),
 	}),
@@ -145,6 +150,13 @@ function ProgramMappingForm({
 										mappingData.attributes.deviceIMEInumber,
 									episodeId: mappingData.attributes.episodeId,
 								},
+								treatmentOutcomeProgramStages:
+									mappingData.treatmentOutcomeProgramStages ??
+									[],
+								regimenProgramStages:
+									mappingData.regimenProgramStages ?? [],
+								regimenDataElements:
+									mappingData.regimenDataElements ?? [],
 						  }
 						: mapping,
 			);
@@ -206,16 +218,70 @@ function ProgramMappingForm({
 		resolver: zodResolver(schema),
 	});
 
-	const programValue = useWatch({
+	const mappedProgram = useWatch({
 		control: form.control,
 		name: "program",
 	});
 
-	const disableFields = programValue === undefined || programValue === "";
+	const mappedRegimenProgramStages = useWatch({
+		defaultValue: data?.regimenProgramStages ?? [],
+		control: form.control,
+		name: "regimenProgramStages",
+	});
+
+	const mappedTreatmentOutcomeProgramStages = useWatch({
+		defaultValue: data?.regimenProgramStages ?? [],
+		control: form.control,
+		name: "treatmentOutcomeProgramStages",
+	});
+
+	const mappedRegimenDataElements = useWatch({
+		defaultValue: data?.regimenDataElements ?? [],
+		control: form.control,
+		name: "regimenDataElements",
+	});
+
+	const selectedProgramAttributes =
+		head(programOptions?.filter((program) => program.id === mappedProgram))
+			?.programTrackedEntityAttributes ?? [];
+
+	const programStagesOptions = (
+		head(programOptions?.filter((program) => program.id === mappedProgram))
+			?.programStages ?? []
+	).map((programStage: any) => ({
+		...programStage,
+		code: programStage.id,
+		name: programStage.displayName,
+	}));
+
+	const regimenOptions = selectedProgramAttributes?.filter(
+		(option: any) => option.optionSet?.id,
+	);
+
+	const regimenDataElementsOptions = flattenDeep(
+		programStagesOptions
+			.filter(
+				(programStage: any) =>
+					mappedRegimenProgramStages?.includes(programStage.id),
+			)
+			.map(({ programStageDataElements }: any) =>
+				programStageDataElements
+					.filter(
+						({ dataElement }: any) => dataElement?.optionSet?.id,
+					)
+					.map(({ dataElement }: any) => ({
+						code: dataElement.id,
+						name: dataElement?.name,
+					})),
+			),
+	) as D2Option[];
+
+	const disableFields = mappedProgram === undefined || mappedProgram === "";
 
 	useEffect(() => {
 		[
-			"name",
+			"regimenProgramStages",
+			"treatmentOutcomeProgramStages",
 			"attributes.firstName",
 			"attributes.surname",
 			"attributes.patientNumber",
@@ -226,18 +292,43 @@ function ProgramMappingForm({
 			"mediatorUrl",
 			"apiKey",
 		].forEach((fieldName: any) => {
-			form.setValue(fieldName, undefined, { shouldValidate: false });
+			if (
+				fieldName === "treatmentOutcomeProgramStages" &&
+				!some(
+					programStagesOptions,
+					({ id }) =>
+						mappedTreatmentOutcomeProgramStages?.includes(id),
+				)
+			) {
+				form.setValue(fieldName, [], { shouldValidate: false });
+			} else if (
+				fieldName === "regimenProgramStages" &&
+				!some(
+					programStagesOptions,
+					({ id }) => mappedRegimenProgramStages?.includes(id),
+				)
+			) {
+				form.setValue(fieldName, [], { shouldValidate: false });
+			} else {
+				form.setValue(fieldName, undefined, { shouldValidate: false });
+			}
 			form.clearErrors(fieldName);
 		});
-	}, [programValue, form]);
+	}, [mappedProgram]);
 
-	const selectedProgramAttributes = head(
-		programOptions?.filter((program) => program.id === programValue),
-	)?.programTrackedEntityAttributes;
+	useEffect(() => {
+		if (
+			!some(
+				regimenDataElementsOptions,
+				({ code }: D2Option) =>
+					mappedRegimenDataElements?.includes(code),
+			)
+		) {
+			form.setValue("regimenDataElements", [], { shouldValidate: false });
+		}
+	}, [mappedRegimenProgramStages]);
 
-	const regimenOptions = selectedProgramAttributes?.filter(
-		(option: any) => option.optionSet?.id,
-	);
+	console.log({ regimenDataElementsOptions, mappedRegimenDataElements });
 
 	return (
 		<div>
@@ -256,6 +347,14 @@ function ProgramMappingForm({
 							<div style={{ padding: "5px" }}>
 								<FilterField
 									required={true}
+									name="name"
+									label={i18n.t("Name")}
+									type="text"
+								/>
+							</div>
+							<div style={{ padding: "5px" }}>
+								<FilterField
+									required={true}
 									disabled={addNew ? false : true}
 									options={programOptions}
 									name="program"
@@ -266,10 +365,14 @@ function ProgramMappingForm({
 							<div style={{ padding: "5px" }}>
 								<FilterField
 									disabled={disableFields}
-									required={true}
-									name="name"
-									label={i18n.t("Name")}
-									type="text"
+									options={programStagesOptions}
+									multiSelect={true}
+									required={false}
+									name="treatmentOutcomeProgramStages"
+									label={i18n.t(
+										"Treatment Outcome Program Stages",
+									)}
+									type="select"
 								/>
 							</div>
 							<div style={{ padding: "5px" }}>
@@ -325,20 +428,44 @@ function ProgramMappingForm({
 							<div style={{ padding: "5px" }}>
 								<FilterField
 									disabled={disableFields}
-									options={regimenOptions}
+									options={selectedProgramAttributes}
 									required={true}
-									name="attributes.regimen"
-									label={i18n.t("Regimen")}
+									name="attributes.phoneNumber"
+									label={i18n.t("Phone Number")}
 									type="select"
 								/>
 							</div>
 							<div style={{ padding: "5px" }}>
 								<FilterField
 									disabled={disableFields}
-									options={selectedProgramAttributes}
-									required={true}
-									name="attributes.phoneNumber"
-									label={i18n.t("Phone Number")}
+									options={regimenOptions}
+									required={false}
+									name="attributes.regimen"
+									label={i18n.t("Regimen Attribute")}
+									type="select"
+								/>
+							</div>
+							<div style={{ padding: "5px" }}>
+								<FilterField
+									disabled={disableFields}
+									options={programStagesOptions}
+									multiSelect={true}
+									required={false}
+									name="regimenProgramStages"
+									label={i18n.t("Regimen Program Stages")}
+									type="select"
+								/>
+							</div>
+							<div style={{ padding: "5px" }}>
+								<FilterField
+									disabled={disableFields}
+									options={regimenDataElementsOptions}
+									multiSelect={true}
+									required={false}
+									name="regimenDataElements"
+									label={i18n.t(
+										"Regimen Program Data Elements",
+									)}
 									type="select"
 								/>
 							</div>
