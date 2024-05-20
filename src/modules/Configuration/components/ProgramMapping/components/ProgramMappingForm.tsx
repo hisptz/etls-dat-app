@@ -328,8 +328,6 @@ function ProgramMappingForm({
 		}
 	}, [mappedRegimenProgramStages]);
 
-	console.log({ regimenDataElementsOptions, mappedRegimenDataElements });
-
 	return (
 		<div>
 			<Modal position="middle" hide={hide} onClose={onClose}>
