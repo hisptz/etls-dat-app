@@ -140,7 +140,7 @@ export function useDATAssignmentTableData() {
 			program: mapping?.program,
 			filters,
 			ou,
-			order: `${mapping?.attributes?.deviceIMEInumber}:desc,enrolledAt:desc`,
+			order: `${mapping?.attributes?.deviceIMEInumber}:desc,created:desc`,
 		},
 
 		lazy: !mapping || isEmpty(programMapping),
@@ -247,7 +247,7 @@ export function useDATAssignmentTableData() {
 		if (sort.direction === "default") {
 			sort.name === "treatmentStart"
 				? refetch({
-						order: `${mapping.attributes?.deviceIMEInumber}:desc,enrolledAt:asc`,
+						order: `${mapping.attributes?.deviceIMEInumber}:desc,created:asc`,
 				  })
 				: mapping.attributes
 				? sort.name === "name"
@@ -266,7 +266,7 @@ export function useDATAssignmentTableData() {
 		if (sort.direction === "asc") {
 			sort.name === "treatmentStart"
 				? refetch({
-						order: `${mapping.attributes?.deviceIMEInumber}:desc,enrolledAt:asc`,
+						order: `${mapping.attributes?.deviceIMEInumber}:desc,created:asc`,
 				  })
 				: mapping.attributes
 				? sort.name === "name"
@@ -283,7 +283,7 @@ export function useDATAssignmentTableData() {
 		} else {
 			sort.name === "treatmentStart"
 				? refetch({
-						order: `${mapping.attributes?.deviceIMEInumber}:desc,enrolledAt:desc`,
+						order: `${mapping.attributes?.deviceIMEInumber}:desc,created:desc`,
 				  })
 				: mapping.attributes
 				? sort.name === "name"

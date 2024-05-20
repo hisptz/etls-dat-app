@@ -131,7 +131,7 @@ export function useAssignDevice() {
 				error: null,
 				loading,
 			};
-		} catch (error) {
+		} catch (error: any) {
 			loading = false;
 			return { response: null, error, loading };
 		}
