@@ -144,7 +144,7 @@ export function useDATClientTableData() {
 			program: mapping?.program,
 			filters,
 			ou,
-			order: `${mapping?.attributes?.deviceIMEInumber}:asc,enrolledAt:desc`,
+			order: `${mapping?.attributes?.deviceIMEInumber}:asc,created:desc`,
 		},
 
 		lazy: !mapping || isEmpty(programMapping),
@@ -253,7 +253,7 @@ export function useDATClientTableData() {
 		if (sort.direction === "default") {
 			sort.name === "treatmentStart"
 				? refetch({
-						order: `${mapping.attributes?.deviceIMEInumber}:asc,enrolledAt:asc`,
+						order: `${mapping.attributes?.deviceIMEInumber}:asc,created:asc`,
 				  })
 				: mapping.attributes
 				? sort.name === "name"
@@ -272,7 +272,7 @@ export function useDATClientTableData() {
 		if (sort.direction === "asc") {
 			sort.name === "treatmentStart"
 				? refetch({
-						order: `${mapping.attributes?.deviceIMEInumber}:asc,enrolledAt:asc`,
+						order: `${mapping.attributes?.deviceIMEInumber}:asc,created:asc`,
 				  })
 				: mapping.attributes
 				? sort.name === "name"
@@ -289,7 +289,7 @@ export function useDATClientTableData() {
 		} else {
 			sort.name === "treatmentStart"
 				? refetch({
-						order: `${mapping.attributes?.deviceIMEInumber}:asc,enrolledAt:desc`,
+						order: `${mapping.attributes?.deviceIMEInumber}:asc,created:desc`,
 				  })
 				: mapping.attributes
 				? sort.name === "name"
