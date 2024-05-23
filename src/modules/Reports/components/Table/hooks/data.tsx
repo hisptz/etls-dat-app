@@ -2,7 +2,7 @@ import { useDataQuery } from "@dhis2/app-runtime";
 import { useCallback, useEffect, useState } from "react";
 import { Pagination } from "@hisptz/dhis2-utils";
 import { useSearchParams } from "react-router-dom";
-import { head, isEmpty } from "lodash";
+import { head, isEmpty, filter } from "lodash";
 import {
 	DATA_ELEMENTS,
 	ProgramMapping,
@@ -18,7 +18,6 @@ import { getProgramMapping } from "../../../../shared/utils";
 import BatteryLevel from "../../../../shared/components/BatteryLevel/BatteryLevel";
 import React from "react";
 import { DateTime } from "luxon";
-import AdherenceStreak from "../../../../shared/components/AdherenceStreak/AdherenceStreak";
 import { GetAdherenceStreakForReport } from "./adherenceStreak";
 
 type Data = {
@@ -138,8 +137,14 @@ export function useReportTableData() {
 	) as ProgramMapping;
 	const stage = programMapping?.programStage ?? "";
 
-	// TODO Add extra mapping for event regimens
-	const dimensions = [
+	const regimenDataElements: Array<string[]> = (
+		programMapping?.regimenProgramStages ?? []
+	).map((programStage: string) =>
+		(programMapping?.regimenDataElements ?? []).map(
+			(dataElement: string) => `${programStage}.${dataElement}`,
+		),
+	);
+	const dimensions: string[] = [
 		stage + "." + programMapping?.attributes?.patientNumber,
 		stage + "." + programMapping?.attributes?.firstName,
 		stage + "." + programMapping?.attributes?.surname,
@@ -156,6 +161,11 @@ export function useReportTableData() {
 				? ":IN:Heartbeat;None"
 				: ""),
 	];
+
+	const groupedDimensions = filter(
+		[...regimenDataElements, dimensions],
+		(dx: string[]) => dx.length,
+	) as Array<string[]>;
 
 	function paginateEvent(
 		eventArray: any,
@@ -179,7 +189,7 @@ export function useReportTableData() {
 	const { error, refetch, loading } = useDataQuery<Data>(query, {
 		variables: {
 			page: 1,
-			pageSize: 100,
+			pageSize: 10000,
 			program: programMapping?.program ?? "",
 			stage,
 			pe: [period],
@@ -202,55 +212,58 @@ export function useReportTableData() {
 
 	const getAllEvents = async () => {
 		setAllData([]);
+		const promises = [];
 		try {
-			const result = (await refetch({
-				page: 1,
-				program: programMapping?.program ?? "",
-				stage,
-				pe: [period],
-				ou: [orgUnit],
-				dx: dimensions,
-			})) as any;
+			for (var dx of groupedDimensions) {
+				const programStage = head((head(dx) ?? "").split(".")) ?? "";
+				const result = (await refetch({
+					page: 1,
+					program: programMapping?.program ?? "",
+					stage: programStage,
+					pe: [period],
+					ou: [orgUnit],
+					dx,
+				})) as any;
 
-			const count = result.reports?.metaData.pager.pageCount;
+				const count = result.reports?.metaData.pager.pageCount;
 
-			if (count) {
-				const promises = [];
+				if (count) {
+					for (let i = 0; i < count; i++) {
+						try {
+							const data = (await refetch({
+								page: i + 1,
+								pe: [period],
+								stage: programStage,
+								ou: [orgUnit],
+								dx,
+							})) as any;
 
-				for (let i = 0; i < count; i++) {
-					try {
-						const data = (await refetch({
-							page: i + 1,
-							pe: [period],
-							ou: [orgUnit],
-							dx: dimensions,
-						})) as any;
-
-						if (data) {
-							promises.push(
-								transformRowsData(
-									data.reports?.headers,
-									data.reports?.rows,
-								),
+							if (data) {
+								promises.push(
+									transformRowsData(
+										data.reports?.headers,
+										data.reports?.rows,
+									),
+								);
+							} else {
+								promises.push(null);
+							}
+						} catch (error) {
+							console.error(
+								`Error fetching data for page ${i + 1}:`,
+								error,
 							);
-						} else {
 							promises.push(null);
 						}
-					} catch (error) {
-						console.error(
-							`Error fetching data for page ${i + 1}:`,
-							error,
-						);
-						promises.push(null);
 					}
 				}
-
-				const RowsData = await Promise.all(promises);
-
-				const flattenedData = _.flatten(RowsData);
-
-				setAllData(flattenedData);
 			}
+
+			const RowsData = await Promise.all(promises);
+
+			const flattenedData = _.flatten(RowsData);
+
+			setAllData(flattenedData);
 		} catch (error) {
 			console.error("Error fetching data:", error);
 		}
@@ -344,7 +357,7 @@ export function useReportTableData() {
 				adherenceFrequency = setting.administration as string;
 			}
 		});
-
+		console.log({ dataArray });
 		return {
 			...dataArray[0],
 			noOfSignal: dataArray.length,
