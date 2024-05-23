@@ -2,7 +2,7 @@ import { useDataQuery } from "@dhis2/app-runtime";
 import { useCallback, useEffect, useState } from "react";
 import { Pagination } from "@hisptz/dhis2-utils";
 import { useSearchParams } from "react-router-dom";
-import { head, isEmpty, filter } from "lodash";
+import { head, isEmpty, filter, reduce, uniqBy } from "lodash";
 import {
 	DATA_ELEMENTS,
 	ProgramMapping,
@@ -274,8 +274,8 @@ export function useReportTableData() {
 	const getAdherenceData = () => {
 		const transformedData: any = {};
 
-		_.forEach(groupedData, (dataArray, key) => {
-			transformedData[key] = _.map(dataArray, (item) => {
+		_.forEach(groupedData, (teiDataRow, key) => {
+			transformedData[key] = _.map(teiDataRow, (item) => {
 				const signal = _.get(
 					item,
 					stage + "." + DATA_ELEMENTS.DEVICE_SIGNAL,
@@ -338,16 +338,20 @@ export function useReportTableData() {
 			? filteredGroupedData
 			: groupedData,
 	).map((tei) => {
-		const dataArray: any =
+		const teiDataRow: any =
 			reportType === "tb-adherence-report"
 				? filteredGroupedData[tei]
 				: groupedData[tei];
 
 		const allDataArray: any = groupedData[tei];
 
-		// TODO extract mapping for event regimens
+		const reducedTeiDataRow: any = reduce(
+			teiDataRow,
+			(rowRecord, item) => ({ ...rowRecord, ...item }),
+			{},
+		);
 		const regimen =
-			dataArray[0][
+			reducedTeiDataRow[
 				stage + "." + programMapping?.attributes?.regimen ?? ""
 			];
 
@@ -357,11 +361,12 @@ export function useReportTableData() {
 				adherenceFrequency = setting.administration as string;
 			}
 		});
-		console.log({ dataArray });
 		return {
-			...dataArray[0],
-			noOfSignal: dataArray.length,
-			allEvents: isEmpty(allDataArray) ? 1 : allDataArray.length,
+			...reducedTeiDataRow,
+			noOfSignal: groupRowDataByEventDate(teiDataRow).length,
+			allEvents: isEmpty(allDataArray)
+				? 1
+				: groupRowDataByEventDate(allDataArray).length,
 			regimen: regimen,
 			adherenceFrequency: adherenceFrequency ?? "Daily",
 		};
@@ -605,9 +610,9 @@ export function sanitizeReportData(
 				? groupDataByMonths()
 				: {};
 
-		const priortizeData = (dataArray: any) => {
-			for (const key in dataArray) {
-				const objects = dataArray[key];
+		const priortizeData = (teiDataRow: any) => {
+			for (const key in teiDataRow) {
+				const objects = teiDataRow[key];
 				let found = false;
 				for (let i = 0; i < objects.length; i++) {
 					if (objects[i].event === "takenDose") {
@@ -616,19 +621,19 @@ export function sanitizeReportData(
 					}
 				}
 				if (found) {
-					dataArray[key] = objects.filter(
+					teiDataRow[key] = objects.filter(
 						(obj: any) => obj.event === "takenDose",
 					);
 				}
 			}
-			return dataArray;
+			return teiDataRow;
 		};
 
-		const transformData = (dataArray: any) => {
+		const transformData = (teiDataRow: any) => {
 			const resultArray = [];
-			for (const key in dataArray) {
-				if (dataArray[key].length > 0) {
-					resultArray.push(dataArray[key][0]);
+			for (const key in teiDataRow) {
+				if (teiDataRow[key].length > 0) {
+					resultArray.push(teiDataRow[key][0]);
 				}
 			}
 			return resultArray;
@@ -730,4 +735,8 @@ export function sanitizeReportData(
 			),
 		};
 	});
+}
+
+function groupRowDataByEventDate(rowData: any[]): any[] {
+	return uniqBy(rowData, "eventdate");
 }
