@@ -5,9 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-
-"POT-Creation-Date: 2024-02-05T07:54:26.895Z\n"
-"PO-Revision-Date: 2024-02-05T07:54:26.895Z\n"
+"POT-Creation-Date: 2024-05-07T09:29:12.800Z\n"
+"PO-Revision-Date: 2024-05-07T09:29:12.800Z\n"
 
 msgid "Configurations"
 msgstr "Configurations"
@@ -69,11 +68,14 @@ msgstr "Hide"
 msgid "Program Mapping"
 msgstr "Program Mapping"
 
+msgid "Name"
+msgstr "Name"
+
 msgid "Mapped Program"
 msgstr "Mapped Program"
 
-msgid "Name"
-msgstr "Name"
+msgid "Treatment Outcome Program Stages"
+msgstr "Treatment Outcome Program Stages"
 
 msgid "First Name"
 msgstr "First Name"
@@ -90,11 +92,17 @@ msgstr "Age"
 msgid "Sex"
 msgstr "Sex"
 
-msgid "Regimen"
-msgstr "Regimen"
-
 msgid "Phone Number"
 msgstr "Phone Number"
+
+msgid "Regimen Attribute"
+msgstr "Regimen Attribute"
+
+msgid "Regimen Program Stages"
+msgstr "Regimen Program Stages"
+
+msgid "Regimen Program Data Elements"
+msgstr "Regimen Program Data Elements"
 
 msgid "Mediator Url"
 msgstr "Mediator Url"
@@ -122,6 +130,9 @@ msgstr "Administration"
 
 msgid "Number Of Doses"
 msgstr "Number Of Doses"
+
+msgid "Regimen"
+msgstr "Regimen"
 
 msgid "Regimens Settings not found"
 msgstr "Regimens Settings not found"
