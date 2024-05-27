@@ -56,10 +56,10 @@ export class TrackedEntityModel {
 	): WebapiControllerTrackerViewRelationshipItem_Event | undefined {
 		return head(
 			this.events
-				.sort((a, b) => {
+				.sort((a: any, b: any) => {
 					return (
-						new Date(b.occurredAt).getTime() -
-						new Date(a.occurredAt).getTime()
+						new Date(b.eventDate).getTime() -
+						new Date(a.eventDate).getTime()
 					);
 				})
 				.filter((event) => event.programStage === programStage),

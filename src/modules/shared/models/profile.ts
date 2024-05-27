@@ -94,8 +94,8 @@ export class PatientProfile extends TrackedEntityModel {
 		const latestRegimenEvent = head(
 			(regimenEvents ?? []).sort((a: any, b: any) => {
 				return (
-					new Date(b.occurredAt).getTime() -
-					new Date(a.occurredAt).getTime()
+					new Date(b.eventDate).getTime() -
+					new Date(a.eventDate).getTime()
 				);
 			}),
 		);
