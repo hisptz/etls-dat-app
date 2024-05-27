@@ -39,6 +39,9 @@ export interface ProgramMapping {
 		deviceIMEInumber?: string;
 		episodeId?: string;
 	};
+	treatmentOutcomeProgramStages?: string[];
+	regimenProgramStages?: string[];
+	regimenDataElements?: string[];
 }
 
 export interface ReportColumn {

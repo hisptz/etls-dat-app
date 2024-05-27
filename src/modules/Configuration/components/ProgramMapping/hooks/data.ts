@@ -9,6 +9,7 @@ const query = {
 			fields: [
 				"id",
 				"displayName",
+				"programStages[id,displayName,programStageDataElements[dataElement[id,name,optionSet[id]]]]",
 				"programTrackedEntityAttributes[trackedEntityAttribute[id,name,code,optionSet[id]]]",
 			],
 			filter: "programType:eq:WITH_REGISTRATION",

@@ -4,10 +4,17 @@ import { RegimenSetting } from "../../../../shared/constants";
 import { ProgramFormData } from "../../ProgramMapping/components/ProgramMappingForm";
 
 const query = {
-	optionSet: {
+	attr: {
 		resource: "trackedEntityAttributes",
-		params: ({ filters }: { filters?: string }) => ({
-			filter: filters,
+		params: ({ attributeFilters }: { attributeFilters?: string }) => ({
+			filter: attributeFilters,
+			fields: ["id,optionSet[options[code,id,name,displayName]]"],
+		}),
+	},
+	de: {
+		resource: "dataElements",
+		params: ({ dataElementFilters }: { dataElementFilters?: string }) => ({
+			filter: dataElementFilters,
 			fields: ["id,optionSet[options[code,id,name,displayName]]"],
 		}),
 	},
@@ -21,8 +28,11 @@ export interface Option {
 }
 
 interface QueryType {
-	optionSet: {
+	attr: {
 		trackedEntityAttributes: [{ optionSet: { options: Option[] } }];
+	};
+	de: {
+		dataElements: [{ optionSet: { options: Option[] } }];
 	};
 }
 
@@ -32,20 +42,30 @@ export function useRegimens() {
 	});
 	const [programMapping] = useSetting("programMapping", { global: true });
 
-	const regimens = programMapping.map((mapping: ProgramFormData) => {
+	const regimenAttributes = programMapping.map((mapping: ProgramFormData) => {
 		return mapping.attributes.regimen;
 	});
 
+	const regimenDataElements = programMapping.map(
+		(mapping: ProgramFormData) => {
+			return mapping.regimenDataElements;
+		},
+	);
+
 	const { data, loading, refetch, error } = useDataQuery<QueryType>(query, {
 		variables: {
-			filters: `id:in:[${regimens}]`,
+			attributeFilters: `id:in:[${regimenAttributes}]`,
+			dataElementFilters: `id:in:[${regimenDataElements}]`,
 		},
-		lazy: !regimens,
+		lazy: !regimenAttributes || !regimenDataElements,
 	});
 
-	const options = data?.optionSet.trackedEntityAttributes.map((item: any) => {
-		return item;
-	});
+	const options = data
+		? [
+				data.attr.trackedEntityAttributes.map((item: any) => item),
+				data.de.dataElements.map((item: any) => item),
+		  ]
+		: [];
 
 	const result = () => {
 		return options?.reduce(
@@ -59,7 +79,7 @@ export function useRegimens() {
 	const updatedOptionSets = regimenOptions?.map((option: any) => ({
 		...option.optionSet?.options.map((opt: any) => ({
 			...opt,
-			attributeID: option.id,
+			attributeId: option.id,
 		})),
 	}));
 
@@ -94,7 +114,7 @@ export function useRegimens() {
 				name: item.code,
 				displayName: item.code,
 				code: item.code,
-				attributeID: item.attributeID,
+				attributeId: item.attributeId,
 			};
 		}) ?? [];
 
@@ -105,7 +125,7 @@ export function useRegimens() {
 				name: item.code,
 				displayName: item.code,
 				code: item.code,
-				attributeID: item.attributeID,
+				attributeId: item.attributeId,
 			};
 		}) ?? [];
 
