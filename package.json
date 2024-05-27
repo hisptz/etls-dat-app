@@ -1,6 +1,6 @@
 {
 	"name": "etls-data-app",
-	"version": "1.0.3",
+	"version": "1.0.5-DEPRECATED",
 	"description": "",
 	"license": "BSD-3-Clause",
 	"private": true,
