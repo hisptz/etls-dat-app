@@ -2,7 +2,15 @@ import { useDataQuery } from "@dhis2/app-runtime";
 import { useCallback, useEffect, useState } from "react";
 import { Pagination } from "@hisptz/dhis2-utils";
 import { useSearchParams } from "react-router-dom";
-import { head, isEmpty, filter, reduce, uniqBy } from "lodash";
+import {
+	head,
+	isEmpty,
+	filter,
+	reduce,
+	uniqBy,
+	forEach,
+	flattenDeep,
+} from "lodash";
 import {
 	DATA_ELEMENTS,
 	ProgramMapping,
@@ -350,10 +358,24 @@ export function useReportTableData() {
 			(rowRecord, item) => ({ ...rowRecord, ...item }),
 			{},
 		);
-		const regimen =
-			reducedTeiDataRow[
-				stage + "." + programMapping?.attributes?.regimen ?? ""
-			];
+
+		// TODO get regimen from program stage or attribute
+		let regimen = "";
+
+		const regimenDataItems: string[] = [
+			...flattenDeep(regimenDataElements),
+			stage + "." + programMapping?.attributes?.regimen ?? "",
+		];
+
+		forEach(regimenDataItems, (dataItem: string) => {
+			if (
+				reducedTeiDataRow[dataItem] &&
+				reducedTeiDataRow[dataItem] !== "" &&
+				regimen === ""
+			) {
+				regimen = reducedTeiDataRow[dataItem];
+			}
+		});
 
 		let adherenceFrequency;
 		regimenSetting?.map((setting: any) => {
