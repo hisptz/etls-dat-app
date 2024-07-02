@@ -77,9 +77,7 @@ const schema = z.object({
 		phoneNumber: z
 			.string({ required_error: "Phone Number attribute is required" })
 			.nonempty("Phone Number attribute is required"),
-		regimen: z
-			.string({ required_error: "Regimen attribute is required" })
-			.nonempty("Regimen attribute is required"),
+		regimen: z.string({ required_error: "Regimen attribute is required" }),
 		deviceIMEInumber: z.string().optional(),
 		episodeId: z.string().optional(),
 	}),
