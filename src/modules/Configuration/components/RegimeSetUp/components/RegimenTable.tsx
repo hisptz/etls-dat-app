@@ -102,7 +102,7 @@ export default function RegimenTable({
 				.map((mapping: any) => {
 					return mapping.attributes.regimen ===
 						attribute?.attributeId ||
-						mapping.regimenDataElements.includes(
+						mapping.regimenDataElements?.includes(
 							attribute?.attributeId,
 						)
 						? mapping.name
