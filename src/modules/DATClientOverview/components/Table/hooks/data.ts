@@ -15,6 +15,7 @@ import { useSetting } from "@dhis2/app-service-datastore";
 import { useRecoilValue } from "recoil";
 import { CurrentUserOrganizationUnit } from "../../../../shared/state/currentUser";
 import { getProgramMapping } from "../../../../shared/utils";
+import { useAdherenceEvents } from "../../../../shared/components/ProfileArea/utils";
 
 const query: any = {
 	patients: {

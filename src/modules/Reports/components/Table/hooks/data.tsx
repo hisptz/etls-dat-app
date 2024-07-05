@@ -2,7 +2,15 @@ import { useDataQuery } from "@dhis2/app-runtime";
 import { useCallback, useEffect, useState } from "react";
 import { Pagination } from "@hisptz/dhis2-utils";
 import { useSearchParams } from "react-router-dom";
-import { head, isEmpty } from "lodash";
+import {
+	head,
+	isEmpty,
+	filter,
+	reduce,
+	uniqBy,
+	forEach,
+	flattenDeep,
+} from "lodash";
 import {
 	DATA_ELEMENTS,
 	ProgramMapping,
@@ -18,7 +26,7 @@ import { getProgramMapping } from "../../../../shared/utils";
 import BatteryLevel from "../../../../shared/components/BatteryLevel/BatteryLevel";
 import React from "react";
 import { DateTime } from "luxon";
-import AdherenceStreak from "../../../../shared/components/AdherenceStreak/AdherenceStreak";
+import { GetAdherenceStreakForReport } from "./adherenceStreak";
 
 type Data = {
 	reports: {
@@ -137,7 +145,14 @@ export function useReportTableData() {
 	) as ProgramMapping;
 	const stage = programMapping?.programStage ?? "";
 
-	const dimensions = [
+	const regimenDataElements: Array<string[]> = (
+		programMapping?.regimenProgramStages ?? []
+	).map((programStage: string) =>
+		(programMapping?.regimenDataElements ?? []).map(
+			(dataElement: string) => `${programStage}.${dataElement}`,
+		),
+	);
+	const dimensions: string[] = [
 		stage + "." + programMapping?.attributes?.patientNumber,
 		stage + "." + programMapping?.attributes?.firstName,
 		stage + "." + programMapping?.attributes?.surname,
@@ -149,11 +164,16 @@ export function useReportTableData() {
 			"." +
 			DATA_ELEMENTS.DEVICE_SIGNAL +
 			(reportType === "tb-adherence-report"
-				? ":IN:Once;Multiple;Heartbeat;None"
+				? ""
 				: reportType === "patients-who-missed-doses"
 				? ":IN:Heartbeat;None"
 				: ""),
 	];
+
+	const groupedDimensions = filter(
+		[...regimenDataElements, dimensions],
+		(dx: string[]) => dx.length,
+	) as Array<string[]>;
 
 	function paginateEvent(
 		eventArray: any,
@@ -177,7 +197,7 @@ export function useReportTableData() {
 	const { error, refetch, loading } = useDataQuery<Data>(query, {
 		variables: {
 			page: 1,
-			pageSize: 50,
+			pageSize: 10000,
 			program: programMapping?.program ?? "",
 			stage,
 			pe: [period],
@@ -199,55 +219,59 @@ export function useReportTableData() {
 	};
 
 	const getAllEvents = async () => {
+		setAllData([]);
+		const promises = [];
 		try {
-			const result = (await refetch({
-				page: 1,
-				program: programMapping?.program ?? "",
-				stage,
-				pe: [period],
-				ou: [orgUnit],
-				dx: dimensions,
-			})) as any;
+			for (var dx of groupedDimensions) {
+				const programStage = head((head(dx) ?? "").split(".")) ?? "";
+				const result = (await refetch({
+					page: 1,
+					program: programMapping?.program ?? "",
+					stage: programStage,
+					pe: [period],
+					ou: [orgUnit],
+					dx,
+				})) as any;
 
-			const count = result.reports?.metaData.pager.pageCount;
+				const count = result.reports?.metaData.pager.pageCount;
 
-			if (count) {
-				const promises = [];
+				if (count) {
+					for (let i = 0; i < count; i++) {
+						try {
+							const data = (await refetch({
+								page: i + 1,
+								pe: [period],
+								stage: programStage,
+								ou: [orgUnit],
+								dx,
+							})) as any;
 
-				for (let i = 0; i < count; i++) {
-					try {
-						const data = (await refetch({
-							page: i + 1,
-							pe: [period],
-							ou: [orgUnit],
-							dx: dimensions,
-						})) as any;
-
-						if (data) {
-							promises.push(
-								transformRowsData(
-									data.reports?.headers,
-									data.reports?.rows,
-								),
+							if (data) {
+								promises.push(
+									transformRowsData(
+										data.reports?.headers,
+										data.reports?.rows,
+									),
+								);
+							} else {
+								promises.push(null);
+							}
+						} catch (error) {
+							console.error(
+								`Error fetching data for page ${i + 1}:`,
+								error,
 							);
-						} else {
 							promises.push(null);
 						}
-					} catch (error) {
-						console.error(
-							`Error fetching data for page ${i + 1}:`,
-							error,
-						);
-						promises.push(null);
 					}
 				}
-
-				const RowsData = await Promise.all(promises);
-
-				const flattenedData = _.flatten(RowsData);
-
-				setAllData(flattenedData);
 			}
+
+			const RowsData = await Promise.all(promises);
+
+			const flattenedData = _.flatten(RowsData);
+
+			setAllData(flattenedData);
 		} catch (error) {
 			console.error("Error fetching data:", error);
 		}
@@ -258,8 +282,8 @@ export function useReportTableData() {
 	const getAdherenceData = () => {
 		const transformedData: any = {};
 
-		_.forEach(groupedData, (dataArray, key) => {
-			transformedData[key] = _.map(dataArray, (item) => {
+		_.forEach(groupedData, (teiDataRow, key) => {
+			transformedData[key] = _.map(teiDataRow, (item) => {
 				const signal = _.get(
 					item,
 					stage + "." + DATA_ELEMENTS.DEVICE_SIGNAL,
@@ -297,6 +321,7 @@ export function useReportTableData() {
 		filterValues: string[],
 	) => {
 		for (const key in data) {
+			// eslint-disable-next-line no-prototype-builtins
 			if (data.hasOwnProperty(key) && Array.isArray(data[key])) {
 				data[key] = data[key].filter((obj: any) =>
 					filterValues.includes(obj[propertyName]),
@@ -321,14 +346,36 @@ export function useReportTableData() {
 			? filteredGroupedData
 			: groupedData,
 	).map((tei) => {
-		const dataArray: any =
+		const teiDataRow: any =
 			reportType === "tb-adherence-report"
 				? filteredGroupedData[tei]
 				: groupedData[tei];
-		const regimen =
-			dataArray[0][
-				stage + "." + programMapping?.attributes?.regimen ?? ""
-			];
+
+		const allDataArray: any = groupedData[tei];
+
+		const reducedTeiDataRow: any = reduce(
+			teiDataRow,
+			(rowRecord, item) => ({ ...rowRecord, ...item }),
+			{},
+		);
+
+		// TODO get regimen from program stage or attribute
+		let regimen = "";
+
+		const regimenDataItems: string[] = [
+			...flattenDeep(regimenDataElements),
+			stage + "." + programMapping?.attributes?.regimen ?? "",
+		];
+
+		forEach(regimenDataItems, (dataItem: string) => {
+			if (
+				reducedTeiDataRow[dataItem] &&
+				reducedTeiDataRow[dataItem] !== "" &&
+				regimen === ""
+			) {
+				regimen = reducedTeiDataRow[dataItem];
+			}
+		});
 
 		let adherenceFrequency;
 		regimenSetting?.map((setting: any) => {
@@ -336,10 +383,12 @@ export function useReportTableData() {
 				adherenceFrequency = setting.administration as string;
 			}
 		});
-
 		return {
-			...dataArray[0],
-			noOfSignal: dataArray.length,
+			...reducedTeiDataRow,
+			noOfSignal: groupRowDataByEventDate(teiDataRow).length,
+			allEvents: isEmpty(allDataArray)
+				? 1
+				: groupRowDataByEventDate(allDataArray).length,
 			regimen: regimen,
 			adherenceFrequency: adherenceFrequency ?? "Daily",
 		};
@@ -531,41 +580,99 @@ export function sanitizeReportData(
 	deviceList?: any[],
 	adherenceStreakData?: any,
 ) {
-	function getAdherenceStreak(events: any, frequency: string) {
-		return (
-			<div style={{ width: "120px" }}>
-				<AdherenceStreak events={events} frequency={frequency} />
-			</div>
-		);
-	}
-
 	return data.map((report: any) => {
 		const eventData = adherenceStreakData
 			? adherenceStreakData[report.tei]
 			: [];
 
-		const percentage = !isEmpty(regimenSettings)
-			? regimenSettings
-					.map((option: RegimenSetting) => {
-						if (option.regimen === report.regimen) {
-							return (
-								(
-									(report.noOfSignal /
-										parseInt(option.numberOfDoses)) *
-									100
-								).toFixed(2) + "%"
-							);
-						} else {
-							return "N/A";
-						}
-					})
-					.filter((val: any) => val !== "N/A")
-			: "N/A";
+		const groupDataByWeeks = () => {
+			const groupedData: any = {};
+			eventData?.forEach((item: any) => {
+				const occurredDate = new Date(item.date);
+				const weekStartDate = new Date(
+					occurredDate.getFullYear(),
+					occurredDate.getMonth(),
+					occurredDate.getDate() - occurredDate.getDay(),
+				);
+				const weekEndDate = new Date(
+					weekStartDate.getFullYear(),
+					weekStartDate.getMonth(),
+					weekStartDate.getDate() + 6,
+				);
+				const week = `${weekStartDate.toLocaleDateString()} - ${weekEndDate.toLocaleDateString()}`;
+				if (!groupedData[week]) {
+					groupedData[week] = [];
+				}
+				groupedData[week].push(item);
+			});
+			return groupedData;
+		};
 
-		const adherencePercentage =
-			percentage != "N/A" && !isEmpty(percentage)
-				? head(percentage)
-				: "N/A";
+		const groupDataByMonths = () => {
+			const groupedData: any = {};
+			eventData?.forEach((item: any) => {
+				const occurredDate = new Date(item.date);
+				const year = occurredDate.getFullYear();
+				const month = occurredDate.getMonth();
+				const monthStartDate = new Date(year, month, 1);
+				const monthEndDate = new Date(year, month + 1, 0);
+				const monthKey = `${monthStartDate.toLocaleDateString()} - ${monthEndDate.toLocaleDateString()}`;
+				if (!groupedData[monthKey]) {
+					groupedData[monthKey] = [];
+				}
+				groupedData[monthKey].push(item);
+			});
+			return groupedData;
+		};
+
+		const groupedData =
+			report.adherenceFrequency == "Weekly"
+				? groupDataByWeeks()
+				: report.adherenceFrequency == "Monthly"
+				? groupDataByMonths()
+				: {};
+
+		const priortizeData = (teiDataRow: any) => {
+			for (const key in teiDataRow) {
+				const objects = teiDataRow[key];
+				let found = false;
+				for (let i = 0; i < objects.length; i++) {
+					if (objects[i].event === "takenDose") {
+						found = true;
+						break;
+					}
+				}
+				if (found) {
+					teiDataRow[key] = objects.filter(
+						(obj: any) => obj.event === "takenDose",
+					);
+				}
+			}
+			return teiDataRow;
+		};
+
+		const transformData = (teiDataRow: any) => {
+			const resultArray = [];
+			for (const key in teiDataRow) {
+				if (teiDataRow[key].length > 0) {
+					resultArray.push(teiDataRow[key][0]);
+				}
+			}
+			return resultArray;
+		};
+
+		const events =
+			report.adherenceFrequency == "Daily"
+				? eventData
+				: transformData(priortizeData(groupedData));
+
+		const takenDose = events?.filter(
+			(event: any) => event.event === "takenDose",
+		).length;
+
+		const newPercentage =
+			((takenDose / events?.length) * 100).toFixed(2) + "%";
+
 		const lastOpened = DateTime.fromFormat(
 			report.lastOpened ?? "",
 			"yyyy-MM-dd HH:mm:ss",
@@ -621,20 +728,23 @@ export function sanitizeReportData(
 						programMapping.attributes?.phoneNumber ?? ""
 				],
 			adherenceFrequency: report.adherenceFrequency,
-			adherencePercentage: adherencePercentage,
-			adherenceStreak: downloadable
-				? report.adherenceFrequency
-				: getAdherenceStreak(
-						eventData ?? [],
-						report.adherenceFrequency,
-				  ),
+			adherencePercentage: newPercentage,
+			adherenceStreak: downloadable ? (
+				report.adherenceFrequency
+			) : (
+				<GetAdherenceStreakForReport
+					device={deviceIMEI}
+					events={eventData ?? []}
+					frequency={report.adherenceFrequency}
+				/>
+			),
 			numberOfMissedDoses: report.noOfSignal,
 			orgUnit: report.ouname,
 			deviceIMEI: deviceIMEI,
 			battery: downloadable ? (
 				(batteryLevel ?? "N/A").toString()
 			) : (
-				<BatteryLevel batteryLevel={batteryLevel} />
+				<BatteryLevel device={deviceIMEI} />
 			),
 			deviceIMEINumber: report.imei,
 			daysInUse: report.daysDeviceInUse,
@@ -647,4 +757,8 @@ export function sanitizeReportData(
 			),
 		};
 	});
+}
+
+function groupRowDataByEventDate(rowData: any[]): any[] {
+	return uniqBy(rowData, "eventdate");
 }

@@ -91,7 +91,7 @@ export default function RegimenTable({
 	}
 
 	function getMappedProgram(regimen: RegimenFormData) {
-		const attribute = head(
+		const attribute: any = head(
 			allRegimenOptions.filter(
 				(option) => regimen.regimen === option.code,
 			),
@@ -100,7 +100,11 @@ export default function RegimenTable({
 		const programName = head(
 			programMapping
 				.map((mapping: any) => {
-					return mapping.attributes.regimen === attribute?.attributeID
+					return mapping.attributes.regimen ===
+						attribute?.attributeId ||
+						mapping.regimenDataElements?.includes(
+							attribute?.attributeId,
+						)
 						? mapping.name
 						: null;
 				})

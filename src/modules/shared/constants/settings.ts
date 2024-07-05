@@ -39,6 +39,9 @@ export interface ProgramMapping {
 		deviceIMEInumber?: string;
 		episodeId?: string;
 	};
+	treatmentOutcomeProgramStages?: string[];
+	regimenProgramStages?: string[];
+	regimenDataElements?: string[];
 }
 
 export interface ReportColumn {
@@ -98,7 +101,7 @@ export const reports: ReportConfig[] = [
 
 			{
 				key: "adherencePercentage",
-				label: "Overall Adherence (%)",
+				label: "Periodic Adherence (%)",
 				path: "adherencePercentage",
 			},
 			{
@@ -167,7 +170,7 @@ export const reports: ReportConfig[] = [
 			},
 			{
 				key: "numberOfMissedDoses",
-				label: "Number of Missed Doses",
+				label: "Number of Missed Doses Across Selected Periods",
 				path: "numberOfMissedDoses",
 			},
 		],

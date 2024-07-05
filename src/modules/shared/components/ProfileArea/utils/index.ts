@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { DATA_ELEMENTS } from "../../../constants";
 import { useSearchParams } from "react-router-dom";
 import { getProgramMapping } from "../../../utils";
+import { isEmpty } from "lodash";
 
 export const useDeviceData = (imei?: string) => {
 	const [programMapping] = useSetting("programMapping", { global: true });
@@ -57,19 +58,37 @@ export const useDeviceData = (imei?: string) => {
 export const useAdherenceEvents = (data: any, programStage: string) => {
 	const filteredEvents = data
 		.filter((event: any) => event.programStage === programStage)
-		.map((event: any) => ({
-			dataValues: event.dataValues.filter(
-				(value: any) =>
-					value.dataElement === DATA_ELEMENTS.DEVICE_SIGNAL,
-			),
-			occurredAt: event.dataValues.filter(
+		.map((event: any) => {
+			const dosageTimeFromDOSAGE_TIME = event.dataValues.filter(
 				(value: any) => value.dataElement === DATA_ELEMENTS.DOSAGE_TIME,
-			),
-			batteryLevel: event.dataValues.filter(
-				(value: any) =>
-					value.dataElement === DATA_ELEMENTS.BATTERY_HEALTH,
-			),
-		}));
+			);
+
+			const dosageTimeFromDEVICE_SIGNAL = event.dataValues
+				.filter(
+					(value: any) =>
+						value.dataElement === DATA_ELEMENTS.DEVICE_SIGNAL,
+				)
+				.map((item: any) => ({
+					...item,
+					value: item.createdAt,
+				}));
+
+			const dosageTime = !isEmpty(dosageTimeFromDOSAGE_TIME)
+				? dosageTimeFromDOSAGE_TIME
+				: dosageTimeFromDEVICE_SIGNAL;
+
+			return {
+				dataValues: event.dataValues.filter(
+					(value: any) =>
+						value.dataElement === DATA_ELEMENTS.DEVICE_SIGNAL,
+				),
+				occurredAt: dosageTime,
+				batteryLevel: event.dataValues.filter(
+					(value: any) =>
+						value.dataElement === DATA_ELEMENTS.BATTERY_HEALTH,
+				),
+			};
+		});
 
 	return { filteredEvents };
 };

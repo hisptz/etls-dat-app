@@ -6,7 +6,6 @@ import { Pagination } from "@hisptz/dhis2-utils";
 
 import { FullPageLoader } from "../../../shared/components/Loaders";
 import { isEmpty } from "lodash";
-
 import {
 	ReportColumn,
 	ReportConfig,
@@ -74,8 +73,10 @@ export default function ReportTable({
 							{error ? null : (
 								<Download
 									enabled={
-										(!loading && !isEmpty(reports)) ||
-										(!loadingDevices && !isEmpty(data))
+										report?.id !==
+										"dat-device-summary-report"
+											? !loading && !isEmpty(reports)
+											: !loadingDevices && !isEmpty(data)
 									}
 									data={sanitizeReportData(
 										report?.id !==
@@ -87,6 +88,7 @@ export default function ReportTable({
 										programMapping,
 										true,
 										deviceList,
+										adherenceStreakData,
 									)}
 									columns={report.columns as ReportColumn[]}
 								/>
