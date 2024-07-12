@@ -9,6 +9,7 @@ import {
 	reduce,
 	uniqBy,
 	forEach,
+	compact,
 	flattenDeep,
 } from "lodash";
 import {
@@ -152,12 +153,14 @@ export function useReportTableData() {
 			(dataElement: string) => `${programStage}.${dataElement}`,
 		),
 	);
-	const dimensions: string[] = [
+	const dimensions: string[] = compact([
 		stage + "." + programMapping?.attributes?.patientNumber,
 		stage + "." + programMapping?.attributes?.firstName,
 		stage + "." + programMapping?.attributes?.surname,
 		stage + "." + programMapping?.attributes?.phoneNumber,
-		stage + "." + programMapping?.attributes?.regimen,
+		!isEmpty(programMapping?.attributes?.regimen ?? "")
+			? stage + "." + programMapping?.attributes?.regimen
+			: "",
 		stage + "." + programMapping?.attributes?.deviceIMEInumber,
 		stage + "." + DATA_ELEMENTS.DOSAGE_TIME,
 		stage +
@@ -168,7 +171,7 @@ export function useReportTableData() {
 				: reportType === "patients-who-missed-doses"
 				? ":IN:Heartbeat;None"
 				: ""),
-	];
+	]);
 
 	const groupedDimensions = filter(
 		[...regimenDataElements, dimensions],
