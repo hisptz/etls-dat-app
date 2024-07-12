@@ -164,7 +164,8 @@ function Calendar({ events, frequency, onClick }: CalendarProps) {
 			);
 
 			const takenDosePresent = filteredEvents.some(
-				(event) => event.event === "takenDose",
+				(event) =>
+					event.event === "takenDose" || event.event === "enrolled",
 			);
 
 			const currentDate = DateTime.now().toJSDate();

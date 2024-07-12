@@ -67,7 +67,10 @@ function AdherenceStreak({ events, frequency }: CalendarProps) {
 			const sanitizeEvents = () => {
 				let takenDoseFound = false;
 				const filteredArray = dailyEvents.filter((event) => {
-					if (event.event === "takenDose") {
+					if (
+						event.event === "takenDose" ||
+						event.event === "enrolled"
+					) {
 						takenDoseFound = true;
 						return true;
 					} else {
