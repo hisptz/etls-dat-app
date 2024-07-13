@@ -31,9 +31,7 @@ When(
 	function (fieldType: "text" | "select", fieldName: string, value: string) {
 		switch (fieldType) {
 			case "text":
-				cy.get(`input[name='${camelCase(fieldName)}']`)
-					.clear()
-					.type(value);
+				cy.get(`input[name='${fieldName}']`).clear().type(value);
 				break;
 			case "select":
 				cy.getWithDataTest(`{${fieldName}-content}`).click();

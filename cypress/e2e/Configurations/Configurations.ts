@@ -6,12 +6,11 @@ When(/^the user clicks on the "([^"]*)" tab$/, function (tab: string) {
 });
 
 Then(/^inputs the device as "([^"]*)"$/, function (device: string) {
-	cy.get(
-		':nth-child(3) > [data-test="dhis2-uicore-centeredcontent"] > .jsx-498096601 > [data-test="dhis2-uicore-modal"] > [data-test="dhis2-uicore-card"] > .jsx-1532202667 > [data-test="dhis2-uicore-modalcontent"] > [style="height: 300px;"] > :nth-child(2) > [data-test="dhis2-uiwidgets-inputfield"] > [data-test="dhis2-uiwidgets-inputfield-content"] > [data-test="dhis2-uicore-box"] > [data-test="dhis2-uicore-input"] > #deviceIMEInumber',
-	)
-		.click()
-		.clear()
-		.type(device);
+	cy.get("#IMEI").click().clear().type(device);
+});
+
+Then("the list should be updated succesfully", function () {
+	cy.get('[data-test="dhis2-uicore-alertbar"]').should("be.visible");
 });
 
 Then(/^edits the device as "([^"]*)"$/, function (device: string) {
@@ -42,13 +41,20 @@ Then("the user clicks on the Edit icon", function () {
 
 Then("the user clicks on the Delete icon", function () {
 	cy.get(
-		':nth-child(50) > :nth-child(3) > div > [data-test="undefined-Delete"] > a.jsx-2002348738 > .icon',
+		'[style="display: flex; flex-direction: row; height: 20px; width: 70px;"] > :nth-child(2)',
 	).click();
 });
 
-When(/^the user clicks on the "([^"]*)" tab$/, function (tab: string) {
-	const sanitizedTab = tab.replaceAll(" ", "-");
-	cy.getWithDataTest(`{${sanitizedTab}-tab-item}`).click();
+Then("the user clicks on the Delete icon of the program mapping", function () {
+	cy.get(
+		':nth-child(4) > :nth-child(5) > [style="display: flex; flex-direction: row; height: 20px; width: 70px;"] > :nth-child(2)',
+	).click();
+});
+
+Then("the user clicks on the Delete icon of the regimen setting", function () {
+	cy.get(
+		':nth-child(6) > :nth-child(6) > [style="display: flex; flex-direction: row; height: 20px; width: 70px;"] > :nth-child(2)',
+	).click();
 });
 
 Then(/^the "([^"]*)" settings should be visible$/, function (tab: string) {
