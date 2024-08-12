@@ -87,15 +87,11 @@ function EditDevice({
 							episodeID: episodeID,
 						}).then(async (res) => {
 							if (res?.updated != 0) {
-								await updateDevice(updatedDevices).then(
-									async () => {
-										show({
-											message: "Update successful",
-											type: { success: true },
-										});
-										refetch();
-									},
-								);
+								show({
+									message: "Update successful",
+									type: { success: true },
+								});
+								refetch();
 							} else if (res.ignored != 0) {
 								show({
 									message: `Could not update: ${res.error[0]?.value}`,
