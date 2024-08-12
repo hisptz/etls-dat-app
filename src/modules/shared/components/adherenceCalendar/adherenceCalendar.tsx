@@ -187,7 +187,7 @@ function AdherenceCalendar({ profile, data }: ProfileAreaProps) {
 											htmlFor="value"
 										>
 											{i18n.t(
-												`${profile.name} was enrolled into the system`,
+												`${profile.name} was enrolled into the DAT system`,
 											)}
 										</label>
 									</div>

@@ -1,6 +1,13 @@
 import i18n from "@dhis2/d2-i18n";
 import styles from "./ProfileArea.module.css";
-import { Button, IconEdit24, Card, ButtonStrip, IconClock24 } from "@dhis2/ui";
+import {
+	Button,
+	IconEdit24,
+	IconAdd24,
+	Card,
+	ButtonStrip,
+	IconClock24,
+} from "@dhis2/ui";
 import React, { useState } from "react";
 import EditDevice from "./EditDevice";
 import { PatientProfile } from "../../models";
@@ -241,7 +248,7 @@ export function ProfileArea({
 				<Card className={styles["profile-area"]}>
 					<div
 						className="row space-between gap-32 align-center"
-						style={{ marginBottom: "16px" }}
+						style={{ marginBottom: "8px" }}
 					>
 						<div style={{ alignItems: "flex-end" }} className="row">
 							<div>
@@ -250,19 +257,38 @@ export function ProfileArea({
 								</h2>
 							</div>
 						</div>
+					</div>
+					<div
+						className="row"
+						style={{
+							width: "100%",
+							justifyContent: "end",
+							marginBottom: "16px",
+						}}
+					>
 						<ButtonStrip>
 							<Button
 								secondary
-								icon={<IconEdit24 />}
+								small
+								icon={
+									profile.deviceIMEINumber == "N/A" ? (
+										<IconAdd24 />
+									) : (
+										<IconEdit24 />
+									)
+								}
 								onClick={() => {
 									setHideDevice(false);
 								}}
 							>
-								{i18n.t("Edit Device")}
+								{profile.deviceIMEINumber == "N/A"
+									? i18n.t("Connect Device")
+									: i18n.t("Edit Device")}
 							</Button>
 							{profile.deviceIMEINumber == "N/A" ? null : (
 								<Button
 									secondary
+									small
 									icon={<IconClock24 />}
 									onClick={() => {
 										setHideAlarm(false);
