@@ -9,16 +9,12 @@ import {
 	IconClock24,
 } from "@dhis2/ui";
 import React, { useState } from "react";
-import EditDevice from "./EditDevice";
+import EditDevice from "./components/EditDevice";
 import { PatientProfile } from "../../models";
-import EditAlarm from "./AddAlarm";
-import NoDeviceAssigned from "./NoDeviceAssigned";
+import EditAlarm from "./components/AddAlarm";
+import NoDeviceAssigned from "./components/NoDeviceAssigned";
 import { DateTime } from "luxon";
-import { useAdherenceEvents } from "./utils";
-import { useSetting } from "@dhis2/app-service-datastore";
-import { useSearchParams } from "react-router-dom";
 import BatteryLevel from "../BatteryLevel/BatteryLevel";
-import { getProgramMapping } from "../../utils";
 import DoseStatus from "../doseStatus/doseStatus";
 import AdherenceCalendar from "../adherenceCalendar/adherenceCalendar";
 
@@ -38,38 +34,21 @@ export function ProfileArea({
 	loading,
 }: ProfileAreaProps) {
 	const [hide, setHideDevice] = useState<boolean>(true);
-	const [params] = useSearchParams();
-	const [hideAlarm, setHideAlarm] = useState<boolean>(true);
+	const [hideAlarmButton, setHideAlarmButton] = useState<boolean>(true);
+	const [hideRemoveDeviceButton, setHideRemoveDeviceButton] =
+		useState<boolean>(true);
 	const [nextRefillDate, setNextRefillDate] = useState<string>("");
 	const [nextRefillTime, setNextRefillTime] = useState<string>("");
 	const [nextDoseTime, setNextDoseTime] = useState<string>("");
 	const [dayInweek, setDayInWeek] = useState<string>("");
-	const [programMapping] = useSetting("programMapping", {
-		global: true,
-	});
-	const currentProgram = params.get("program");
-
-	const program = getProgramMapping(programMapping, currentProgram);
-
-	const { filteredEvents } = useAdherenceEvents(
-		profile.events,
-		program?.programStage ?? "",
-	);
 
 	const onHide = () => {
 		setHideDevice(true);
 	};
 
 	const onHideAlarm = () => {
-		setHideAlarm(true);
+		setHideAlarmButton(true);
 	};
-
-	const takenDoses = filteredEvents.filter((item: any) => {
-		return item.dataValues.some((dataValue: any) => {
-			const value = dataValue.value;
-			return value === "Once" || value === "Multiple";
-		});
-	});
 
 	const totalOpenings = data?.deviceOpenings ?? "N/A";
 
@@ -291,7 +270,7 @@ export function ProfileArea({
 									small
 									icon={<IconClock24 />}
 									onClick={() => {
-										setHideAlarm(false);
+										setHideAlarmButton(false);
 										setNextRefillDate(
 											DateTime.fromFormat(
 												data?.refillAlarm ?? "",
@@ -441,28 +420,30 @@ export function ProfileArea({
 					height: "auto",
 				}}
 			>
-				<Card>
-					<div style={{ padding: "12px 32px 12px 32px" }}>
-						<div
-							style={{
-								display: "flex",
-								flexDirection: "row",
-								flexWrap: "wrap",
-							}}
-						>
-							{dose.map((dose, index) => {
-								return (
-									<DoseStatus
-										key={index}
-										color={dose.color}
-										status={dose.status}
-									/>
-								);
-							})}
+				{profile.deviceIMEINumber !== "N/A" && (
+					<Card>
+						<div style={{ padding: "12px 32px 12px 32px" }}>
+							<div
+								style={{
+									display: "flex",
+									flexDirection: "row",
+									flexWrap: "wrap",
+								}}
+							>
+								{dose.map((dose, index) => {
+									return (
+										<DoseStatus
+											key={index}
+											color={dose.color}
+											status={dose.status}
+										/>
+									);
+								})}
+							</div>
+							<AdherenceCalendar profile={profile} data={data} />
 						</div>
-						<AdherenceCalendar profile={profile} data={data} />
-					</div>
-				</Card>
+					</Card>
+				)}
 			</div>
 
 			{!hide && (
@@ -479,7 +460,7 @@ export function ProfileArea({
 					onHide={onHide}
 				/>
 			)}
-			{!hideAlarm && (
+			{!hideAlarmButton && (
 				<EditAlarm
 					nextRefillDate={
 						nextRefillDate != "Invalid DateTime"
@@ -498,7 +479,7 @@ export function ProfileArea({
 					alarmStatus={alarmStatus}
 					refillAlarmStatus={refillAlarmStatus}
 					refetch={refetchDevice}
-					hide={hideAlarm}
+					hide={hideAlarmButton}
 					onHide={onHideAlarm}
 					device={profile.deviceIMEINumber}
 					frequency={profile.adherenceFrequency}
