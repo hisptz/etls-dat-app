@@ -84,13 +84,11 @@ export class PatientProfile extends TrackedEntityModel {
 
 	getRegimenFromDataElements(): string {
 		let regimen = "";
-
 		const regimenEvents = (
 			this.programMapping?.regimenProgramStages ?? []
 		).map((programStage) => {
-			return this.getLatestEvent(programStage);
+			return this.getLatestEvent(programStage) ?? {};
 		});
-
 		const latestRegimenEvent = head(
 			(regimenEvents ?? []).sort((a: any, b: any) => {
 				return (

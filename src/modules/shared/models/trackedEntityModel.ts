@@ -54,16 +54,16 @@ export class TrackedEntityModel {
 	getLatestEvent(
 		programStage: string,
 	): WebapiControllerTrackerViewRelationshipItem_Event | undefined {
-		return head(
-			this.events
-				.sort((a: any, b: any) => {
-					return (
-						new Date(b.eventDate).getTime() -
-						new Date(a.eventDate).getTime()
-					);
-				})
-				.filter((event) => event.programStage === programStage),
-		);
+		let filteredEvents = [...this.events]
+			.sort((a: any, b: any) => {
+				return (
+					new Date(b.eventDate).getTime() -
+					new Date(a.eventDate).getTime()
+				);
+			})
+			.filter((event) => event.programStage === programStage);
+		const event = filteredEvents.length ? head(filteredEvents) : undefined;
+		return event;
 	}
 
 	getLatestEventValue(programStage: string, dataElement: string): string {
