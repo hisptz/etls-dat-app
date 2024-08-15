@@ -484,7 +484,7 @@ export function ProfileArea({
 					onConfirm={() => {
 						setHideDeviceUnassignbutton(true);
 					}}
-					refetch={refetchDevice}
+					refetch={refetch}
 				/>
 			)}
 			{!hideAlarmButton && (
