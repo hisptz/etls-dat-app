@@ -36,6 +36,7 @@ export function useAssignDevice() {
 		({ type }) => ({ ...type, duration: 3000 }),
 	);
 
+	// TODO update this to new tracker API
 	const trackedEntityAttributesMutation: any = {
 		type: "create",
 		resource: "trackedEntityInstances",

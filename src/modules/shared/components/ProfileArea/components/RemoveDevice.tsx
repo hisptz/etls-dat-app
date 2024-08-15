@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import i18n from "@dhis2/d2-i18n";
 import {
 	Button,
@@ -32,9 +32,11 @@ export default function RemoveDeviceModal({
 		({ message }) => message,
 		({ type }) => ({ ...type, duration: 3000 }),
 	);
+	const [removing, setRemoving] = useState<boolean>(false);
 	const { unassignDevice, unassignDeviceWisePill } = useAssignDevice();
 
-	const onSave = async () => {
+	const onRemoveDevice = async () => {
+		setRemoving(true);
 		try {
 			await unassignDeviceWisePill({ imei }).then(
 				async (wisepillResponse) => {
@@ -56,20 +58,23 @@ export default function RemoveDeviceModal({
 								});
 							}
 						});
+					} else {
+						show({
+							message: "Could not remove device",
+							type: { critical: true },
+						});
 					}
 				},
 			);
-
+			setRemoving(true);
 			onConfirm();
-			show({
-				message: i18n.t("Device removed successfully"),
-				type: { success: true },
-			});
 		} catch (error) {
+			setRemoving(true);
 			show({
 				message: i18n.t("Failed to remove device"),
 				type: { warning: true },
 			});
+			onClose();
 		}
 	};
 
@@ -84,7 +89,11 @@ export default function RemoveDeviceModal({
 			<ModalActions>
 				<ButtonStrip>
 					<Button onClick={onClose}>{i18n.t("Cancel")}</Button>
-					<Button destructive onClick={onConfirm}>
+					<Button
+						loading={removing}
+						destructive
+						onClick={onRemoveDevice}
+					>
 						{i18n.t("Remove")}
 					</Button>
 				</ButtonStrip>
