@@ -1,6 +1,6 @@
 {
 	"name": "etls-data-app",
-	"version": "1.0.6-bugfix-1-DEPRECATED",
+	"version": "1.0.7",
 	"description": "",
 	"license": "BSD-3-Clause",
 	"private": true,
@@ -56,7 +56,7 @@
 		"@dhis2/app-service-datastore": "^1.0.0-beta.3",
 		"@dhis2/ui": "^9.2.0",
 		"@hisptz/dhis2-analytics": "^1.0.61",
-		"@hisptz/dhis2-ui": "^1.0.55",
+		"@hisptz/dhis2-ui": "^1.0.69",
 		"@hisptz/dhis2-utils": "^1.0.58",
 		"@hookform/resolvers": "^3.3.0",
 		"async-es": "^3.2.5",

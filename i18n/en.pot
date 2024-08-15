@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2024-05-07T09:29:12.800Z\n"
-"PO-Revision-Date: 2024-05-07T09:29:12.800Z\n"
+"POT-Creation-Date: 2024-08-15T04:03:55.658Z\n"
+"PO-Revision-Date: 2024-08-15T04:03:55.658Z\n"
 
 msgid "Configurations"
 msgstr "Configurations"
@@ -332,6 +332,18 @@ msgstr "Time"
 msgid "Assign the device number, or click clear to clear previous device"
 msgstr "Assign the device number, or click clear to clear previous device"
 
+msgid "Device removed successfully"
+msgstr "Device removed successfully"
+
+msgid "Failed to remove device"
+msgstr "Failed to remove device"
+
+msgid "Remove Device"
+msgstr "Remove Device"
+
+msgid "Remove"
+msgstr "Remove"
+
 msgid "Patient Summary"
 msgstr "Patient Summary"
 
@@ -343,6 +355,9 @@ msgstr "Phone"
 
 msgid "DAT Device Information"
 msgstr "DAT Device Information"
+
+msgid "Connect Device"
+msgstr "Connect Device"
 
 msgid "Edit Device"
 msgstr "Edit Device"
