@@ -137,8 +137,71 @@ export function useAssignDevice() {
 		}
 	};
 
+	const handleUnassignDevice = async () => {
+		const updatedAttributes =
+			attributeIndex === -1
+				? [
+						...patientTei!.attributes,
+						{
+							attribute: DEVICE_IMEI,
+							value: null,
+						},
+				  ]
+				: patientTei!.attributes.map((attribute, index) =>
+						index === attributeIndex
+							? { ...attribute, value: null }
+							: attribute,
+				  );
+		const updatedTei = {
+			attributes: updatedAttributes,
+			trackedEntityInstance,
+			orgUnit,
+		};
+
+		const res = (await update({
+			data: { trackedEntityInstances: [updatedTei] },
+		})) as any;
+
+		return {
+			updated: res?.response.importSummaries[0].importCount.updated,
+			ignored: res?.response.importSummaries[0].importCount.ignored,
+			error: res?.response.importSummaries[0].conflicts,
+		};
+	};
+
+	const handleUnassignDeviceFromWisepill = async ({
+		imei,
+	}: {
+		imei: string;
+	}) => {
+		let loading = true;
+		try {
+			const response = await axios.put(
+				`${MediatorUrl}/api/devices/unassign?imei=${imei}`,
+				{},
+				{
+					headers: {
+						"x-api-key": ApiKey,
+					},
+				},
+			);
+			loading = false;
+
+			return {
+				response: response,
+				error: null,
+				loading,
+			};
+		} catch (error: any) {
+			loading = false;
+			return { response: null, error, loading };
+		}
+	};
+
 	return {
 		assignDevice: handleAssignDevice,
 		assignDeviceWisePill: handleAssignDeviceToWisepill,
+		unassignDevice: handleUnassignDevice,
+		unassignDeviceWisePill: handleUnassignDeviceFromWisepill,
 	};
 }
