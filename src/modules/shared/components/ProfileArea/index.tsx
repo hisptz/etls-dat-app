@@ -1,19 +1,24 @@
 import i18n from "@dhis2/d2-i18n";
 import styles from "./ProfileArea.module.css";
-import { Button, IconEdit24, Card, ButtonStrip, IconClock24 } from "@dhis2/ui";
+import {
+	Button,
+	IconEdit24,
+	IconAdd24,
+	IconDelete24,
+	Card,
+	ButtonStrip,
+	IconClock24,
+} from "@dhis2/ui";
 import React, { useState } from "react";
-import EditDevice from "./EditDevice";
+import EditDevice from "./components/EditDevice";
 import { PatientProfile } from "../../models";
-import EditAlarm from "./AddAlarm";
-import NoDeviceAssigned from "./NoDeviceAssigned";
+import EditAlarm from "./components/AddAlarm";
+import NoDeviceAssigned from "./components/NoDeviceAssigned";
 import { DateTime } from "luxon";
-import { useAdherenceEvents } from "./utils";
-import { useSetting } from "@dhis2/app-service-datastore";
-import { useSearchParams } from "react-router-dom";
 import BatteryLevel from "../BatteryLevel/BatteryLevel";
-import { getProgramMapping } from "../../utils";
 import DoseStatus from "../doseStatus/doseStatus";
 import AdherenceCalendar from "../adherenceCalendar/adherenceCalendar";
+import RemoveDeviceModal from "./components/RemoveDevice";
 
 export interface ProfileAreaProps {
 	profile: PatientProfile;
@@ -31,38 +36,21 @@ export function ProfileArea({
 	loading,
 }: ProfileAreaProps) {
 	const [hide, setHideDevice] = useState<boolean>(true);
-	const [params] = useSearchParams();
-	const [hideAlarm, setHideAlarm] = useState<boolean>(true);
+	const [hideDeviceUnassignButton, setHideDeviceUnassignbutton] =
+		useState<boolean>(true);
+	const [hideAlarmButton, setHideAlarmButton] = useState<boolean>(true);
 	const [nextRefillDate, setNextRefillDate] = useState<string>("");
 	const [nextRefillTime, setNextRefillTime] = useState<string>("");
 	const [nextDoseTime, setNextDoseTime] = useState<string>("");
 	const [dayInweek, setDayInWeek] = useState<string>("");
-	const [programMapping] = useSetting("programMapping", {
-		global: true,
-	});
-	const currentProgram = params.get("program");
-
-	const program = getProgramMapping(programMapping, currentProgram);
-
-	const { filteredEvents } = useAdherenceEvents(
-		profile.events,
-		program?.programStage ?? "",
-	);
 
 	const onHide = () => {
 		setHideDevice(true);
 	};
 
 	const onHideAlarm = () => {
-		setHideAlarm(true);
+		setHideAlarmButton(true);
 	};
-
-	const takenDoses = filteredEvents.filter((item: any) => {
-		return item.dataValues.some((dataValue: any) => {
-			const value = dataValue.value;
-			return value === "Once" || value === "Multiple";
-		});
-	});
 
 	const totalOpenings = data?.deviceOpenings ?? "N/A";
 
@@ -241,7 +229,7 @@ export function ProfileArea({
 				<Card className={styles["profile-area"]}>
 					<div
 						className="row space-between gap-32 align-center"
-						style={{ marginBottom: "16px" }}
+						style={{ marginBottom: "8px" }}
 					>
 						<div style={{ alignItems: "flex-end" }} className="row">
 							<div>
@@ -250,22 +238,52 @@ export function ProfileArea({
 								</h2>
 							</div>
 						</div>
+					</div>
+					<div
+						className="row"
+						style={{
+							width: "100%",
+							justifyContent: "end",
+							marginBottom: "16px",
+						}}
+					>
 						<ButtonStrip>
+							{profile.deviceIMEINumber !== "N/A" && (
+								<Button
+									small
+									onClick={() => {
+										setHideDeviceUnassignbutton(false);
+									}}
+									icon={<IconDelete24 />}
+								>
+									{i18n.t("Remove Device")}
+								</Button>
+							)}
 							<Button
 								secondary
-								icon={<IconEdit24 />}
+								small
+								icon={
+									profile.deviceIMEINumber == "N/A" ? (
+										<IconAdd24 />
+									) : (
+										<IconEdit24 />
+									)
+								}
 								onClick={() => {
 									setHideDevice(false);
 								}}
 							>
-								{i18n.t("Edit Device")}
+								{profile.deviceIMEINumber == "N/A"
+									? i18n.t("Connect Device")
+									: i18n.t("Edit Device")}
 							</Button>
 							{profile.deviceIMEINumber == "N/A" ? null : (
 								<Button
 									secondary
+									small
 									icon={<IconClock24 />}
 									onClick={() => {
-										setHideAlarm(false);
+										setHideAlarmButton(false);
 										setNextRefillDate(
 											DateTime.fromFormat(
 												data?.refillAlarm ?? "",
@@ -415,28 +433,30 @@ export function ProfileArea({
 					height: "auto",
 				}}
 			>
-				<Card>
-					<div style={{ padding: "12px 32px 12px 32px" }}>
-						<div
-							style={{
-								display: "flex",
-								flexDirection: "row",
-								flexWrap: "wrap",
-							}}
-						>
-							{dose.map((dose, index) => {
-								return (
-									<DoseStatus
-										key={index}
-										color={dose.color}
-										status={dose.status}
-									/>
-								);
-							})}
+				{profile.deviceIMEINumber !== "N/A" && (
+					<Card>
+						<div style={{ padding: "12px 32px 12px 32px" }}>
+							<div
+								style={{
+									display: "flex",
+									flexDirection: "row",
+									flexWrap: "wrap",
+								}}
+							>
+								{dose.map((dose, index) => {
+									return (
+										<DoseStatus
+											key={index}
+											color={dose.color}
+											status={dose.status}
+										/>
+									);
+								})}
+							</div>
+							<AdherenceCalendar profile={profile} data={data} />
 						</div>
-						<AdherenceCalendar profile={profile} data={data} />
-					</div>
-				</Card>
+					</Card>
+				)}
 			</div>
 
 			{!hide && (
@@ -453,7 +473,21 @@ export function ProfileArea({
 					onHide={onHide}
 				/>
 			)}
-			{!hideAlarm && (
+			{!hideDeviceUnassignButton && (
+				<RemoveDeviceModal
+					patientName={profile.name}
+					imei={profile.deviceIMEINumber}
+					hide={hideDeviceUnassignButton}
+					onClose={() => {
+						setHideDeviceUnassignbutton(true);
+					}}
+					onConfirm={() => {
+						setHideDeviceUnassignbutton(true);
+					}}
+					refetch={refetchDevice}
+				/>
+			)}
+			{!hideAlarmButton && (
 				<EditAlarm
 					nextRefillDate={
 						nextRefillDate != "Invalid DateTime"
@@ -472,7 +506,7 @@ export function ProfileArea({
 					alarmStatus={alarmStatus}
 					refillAlarmStatus={refillAlarmStatus}
 					refetch={refetchDevice}
-					hide={hideAlarm}
+					hide={hideAlarmButton}
 					onHide={onHideAlarm}
 					device={profile.deviceIMEINumber}
 					frequency={profile.adherenceFrequency}

@@ -8,7 +8,7 @@ import { useSearchParams } from "react-router-dom";
 import { PatientProfile } from "../../models";
 import { getProgramMapping } from "../../utils";
 import { useAdherenceEvents } from "../ProfileArea/utils";
-import NoDeviceAssigned from "../ProfileArea/NoDeviceAssigned";
+import NoDeviceAssigned from "../ProfileArea/components/NoDeviceAssigned";
 import BatteryLevel from "../BatteryLevel/BatteryLevel";
 
 export interface ProfileAreaProps {
@@ -187,7 +187,7 @@ function AdherenceCalendar({ profile, data }: ProfileAreaProps) {
 											htmlFor="value"
 										>
 											{i18n.t(
-												`${profile.name} was enrolled into the system`,
+												`${profile.name} was enrolled into the DAT system`,
 											)}
 										</label>
 									</div>

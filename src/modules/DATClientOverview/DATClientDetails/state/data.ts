@@ -7,9 +7,9 @@ import { DataEngineState } from "../../../shared/state";
 
 const query: any = {
 	patient: {
-		resource: "tracker/trackedEntities",
+		resource: "trackedEntityInstances",
 		params: ({ id, program }: { id: string; program: string }) => ({
-			trackedEntity: id,
+			trackedEntityInstance: id,
 			ouMode: "ACCESSIBLE",
 			program: program,
 			fields: TEI_FIELDS,
@@ -36,7 +36,9 @@ export const PatientState = selectorFamily<
 				},
 			});
 
-			const trackedEntity = head((response?.patient as any)?.instances);
+			const trackedEntity = head(
+				(response?.patient as any)?.trackedEntityInstances,
+			);
 
 			if (!trackedEntity) {
 				throw Error(

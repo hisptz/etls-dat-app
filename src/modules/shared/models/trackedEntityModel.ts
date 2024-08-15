@@ -10,6 +10,7 @@ import { SHARED_ATTRIBUTES } from "../constants";
 export class TrackedEntityModel {
 	public instance?: TrackedEntity;
 	public trackedEntity?: string;
+	public trackedEntityInstance?: string;
 	public attributes?: TrackedEntity["attributes"] = [];
 	public enrollment?: WebapiControllerTrackerViewRelationshipItem_Enrollment;
 	public events: Array<WebapiControllerTrackerViewRelationshipItem_Event> =
@@ -20,14 +21,14 @@ export class TrackedEntityModel {
 
 	constructor(trackedEntity?: TrackedEntity) {
 		const {
-			trackedEntity: teiId,
+			trackedEntityInstance: teiId,
 			enrollments,
 			attributes,
 			orgUnit,
 			...meta
 		} = trackedEntity ?? {};
 
-		this.trackedEntity = teiId ?? uid();
+		this.trackedEntityInstance = teiId ?? uid();
 
 		if (trackedEntity) {
 			this.attributes = attributes;
@@ -53,16 +54,16 @@ export class TrackedEntityModel {
 	getLatestEvent(
 		programStage: string,
 	): WebapiControllerTrackerViewRelationshipItem_Event | undefined {
-		return head(
-			this.events
-				.sort((a, b) => {
-					return (
-						new Date(b.occurredAt).getTime() -
-						new Date(a.occurredAt).getTime()
-					);
-				})
-				.filter((event) => event.programStage === programStage),
-		);
+		let filteredEvents = [...this.events]
+			.sort((a: any, b: any) => {
+				return (
+					new Date(b.eventDate).getTime() -
+					new Date(a.eventDate).getTime()
+				);
+			})
+			.filter((event) => event.programStage === programStage);
+		const event = filteredEvents.length ? head(filteredEvents) : undefined;
+		return event;
 	}
 
 	getLatestEventValue(programStage: string, dataElement: string): string {
@@ -78,6 +79,7 @@ export class TrackedEntityModel {
 		return {
 			orgUnit: this.orgUnit as string,
 			trackedEntity: this.trackedEntity as string,
+			trackedEntityInstance: this.trackedEntityInstance as string,
 			attributes: this.attributes as any[],
 			enrollments: [
 				{

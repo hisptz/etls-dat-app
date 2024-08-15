@@ -18,28 +18,26 @@ import { getProgramMapping } from "../../../../shared/utils";
 
 const query: any = {
 	patients: {
-		resource: "tracker/trackedEntities",
+		resource: "trackedEntityInstances",
 		params: ({
 			page,
 			pageSize,
 			filters,
-
 			program,
-			orgUnit,
+			ou,
 			order,
 		}: {
 			page: number;
 			pageSize: number;
 			filters?: string[];
 			program: string;
-			orgUnit?: string;
+			ou?: string;
 			order?: string;
 		}) => ({
 			pageSize,
 			page,
-
 			program,
-			orgUnit,
+			ou,
 			rootJunction: "OR",
 			filter: filters,
 			totalPages: true,
@@ -52,10 +50,13 @@ const query: any = {
 
 type Data = {
 	patients: {
-		instances: TrackedEntity[];
-		page: number;
-		pageSize: number;
-		total: number;
+		trackedEntityInstances: TrackedEntity[];
+		pager: {
+			page: number;
+			pageCount: number;
+			total: number;
+			pageSize: number;
+		};
 	};
 };
 
@@ -128,7 +129,7 @@ export function useDATAssignmentTableData() {
 	const [params] = useSearchParams();
 	const currentProgram = params.get("program");
 
-	const orgUnit =
+	const ou =
 		params.get("ou") ??
 		defaultOrganizationUnit.map(({ id }) => id).join(";");
 	const mapping = getProgramMapping(programMapping, currentProgram) ?? {};
@@ -137,10 +138,9 @@ export function useDATAssignmentTableData() {
 			page: 1,
 			pageSize: 10,
 			program: mapping?.program,
-
 			filters,
-			orgUnit,
-			order: `${mapping?.attributes?.deviceIMEInumber}:desc,enrolledAt:desc`,
+			ou,
+			order: `${mapping?.attributes?.deviceIMEInumber}:desc,created:desc`,
 		},
 
 		lazy: !mapping || isEmpty(programMapping),
@@ -151,7 +151,7 @@ export function useDATAssignmentTableData() {
 		refetch({
 			page,
 			filters,
-			orgUnit,
+			ou,
 		});
 	};
 	const onPageSizeChange = (pageSize: number) => {
@@ -159,7 +159,7 @@ export function useDATAssignmentTableData() {
 			page: 1,
 			pageSize,
 			filters,
-			orgUnit,
+			ou,
 		});
 	};
 
@@ -180,7 +180,7 @@ export function useDATAssignmentTableData() {
 	useEffect(() => {
 		if (data) {
 			const rawData =
-				data?.patients.instances.map((tei) => {
+				data?.patients.trackedEntityInstances.map((tei) => {
 					return new PatientProfile(tei, mapping, regimenSetting);
 				}) ?? [];
 
@@ -193,14 +193,14 @@ export function useDATAssignmentTableData() {
 				? refetch({
 						page: (currentPage ?? 2) - 1,
 						filters,
-						orgUnit,
+						ou,
 				  })
 				: null;
 
 			setPatients(sanitizedData ?? []);
 			setPagination({
-				page: data?.patients.page,
-				pageSize: data?.patients.pageSize,
+				page: data?.patients.pager.page,
+				pageSize: data?.patients.pager.pageSize,
 				isLastPage: lastPage,
 			});
 		}
@@ -208,12 +208,12 @@ export function useDATAssignmentTableData() {
 
 	useEffect(() => {
 		if (!isEmpty(programMapping)) {
-			refetch({ program: mapping?.program, page: 1, filters, orgUnit });
+			refetch({ program: mapping?.program, page: 1, filters, ou });
 		}
 	}, [currentProgram]);
 
 	const refreshingData = async () => {
-		await refetch({ program: mapping?.program, page: 1, filters, orgUnit });
+		await refetch({ program: mapping?.program, page: 1, filters, ou });
 		setLoading(false);
 	};
 
@@ -234,9 +234,9 @@ export function useDATAssignmentTableData() {
 	});
 
 	const onDownload = (type: "xlsx" | "csv" | "json") => {
-		if (!isEmpty(orgUnit)) {
+		if (!isEmpty(ou)) {
 			download(type, {
-				orgUnit,
+				ou,
 				filters,
 				program: DAT_PROGRAM(),
 			});
@@ -247,7 +247,7 @@ export function useDATAssignmentTableData() {
 		if (sort.direction === "default") {
 			sort.name === "treatmentStart"
 				? refetch({
-						order: `${mapping.attributes?.deviceIMEInumber}:desc,enrolledAt:asc`,
+						order: `${mapping.attributes?.deviceIMEInumber}:desc,created:asc`,
 				  })
 				: mapping.attributes
 				? sort.name === "name"
@@ -266,7 +266,7 @@ export function useDATAssignmentTableData() {
 		if (sort.direction === "asc") {
 			sort.name === "treatmentStart"
 				? refetch({
-						order: `${mapping.attributes?.deviceIMEInumber}:desc,enrolledAt:asc`,
+						order: `${mapping.attributes?.deviceIMEInumber}:desc,created:asc`,
 				  })
 				: mapping.attributes
 				? sort.name === "name"
@@ -283,7 +283,7 @@ export function useDATAssignmentTableData() {
 		} else {
 			sort.name === "treatmentStart"
 				? refetch({
-						order: `${mapping.attributes?.deviceIMEInumber}:desc,enrolledAt:desc`,
+						order: `${mapping.attributes?.deviceIMEInumber}:desc,created:desc`,
 				  })
 				: mapping.attributes
 				? sort.name === "name"

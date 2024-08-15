@@ -19,26 +19,26 @@ import { useAdherenceEvents } from "../../../../shared/components/ProfileArea/ut
 
 const query: any = {
 	patients: {
-		resource: "tracker/trackedEntities",
+		resource: "trackedEntityInstances",
 		params: ({
 			page,
 			pageSize,
 			filters,
 			program,
-			orgUnit,
+			ou,
 			order,
 		}: {
 			page: number;
 			pageSize: number;
 			filters?: string[];
 			program: string;
-			orgUnit?: string;
+			ou?: string;
 			order?: string;
 		}) => ({
 			pageSize,
 			page,
 			program,
-			orgUnit,
+			ou,
 			rootJunction: "OR",
 			filter: filters,
 			totalPages: true,
@@ -51,10 +51,13 @@ const query: any = {
 
 type Data = {
 	patients: {
-		instances: TrackedEntity[];
-		page: number;
-		pageSize: number;
-		total: number;
+		trackedEntityInstances: TrackedEntity[];
+		pager: {
+			page: number;
+			pageCount: number;
+			total: number;
+			pageSize: number;
+		};
 	};
 };
 
@@ -130,7 +133,7 @@ export function useDATClientTableData() {
 	const [params] = useSearchParams();
 	const currentProgram = params.get("program");
 
-	const orgUnit =
+	const ou =
 		params.get("ou") ??
 		defaultOrganizationUnit.map(({ id }) => id).join(";");
 	const mapping = getProgramMapping(programMapping, currentProgram) ?? {};
@@ -140,8 +143,8 @@ export function useDATClientTableData() {
 			pageSize: 10,
 			program: mapping?.program,
 			filters,
-			orgUnit,
-			order: `${mapping?.attributes?.deviceIMEInumber}:asc,enrolledAt:desc`,
+			ou,
+			order: `${mapping?.attributes?.deviceIMEInumber}:asc,created:desc`,
 		},
 
 		lazy: !mapping || isEmpty(programMapping),
@@ -152,7 +155,7 @@ export function useDATClientTableData() {
 		refetch({
 			page,
 			filters,
-			orgUnit,
+			ou,
 		});
 	};
 	const onPageSizeChange = (pageSize: number) => {
@@ -160,7 +163,7 @@ export function useDATClientTableData() {
 			page: 1,
 			pageSize,
 			filters,
-			orgUnit,
+			ou,
 		});
 	};
 
@@ -184,7 +187,7 @@ export function useDATClientTableData() {
 	useEffect(() => {
 		if (data) {
 			const rawData =
-				data?.patients.instances.map((tei) => {
+				data?.patients.trackedEntityInstances.map((tei) => {
 					return new PatientProfile(tei, mapping, regimenSetting);
 				}) ?? [];
 
@@ -196,14 +199,14 @@ export function useDATClientTableData() {
 				? refetch({
 						page: (currentPage ?? 2) - 1,
 						filters,
-						orgUnit,
+						ou,
 				  })
 				: null;
 
 			setPatients(sanitizedData ?? []);
 			setPagination({
-				page: data?.patients.page,
-				pageSize: data?.patients.pageSize,
+				page: data?.patients.pager.page,
+				pageSize: data?.patients.pager.pageSize,
 				isLastPage: lastPage,
 			});
 		}
@@ -211,12 +214,12 @@ export function useDATClientTableData() {
 
 	useEffect(() => {
 		if (!isEmpty(programMapping)) {
-			refetch({ program: mapping?.program, page: 1, filters, orgUnit });
+			refetch({ program: mapping?.program, page: 1, filters, ou });
 		}
 	}, [currentProgram]);
 
 	const refreshingData = async () => {
-		await refetch({ program: mapping?.program, page: 1, filters, orgUnit });
+		await refetch({ program: mapping?.program, page: 1, filters, ou });
 		setLoading(false);
 	};
 
@@ -237,9 +240,9 @@ export function useDATClientTableData() {
 	});
 
 	const onDownload = (type: "xlsx" | "csv" | "json") => {
-		if (!isEmpty(orgUnit)) {
+		if (!isEmpty(ou)) {
 			download(type, {
-				orgUnit,
+				ou,
 				filters,
 				program: DAT_PROGRAM(),
 			});
@@ -250,7 +253,7 @@ export function useDATClientTableData() {
 		if (sort.direction === "default") {
 			sort.name === "treatmentStart"
 				? refetch({
-						order: `${mapping.attributes?.deviceIMEInumber}:asc,enrolledAt:asc`,
+						order: `${mapping.attributes?.deviceIMEInumber}:asc,created:asc`,
 				  })
 				: mapping.attributes
 				? sort.name === "name"
@@ -269,7 +272,7 @@ export function useDATClientTableData() {
 		if (sort.direction === "asc") {
 			sort.name === "treatmentStart"
 				? refetch({
-						order: `${mapping.attributes?.deviceIMEInumber}:asc,enrolledAt:asc`,
+						order: `${mapping.attributes?.deviceIMEInumber}:asc,created:asc`,
 				  })
 				: mapping.attributes
 				? sort.name === "name"
@@ -286,7 +289,7 @@ export function useDATClientTableData() {
 		} else {
 			sort.name === "treatmentStart"
 				? refetch({
-						order: `${mapping.attributes?.deviceIMEInumber}:asc,enrolledAt:desc`,
+						order: `${mapping.attributes?.deviceIMEInumber}:asc,created:desc`,
 				  })
 				: mapping.attributes
 				? sort.name === "name"

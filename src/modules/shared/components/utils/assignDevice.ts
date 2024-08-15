@@ -29,29 +29,28 @@ export function useAssignDevice() {
 		(attribute) => attribute.attribute === EPISODE_ID,
 	);
 
-	const { trackedEntity, trackedEntityType, orgUnit } =
-		patientTei as TrackedEntity;
+	const { trackedEntityInstance, orgUnit } = patientTei as TrackedEntity;
 
 	const { show } = useAlert(
 		({ message }) => message,
 		({ type }) => ({ ...type, duration: 3000 }),
 	);
 
+	// TODO update this to new tracker API
 	const trackedEntityAttributesMutation: any = {
 		type: "create",
-		resource: "tracker",
+		resource: "trackedEntityInstances",
 		params: {
-			async: false,
+			strategy: "CREATE_AND_UPDATE",
 		},
 		data: ({ data }: any) => data,
-		async: false,
 	};
 
 	const [update] = useDataMutation(trackedEntityAttributesMutation, {
 		onError: (error) => {
 			show({
 				message: `Could not update: ${error}`,
-				type: { info: true },
+				type: { critical: true },
 			});
 		},
 	});
@@ -85,27 +84,21 @@ export function useAssignDevice() {
 				  );
 		const updatedTei = {
 			attributes: updatedAttributes,
-			trackedEntity,
-			trackedEntityType,
+			trackedEntityInstance,
 			orgUnit,
 		};
 
 		if (data) {
 			const res = await update({
-				data: { trackedEntities: [updatedTei] },
+				data: { trackedEntityInstances: [updatedTei] },
 			});
 
 			return {
-				updated:
-					res?.bundleReport.typeReportMap.TRACKED_ENTITY.stats
-						.updated,
+				updated: res?.response.importSummaries[0].importCount.updated,
 
-				ignored:
-					res?.bundleReport.typeReportMap.TRACKED_ENTITY.stats
-						.ignored,
+				ignored: res?.response.importSummaries[0].importCount.ignored,
 
-				error: res?.bundleReport.typeReportMap.TRACKED_ENTITY
-					.objectReports[0].errorReports,
+				error: res?.response.importSummaries[0].conflicts,
 			};
 		}
 	};
@@ -134,8 +127,73 @@ export function useAssignDevice() {
 			);
 			loading = false;
 
-			return { response: response, error: null, loading };
-		} catch (error) {
+			return {
+				response: response,
+				error: null,
+				loading,
+			};
+		} catch (error: any) {
+			loading = false;
+			return { response: null, error, loading };
+		}
+	};
+
+	const handleUnassignDevice = async () => {
+		const updatedAttributes =
+			attributeIndex === -1
+				? [
+						...patientTei!.attributes,
+						{
+							attribute: DEVICE_IMEI,
+							value: null,
+						},
+				  ]
+				: patientTei!.attributes.map((attribute, index) =>
+						index === attributeIndex
+							? { ...attribute, value: null }
+							: attribute,
+				  );
+		const updatedTei = {
+			attributes: updatedAttributes,
+			trackedEntityInstance,
+			orgUnit,
+		};
+
+		const res = (await update({
+			data: { trackedEntityInstances: [updatedTei] },
+		})) as any;
+
+		return {
+			updated: res?.response.importSummaries[0].importCount.updated,
+			ignored: res?.response.importSummaries[0].importCount.ignored,
+			error: res?.response.importSummaries[0].conflicts,
+		};
+	};
+
+	const handleUnassignDeviceFromWisepill = async ({
+		imei,
+	}: {
+		imei: string;
+	}) => {
+		let loading = true;
+		try {
+			const response = await axios.put(
+				`${MediatorUrl}/api/devices/unassign?imei=${imei}`,
+				{},
+				{
+					headers: {
+						"x-api-key": ApiKey,
+					},
+				},
+			);
+			loading = false;
+
+			return {
+				response: response,
+				error: null,
+				loading,
+			};
+		} catch (error: any) {
 			loading = false;
 			return { response: null, error, loading };
 		}
@@ -144,5 +202,7 @@ export function useAssignDevice() {
 	return {
 		assignDevice: handleAssignDevice,
 		assignDeviceWisePill: handleAssignDeviceToWisepill,
+		unassignDevice: handleUnassignDevice,
+		unassignDeviceWisePill: handleUnassignDeviceFromWisepill,
 	};
 }

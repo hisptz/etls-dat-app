@@ -9077,6 +9077,7 @@ export type TrackedEntity = {
 	programOwners: Array<WebapiControllerTrackerView_ProgramOwner>;
 	storedBy: string;
 	trackedEntity: string;
+	trackedEntityInstance: string;
 	trackedEntityType: string;
 	updatedAt: string | number;
 	updatedAtClient: string | number;
@@ -10309,6 +10310,7 @@ export type WebapiControllerTrackerViewRelationshipItem_Enrollment = {
 	createdBy: WebapiControllerTrackerView_User;
 	deleted: boolean;
 	enrolledAt: string | number;
+	enrollmentDate: string | number;
 	enrollment: string;
 	events: Array<WebapiControllerTrackerViewRelationshipItem_Event>;
 	followUp: boolean;

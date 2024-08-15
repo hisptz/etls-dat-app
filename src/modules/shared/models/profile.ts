@@ -22,7 +22,7 @@ export class PatientProfile extends TrackedEntityModel {
 	}
 
 	get id(): string {
-		return this.trackedEntity as string;
+		return this.trackedEntityInstance as string;
 	}
 
 	get name() {
@@ -56,9 +56,9 @@ export class PatientProfile extends TrackedEntityModel {
 
 	get enrollmentDate(): string {
 		return (
-			DateTime.fromISO(this.enrollment?.enrolledAt as string).toFormat(
-				"dd/LL/yyyy",
-			) ?? ""
+			DateTime.fromISO(
+				this.enrollment?.enrollmentDate as string,
+			).toFormat("dd/LL/yyyy") ?? ""
 		);
 	}
 
@@ -84,18 +84,16 @@ export class PatientProfile extends TrackedEntityModel {
 
 	getRegimenFromDataElements(): string {
 		let regimen = "";
-
 		const regimenEvents = (
 			this.programMapping?.regimenProgramStages ?? []
 		).map((programStage) => {
-			return this.getLatestEvent(programStage);
+			return this.getLatestEvent(programStage) ?? {};
 		});
-
 		const latestRegimenEvent = head(
 			(regimenEvents ?? []).sort((a: any, b: any) => {
 				return (
-					new Date(b.occurredAt).getTime() -
-					new Date(a.occurredAt).getTime()
+					new Date(b.eventDate).getTime() -
+					new Date(a.eventDate).getTime()
 				);
 			}),
 		);
