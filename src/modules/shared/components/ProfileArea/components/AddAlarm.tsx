@@ -11,11 +11,11 @@ import {
 	Checkbox,
 } from "@dhis2/ui";
 import i18n from "@dhis2/d2-i18n";
-import { FilterField } from "../../../Configuration/components/ProgramMapping/components/FilterField";
+import { FilterField } from "../../../../Configuration/components/ProgramMapping/components/FilterField";
 import { FormProvider, useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { useSetAlarm } from "../utils/assignAlarm";
+import { useSetAlarm } from "../../utils/assignAlarm";
 import { useAlert } from "@dhis2/app-runtime";
 import { DateTime } from "luxon";
 

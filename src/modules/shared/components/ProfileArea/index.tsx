@@ -4,6 +4,7 @@ import {
 	Button,
 	IconEdit24,
 	IconAdd24,
+	IconDelete24,
 	Card,
 	ButtonStrip,
 	IconClock24,
@@ -17,6 +18,7 @@ import { DateTime } from "luxon";
 import BatteryLevel from "../BatteryLevel/BatteryLevel";
 import DoseStatus from "../doseStatus/doseStatus";
 import AdherenceCalendar from "../adherenceCalendar/adherenceCalendar";
+import RemoveDeviceModal from "./components/RemoveDevice";
 
 export interface ProfileAreaProps {
 	profile: PatientProfile;
@@ -34,9 +36,9 @@ export function ProfileArea({
 	loading,
 }: ProfileAreaProps) {
 	const [hide, setHideDevice] = useState<boolean>(true);
-	const [hideAlarmButton, setHideAlarmButton] = useState<boolean>(true);
-	const [hideRemoveDeviceButton, setHideRemoveDeviceButton] =
+	const [hideDeviceUnassignButton, setHideDeviceUnassignbutton] =
 		useState<boolean>(true);
+	const [hideAlarmButton, setHideAlarmButton] = useState<boolean>(true);
 	const [nextRefillDate, setNextRefillDate] = useState<string>("");
 	const [nextRefillTime, setNextRefillTime] = useState<string>("");
 	const [nextDoseTime, setNextDoseTime] = useState<string>("");
@@ -246,6 +248,17 @@ export function ProfileArea({
 						}}
 					>
 						<ButtonStrip>
+							{profile.deviceIMEINumber !== "N/A" && (
+								<Button
+									small
+									onClick={() => {
+										setHideDeviceUnassignbutton(false);
+									}}
+									icon={<IconDelete24 />}
+								>
+									{i18n.t("Remove Device")}
+								</Button>
+							)}
 							<Button
 								secondary
 								small
@@ -458,6 +471,20 @@ export function ProfileArea({
 					refetch={refetch}
 					hide={hide}
 					onHide={onHide}
+				/>
+			)}
+			{!hideDeviceUnassignButton && (
+				<RemoveDeviceModal
+					patientName={profile.name}
+					imei={profile.deviceIMEINumber}
+					hide={hideDeviceUnassignButton}
+					onClose={() => {
+						setHideDeviceUnassignbutton(true);
+					}}
+					onConfirm={() => {
+						setHideDeviceUnassignbutton(true);
+					}}
+					refetch={refetchDevice}
 				/>
 			)}
 			{!hideAlarmButton && (
