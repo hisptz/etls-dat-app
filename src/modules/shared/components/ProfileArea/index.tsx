@@ -433,7 +433,7 @@ export function ProfileArea({
 					height: "auto",
 				}}
 			>
-				{profile.deviceIMEINumber !== "N/A" && (
+				{profile.adherenceEpisode !== "" && (
 					<Card>
 						<div style={{ padding: "12px 32px 12px 32px" }}>
 							<div

@@ -148,7 +148,7 @@ function AdherenceCalendar({ profile, data }: ProfileAreaProps) {
 					padding: "32px",
 				}}
 			>
-				{profile.deviceIMEINumber == "N/A" ? (
+				{profile.adherenceEpisode == "N/A" ? (
 					<NoDeviceAssigned
 						title={i18n.t("Missing Dose Data")}
 						message={
