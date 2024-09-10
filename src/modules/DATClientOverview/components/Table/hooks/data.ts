@@ -230,6 +230,7 @@ export function useDATClientTableData() {
 	// 	}
 	// }, []);
 
+	// TODO use deprecated tracker API
 	const { download, downloading } = useDownloadData({
 		resource: "tracker/trackedEntities",
 		query: query,
