@@ -7,9 +7,11 @@ import { useSetting } from "@dhis2/app-service-datastore";
 import { useSearchParams } from "react-router-dom";
 import { PatientProfile } from "../../models";
 import { getProgramMapping } from "../../utils";
-import { useAdherenceEvents } from "../ProfileArea/utils";
+import { useActualCurrentDate, useAdherenceEvents } from "../ProfileArea/utils";
 import NoDeviceAssigned from "../ProfileArea/components/NoDeviceAssigned";
 import BatteryLevel from "../BatteryLevel/BatteryLevel";
+import { CircularLoader } from "@dhis2/ui";
+import { Center } from "@dhis2/ui";
 
 export interface ProfileAreaProps {
 	profile: PatientProfile;
@@ -17,6 +19,7 @@ export interface ProfileAreaProps {
 }
 
 function AdherenceCalendar({ profile, data }: ProfileAreaProps) {
+	const { date: actualDate } = useActualCurrentDate();
 	const [programMapping] = useSetting("programMapping", {
 		global: true,
 	});
@@ -130,16 +133,25 @@ function AdherenceCalendar({ profile, data }: ProfileAreaProps) {
 					marginRight: "12px",
 				}}
 			>
-				<Calendar
-					events={events}
-					frequency={profile.adherenceFrequency}
-					onClick={(val) => {
-						setBatteryLevel(val.batteryLevel);
-						setFormattedDateWithTime(formatDateWithTime(val.date));
-						setFormattedDate(formatDate(val.date));
-						setEventCode(val.event);
-					}}
-				/>
+				{actualDate == null ? (
+					<Center>
+						<CircularLoader />
+					</Center>
+				) : (
+					<Calendar
+						events={events}
+						frequency={profile.adherenceFrequency}
+						onClick={(val) => {
+							setBatteryLevel(val.batteryLevel);
+							setFormattedDateWithTime(
+								formatDateWithTime(val.date),
+							);
+							setFormattedDate(formatDate(val.date));
+							setEventCode(val.event);
+						}}
+						actualDate={actualDate}
+					/>
+				)}
 			</div>
 			<div
 				style={{
